@@ -1,0 +1,4935 @@
+{
+  "version": "3.4",
+  "log": [
+    {
+      "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker": {
+        "src": "@excubiae\\contracts\\contracts\\checker\\BaseChecker.sol:11",
+        "inherit": [
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "check(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarChecker.sol:AnonAadhaarChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarChecker.sol:10",
+        "version": {
+          "withMetadata": "2694b1fbed87c126dd2616acff7b6d03232382108bdc25143136d91bce140cd6",
+          "withoutMetadata": "dc7670344985257b4c14d914313fbbc3c0b092abc5b38407fc5debd683b698d2",
+          "linkedWithoutMetadata": "dc7670344985257b4c14d914313fbbc3c0b092abc5b38407fc5debd683b698d2"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AnonAadhaarChecker",
+              "label": "anonAadhaarContract",
+              "type": "t_contract(IAnonAadhaar)417",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarChecker.sol:12"
+            },
+            {
+              "contract": "AnonAadhaarChecker",
+              "label": "nullifierSeed",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarChecker.sol:15"
+            }
+          ],
+          "types": {
+            "t_contract(IAnonAadhaar)417": {
+              "label": "contract IAnonAadhaar"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarCheckerFactory.sol:AnonAadhaarCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "322761cece28126e8517901973350d1b5c9d37e10cdac8f09eb10174a6c1def5",
+          "withoutMetadata": "ab8bf3bc4457e2fe7fcf1dcc222cf32065927d5afb79334c77f9f4fb0162ca1c",
+          "linkedWithoutMetadata": "ab8bf3bc4457e2fe7fcf1dcc222cf32065927d5afb79334c77f9f4fb0162ca1c"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "AnonAadhaarCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarCheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicy.sol:AnonAadhaarPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicy.sol:11",
+        "version": {
+          "withMetadata": "3066df54b4285052bf571b3cf3380892f615dbf66a9a8056fd26632d5fc824f2",
+          "withoutMetadata": "d2efd12285aee7618edf6f3781446df1bb0a9a14c42f1f89ca8eeb304ff01794",
+          "linkedWithoutMetadata": "d2efd12285aee7618edf6f3781446df1bb0a9a14c42f1f89ca8eeb304ff01794"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AnonAadhaarPolicy",
+              "label": "enforcedAadhaars",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicy.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicyFactory.sol:AnonAadhaarPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "5ebdb833dedd0177edbc304c11b8b9655dc7e5901bcb9da5ac7896adaa1f597a",
+          "withoutMetadata": "1bc8a06321f3a90881a43cff4d1fb28bb8b93c27404596e4a238c914e5a81f08",
+          "linkedWithoutMetadata": "1bc8a06321f3a90881a43cff4d1fb28bb8b93c27404596e4a238c914e5a81f08"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "AnonAadhaarPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/anonAadhaar/IAnonAadhaar.sol:IAnonAadhaar": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\IAnonAadhaar.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "verifyAnonAadhaarProof(uint256,uint256,uint256,uint256,uint256[4],uint256[8])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/eas/EASChecker.sol:EASChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASChecker.sol:10",
+        "version": {
+          "withMetadata": "61f2366e6a1bc10c11126ec98d090411fe67e47e311bad3af75da1f369826754",
+          "withoutMetadata": "420131f7906ef654e9fa7ebca1854730cce0816c1455270f0e9935e61840571c",
+          "linkedWithoutMetadata": "420131f7906ef654e9fa7ebca1854730cce0816c1455270f0e9935e61840571c"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "EASChecker",
+              "label": "eas",
+              "type": "t_contract(IEAS)785",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASChecker.sol:12"
+            },
+            {
+              "contract": "EASChecker",
+              "label": "schema",
+              "type": "t_bytes32",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASChecker.sol:15"
+            },
+            {
+              "contract": "EASChecker",
+              "label": "attester",
+              "type": "t_address",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASChecker.sol:18"
+            }
+          ],
+          "types": {
+            "t_contract(IEAS)785": {
+              "label": "contract IEAS"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/eas/EASCheckerFactory.sol:EASCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "60c399f07a9f5b90fc7bd5881648e75af22db31059d08fcd94473537d1b035fd",
+          "withoutMetadata": "98c16fa48fab4b0dbd32ccc827ead429a6fe102d464d2f093704c733d0635f2e",
+          "linkedWithoutMetadata": "98c16fa48fab4b0dbd32ccc827ead429a6fe102d464d2f093704c733d0635f2e"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,address,bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "EASCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASCheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/eas/EASPolicy.sol:EASPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicy.sol:9",
+        "version": {
+          "withMetadata": "370f64c3462255d9c9b8aa05d6130ea44dab5e68150715e6bee41bfcbf67e55d",
+          "withoutMetadata": "d6ab1be9cda9bf280cb1d1a1c0c4cc58e90656a71c956b2d9592205f7df452fb",
+          "linkedWithoutMetadata": "d6ab1be9cda9bf280cb1d1a1c0c4cc58e90656a71c956b2d9592205f7df452fb"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "EASPolicy",
+              "label": "enforcedAttestations",
+              "type": "t_mapping(t_bytes32,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicy.sol:11"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_bool)": {
+              "label": "mapping(bytes32 => bool)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/eas/EASPolicyFactory.sol:EASPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "70c5533a736b8c45430728fd2b6702c48f6f0c9236101d5588905685fb245932",
+          "withoutMetadata": "b361e1fecdacefb18bf0f3efc9ce0f6435bb1cc346873d2076401a922023787c",
+          "linkedWithoutMetadata": "b361e1fecdacefb18bf0f3efc9ce0f6435bb1cc346873d2076401a922023787c"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "EASPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/eas/IEAS.sol:IEAS": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\eas\\IEAS.sol:6",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getAttestation(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/erc20/ERC20Checker.sol:ERC20Checker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20Checker.sol:11",
+        "version": {
+          "withMetadata": "4c2c1c890a1ba3474bed426892f1baf650001686edd9939a9b777bcd137e7cd0",
+          "withoutMetadata": "499376ea4669536f562d7a59608eb043e3b3b1ab0f7ce62845349f0252292be1",
+          "linkedWithoutMetadata": "499376ea4669536f562d7a59608eb043e3b3b1ab0f7ce62845349f0252292be1"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20Checker",
+              "label": "token",
+              "type": "t_contract(IERC20)5486",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20Checker.sol:13"
+            },
+            {
+              "contract": "ERC20Checker",
+              "label": "threshold",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20Checker.sol:16"
+            }
+          ],
+          "types": {
+            "t_contract(IERC20)5486": {
+              "label": "contract IERC20"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/erc20/ERC20CheckerFactory.sol:ERC20CheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20CheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "cf1a6fa8304b69d6af3d5fcaba540b029b7b3d6f50fdab3749466d5a11a485ae",
+          "withoutMetadata": "eb739652952f3276da0c5cea7e15769dff72be801fe7ead7957e564062dd0707",
+          "linkedWithoutMetadata": "eb739652952f3276da0c5cea7e15769dff72be801fe7ead7957e564062dd0707"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20CheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20CheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/erc20/ERC20Policy.sol:ERC20Policy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20Policy.sol:8",
+        "version": {
+          "withMetadata": "8c630ffb0d9d3501e9f5d41cdfa7ea871ac8f5d6a2e7ec0835a0b95ad09246fd",
+          "withoutMetadata": "a3e01002ee9a89333885a2f192b59d66d3ca69be428318607971a2ace0e80743",
+          "linkedWithoutMetadata": "a3e01002ee9a89333885a2f192b59d66d3ca69be428318607971a2ace0e80743"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20Policy",
+              "label": "enforcedUsers",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20Policy.sol:10"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/erc20/ERC20PolicyFactory.sol:ERC20PolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20PolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "a68f717bd0783a7e0abcee3bd90f105879805db3c628230c6daab5682989685c",
+          "withoutMetadata": "58000dcbb53d0864e5246e0267e54a4b3018cf14b13e2962694bd3111f374fba",
+          "linkedWithoutMetadata": "58000dcbb53d0864e5246e0267e54a4b3018cf14b13e2962694bd3111f374fba"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20PolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20PolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesChecker.sol:ERC20VotesChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesChecker.sol:11",
+        "version": {
+          "withMetadata": "07854e961cdc06d714d033e58e8f65564916e982719b389ea7f7b4b021d49f8a",
+          "withoutMetadata": "5c9a3acea69be59b48167d0792bbdbed2cdb3cee95dc1b3b8f2cc5a64035f6b3",
+          "linkedWithoutMetadata": "5c9a3acea69be59b48167d0792bbdbed2cdb3cee95dc1b3b8f2cc5a64035f6b3"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20VotesChecker",
+              "label": "token",
+              "type": "t_contract(IVotes)4756",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesChecker.sol:13"
+            },
+            {
+              "contract": "ERC20VotesChecker",
+              "label": "snapshotBlock",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesChecker.sol:16"
+            },
+            {
+              "contract": "ERC20VotesChecker",
+              "label": "threshold",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesChecker.sol:19"
+            }
+          ],
+          "types": {
+            "t_contract(IVotes)4756": {
+              "label": "contract IVotes"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesCheckerFactory.sol:ERC20VotesCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "6990663010c1ea64e3a8134461ee315a864e2cce80dc866b3dac5902ae74d8c4",
+          "withoutMetadata": "99332f2604ae15499db84b0b2682a5605e999a0d2e39b15a5f8ec08960cba5ec",
+          "linkedWithoutMetadata": "99332f2604ae15499db84b0b2682a5605e999a0d2e39b15a5f8ec08960cba5ec"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20VotesCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesCheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicy.sol:ERC20VotesPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicy.sol:9",
+        "version": {
+          "withMetadata": "c35ec995da3e0223b896e6cc353482017c6642b714f97dafab3692b182b3679d",
+          "withoutMetadata": "42926caefd80e9908ec6721a6e2fb180a24cefc0f25a736b8809ec1177962ff6",
+          "linkedWithoutMetadata": "42926caefd80e9908ec6721a6e2fb180a24cefc0f25a736b8809ec1177962ff6"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20VotesPolicy",
+              "label": "enforcedUsers",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicy.sol:11"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicyFactory.sol:ERC20VotesPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "dad9666a03bad43c1078312c5b3622f7b2bf43f0b2bfdfe0b68dcd3305cf5cba",
+          "withoutMetadata": "a9a7bcd7e5cf093268463f4e353d316cb6d0b0543a0f91362a5e5bd487d04aff",
+          "linkedWithoutMetadata": "a9a7bcd7e5cf093268463f4e353d316cb6d0b0543a0f91362a5e5bd487d04aff"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20VotesPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllChecker.sol:FreeForAllChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllChecker.sol:9",
+        "version": {
+          "withMetadata": "77fc17a342d5f55ac5413e5f35652c50955eab052c2b10d974f079f9afef2a4a",
+          "withoutMetadata": "607e4ae4d7d3fa8a76f4dc63191c850b2dfff710ace09ee0a846db3eeb1c6f42",
+          "linkedWithoutMetadata": "607e4ae4d7d3fa8a76f4dc63191c850b2dfff710ace09ee0a846db3eeb1c6f42"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllCheckerFactory.sol:FreeForAllCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "8be0bfefd8522d7f0294f7662af3afe88b625a51f4634461b6ab0a5f50d8ca7a",
+          "withoutMetadata": "b3bddb8ee43f1ca96bfe007f40115379f01b24f21fe836de2fb9edc99d731350",
+          "linkedWithoutMetadata": "b3bddb8ee43f1ca96bfe007f40115379f01b24f21fe836de2fb9edc99d731350"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy()"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "FreeForAllCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllCheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllPolicy.sol:FreeForAllPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllPolicy.sol:8",
+        "version": {
+          "withMetadata": "2dd3a5394e2fcb8e0576d5f420ad1cac14b7ce4b359dc75ed2c2dfcbd8729e70",
+          "withoutMetadata": "4a2766f6ca24dbbf97fd94bbf257b2edbe5d99d0fd416f3c8ca90c0a144def4b",
+          "linkedWithoutMetadata": "4a2766f6ca24dbbf97fd94bbf257b2edbe5d99d0fd416f3c8ca90c0a144def4b"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllPolicyFactory.sol:FreeForAllPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "66b11f8b2656775d5989d831e058eb589480ad625da7ba32a10c2f5560bcf7e8",
+          "withoutMetadata": "d7fdaf407d646f2e594e85eea1ca1a032eb6f1c0f23f6c321e5a0b4dc920b2cd",
+          "linkedWithoutMetadata": "d7fdaf407d646f2e594e85eea1ca1a032eb6f1c0f23f6c321e5a0b4dc920b2cd"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "FreeForAllPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportChecker.sol:GitcoinPassportChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportChecker.sol:10",
+        "version": {
+          "withMetadata": "229a32c155c3a7175a1c312e8535be65c51268447ded3e6132052697db7987c5",
+          "withoutMetadata": "2b552de83923295752d5f4eba44965682b0cfe4f182d4fdda042293e924ec198",
+          "linkedWithoutMetadata": "2b552de83923295752d5f4eba44965682b0cfe4f182d4fdda042293e924ec198"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "GitcoinPassportChecker",
+              "label": "passportDecoder",
+              "type": "t_contract(IGitcoinPassportDecoder)1810",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportChecker.sol:12"
+            },
+            {
+              "contract": "GitcoinPassportChecker",
+              "label": "thresholdScore",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportChecker.sol:15"
+            }
+          ],
+          "types": {
+            "t_contract(IGitcoinPassportDecoder)1810": {
+              "label": "contract IGitcoinPassportDecoder"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportCheckerFactory.sol:GitcoinPassportCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "bda4493f2078c578a5e4d1ed1df024a4aa5ced0bc09f3dee8ff5ff48aa3804e8",
+          "withoutMetadata": "c75bf62bfdf2916490b953fe6659c398235f5865178a44ece59191346598e217",
+          "linkedWithoutMetadata": "c75bf62bfdf2916490b953fe6659c398235f5865178a44ece59191346598e217"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "GitcoinPassportCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportCheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportPolicy.sol:GitcoinPassportPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicy.sol:10",
+        "version": {
+          "withMetadata": "e1a5a887cbc78a3140a3b87bfd52787ce34bc48b27ee0ae73699100aaa63b4a0",
+          "withoutMetadata": "2e156cf4c0fcc0a8bf86118eba61fb3f413a4cc5123d8a93eef415b08cedf19d",
+          "linkedWithoutMetadata": "2e156cf4c0fcc0a8bf86118eba61fb3f413a4cc5123d8a93eef415b08cedf19d"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "GitcoinPassportPolicy",
+              "label": "enforcedUsers",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicy.sol:12"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportPolicyFactory.sol:GitcoinPassportPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "0d9fbf94c895f711802e9a86fb1025edc8111921efa400439223a0db7ebbec37",
+          "withoutMetadata": "43d7b654cab2b84319c978bae8dcfc4d541a0f45f0da821ac7c901b385553882",
+          "linkedWithoutMetadata": "43d7b654cab2b84319c978bae8dcfc4d541a0f45f0da821ac7c901b385553882"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "GitcoinPassportPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/gitcoin/IGitcoinPassportDecoder.sol:IGitcoinPassportDecoder": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\gitcoin\\IGitcoinPassportDecoder.sol:14",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getPassport(address)",
+          "getScore(address)",
+          "isHuman(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/hats/HatsChecker.sol:HatsChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsChecker.sol:10",
+        "version": {
+          "withMetadata": "e0abf4869bcc1a3943cc5ce32e00d999b0ece1b3f79300dadbb06b8ea0369399",
+          "withoutMetadata": "27510cf18be33e1aa967632ab29866e71bc99e931bbc7d2584dc37d465425ee1",
+          "linkedWithoutMetadata": "27510cf18be33e1aa967632ab29866e71bc99e931bbc7d2584dc37d465425ee1"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "HatsChecker",
+              "label": "hats",
+              "type": "t_contract(IHats)2173",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsChecker.sol:12"
+            },
+            {
+              "contract": "HatsChecker",
+              "label": "criterionHats",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsChecker.sol:15"
+            }
+          ],
+          "types": {
+            "t_contract(IHats)2173": {
+              "label": "contract IHats"
+            },
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/hats/HatsCheckerFactory.sol:HatsCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "41e00508922df8b06cb76f53d1c808e909cd660f7fd6be0d5805ac11c4976102",
+          "withoutMetadata": "1d974234b752089dd84fb8192e1f7e49e186691c1bf34b49cbcad83cd2af4113",
+          "linkedWithoutMetadata": "1d974234b752089dd84fb8192e1f7e49e186691c1bf34b49cbcad83cd2af4113"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,uint256[])"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "HatsCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsCheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/hats/HatsPolicy.sol:HatsPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicy.sol:10",
+        "version": {
+          "withMetadata": "923dd63b33f6b8040eddbd009b9b9a40193189ab4b4932049b6546019160692a",
+          "withoutMetadata": "e331d1f248db0c3253780dc0403249a9a298a1111d4f00c0b16217df5179b749",
+          "linkedWithoutMetadata": "e331d1f248db0c3253780dc0403249a9a298a1111d4f00c0b16217df5179b749"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "HatsPolicy",
+              "label": "enforced",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicy.sol:12"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/hats/HatsPolicyFactory.sol:HatsPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "90edc587f9fa6a31983819464a2c09a76ff2c46c4ac0e0717a7665a507cae73d",
+          "withoutMetadata": "3569e135a0e30ce645d0e975adc344603dd7a5c1d4d8c1768b33b8c514140735",
+          "linkedWithoutMetadata": "3569e135a0e30ce645d0e975adc344603dd7a5c1d4d8c1768b33b8c514140735"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "HatsPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/hats/IHats.sol:IHats": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\hats\\IHats.sol:7",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "mintTopHat(address,string,string)",
+          "createHat(uint256,string,uint32,address,address,bool,string)",
+          "mintHat(uint256,address)",
+          "isWearerOfHat(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/merkle/MerkleProofChecker.sol:MerkleProofChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofChecker.sol:11",
+        "version": {
+          "withMetadata": "b411a721ab0dafd131be848ae55cab64e79c013c1a084bfb8953b433192ee28f",
+          "withoutMetadata": "115cfeafce6e202369f4cbcc593881e9dcfa4b2fe583ac575399d9c17f498c84",
+          "linkedWithoutMetadata": "115cfeafce6e202369f4cbcc593881e9dcfa4b2fe583ac575399d9c17f498c84"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MerkleProofChecker",
+              "label": "root",
+              "type": "t_bytes32",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofChecker.sol:13"
+            }
+          ],
+          "types": {
+            "t_bytes32": {
+              "label": "bytes32"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/merkle/MerkleProofCheckerFactory.sol:MerkleProofCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "856ad158d790f7c6c96d5646d019f0133707de122e9d454f1d8f402691ddb98a",
+          "withoutMetadata": "92eae3e68512c79b8927e55c6459b001deeb3d8e9cb7284a8f31efaaae765cce",
+          "linkedWithoutMetadata": "92eae3e68512c79b8927e55c6459b001deeb3d8e9cb7284a8f31efaaae765cce"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MerkleProofCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofCheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/merkle/MerkleProofPolicy.sol:MerkleProofPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicy.sol:11",
+        "version": {
+          "withMetadata": "cb9492844aa6bcf45c43026a3462cb0a006362b6bc733a4657f39a7eed52ff9c",
+          "withoutMetadata": "3d76c3c9c700deefcd983b45958877943a3309218c476a34d2e3cab863b70255",
+          "linkedWithoutMetadata": "3d76c3c9c700deefcd983b45958877943a3309218c476a34d2e3cab863b70255"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MerkleProofPolicy",
+              "label": "enforcedAddresses",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicy.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/merkle/MerkleProofPolicyFactory.sol:MerkleProofPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "cd4a7b1bfd47fc64700372fbf0519b09b2e604b54c16b6a8b0649654da380865",
+          "withoutMetadata": "a6c24b030ff8a407e0de2f5dedc10ac430d2524de4fb1d59e051a4918e7db7ee",
+          "linkedWithoutMetadata": "a6c24b030ff8a407e0de2f5dedc10ac430d2524de4fb1d59e051a4918e7db7ee"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MerkleProofPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/semaphore/ISemaphore.sol:ISemaphore": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\ISemaphore.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "verifyProof(uint256,(uint256,uint256,uint256,uint256,uint256,uint256[8]))"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreChecker.sol:SemaphoreChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreChecker.sol:11",
+        "version": {
+          "withMetadata": "9c55273e5d8c09d41107783d9605fb75a4809b60fd69dc8834ebd7670ec9630c",
+          "withoutMetadata": "81b599aabc14cc4455833c372c66c2ae6c9f7974cf1600bf2afdd8b314f08683",
+          "linkedWithoutMetadata": "81b599aabc14cc4455833c372c66c2ae6c9f7974cf1600bf2afdd8b314f08683"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SemaphoreChecker",
+              "label": "semaphore",
+              "type": "t_contract(ISemaphore)2492",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreChecker.sol:13"
+            },
+            {
+              "contract": "SemaphoreChecker",
+              "label": "groupId",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreChecker.sol:17"
+            }
+          ],
+          "types": {
+            "t_contract(ISemaphore)2492": {
+              "label": "contract ISemaphore"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreCheckerFactory.sol:SemaphoreCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "efeb0fc753fdc66a7cff1af24acf71765626984fea5d023e0aef15d65bd60abb",
+          "withoutMetadata": "856a10bb2a12e13251ee1e55836670a1589038c4a6ebd848b76a40dd202f8af7",
+          "linkedWithoutMetadata": "856a10bb2a12e13251ee1e55836670a1589038c4a6ebd848b76a40dd202f8af7"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SemaphoreCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreCheckerFactory.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/semaphore/SemaphorePolicy.sol:SemaphorePolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphorePolicy.sol:13",
+        "version": {
+          "withMetadata": "6565a17dead5d9ed7dd5a131a5b11b8142f42922358e26ed0e883a2494780d58",
+          "withoutMetadata": "483232c94dd3589a949c8ed1bcf58f33c6d96b59ace18e8fdf64326ca948f275",
+          "linkedWithoutMetadata": "483232c94dd3589a949c8ed1bcf58f33c6d96b59ace18e8fdf64326ca948f275"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SemaphorePolicy",
+              "label": "spentNullifiers",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphorePolicy.sol:15"
+            }
+          ],
+          "types": {
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/semaphore/SemaphorePolicyFactory.sol:SemaphorePolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphorePolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "1f0872d024308cd2d3f407b0212f41dff8d9565369121caa4f0f8ef78c3f9d84",
+          "withoutMetadata": "ab9ac36bc6f71532400ee549774151802461a80952cdcc022f611f010f52ee8b",
+          "linkedWithoutMetadata": "ab9ac36bc6f71532400ee549774151802461a80952cdcc022f611f010f52ee8b"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SemaphorePolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphorePolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/token/TokenChecker.sol:TokenChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\token\\TokenChecker.sol:11",
+        "version": {
+          "withMetadata": "5945b45737a49e79f168da1db4f73746fd52869d591f0796e4fa67ba864b9f8d",
+          "withoutMetadata": "71d0588d16f87cc550ea8225f3b3f9a9cae0fe803766a280ad2fd31c714ceb99",
+          "linkedWithoutMetadata": "71d0588d16f87cc550ea8225f3b3f9a9cae0fe803766a280ad2fd31c714ceb99"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TokenChecker",
+              "label": "token",
+              "type": "t_contract(ERC721)6469",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\token\\TokenChecker.sol:13"
+            }
+          ],
+          "types": {
+            "t_contract(ERC721)6469": {
+              "label": "contract ERC721"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/token/TokenCheckerFactory.sol:TokenCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\token\\TokenCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "a9e3c05d1a4c45ebd00f5c34b38b6b38d4bd761690d091f4414d4e52d65da275",
+          "withoutMetadata": "70eaea9b3af87b24cb6ad4db06582dd593ddf3618a00ff8c1d3e158cba54d1f1",
+          "linkedWithoutMetadata": "70eaea9b3af87b24cb6ad4db06582dd593ddf3618a00ff8c1d3e158cba54d1f1"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TokenCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\token\\TokenCheckerFactory.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/token/TokenPolicy.sol:TokenPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\token\\TokenPolicy.sol:11",
+        "version": {
+          "withMetadata": "a983aad8ac97fd9a644579270e8e761fbcc56c42fb6fd0741dcffc64eaf540bd",
+          "withoutMetadata": "5a95d8d251da2b50e1b75fbdcaa2f6323c847bd2ba1e23a861c75f474882abea",
+          "linkedWithoutMetadata": "5a95d8d251da2b50e1b75fbdcaa2f6323c847bd2ba1e23a861c75f474882abea"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TokenPolicy",
+              "label": "enforcedTokenIds",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\token\\TokenPolicy.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/token/TokenPolicyFactory.sol:TokenPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\token\\TokenPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "acce24affd48ba40c45e0a6a90057f4042e062ffd12da3f97ea1411072f0b5d8",
+          "withoutMetadata": "628e0bfac6fe48734b5e70332708d387eeac54a9d26b0083b666d950a9549a7e",
+          "linkedWithoutMetadata": "628e0bfac6fe48734b5e70332708d387eeac54a9d26b0083b666d950a9549a7e"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TokenPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\token\\TokenPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/zupass/ZupassChecker.sol:ZupassChecker": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassChecker.sol:10",
+        "version": {
+          "withMetadata": "bef8cd143565907ef56a1cfa7d35bb8225d10e3aee960bb057db0be947ea95ed",
+          "withoutMetadata": "ee3440c5ee2e1fa22b8b6844a8ee003ff86ae9f5edd2f3f904746f3db1cbe2d3",
+          "linkedWithoutMetadata": "ee3440c5ee2e1fa22b8b6844a8ee003ff86ae9f5edd2f3f904746f3db1cbe2d3"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/checker/BaseChecker.sol:BaseChecker",
+          "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ZupassChecker",
+              "label": "validEventId",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassChecker.sol:12"
+            },
+            {
+              "contract": "ZupassChecker",
+              "label": "validSigner1",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassChecker.sol:15"
+            },
+            {
+              "contract": "ZupassChecker",
+              "label": "validSigner2",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassChecker.sol:18"
+            },
+            {
+              "contract": "ZupassChecker",
+              "label": "verifier",
+              "type": "t_contract(ZupassGroth16Verifier)3698",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassChecker.sol:21"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_contract(ZupassGroth16Verifier)3698": {
+              "label": "contract ZupassGroth16Verifier"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/zupass/ZupassCheckerFactory.sol:ZupassCheckerFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassCheckerFactory.sol:10",
+        "version": {
+          "withMetadata": "a7a2d819792ef730180131054e3c3beeb218396e1700894e65198c75e0498e52",
+          "withoutMetadata": "233364b30e3b0490af29cbd3f5faba91da1d95df1fbad93c92c7da458411b1b2",
+          "linkedWithoutMetadata": "233364b30e3b0490af29cbd3f5faba91da1d95df1fbad93c92c7da458411b1b2"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(uint256,uint256,uint256,address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ZupassCheckerFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassCheckerFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/zupass/ZupassGroth16Verifier.sol:ZupassGroth16Verifier": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassGroth16Verifier.sol:23",
+        "version": {
+          "withMetadata": "7f8cbd6511faeabb04c350c08cdb058450f71ec21daaff6af274debddc51661f",
+          "withoutMetadata": "e72a4a544018c11951bb1afa799ceb780f70d84d0c55cf99b14b7ebbf80623ca",
+          "linkedWithoutMetadata": "e72a4a544018c11951bb1afa799ceb780f70d84d0c55cf99b14b7ebbf80623ca"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "verifyProof(uint256[2],uint256[2][2],uint256[2],uint256[38])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicy.sol:ZupassPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicy.sol:9",
+        "version": {
+          "withMetadata": "d65a200f1540c60d9004be80e36c01b01d9ccc8a292f6130fed89deda4a66219",
+          "withoutMetadata": "d01545124a7f1ae5f7ed6b6f74594a2f8597498209c49401656ef5611f47d018",
+          "linkedWithoutMetadata": "d01545124a7f1ae5f7ed6b6f74594a2f8597498209c49401656ef5611f47d018"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy",
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "trait()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ZupassPolicy",
+              "label": "enforcedTickets",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicy.sol:11"
+            }
+          ],
+          "types": {
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicyFactory.sol:ZupassPolicyFactory": {
+        "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicyFactory.sol:10",
+        "version": {
+          "withMetadata": "cb6ba059074cd81564be358028f3025c17f8afcb71477d62843595e4a151672b",
+          "withoutMetadata": "96e2e500448736b47b6595c38d8d4fc5be86cbf1397876944cd2d57e35ea884d",
+          "linkedWithoutMetadata": "96e2e500448736b47b6595c38d8d4fc5be86cbf1397876944cd2d57e35ea884d"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ZupassPolicyFactory",
+            "src": "@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicyFactory.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol:IBaseChecker": {
+        "src": "@excubiae\\contracts\\contracts\\interfaces\\IBaseChecker.sol:7",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "check(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy": {
+        "src": "@excubiae\\contracts\\contracts\\interfaces\\IBasePolicy.sol:9",
+        "inherit": [
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy"
+        ],
+        "libraries": [],
+        "methods": [
+          "enforce(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone": {
+        "src": "@excubiae\\contracts\\contracts\\interfaces\\IClone.sol:7",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "initialize()",
+          "getAppendedBytes()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory": {
+        "src": "@excubiae\\contracts\\contracts\\interfaces\\IFactory.sol:7",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy": {
+        "src": "@excubiae\\contracts\\contracts\\interfaces\\IPolicy.sol:7",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "trait()",
+          "setTarget(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/policy/BasePolicy.sol:BasePolicy": {
+        "src": "@excubiae\\contracts\\contracts\\policy\\BasePolicy.sol:11",
+        "inherit": [
+          "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol:IBasePolicy",
+          "@excubiae/contracts/contracts/policy/Policy.sol:Policy",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "enforce(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "BasePolicy",
+              "label": "BASE_CHECKER",
+              "type": "t_contract(BaseChecker)39",
+              "src": "@excubiae\\contracts\\contracts\\policy\\BasePolicy.sol:13"
+            }
+          ],
+          "types": {
+            "t_contract(BaseChecker)39": {
+              "label": "contract BaseChecker"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/policy/Policy.sol:Policy": {
+        "src": "@excubiae\\contracts\\contracts\\policy\\Policy.sol:11",
+        "inherit": [
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context",
+          "@excubiae/contracts/contracts/interfaces/IPolicy.sol:IPolicy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "setTarget(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Policy",
+              "label": "guarded",
+              "type": "t_address",
+              "src": "@excubiae\\contracts\\contracts\\policy\\Policy.sol:14"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/proxy/Clone.sol:Clone": {
+        "src": "@excubiae\\contracts\\contracts\\proxy\\Clone.sol:10",
+        "inherit": [
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "initialize()",
+          "getAppendedBytes()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Clone",
+              "label": "initialized",
+              "type": "t_bool",
+              "src": "@excubiae\\contracts\\contracts\\proxy\\Clone.sol:13"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/proxy/Factory.sol:Factory": {
+        "src": "@excubiae\\contracts\\contracts\\proxy\\Factory.sol:10",
+        "inherit": [
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Factory",
+            "src": "@excubiae\\contracts\\contracts\\proxy\\Factory.sol:17"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "IMPLEMENTATION",
+            "src": "@excubiae\\contracts\\contracts\\proxy\\Factory.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/test/extensions/mocks/MockAnonAadhaar.sol:MockAnonAadhaar": {
+        "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockAnonAadhaar.sol:8",
+        "version": {
+          "withMetadata": "da2d0b69398f293aebe2c815382fa18c2b2e3ed2c5dc69d0188a71c9cddefa88",
+          "withoutMetadata": "82670aa22abed021fa9233043a4b603665de94f4e660b67b9b38c20b2c078f84",
+          "linkedWithoutMetadata": "82670aa22abed021fa9233043a4b603665de94f4e660b67b9b38c20b2c078f84"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/extensions/anonAadhaar/IAnonAadhaar.sol:IAnonAadhaar"
+        ],
+        "libraries": [],
+        "methods": [
+          "flipValid()",
+          "verifyAnonAadhaarProof(uint256,uint256,uint256,uint256,uint256[4],uint256[8])"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "state-variable-assignment",
+            "name": "valid",
+            "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockAnonAadhaar.sol:9"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MockAnonAadhaar",
+              "label": "valid",
+              "type": "t_bool",
+              "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockAnonAadhaar.sol:9"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/test/extensions/mocks/MockEAS.sol:MockEAS": {
+        "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockEAS.sol:8",
+        "version": {
+          "withMetadata": "d56d096cbad8132c5fdb8f1aaa91edf7c566bf4363177f198fc438499dcd9704",
+          "withoutMetadata": "db3e3a99e6a17c9f6c565e7412f591bc28d32a8bae4b3df594aed76d872c0762",
+          "linkedWithoutMetadata": "db3e3a99e6a17c9f6c565e7412f591bc28d32a8bae4b3df594aed76d872c0762"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/extensions/eas/IEAS.sol:IEAS"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,bytes32,address)",
+          "getAttestation(bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MockEAS",
+            "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockEAS.sol:16"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "attester",
+            "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockEAS.sol:9"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "schema",
+            "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockEAS.sol:10"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "recipient",
+            "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockEAS.sol:11"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/test/extensions/mocks/MockGitcoinPassportDecoder.sol:MockGitcoinPassportDecoder": {
+        "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockGitcoinPassportDecoder.sol:6",
+        "version": {
+          "withMetadata": "78cf09598c22fec034f0426f9f6ff480ef74837dae000f2a5abdd042db6cd681",
+          "withoutMetadata": "7bac9a52bed38a39deb43c490993275d68b361e0c4224b837c8d385f65d551d6",
+          "linkedWithoutMetadata": "7bac9a52bed38a39deb43c490993275d68b361e0c4224b837c8d385f65d551d6"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getScore(address)",
+          "changeScore(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MockGitcoinPassportDecoder",
+              "label": "score",
+              "type": "t_uint256",
+              "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockGitcoinPassportDecoder.sol:7"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/test/extensions/mocks/MockHatsProtocol.sol:MockHatsProtocol": {
+        "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockHatsProtocol.sol:6",
+        "version": {
+          "withMetadata": "017e4c5eecda39a5f433c67f33b441d8ecb87ff8110f8c338a91fe46eb7edbb5",
+          "withoutMetadata": "01bfe3aac70c219c9b929141b2f48033c5271889daa067864f7ea00a4bdb548b",
+          "linkedWithoutMetadata": "01bfe3aac70c219c9b929141b2f48033c5271889daa067864f7ea00a4bdb548b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isWearerOfHat(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@excubiae/contracts/contracts/test/extensions/mocks/MockToken.sol:MockToken": {
+        "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockToken.sol:10",
+        "version": {
+          "withMetadata": "0a66de3e2e8b6d19a74dbfa2fdfbd3294d9ff66c466d5f5966e0009f4f4b199e",
+          "withoutMetadata": "00ff32715673aa5ab4f3df3b7659c7433f1f663be7395fad4a3560927f74ce82",
+          "linkedWithoutMetadata": "00ff32715673aa5ab4f3df3b7659c7433f1f663be7395fad4a3560927f74ce82"
+        },
+        "inherit": [
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721",
+          "@openzeppelin/contracts/interfaces/draft-IERC6093.sol:IERC721Errors",
+          "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol:IERC721Metadata",
+          "@openzeppelin/contracts/token/ERC721/IERC721.sol:IERC721",
+          "@openzeppelin/contracts/utils/introspection/ERC165.sol:ERC165",
+          "@openzeppelin/contracts/utils/introspection/IERC165.sol:IERC165",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "giveToken(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MockToken",
+            "src": "@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockToken.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/access/Ownable.sol:Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20",
+        "inherit": [
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:38"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:21"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/governance/utils/IVotes.sol:IVotes": {
+        "src": "@openzeppelin\\contracts\\governance\\utils\\IVotes.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getVotes(address)",
+          "getPastVotes(address,uint256)",
+          "getPastTotalSupply(uint256)",
+          "delegates(address)",
+          "delegate(address)",
+          "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/interfaces/draft-IERC6093.sol:IERC1155Errors": {
+        "src": "@openzeppelin\\contracts\\interfaces\\draft-IERC6093.sol:113",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/interfaces/draft-IERC6093.sol:IERC20Errors": {
+        "src": "@openzeppelin\\contracts\\interfaces\\draft-IERC6093.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/interfaces/draft-IERC6093.sol:IERC721Errors": {
+        "src": "@openzeppelin\\contracts\\interfaces\\draft-IERC6093.sol:55",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20": {
+        "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:29",
+        "inherit": [
+          "@openzeppelin/contracts/interfaces/draft-IERC6093.sol:IERC20Errors",
+          "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol:IERC20Metadata",
+          "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "decimals()",
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20",
+            "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:44"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20",
+              "label": "_balances",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:30"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_allowances",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:32"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_totalSupply",
+              "type": "t_uint256",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:34"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:36"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:37"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+              "label": "mapping(address => mapping(address => uint256))"
+            },
+            "t_string_storage": {
+              "label": "string"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20": {
+        "src": "@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol:IERC20Metadata": {
+        "src": "@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol:11",
+        "inherit": [
+          "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "decimals()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/token/ERC721/ERC721.sol:ERC721": {
+        "src": "@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol:19",
+        "inherit": [
+          "@openzeppelin/contracts/interfaces/draft-IERC6093.sol:IERC721Errors",
+          "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol:IERC721Metadata",
+          "@openzeppelin/contracts/token/ERC721/IERC721.sol:IERC721",
+          "@openzeppelin/contracts/utils/introspection/ERC165.sol:ERC165",
+          "@openzeppelin/contracts/utils/introspection/IERC165.sol:IERC165",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)",
+          "approve(address,uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "transferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC721",
+            "src": "@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol:39"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC721",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol:23"
+            },
+            {
+              "contract": "ERC721",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol:26"
+            },
+            {
+              "contract": "ERC721",
+              "label": "_owners",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol:28"
+            },
+            {
+              "contract": "ERC721",
+              "label": "_balances",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol:30"
+            },
+            {
+              "contract": "ERC721",
+              "label": "_tokenApprovals",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol:32"
+            },
+            {
+              "contract": "ERC721",
+              "label": "_operatorApprovals",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+              "src": "@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol:34"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_mapping(t_uint256,t_address)": {
+              "label": "mapping(uint256 => address)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+              "label": "mapping(address => mapping(address => bool))"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/token/ERC721/IERC721.sol:IERC721": {
+        "src": "@openzeppelin\\contracts\\token\\ERC721\\IERC721.sol:11",
+        "inherit": [
+          "@openzeppelin/contracts/utils/introspection/IERC165.sol:IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "safeTransferFrom(address,address,uint256,bytes)",
+          "safeTransferFrom(address,address,uint256)",
+          "transferFrom(address,address,uint256)",
+          "approve(address,uint256)",
+          "setApprovalForAll(address,bool)",
+          "getApproved(uint256)",
+          "isApprovedForAll(address,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol:IERC721Receiver": {
+        "src": "@openzeppelin\\contracts\\token\\ERC721\\IERC721Receiver.sol:11",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol:IERC721Metadata": {
+        "src": "@openzeppelin\\contracts\\token\\ERC721\\extensions\\IERC721Metadata.sol:12",
+        "inherit": [
+          "@openzeppelin/contracts/token/ERC721/IERC721.sol:IERC721",
+          "@openzeppelin/contracts/utils/introspection/IERC165.sol:IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/token/ERC721/utils/ERC721Utils.sol:ERC721Utils": {
+        "src": "@openzeppelin\\contracts\\token\\ERC721\\utils\\ERC721Utils.sol:16",
+        "version": {
+          "withMetadata": "3b91d54d44732bd362595f030108b7d652c4896401334d499942d3802cde8f26",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/Context.sol:Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:16",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/Panic.sol:Panic": {
+        "src": "@openzeppelin\\contracts\\utils\\Panic.sol:26",
+        "version": {
+          "withMetadata": "18af38b215aa82e5b9e190077fe255402503dd79151eff9011a50d73506f48c6",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/Strings.sol:Strings": {
+        "src": "@openzeppelin\\contracts\\utils\\Strings.sol:13",
+        "version": {
+          "withMetadata": "e8d6e4886fc12d64cfaee1b9dcd17e7b9022ab04f7b4ff8514420f7599dae011",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/cryptography/Hashes.sol:Hashes": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\Hashes.sol:11",
+        "version": {
+          "withMetadata": "d13bcbb02d877384b90b4b708e2aaecb2aaf3f975ab26f5ddd13bf7f78c2d168",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol:MerkleProof": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\MerkleProof.sol:31",
+        "version": {
+          "withMetadata": "a54851397f4af35fd3b2d2014c23edb87c3aba4c57c7ede3bad61c6b31b3c29b",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/introspection/ERC165.sol:ERC165": {
+        "src": "@openzeppelin\\contracts\\utils\\introspection\\ERC165.sol:20",
+        "inherit": [
+          "@openzeppelin/contracts/utils/introspection/IERC165.sol:IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/introspection/IERC165.sol:IERC165": {
+        "src": "@openzeppelin\\contracts\\utils\\introspection\\IERC165.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/math/Math.sol:Math": {
+        "src": "@openzeppelin\\contracts\\utils\\math\\Math.sol:12",
+        "version": {
+          "withMetadata": "d615bafc54e27f9ceb506c0d3dcf5abffa16025fe133b89c97a02b4ce8ffe7f7",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/math/SafeCast.sol:SafeCast": {
+        "src": "@openzeppelin\\contracts\\utils\\math\\SafeCast.sol:19",
+        "version": {
+          "withMetadata": "a7f1ca3b8aa423805776ae8f808db352566e4239432fa65596841d6263194dd0",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "@openzeppelin/contracts/utils/math/SignedMath.sol:SignedMath": {
+        "src": "@openzeppelin\\contracts\\utils\\math\\SignedMath.sol:11",
+        "version": {
+          "withMetadata": "8f8d91cf5ee7bf61e273f61af3226f85a57f9f7d7a15676b74d5deda80d82371",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/MACI.sol:MACI": {
+        "src": "contracts\\MACI.sol:21",
+        "version": {
+          "withMetadata": "ea2f78f4c41a75755dc32a3b3ac95c01170bdfe74c33add25d62901a42384892",
+          "withoutMetadata": "ea2f78f4c41a75755dc32a3b3ac95c01170bdfe74c33add25d62901a42384892",
+          "linkedWithoutMetadata": "ea2f78f4c41a75755dc32a3b3ac95c01170bdfe74c33add25d62901a42384892"
+        },
+        "inherit": [
+          "contracts/crypto/Hasher.sol:Hasher",
+          "contracts/crypto/SnarkConstants.sol:SnarkConstants",
+          "contracts/utilities/Params.sol:Params",
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "contracts/interfaces/IMACI.sol:IMACI"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,address,address,address,uint8,uint256[5])",
+          "signUp((uint256,uint256),bytes)",
+          "deployPoll((uint256,uint256,(uint8,uint8,uint8),uint8,(uint256,uint256),address,address,uint8,address,address,address[],uint256))",
+          "getStateTreeRoot()",
+          "getPoll(uint256)",
+          "totalSignups()",
+          "getStateRootOnIndexedSignUp(uint256)",
+          "getStateIndex(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MACI",
+            "src": "contracts\\MACI.sol:94"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "stateTreeDepth",
+            "src": "contracts\\MACI.sol:28"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "maxSignups",
+            "src": "contracts\\MACI.sol:30"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "pollFactory",
+            "src": "contracts\\MACI.sol:47"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "messageProcessorFactory",
+            "src": "contracts\\MACI.sol:50"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "tallyFactory",
+            "src": "contracts\\MACI.sol:53"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "signUpPolicy",
+            "src": "contracts\\MACI.sol:60"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MACI",
+              "label": "emptyBallotRoots",
+              "type": "t_array(t_uint256)5_storage",
+              "src": "contracts\\MACI.sol:38"
+            },
+            {
+              "contract": "MACI",
+              "label": "nextPollId",
+              "type": "t_uint256",
+              "src": "contracts\\MACI.sol:41"
+            },
+            {
+              "contract": "MACI",
+              "label": "polls",
+              "type": "t_mapping(t_uint256,t_struct(PollContracts)19058_storage)",
+              "src": "contracts\\MACI.sol:44"
+            },
+            {
+              "contract": "MACI",
+              "label": "leanIMTData",
+              "type": "t_struct(LeanIMTData)20774_storage",
+              "src": "contracts\\MACI.sol:56"
+            },
+            {
+              "contract": "MACI",
+              "label": "stateRootsOnSignUp",
+              "type": "t_array(t_uint256)dyn_storage",
+              "src": "contracts\\MACI.sol:64"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)5_storage": {
+              "label": "uint256[5]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_uint256,t_struct(PollContracts)19058_storage)": {
+              "label": "mapping(uint256 => struct IMACI.PollContracts)"
+            },
+            "t_struct(PollContracts)19058_storage": {
+              "label": "struct IMACI.PollContracts",
+              "members": [
+                {
+                  "label": "poll",
+                  "type": "t_address"
+                },
+                {
+                  "label": "messageProcessor",
+                  "type": "t_address"
+                },
+                {
+                  "label": "tally",
+                  "type": "t_address"
+                }
+              ]
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_struct(LeanIMTData)20774_storage": {
+              "label": "struct LeanIMTData",
+              "members": [
+                {
+                  "label": "size",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "depth",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "sideNodes",
+                  "type": "t_mapping(t_uint256,t_uint256)"
+                },
+                {
+                  "label": "leaves",
+                  "type": "t_mapping(t_uint256,t_uint256)"
+                }
+              ]
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)"
+            },
+            "t_array(t_uint256)dyn_storage": {
+              "label": "uint256[]"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/MessageProcessor.sol:MessageProcessor": {
+        "src": "contracts\\MessageProcessor.sol:19",
+        "version": {
+          "withMetadata": "720dfbb0a1c425ea56df88af7b8e551ee55244558b6f901f630b40d32b970625",
+          "withoutMetadata": "5ede7230cb106c5c9059fa1ce1d36c069ec6c8176ba8ba13f96708cc5e08de31",
+          "linkedWithoutMetadata": "5ede7230cb106c5c9059fa1ce1d36c069ec6c8176ba8ba13f96708cc5e08de31"
+        },
+        "inherit": [
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "contracts/interfaces/IMessageProcessor.sol:IMessageProcessor",
+          "contracts/crypto/Hasher.sol:Hasher",
+          "contracts/crypto/SnarkConstants.sol:SnarkConstants",
+          "contracts/crypto/SnarkCommon.sol:SnarkCommon",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "processMessages(uint256,uint256[8])",
+          "getPublicCircuitInputs(uint256,uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MessageProcessor",
+              "label": "processingComplete",
+              "type": "t_bool",
+              "src": "contracts\\MessageProcessor.sol:29"
+            },
+            {
+              "contract": "MessageProcessor",
+              "label": "totalBatchesProcessed",
+              "type": "t_uint256",
+              "src": "contracts\\MessageProcessor.sol:32"
+            },
+            {
+              "contract": "MessageProcessor",
+              "label": "currentBatchIndex",
+              "type": "t_uint256",
+              "src": "contracts\\MessageProcessor.sol:35"
+            },
+            {
+              "contract": "MessageProcessor",
+              "label": "sbCommitment",
+              "type": "t_uint256",
+              "src": "contracts\\MessageProcessor.sol:38"
+            },
+            {
+              "contract": "MessageProcessor",
+              "label": "poll",
+              "type": "t_contract(IPoll)19378",
+              "src": "contracts\\MessageProcessor.sol:40"
+            },
+            {
+              "contract": "MessageProcessor",
+              "label": "verifier",
+              "type": "t_contract(IVerifier)19702",
+              "src": "contracts\\MessageProcessor.sol:41"
+            },
+            {
+              "contract": "MessageProcessor",
+              "label": "verifyingKeysRegistry",
+              "type": "t_contract(IVerifyingKeysRegistry)19799",
+              "src": "contracts\\MessageProcessor.sol:42"
+            },
+            {
+              "contract": "MessageProcessor",
+              "label": "mode",
+              "type": "t_enum(Mode)21626",
+              "src": "contracts\\MessageProcessor.sol:43"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_contract(IPoll)19378": {
+              "label": "contract IPoll"
+            },
+            "t_contract(IVerifier)19702": {
+              "label": "contract IVerifier"
+            },
+            "t_contract(IVerifyingKeysRegistry)19799": {
+              "label": "contract IVerifyingKeysRegistry"
+            },
+            "t_enum(Mode)21626": {
+              "label": "enum DomainObjs.Mode",
+              "members": [
+                "QV",
+                "NON_QV",
+                "FULL"
+              ]
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/MessageProcessorFactory.sol:MessageProcessorFactory": {
+        "src": "contracts\\MessageProcessorFactory.sol:14",
+        "version": {
+          "withMetadata": "6a5613909e888438a3b11b871ed44023c4cc98caa8f89bb2b04565d007e8073e",
+          "withoutMetadata": "dfa0a0f6d3661a03d8591229f444b95de257377a7e0f9451ff757140a679eeff",
+          "linkedWithoutMetadata": "dfa0a0f6d3661a03d8591229f444b95de257377a7e0f9451ff757140a679eeff"
+        },
+        "inherit": [
+          "contracts/interfaces/IMessageProcessorFactory.sol:IMessageProcessorFactory",
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "contracts/utilities/Params.sol:Params",
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,address,address,uint8)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MessageProcessorFactory",
+            "src": "contracts\\MessageProcessorFactory.sol:16"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/Poll.sol:Poll": {
+        "src": "contracts\\Poll.sol:19",
+        "version": {
+          "withMetadata": "aea5b30dc1b4753da04b7cf5598fba91b4685410f3373a0b2cdb439803d817a0",
+          "withoutMetadata": "a860383c89bf272afe24ffbc9e5511b63844e75e5e491b234a458fe81ac9423c",
+          "linkedWithoutMetadata": "a860383c89bf272afe24ffbc9e5511b63844e75e5e491b234a458fe81ac9423c"
+        },
+        "inherit": [
+          "contracts/interfaces/IPoll.sol:IPoll",
+          "contracts/crypto/SnarkCommon.sol:SnarkCommon",
+          "contracts/utilities/Utilities.sol:Utilities",
+          "contracts/crypto/Hasher.sol:Hasher",
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "contracts/crypto/SnarkConstants.sol:SnarkConstants",
+          "contracts/utilities/Params.sol:Params",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "getBatchHashes()",
+          "publishMessage((uint256[10]),(uint256,uint256))",
+          "relayMessagesBatch(uint256[],bytes32)",
+          "padLastBatch()",
+          "publishMessageBatch(struct DomainObjs.Message[],struct DomainObjs.PublicKey[])",
+          "joinPoll(uint256,(uint256,uint256),uint256,uint256[8],bytes,bytes)",
+          "verifyJoiningPollProof(uint256,uint256,(uint256,uint256),uint256[8])",
+          "verifyJoinedPollProof(uint256,uint256[8])",
+          "getPublicJoiningCircuitInputs(uint256,uint256,(uint256,uint256))",
+          "getPublicJoinedCircuitInputs(uint256)",
+          "mergeState()",
+          "getStartAndEndDate()",
+          "totalSignupsAndMessages()",
+          "totalSignups()",
+          "getMaciContract()",
+          "getStateIndex(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Poll",
+              "label": "maxSignups",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:21"
+            },
+            {
+              "contract": "Poll",
+              "label": "coordinatorPublicKey",
+              "type": "t_struct(PublicKey)21638_storage",
+              "src": "contracts\\Poll.sol:27"
+            },
+            {
+              "contract": "Poll",
+              "label": "coordinatorPublicKeyHash",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:30"
+            },
+            {
+              "contract": "Poll",
+              "label": "mergedStateRoot",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:33"
+            },
+            {
+              "contract": "Poll",
+              "label": "startDate",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:36"
+            },
+            {
+              "contract": "Poll",
+              "label": "endDate",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:38"
+            },
+            {
+              "contract": "Poll",
+              "label": "emptyBallotRoot",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:41"
+            },
+            {
+              "contract": "Poll",
+              "label": "stateMerged",
+              "type": "t_bool",
+              "src": "contracts\\Poll.sol:44"
+            },
+            {
+              "contract": "Poll",
+              "label": "currentSbCommitment",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:53"
+            },
+            {
+              "contract": "Poll",
+              "label": "numMessages",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:56"
+            },
+            {
+              "contract": "Poll",
+              "label": "actualStateTreeDepth",
+              "type": "t_uint8",
+              "src": "contracts\\Poll.sol:60"
+            },
+            {
+              "contract": "Poll",
+              "label": "voteOptions",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:63"
+            },
+            {
+              "contract": "Poll",
+              "label": "treeDepths",
+              "type": "t_struct(TreeDepths)21667_storage",
+              "src": "contracts\\Poll.sol:66"
+            },
+            {
+              "contract": "Poll",
+              "label": "messageBatchSize",
+              "type": "t_uint8",
+              "src": "contracts\\Poll.sol:69"
+            },
+            {
+              "contract": "Poll",
+              "label": "extContracts",
+              "type": "t_struct(ExtContracts)21684_storage",
+              "src": "contracts\\Poll.sol:72"
+            },
+            {
+              "contract": "Poll",
+              "label": "batchHashes",
+              "type": "t_array(t_uint256)dyn_storage",
+              "src": "contracts\\Poll.sol:75"
+            },
+            {
+              "contract": "Poll",
+              "label": "chainHash",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:78"
+            },
+            {
+              "contract": "Poll",
+              "label": "isBatchHashesPadded",
+              "type": "t_bool",
+              "src": "contracts\\Poll.sol:81"
+            },
+            {
+              "contract": "Poll",
+              "label": "pollStateTree",
+              "type": "t_struct(LazyIMTData)20013_storage",
+              "src": "contracts\\Poll.sol:84"
+            },
+            {
+              "contract": "Poll",
+              "label": "ipfsHashes",
+              "type": "t_array(t_bytes32)dyn_storage",
+              "src": "contracts\\Poll.sol:87"
+            },
+            {
+              "contract": "Poll",
+              "label": "relayers",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\Poll.sol:90"
+            },
+            {
+              "contract": "Poll",
+              "label": "pollNullifiers",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\Poll.sol:99"
+            },
+            {
+              "contract": "Poll",
+              "label": "pollId",
+              "type": "t_uint256",
+              "src": "contracts\\Poll.sol:102"
+            },
+            {
+              "contract": "Poll",
+              "label": "pollStateRootsOnJoin",
+              "type": "t_array(t_uint256)dyn_storage",
+              "src": "contracts\\Poll.sol:106"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_struct(PublicKey)21638_storage": {
+              "label": "struct DomainObjs.PublicKey",
+              "members": [
+                {
+                  "label": "x",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "y",
+                  "type": "t_uint256"
+                }
+              ]
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_uint8": {
+              "label": "uint8"
+            },
+            "t_struct(TreeDepths)21667_storage": {
+              "label": "struct Params.TreeDepths",
+              "members": [
+                {
+                  "label": "tallyProcessingStateTreeDepth",
+                  "type": "t_uint8"
+                },
+                {
+                  "label": "voteOptionTreeDepth",
+                  "type": "t_uint8"
+                },
+                {
+                  "label": "stateTreeDepth",
+                  "type": "t_uint8"
+                }
+              ]
+            },
+            "t_struct(ExtContracts)21684_storage": {
+              "label": "struct Params.ExtContracts",
+              "members": [
+                {
+                  "label": "maci",
+                  "type": "t_contract(IMACI)19160"
+                },
+                {
+                  "label": "verifier",
+                  "type": "t_contract(IVerifier)19702"
+                },
+                {
+                  "label": "verifyingKeysRegistry",
+                  "type": "t_contract(IVerifyingKeysRegistry)19799"
+                },
+                {
+                  "label": "policy",
+                  "type": "t_contract(IBasePolicy)3887"
+                },
+                {
+                  "label": "initialVoiceCreditProxy",
+                  "type": "t_contract(IInitialVoiceCreditProxy)19043"
+                }
+              ]
+            },
+            "t_contract(IMACI)19160": {
+              "label": "contract IMACI"
+            },
+            "t_contract(IVerifier)19702": {
+              "label": "contract IVerifier"
+            },
+            "t_contract(IVerifyingKeysRegistry)19799": {
+              "label": "contract IVerifyingKeysRegistry"
+            },
+            "t_contract(IBasePolicy)3887": {
+              "label": "contract IBasePolicy"
+            },
+            "t_contract(IInitialVoiceCreditProxy)19043": {
+              "label": "contract IInitialVoiceCreditProxy"
+            },
+            "t_array(t_uint256)dyn_storage": {
+              "label": "uint256[]"
+            },
+            "t_struct(LazyIMTData)20013_storage": {
+              "label": "struct LazyIMTData",
+              "members": [
+                {
+                  "label": "maxIndex",
+                  "type": "t_uint40"
+                },
+                {
+                  "label": "numberOfLeaves",
+                  "type": "t_uint40"
+                },
+                {
+                  "label": "elements",
+                  "type": "t_mapping(t_uint256,t_uint256)"
+                }
+              ]
+            },
+            "t_uint40": {
+              "label": "uint40"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)"
+            },
+            "t_array(t_bytes32)dyn_storage": {
+              "label": "bytes32[]"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/PollFactory.sol:PollFactory": {
+        "src": "contracts\\PollFactory.sol:14",
+        "version": {
+          "withMetadata": "3773cd91e71c050219acfa48030ca34c3cb20125196f4605e331843ea8d298f4",
+          "withoutMetadata": "de10d3e0c158b8578069dc95782e5cb8b93b67a64bb4902ec48e0a43021aac74",
+          "linkedWithoutMetadata": "de10d3e0c158b8578069dc95782e5cb8b93b67a64bb4902ec48e0a43021aac74"
+        },
+        "inherit": [
+          "contracts/interfaces/IPollFactory.sol:IPollFactory",
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "contracts/utilities/Params.sol:Params",
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy((uint256,uint256,(uint8,uint8,uint8),uint8,(uint256,uint256),(address,address,address,address,address),uint256,uint256,address[],uint256))"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "PollFactory",
+            "src": "contracts\\PollFactory.sol:16"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/Tally.sol:Tally": {
+        "src": "contracts\\Tally.sol:19",
+        "version": {
+          "withMetadata": "61dc03f26ea16d34443ae151535061f6c60120bfb3035ad6be89cd95372eb379",
+          "withoutMetadata": "1cd84b11ac053275b825dd982393bc7394a94c1979d59af04103fde76e0fd206",
+          "linkedWithoutMetadata": "1cd84b11ac053275b825dd982393bc7394a94c1979d59af04103fde76e0fd206"
+        },
+        "inherit": [
+          "contracts/interfaces/ITally.sol:ITally",
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "contracts/crypto/Hasher.sol:Hasher",
+          "contracts/crypto/SnarkConstants.sol:SnarkConstants",
+          "contracts/crypto/SnarkCommon.sol:SnarkCommon",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "isTallied()",
+          "getTallyResults(uint256)",
+          "updateSbCommitment()",
+          "tallyVotes(uint256,uint256[8])",
+          "getPublicCircuitInputs(uint256,uint256)",
+          "verifyTallyProof(uint256,uint256,uint256[8])",
+          "verifySpentVoiceCredits(uint256,uint256,uint256,uint256)",
+          "verifyPerVoteOptionSpentVoiceCredits(uint256,uint256,uint256[][],uint256,uint8,uint256,uint256)",
+          "verifyTallyResult(uint256,uint256,uint256[][],uint256,uint8,uint256,uint256)",
+          "addTallyResults((uint256[],uint256[],uint256[][][],uint256,uint256,uint256,uint256,uint256,uint256))"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Tally",
+              "label": "tallyCommitment",
+              "type": "t_uint256",
+              "src": "contracts\\Tally.sol:42"
+            },
+            {
+              "contract": "Tally",
+              "label": "tallyBatchNum",
+              "type": "t_uint256",
+              "src": "contracts\\Tally.sol:44"
+            },
+            {
+              "contract": "Tally",
+              "label": "sbCommitment",
+              "type": "t_uint256",
+              "src": "contracts\\Tally.sol:47"
+            },
+            {
+              "contract": "Tally",
+              "label": "verifier",
+              "type": "t_contract(IVerifier)19702",
+              "src": "contracts\\Tally.sol:49"
+            },
+            {
+              "contract": "Tally",
+              "label": "verifyingKeysRegistry",
+              "type": "t_contract(IVerifyingKeysRegistry)19799",
+              "src": "contracts\\Tally.sol:50"
+            },
+            {
+              "contract": "Tally",
+              "label": "poll",
+              "type": "t_contract(IPoll)19378",
+              "src": "contracts\\Tally.sol:51"
+            },
+            {
+              "contract": "Tally",
+              "label": "messageProcessor",
+              "type": "t_contract(IMessageProcessor)19189",
+              "src": "contracts\\Tally.sol:52"
+            },
+            {
+              "contract": "Tally",
+              "label": "mode",
+              "type": "t_enum(Mode)21626",
+              "src": "contracts\\Tally.sol:53"
+            },
+            {
+              "contract": "Tally",
+              "label": "tallyResults",
+              "type": "t_mapping(t_uint256,t_struct(TallyResult)19473_storage)",
+              "src": "contracts\\Tally.sol:56"
+            },
+            {
+              "contract": "Tally",
+              "label": "totalTallyResults",
+              "type": "t_uint256",
+              "src": "contracts\\Tally.sol:59"
+            },
+            {
+              "contract": "Tally",
+              "label": "totalSpent",
+              "type": "t_uint256",
+              "src": "contracts\\Tally.sol:62"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_contract(IVerifier)19702": {
+              "label": "contract IVerifier"
+            },
+            "t_contract(IVerifyingKeysRegistry)19799": {
+              "label": "contract IVerifyingKeysRegistry"
+            },
+            "t_contract(IPoll)19378": {
+              "label": "contract IPoll"
+            },
+            "t_contract(IMessageProcessor)19189": {
+              "label": "contract IMessageProcessor"
+            },
+            "t_enum(Mode)21626": {
+              "label": "enum DomainObjs.Mode",
+              "members": [
+                "QV",
+                "NON_QV",
+                "FULL"
+              ]
+            },
+            "t_mapping(t_uint256,t_struct(TallyResult)19473_storage)": {
+              "label": "mapping(uint256 => struct ITally.TallyResult)"
+            },
+            "t_struct(TallyResult)19473_storage": {
+              "label": "struct ITally.TallyResult",
+              "members": [
+                {
+                  "label": "value",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "isSet",
+                  "type": "t_bool"
+                }
+              ]
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/TallyFactory.sol:TallyFactory": {
+        "src": "contracts\\TallyFactory.sol:13",
+        "version": {
+          "withMetadata": "1ed535625ea9b95507c5980ce8f2c5c5d64f4e28176ca5450ff4021fe644f804",
+          "withoutMetadata": "9d64f135f6f7ebf009657762bdecd007f3a04d6a10d39bb724c52b11949137d6",
+          "linkedWithoutMetadata": "9d64f135f6f7ebf009657762bdecd007f3a04d6a10d39bb724c52b11949137d6"
+        },
+        "inherit": [
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "contracts/interfaces/ITallyFactory.sol:ITallyFactory",
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(address,address,address,address,uint8)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TallyFactory",
+            "src": "contracts\\TallyFactory.sol:15"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/VerifyingKeysRegistry.sol:VerifyingKeysRegistry": {
+        "src": "contracts\\VerifyingKeysRegistry.sol:14",
+        "version": {
+          "withMetadata": "bc17deb72c4e0ff9b1d8ff304dba40488cb5111587abffd76b73a3dc99570cb5",
+          "withoutMetadata": "ccbefae9ca395bbae7dd3b2f0d5182102de956da7f275ec0db06bdee257e231d",
+          "linkedWithoutMetadata": "ccbefae9ca395bbae7dd3b2f0d5182102de956da7f275ec0db06bdee257e231d"
+        },
+        "inherit": [
+          "contracts/interfaces/IVerifyingKeysRegistry.sol:IVerifyingKeysRegistry",
+          "contracts/crypto/SnarkCommon.sol:SnarkCommon",
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address)",
+          "isPollJoiningVerifyingKeySet(uint256)",
+          "isPollJoinedVerifyingKeySet(uint256)",
+          "isProcessVerifyingKeySet(uint256,uint8)",
+          "isTallyVerifyingKeySet(uint256,uint8)",
+          "generatePollJoiningVerifyingKeySignature(uint256)",
+          "generatePollJoinedVerifyingKeySignature(uint256)",
+          "generateProcessVerifyingKeySignature(uint256,uint256,uint8)",
+          "generateTallyVerifyingKeySignature(uint256,uint256,uint256)",
+          "setVerifyingKeysBatch((uint256,uint256,uint256,uint256,uint8,enum DomainObjs.Mode[],((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]),((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]),struct SnarkCommon.VerifyingKey[],struct SnarkCommon.VerifyingKey[]))",
+          "setVerifyingKeys(uint256,uint256,uint256,uint8,uint8,((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]),((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]))",
+          "setProcessVerifyingKey(uint256,uint256,uint8,uint8,((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]))",
+          "setTallyVerifyingKey(uint256,uint256,uint256,uint8,((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]))",
+          "setPollJoiningVerifyingKey(uint256,((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]))",
+          "setPollJoinedVerifyingKey(uint256,((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]))",
+          "hasProcessVerifyingKey(uint256,uint256,uint8,uint8)",
+          "getProcessVerifyingKeyBySignature(uint256,uint8)",
+          "getProcessVerifyingKey(uint256,uint256,uint8,uint8)",
+          "hasTallyVerifyingKey(uint256,uint256,uint256,uint8)",
+          "getTallyVerifyingKeyBySignature(uint256,uint8)",
+          "getTallyVerifyingKey(uint256,uint256,uint256,uint8)",
+          "getPollJoiningVerifyingKeyBySignature(uint256)",
+          "getPollJoinedVerifyingKeyBySignature(uint256)",
+          "getPollJoiningVerifyingKey(uint256)",
+          "getPollJoinedVerifyingKey(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "VerifyingKeysRegistry",
+            "src": "contracts\\VerifyingKeysRegistry.sol:38"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "VerifyingKeysRegistry",
+              "label": "processVerifyingKeys",
+              "type": "t_mapping(t_enum(Mode)21626,t_mapping(t_uint256,t_struct(VerifyingKey)18472_storage))",
+              "src": "contracts\\VerifyingKeysRegistry.sol:15"
+            },
+            {
+              "contract": "VerifyingKeysRegistry",
+              "label": "processVerifyingKeysSet",
+              "type": "t_mapping(t_enum(Mode)21626,t_mapping(t_uint256,t_bool))",
+              "src": "contracts\\VerifyingKeysRegistry.sol:16"
+            },
+            {
+              "contract": "VerifyingKeysRegistry",
+              "label": "tallyVerifyingKeys",
+              "type": "t_mapping(t_enum(Mode)21626,t_mapping(t_uint256,t_struct(VerifyingKey)18472_storage))",
+              "src": "contracts\\VerifyingKeysRegistry.sol:18"
+            },
+            {
+              "contract": "VerifyingKeysRegistry",
+              "label": "tallyVerifyingKeysSet",
+              "type": "t_mapping(t_enum(Mode)21626,t_mapping(t_uint256,t_bool))",
+              "src": "contracts\\VerifyingKeysRegistry.sol:19"
+            },
+            {
+              "contract": "VerifyingKeysRegistry",
+              "label": "pollJoiningVerifyingKeys",
+              "type": "t_mapping(t_uint256,t_struct(VerifyingKey)18472_storage)",
+              "src": "contracts\\VerifyingKeysRegistry.sol:21"
+            },
+            {
+              "contract": "VerifyingKeysRegistry",
+              "label": "pollJoiningVerifyingKeysSet",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\VerifyingKeysRegistry.sol:22"
+            },
+            {
+              "contract": "VerifyingKeysRegistry",
+              "label": "pollJoinedVerifyingKeys",
+              "type": "t_mapping(t_uint256,t_struct(VerifyingKey)18472_storage)",
+              "src": "contracts\\VerifyingKeysRegistry.sol:24"
+            },
+            {
+              "contract": "VerifyingKeysRegistry",
+              "label": "pollJoinedVerifyingKeysSet",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\VerifyingKeysRegistry.sol:25"
+            }
+          ],
+          "types": {
+            "t_mapping(t_enum(Mode)21626,t_mapping(t_uint256,t_struct(VerifyingKey)18472_storage))": {
+              "label": "mapping(enum DomainObjs.Mode => mapping(uint256 => struct SnarkCommon.VerifyingKey))"
+            },
+            "t_enum(Mode)21626": {
+              "label": "enum DomainObjs.Mode",
+              "members": [
+                "QV",
+                "NON_QV",
+                "FULL"
+              ]
+            },
+            "t_mapping(t_uint256,t_struct(VerifyingKey)18472_storage)": {
+              "label": "mapping(uint256 => struct SnarkCommon.VerifyingKey)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_struct(VerifyingKey)18472_storage": {
+              "label": "struct SnarkCommon.VerifyingKey",
+              "members": [
+                {
+                  "label": "alpha1",
+                  "type": "t_struct(G1Point)17998_storage"
+                },
+                {
+                  "label": "beta2",
+                  "type": "t_struct(G2Point)18007_storage"
+                },
+                {
+                  "label": "gamma2",
+                  "type": "t_struct(G2Point)18007_storage"
+                },
+                {
+                  "label": "delta2",
+                  "type": "t_struct(G2Point)18007_storage"
+                },
+                {
+                  "label": "ic",
+                  "type": "t_array(t_struct(G1Point)17998_storage)dyn_storage"
+                }
+              ]
+            },
+            "t_struct(G1Point)17998_storage": {
+              "label": "struct Pairing.G1Point",
+              "members": [
+                {
+                  "label": "x",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "y",
+                  "type": "t_uint256"
+                }
+              ]
+            },
+            "t_struct(G2Point)18007_storage": {
+              "label": "struct Pairing.G2Point",
+              "members": [
+                {
+                  "label": "x",
+                  "type": "t_array(t_uint256)2_storage"
+                },
+                {
+                  "label": "y",
+                  "type": "t_array(t_uint256)2_storage"
+                }
+              ]
+            },
+            "t_array(t_struct(G1Point)17998_storage)dyn_storage": {
+              "label": "struct Pairing.G1Point[]"
+            },
+            "t_array(t_uint256)2_storage": {
+              "label": "uint256[2]"
+            },
+            "t_mapping(t_enum(Mode)21626,t_mapping(t_uint256,t_bool))": {
+              "label": "mapping(enum DomainObjs.Mode => mapping(uint256 => bool))"
+            },
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/BabyJubJub.sol:CurveBabyJubJub": {
+        "src": "contracts\\crypto\\BabyJubJub.sol:10",
+        "version": {
+          "withMetadata": "fd899f44056e4398ca82533770b5b334a48dfaf892c6f1fdf0a0d995f0cfc2f5",
+          "withoutMetadata": "ad99bb91762ed91603d7ccea0ec829cc4e08b0553aa0f13b78fce366116725e1",
+          "linkedWithoutMetadata": "ad99bb91762ed91603d7ccea0ec829cc4e08b0553aa0f13b78fce366116725e1"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/Hasher.sol:Hasher": {
+        "src": "contracts\\crypto\\Hasher.sol:12",
+        "version": {
+          "withMetadata": "604bb66ddc1477925d635980606e14fe03b31736a4976e682b7e95da361671ba",
+          "withoutMetadata": "6931997c1f04ec206176f4d727932eefaad5b0abc17905d6f75c657336acfdaf",
+          "linkedWithoutMetadata": "6931997c1f04ec206176f4d727932eefaad5b0abc17905d6f75c657336acfdaf"
+        },
+        "inherit": [
+          "contracts/crypto/SnarkConstants.sol:SnarkConstants"
+        ],
+        "libraries": [],
+        "methods": [
+          "sha256Hash(uint256[])",
+          "hash2(uint256[2])",
+          "hash3(uint256[3])",
+          "hash4(uint256[4])",
+          "hash5(uint256[5])",
+          "hashLeftRight(uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/Pairing.sol:Pairing": {
+        "src": "contracts\\crypto\\Pairing.sol:25",
+        "version": {
+          "withMetadata": "2974649875e316423cf28b045fc939f193206681d2e6407d53edd1508df860c1",
+          "withoutMetadata": "80c4e35721cae74c6c187adec3a8a9b168c1b290cb6890af6cea490d7388070a",
+          "linkedWithoutMetadata": "80c4e35721cae74c6c187adec3a8a9b168c1b290cb6890af6cea490d7388070a"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/PoseidonT3.sol:PoseidonT3": {
+        "src": "contracts\\crypto\\PoseidonT3.sol:5",
+        "version": {
+          "withMetadata": "8e6e57cc9e80fd9f1947d90b42815ecc85e766ddf8c7a31397f1e9a58c796bfc",
+          "withoutMetadata": "0930f0bc10e8633d3dff4b34a65f239f06673365e76b74d44112fb939a4d442a",
+          "linkedWithoutMetadata": "0930f0bc10e8633d3dff4b34a65f239f06673365e76b74d44112fb939a4d442a"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "poseidon(uint256[2])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/PoseidonT4.sol:PoseidonT4": {
+        "src": "contracts\\crypto\\PoseidonT4.sol:5",
+        "version": {
+          "withMetadata": "d078c321782238bf0309ce6494225360dc6ed32a41d4848a42cf4616e0f8b609",
+          "withoutMetadata": "57a1cbfe65012f3e7775deb4436ae169f847b9a260344fe6aea5a55419fddff0",
+          "linkedWithoutMetadata": "57a1cbfe65012f3e7775deb4436ae169f847b9a260344fe6aea5a55419fddff0"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "poseidon(uint256[3])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/PoseidonT5.sol:PoseidonT5": {
+        "src": "contracts\\crypto\\PoseidonT5.sol:5",
+        "version": {
+          "withMetadata": "c0a5fabba1ddac6443685d7f48e342166c804461bbda42d5de060f100e8cb94e",
+          "withoutMetadata": "06863c110e61546779fdb7bd8b9e532073d5a73fab074dc83c9e4ed4540f8ef4",
+          "linkedWithoutMetadata": "06863c110e61546779fdb7bd8b9e532073d5a73fab074dc83c9e4ed4540f8ef4"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "poseidon(uint256[4])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/PoseidonT6.sol:PoseidonT6": {
+        "src": "contracts\\crypto\\PoseidonT6.sol:5",
+        "version": {
+          "withMetadata": "d74d44a501ca016ee9133d7c66909684a3d130df274f2c420460d849c4c3c1dc",
+          "withoutMetadata": "212a4b55b67eaf52064ddfc57c8225a7b81c63cc6d8997a8d19d465fa99a197e",
+          "linkedWithoutMetadata": "212a4b55b67eaf52064ddfc57c8225a7b81c63cc6d8997a8d19d465fa99a197e"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "poseidon(uint256[5])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/SnarkCommon.sol:SnarkCommon": {
+        "src": "contracts\\crypto\\SnarkCommon.sol:8",
+        "version": {
+          "withMetadata": "de4572c6456cd24f27d08ecb7ed0646fd72e295fb87a24ed20da858f86c75941",
+          "withoutMetadata": "ac0db523ddc3e330f735df7b3b0b24460531c71290a891170e840f8f67d5ff6b",
+          "linkedWithoutMetadata": "ac0db523ddc3e330f735df7b3b0b24460531c71290a891170e840f8f67d5ff6b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/SnarkConstants.sol:SnarkConstants": {
+        "src": "contracts\\crypto\\SnarkConstants.sol:7",
+        "version": {
+          "withMetadata": "22715741253586867a2235fdb4b41b0afa1c85e41969ad301a655a7cc227a58b",
+          "withoutMetadata": "ac0db523ddc3e330f735df7b3b0b24460531c71290a891170e840f8f67d5ff6b",
+          "linkedWithoutMetadata": "ac0db523ddc3e330f735df7b3b0b24460531c71290a891170e840f8f67d5ff6b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/crypto/Verifier.sol:Verifier": {
+        "src": "contracts\\crypto\\Verifier.sol:11",
+        "version": {
+          "withMetadata": "effbee21e51ebd3f7c0ab7862c2dd4247752cfc1fca3be18117e76abd74fd0c6",
+          "withoutMetadata": "98108539dd48bb290f60ba0ae96ff7f5b6c066b92b2770f6a7fa07073ec91bd9",
+          "linkedWithoutMetadata": "98108539dd48bb290f60ba0ae96ff7f5b6c066b92b2770f6a7fa07073ec91bd9"
+        },
+        "inherit": [
+          "contracts/crypto/SnarkCommon.sol:SnarkCommon",
+          "contracts/crypto/SnarkConstants.sol:SnarkConstants",
+          "contracts/interfaces/IVerifier.sol:IVerifier"
+        ],
+        "libraries": [],
+        "methods": [
+          "verify(uint256[8],((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]),uint256[])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/initialVoiceCreditProxy/ConstantInitialVoiceCreditProxy.sol:ConstantInitialVoiceCreditProxy": {
+        "src": "contracts\\initialVoiceCreditProxy\\ConstantInitialVoiceCreditProxy.sol:11",
+        "version": {
+          "withMetadata": "e0fa5899c50cc33ecd060e70aaf12fade34bf9b4144e7c5e1b01c025203b5704",
+          "withoutMetadata": "7cd986d6716bd8183d1d401c565c45554c7fa747eccdbc14696670e21033245c",
+          "linkedWithoutMetadata": "7cd986d6716bd8183d1d401c565c45554c7fa747eccdbc14696670e21033245c"
+        },
+        "inherit": [
+          "contracts/interfaces/IInitialVoiceCreditProxy.sol:IInitialVoiceCreditProxy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "getVoiceCredits(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ConstantInitialVoiceCreditProxy",
+              "label": "balance",
+              "type": "t_uint256",
+              "src": "contracts\\initialVoiceCreditProxy\\ConstantInitialVoiceCreditProxy.sol:13"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/initialVoiceCreditProxy/ConstantInitialVoiceCreditProxyFactory.sol:ConstantInitialVoiceCreditProxyFactory": {
+        "src": "contracts\\initialVoiceCreditProxy\\ConstantInitialVoiceCreditProxyFactory.sol:11",
+        "version": {
+          "withMetadata": "8490e4f79b15d32bebee2fe84d9f0d85507a792d30f46d8f605c42cc0a73ac78",
+          "withoutMetadata": "82463c739fa4750cf797ecd6f77ef9f35396972e2db3651d34eebfb227da86af",
+          "linkedWithoutMetadata": "82463c739fa4750cf797ecd6f77ef9f35396972e2db3651d34eebfb227da86af"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ConstantInitialVoiceCreditProxyFactory",
+            "src": "contracts\\initialVoiceCreditProxy\\ConstantInitialVoiceCreditProxyFactory.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/initialVoiceCreditProxy/ERC20VotesInitialVoiceCreditProxy.sol:ERC20VotesInitialVoiceCreditProxy": {
+        "src": "contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxy.sol:12",
+        "version": {
+          "withMetadata": "fafedf956069a67068f740a281d47d47b56cb4ce15b848eb16a428e6fe80b26a",
+          "withoutMetadata": "d6cf3f3157f0ec93bda26d6a8c39b9e0df0e353efab8886b4a4694b0ea9bc12f",
+          "linkedWithoutMetadata": "d6cf3f3157f0ec93bda26d6a8c39b9e0df0e353efab8886b4a4694b0ea9bc12f"
+        },
+        "inherit": [
+          "contracts/interfaces/IInitialVoiceCreditProxy.sol:IInitialVoiceCreditProxy",
+          "@excubiae/contracts/contracts/proxy/Clone.sol:Clone",
+          "@excubiae/contracts/contracts/interfaces/IClone.sol:IClone"
+        ],
+        "libraries": [],
+        "methods": [
+          "getVoiceCredits(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20VotesInitialVoiceCreditProxy",
+              "label": "snapshotBlock",
+              "type": "t_uint256",
+              "src": "contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxy.sol:14"
+            },
+            {
+              "contract": "ERC20VotesInitialVoiceCreditProxy",
+              "label": "token",
+              "type": "t_address",
+              "src": "contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxy.sol:16"
+            },
+            {
+              "contract": "ERC20VotesInitialVoiceCreditProxy",
+              "label": "factor",
+              "type": "t_uint256",
+              "src": "contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxy.sol:18"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/initialVoiceCreditProxy/ERC20VotesInitialVoiceCreditProxyFactory.sol:ERC20VotesInitialVoiceCreditProxyFactory": {
+        "src": "contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxyFactory.sol:11",
+        "version": {
+          "withMetadata": "ba4c095c5d08bb396b89a9f05d1b3d458defb7927aaca8533d3f6e4733586ca3",
+          "withoutMetadata": "29a012d650989eae3516270f45029aafaedd63486ef64e5c7caa40cfc251e8ab",
+          "linkedWithoutMetadata": "29a012d650989eae3516270f45029aafaedd63486ef64e5c7caa40cfc251e8ab"
+        },
+        "inherit": [
+          "@excubiae/contracts/contracts/proxy/Factory.sol:Factory",
+          "@excubiae/contracts/contracts/interfaces/IFactory.sol:IFactory"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "deploy(uint256,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20VotesInitialVoiceCreditProxyFactory",
+            "src": "contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxyFactory.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/IInitialVoiceCreditProxy.sol:IInitialVoiceCreditProxy": {
+        "src": "contracts\\interfaces\\IInitialVoiceCreditProxy.sol:6",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getVoiceCredits(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/IMACI.sol:IMACI": {
+        "src": "contracts\\interfaces\\IMACI.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "stateTreeDepth()",
+          "getStateTreeRoot()",
+          "getStateIndex(uint256)",
+          "deployPoll((uint256,uint256,(uint8,uint8,uint8),uint8,(uint256,uint256),address,address,uint8,address,address,address[],uint256))",
+          "signUp((uint256,uint256),bytes)",
+          "getStateRootOnIndexedSignUp(uint256)",
+          "totalSignups()",
+          "nextPollId()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/IMessageProcessor.sol:IMessageProcessor": {
+        "src": "contracts\\interfaces\\IMessageProcessor.sol:6",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "processingComplete()",
+          "sbCommitment()",
+          "getPublicCircuitInputs(uint256,uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/IMessageProcessorFactory.sol:IMessageProcessorFactory": {
+        "src": "contracts\\interfaces\\IMessageProcessorFactory.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "deploy(address,address,address,uint8)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/IPoll.sol:IPoll": {
+        "src": "contracts\\interfaces\\IPoll.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "joinPoll(uint256,(uint256,uint256),uint256,uint256[8],bytes,bytes)",
+          "totalSignupsAndMessages()",
+          "getBatchHashes()",
+          "padLastBatch()",
+          "publishMessage((uint256[10]),(uint256,uint256))",
+          "publishMessageBatch(struct DomainObjs.Message[],struct DomainObjs.PublicKey[])",
+          "relayMessagesBatch(uint256[],bytes32)",
+          "mergeState()",
+          "getStartAndEndDate()",
+          "endDate()",
+          "startDate()",
+          "stateMerged()",
+          "treeDepths()",
+          "voteOptions()",
+          "messageBatchSize()",
+          "coordinatorPublicKeyHash()",
+          "currentSbCommitment()",
+          "actualStateTreeDepth()",
+          "getMaciContract()",
+          "getStateIndex(uint256)",
+          "totalSignups()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/IPollFactory.sol:IPollFactory": {
+        "src": "contracts\\interfaces\\IPollFactory.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "deploy((uint256,uint256,(uint8,uint8,uint8),uint8,(uint256,uint256),(address,address,address,address,address),uint256,uint256,address[],uint256))"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/ISemaphore.sol:ISemaphore": {
+        "src": "contracts\\interfaces\\ISemaphore.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "verifyProof(uint256,(uint256,uint256,uint256,uint256,uint256,uint256[8]))"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/ITally.sol:ITally": {
+        "src": "contracts\\interfaces\\ITally.sol:6",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "addTallyResults((uint256[],uint256[],uint256[][][],uint256,uint256,uint256,uint256,uint256,uint256))",
+          "updateSbCommitment()",
+          "tallyVotes(uint256,uint256[8])",
+          "isTallied()",
+          "tallyCommitment()",
+          "tallyBatchNum()",
+          "sbCommitment()",
+          "getTallyResults(uint256)",
+          "totalTallyResults()",
+          "totalSpent()",
+          "getPublicCircuitInputs(uint256,uint256)",
+          "verifyTallyProof(uint256,uint256,uint256[8])",
+          "verifyPerVoteOptionSpentVoiceCredits(uint256,uint256,uint256[][],uint256,uint8,uint256,uint256)",
+          "verifySpentVoiceCredits(uint256,uint256,uint256,uint256)",
+          "verifyTallyResult(uint256,uint256,uint256[][],uint256,uint8,uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/ITallyFactory.sol:ITallyFactory": {
+        "src": "contracts\\interfaces\\ITallyFactory.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "deploy(address,address,address,address,uint8)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/IVerifier.sol:IVerifier": {
+        "src": "contracts\\interfaces\\IVerifier.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "verify(uint256[8],((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]),uint256[])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/interfaces/IVerifyingKeysRegistry.sol:IVerifyingKeysRegistry": {
+        "src": "contracts\\interfaces\\IVerifyingKeysRegistry.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getTallyVerifyingKey(uint256,uint256,uint256,uint8)",
+          "getProcessVerifyingKey(uint256,uint256,uint8,uint8)",
+          "getPollJoiningVerifyingKey(uint256)",
+          "getPollJoinedVerifyingKey(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/mocks/MockERC20.sol:MockERC20": {
+        "src": "contracts\\mocks\\MockERC20.sol:8",
+        "version": {
+          "withMetadata": "b54250d5fdbff06c81b708d8524c51d6f3ea2ea3509ee0759db0b9b508f58108",
+          "withoutMetadata": "b016dae4fc4bd736b6660a11374fc8556c3efc655f10118c5c39ff7be16e6193",
+          "linkedWithoutMetadata": "b016dae4fc4bd736b6660a11374fc8556c3efc655f10118c5c39ff7be16e6193"
+        },
+        "inherit": [
+          "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20",
+          "@openzeppelin/contracts/interfaces/draft-IERC6093.sol:IERC20Errors",
+          "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol:IERC20Metadata",
+          "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(string,string)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MockERC20",
+            "src": "contracts\\mocks\\MockERC20.sol:9"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/mocks/MockERC20Votes.sol:MockERC20Votes": {
+        "src": "contracts\\mocks\\MockERC20Votes.sol:8",
+        "version": {
+          "withMetadata": "69f8c981d49b3c91647828999b6ec8476ff6e734d3224eb63228dadfec423533",
+          "withoutMetadata": "c4bc7715da360ef9a30f0eca43d04f4a40e101150496983e8a15450fd1a2b912",
+          "linkedWithoutMetadata": "c4bc7715da360ef9a30f0eca43d04f4a40e101150496983e8a15450fd1a2b912"
+        },
+        "inherit": [
+          "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20",
+          "@openzeppelin/contracts/interfaces/draft-IERC6093.sol:IERC20Errors",
+          "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol:IERC20Metadata",
+          "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(string,string)",
+          "changeVotes(uint256)",
+          "getPastVotes(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MockERC20Votes",
+            "src": "contracts\\mocks\\MockERC20Votes.sol:11"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MockERC20Votes",
+              "label": "votes",
+              "type": "t_uint256",
+              "src": "contracts\\mocks\\MockERC20Votes.sol:9"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/mocks/MockSemaphore.sol:MockSemaphore": {
+        "src": "contracts\\mocks\\MockSemaphore.sol:8",
+        "version": {
+          "withMetadata": "399d4514ab6a974c4df19f57e596b91ea4744bb4e1caf9da357d6e89a951e387",
+          "withoutMetadata": "7a84c45a961dc1a6917f87d7d2b8c59028c78a5d1e9790a5c817a016b20c6f8c",
+          "linkedWithoutMetadata": "7a84c45a961dc1a6917f87d7d2b8c59028c78a5d1e9790a5c817a016b20c6f8c"
+        },
+        "inherit": [
+          "contracts/interfaces/ISemaphore.sol:ISemaphore"
+        ],
+        "libraries": [],
+        "methods": [
+          "(uint256)",
+          "flipValid()",
+          "verifyProof(uint256,(uint256,uint256,uint256,uint256,uint256,uint256[8]))"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MockSemaphore",
+            "src": "contracts\\mocks\\MockSemaphore.sol:16"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "groupId",
+            "src": "contracts\\mocks\\MockSemaphore.sol:10"
+          },
+          {
+            "kind": "state-variable-assignment",
+            "name": "valid",
+            "src": "contracts\\mocks\\MockSemaphore.sol:12"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MockSemaphore",
+              "label": "valid",
+              "type": "t_bool",
+              "src": "contracts\\mocks\\MockSemaphore.sol:12"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/mocks/MockVerifier.sol:MockVerifier": {
+        "src": "contracts\\mocks\\MockVerifier.sol:10",
+        "version": {
+          "withMetadata": "8cb4b78c75944f64cb285fb33f0f17b5d5ee1d95e2559af3e0a38571f85e52c3",
+          "withoutMetadata": "95a386ccd2ab4ffa7a6ccfca76422a09df9b6e0572b49532bfcb2b91279db51b",
+          "linkedWithoutMetadata": "95a386ccd2ab4ffa7a6ccfca76422a09df9b6e0572b49532bfcb2b91279db51b"
+        },
+        "inherit": [
+          "contracts/crypto/SnarkCommon.sol:SnarkCommon",
+          "contracts/crypto/SnarkConstants.sol:SnarkConstants",
+          "contracts/interfaces/IVerifier.sol:IVerifier"
+        ],
+        "libraries": [],
+        "methods": [
+          "verify(uint256[8],((uint256,uint256),(uint256[2],uint256[2]),(uint256[2],uint256[2]),(uint256[2],uint256[2]),struct Pairing.G1Point[]),uint256[])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/mocks/Mocker.sol:Mocker": {
+        "src": "contracts\\mocks\\Mocker.sol:38",
+        "version": {
+          "withMetadata": "21e7f2fe00c9c1c4747f0e4a8ca0622f145c8bbfb5a22c7f978125b3bcd21ada",
+          "withoutMetadata": "ac0db523ddc3e330f735df7b3b0b24460531c71290a891170e840f8f67d5ff6b",
+          "linkedWithoutMetadata": "ac0db523ddc3e330f735df7b3b0b24460531c71290a891170e840f8f67d5ff6b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/trees/LazyIMT.sol:InternalLazyIMT": {
+        "src": "contracts\\trees\\LazyIMT.sol:26",
+        "version": {
+          "withMetadata": "c01aa65843ae46855384f70753eac15b4b34ac05bf5aee209e4ab952e1149317",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/trees/LeanIMT.sol:InternalLeanIMT": {
+        "src": "contracts\\trees\\LeanIMT.sol:32",
+        "version": {
+          "withMetadata": "c39f741c5d82ee133885905aaf996c2c70536456b3ea244e9530200d2211328c",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/utilities/DomainObjs.sol:DomainObjs": {
+        "src": "contracts\\utilities\\DomainObjs.sol:7",
+        "version": {
+          "withMetadata": "722d59abf6a2664e81b038592ced17a44072cd69f6116468f3eabe161c3b324b",
+          "withoutMetadata": "6d5184115254d09e850ec4ee9730f1e5822a4e43aad6dad3ad7077a87626e892",
+          "linkedWithoutMetadata": "6d5184115254d09e850ec4ee9730f1e5822a4e43aad6dad3ad7077a87626e892"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/utilities/Params.sol:Params": {
+        "src": "contracts\\utilities\\Params.sol:16",
+        "version": {
+          "withMetadata": "9447932a8ab49bddd5cd023ac796f8371059d39d6ed48db55493425f82300e8c",
+          "withoutMetadata": "ac0db523ddc3e330f735df7b3b0b24460531c71290a891170e840f8f67d5ff6b",
+          "linkedWithoutMetadata": "ac0db523ddc3e330f735df7b3b0b24460531c71290a891170e840f8f67d5ff6b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "contracts/utilities/Utilities.sol:Utilities": {
+        "src": "contracts\\utilities\\Utilities.sol:13",
+        "version": {
+          "withMetadata": "f0145d5d4226abe0afae52b7f778b129bf30062117255c34b0b0b9f1cdae5ce1",
+          "withoutMetadata": "3bb30cf0492e00ebcf53a2fdf5f368b787afa9b5afcbb445937b52e55163d691",
+          "linkedWithoutMetadata": "3bb30cf0492e00ebcf53a2fdf5f368b787afa9b5afcbb445937b52e55163d691"
+        },
+        "inherit": [
+          "contracts/crypto/Hasher.sol:Hasher",
+          "contracts/utilities/DomainObjs.sol:DomainObjs",
+          "contracts/crypto/SnarkConstants.sol:SnarkConstants"
+        ],
+        "libraries": [],
+        "methods": [
+          "hashStateLeaf(((uint256,uint256),uint256))",
+          "padAndHashMessage(uint256[2])",
+          "hashMessageAndPublicKey((uint256[10]),(uint256,uint256))"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      },
+      "solady/src/utils/LibClone.sol:LibClone": {
+        "src": "solady\\src\\utils\\LibClone.sol:69",
+        "version": {
+          "withMetadata": "ed8c4eb9d8667bea0cfee5e6614550b4ff433bd5bd91b55022bc92784bde2605",
+          "withoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db",
+          "linkedWithoutMetadata": "a64c6cf9c6ba9368f5132c93a0196b3204a7963dbb4dd05dfddb4ab23126b8db"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.28"
+      }
+    }
+  ]
+}
