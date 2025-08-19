@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Image from "next/image";
 import "./globals.css";
+import { Button } from "@sasvoth/ui/button";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -24,6 +26,42 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <nav className="flex items-center justify-between px-8 py-3 border-b border-gray-200 bg-white">
+          <div className="flex items-center gap-6">
+            <Image
+              src="/logo.svg"
+              alt="Logo"
+              width={40}
+              height={80}
+              className="object-contain"
+            />
+            <a
+              href="/"
+              className="flex items-center text-gray-900 hover:text-gray-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+                className="mr-1"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-6 0h6"
+                />
+              </svg>
+              Home
+            </a>
+          </div>
+          <div>
+            <Button>Login</Button>
+          </div>
+        </nav>
         {children}
       </body>
     </html>
