@@ -22,7 +22,7 @@
     "@sasvoth/eslint-config": "workspace:*",
     "@sasvoth/typescript-config": "workspace:*",
     "@eslint/eslintrc": "catalog:",
-    "@tailwindcss/postcss": "catalog:",
+    "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
