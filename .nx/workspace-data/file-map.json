@@ -1,0 +1,585 @@
+{
+  "version": "6.0",
+  "nxVersion": "21.6.2",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {
+      "api": [
+        {
+          "file": "apps/api/README.md",
+          "hash": "12752545219937347845"
+        },
+        {
+          "file": "apps/api/docker-compose.yml",
+          "hash": "3904220843049611768"
+        },
+        {
+          "file": "apps/api/eslint.config.mjs",
+          "hash": "11482672230086606977"
+        },
+        {
+          "file": "apps/api/nest-cli.json",
+          "hash": "18272654682417215031"
+        },
+        {
+          "file": "apps/api/package.json",
+          "hash": "1717389588580353142",
+          "deps": [
+            "npm:@eslint/eslintrc",
+            "npm:@eslint/js",
+            "npm:@nestjs/cli",
+            "npm:@nestjs/schematics",
+            "npm:@nestjs/testing",
+            "npm:@swc/cli",
+            "npm:@swc/core",
+            "npm:@types/bcrypt",
+            "npm:@types/express",
+            "npm:@types/form-data",
+            "npm:@types/jest",
+            "npm:@types/jsonwebtoken",
+            "npm:@types/mongoose",
+            "npm:@types/node@22.18.8",
+            "npm:@types/supertest",
+            "npm:eslint",
+            "npm:globals@16.4.0",
+            "npm:jest",
+            "npm:prettier",
+            "npm:source-map-support@0.5.21",
+            "npm:supertest",
+            "npm:ts-jest",
+            "npm:ts-loader",
+            "npm:ts-node",
+            "npm:tsconfig-paths@4.2.0",
+            "npm:typescript",
+            "npm:typescript-eslint",
+            "npm:@nestjs/common",
+            "npm:@nestjs/config",
+            "npm:@nestjs/core",
+            "npm:@nestjs/mapped-types",
+            "npm:@nestjs/platform-express",
+            "npm:@sendgrid/mail",
+            "npm:axios",
+            "npm:bcrypt",
+            "npm:circomlib",
+            "npm:config",
+            "npm:dotenv@17.2.3",
+            "npm:ethers",
+            "npm:form-data",
+            "npm:ipfs-http-client",
+            "npm:jsonwebtoken",
+            "npm:reflect-metadata",
+            "npm:rxjs@7.8.2",
+            "npm:snarkjs"
+          ]
+        },
+        {
+          "file": "apps/api/src/app.controller.spec.ts",
+          "hash": "3407876829745233448"
+        },
+        {
+          "file": "apps/api/src/app.controller.ts",
+          "hash": "1345450293891055440"
+        },
+        {
+          "file": "apps/api/src/app.module.ts",
+          "hash": "7338342334538064110"
+        },
+        {
+          "file": "apps/api/src/app.service.ts",
+          "hash": "15275323873054081339"
+        },
+        {
+          "file": "apps/api/src/main.ts",
+          "hash": "8143503177558657450"
+        },
+        {
+          "file": "apps/api/src/results-meta/dto/create-results-meta.dto.ts",
+          "hash": "13536697135649735417"
+        },
+        {
+          "file": "apps/api/src/results-meta/dto/update-results-meta.dto.ts",
+          "hash": "72257205589909868"
+        },
+        {
+          "file": "apps/api/src/results-meta/results-meta.controller.spec.ts",
+          "hash": "8986741634119013957"
+        },
+        {
+          "file": "apps/api/src/results-meta/results-meta.controller.ts",
+          "hash": "9065140866863977670"
+        },
+        {
+          "file": "apps/api/src/results-meta/results-meta.module.ts",
+          "hash": "2826074231059577009"
+        },
+        {
+          "file": "apps/api/src/results-meta/results-meta.service.spec.ts",
+          "hash": "10206528981230947196"
+        },
+        {
+          "file": "apps/api/src/results-meta/results-meta.service.ts",
+          "hash": "13056774455767959765"
+        },
+        {
+          "file": "apps/api/src/results-meta/schemas/results-meta.schema.ts",
+          "hash": "4265313079286042688"
+        },
+        {
+          "file": "apps/api/src/rewards/dto/create-reward.dto.ts",
+          "hash": "14427166895655732920"
+        },
+        {
+          "file": "apps/api/src/rewards/dto/update-reward.dto.ts",
+          "hash": "15047257733574258377"
+        },
+        {
+          "file": "apps/api/src/rewards/rewards.controller.spec.ts",
+          "hash": "5410736630990153691"
+        },
+        {
+          "file": "apps/api/src/rewards/rewards.controller.ts",
+          "hash": "12352593289275667157"
+        },
+        {
+          "file": "apps/api/src/rewards/rewards.module.ts",
+          "hash": "17998543091866235344"
+        },
+        {
+          "file": "apps/api/src/rewards/rewards.service.spec.ts",
+          "hash": "12954011356461453788"
+        },
+        {
+          "file": "apps/api/src/rewards/rewards.service.ts",
+          "hash": "7871007330104427481"
+        },
+        {
+          "file": "apps/api/src/rewards/schemas/reward.schema.ts",
+          "hash": "8786073235897454155"
+        },
+        {
+          "file": "apps/api/src/users/dto/create-user.dto.ts",
+          "hash": "11639189899478056636"
+        },
+        {
+          "file": "apps/api/src/users/dto/update-user.dto.ts",
+          "hash": "13199424294807899846"
+        },
+        {
+          "file": "apps/api/src/users/schemas/user.schema.ts",
+          "hash": "11660447754182987053"
+        },
+        {
+          "file": "apps/api/src/users/users.controller.ts",
+          "hash": "15061851481418030481"
+        },
+        {
+          "file": "apps/api/src/users/users.module.ts",
+          "hash": "13425167996903622913"
+        },
+        {
+          "file": "apps/api/src/users/users.service.ts",
+          "hash": "13631969348037710199"
+        },
+        {
+          "file": "apps/api/src/voice-credits/dto/create-voice-credit.dto.ts",
+          "hash": "4890291913775291007"
+        },
+        {
+          "file": "apps/api/src/voice-credits/dto/update-voice-credit.dto.ts",
+          "hash": "14897833317618195894"
+        },
+        {
+          "file": "apps/api/src/voice-credits/schemas/voice-credit.schema.ts",
+          "hash": "7836090484704833298"
+        },
+        {
+          "file": "apps/api/src/voice-credits/voice-credits.controller.ts",
+          "hash": "16671688609231089297"
+        },
+        {
+          "file": "apps/api/src/voice-credits/voice-credits.module.ts",
+          "hash": "12543583448736899576"
+        },
+        {
+          "file": "apps/api/src/voice-credits/voice-credits.service.ts",
+          "hash": "6063116218258500718"
+        },
+        {
+          "file": "apps/api/src/votes-meta/dto/create-votes-meta.dto.ts",
+          "hash": "13919506180393053044"
+        },
+        {
+          "file": "apps/api/src/votes-meta/dto/update-votes-meta.dto.ts",
+          "hash": "10756644839395660110"
+        },
+        {
+          "file": "apps/api/src/votes-meta/schemas/votes-meta.schema.ts",
+          "hash": "5129209693138889579"
+        },
+        {
+          "file": "apps/api/src/votes-meta/votes-meta.controller.spec.ts",
+          "hash": "9743602751779401404"
+        },
+        {
+          "file": "apps/api/src/votes-meta/votes-meta.controller.ts",
+          "hash": "8111202700593119228"
+        },
+        {
+          "file": "apps/api/src/votes-meta/votes-meta.module.ts",
+          "hash": "4069160403627413874"
+        },
+        {
+          "file": "apps/api/src/votes-meta/votes-meta.service.spec.ts",
+          "hash": "16692242008137998910"
+        },
+        {
+          "file": "apps/api/src/votes-meta/votes-meta.service.ts",
+          "hash": "904111545786050419"
+        },
+        {
+          "file": "apps/api/src/voting-event/dto/create-voting-event.dto.ts",
+          "hash": "4724365194104532138"
+        },
+        {
+          "file": "apps/api/src/voting-event/dto/update-voting-event.dto.ts",
+          "hash": "11566498646217882235"
+        },
+        {
+          "file": "apps/api/src/voting-event/schemas/voting-event.schema.ts",
+          "hash": "17545014905392501578"
+        },
+        {
+          "file": "apps/api/src/voting-event/voting-event.controller.ts",
+          "hash": "16327831591498301711"
+        },
+        {
+          "file": "apps/api/src/voting-event/voting-event.module.ts",
+          "hash": "8744283601736172799"
+        },
+        {
+          "file": "apps/api/src/voting-event/voting-event.service.ts",
+          "hash": "11453097961171317345"
+        },
+        {
+          "file": "apps/api/test/app.e2e-spec.ts",
+          "hash": "158522780483466152"
+        },
+        {
+          "file": "apps/api/test/jest-e2e.json",
+          "hash": "10645908491471703423"
+        },
+        {
+          "file": "apps/api/tsconfig.build.json",
+          "hash": "9666801268768259513"
+        },
+        {
+          "file": "apps/api/tsconfig.json",
+          "hash": "14731237877679986244"
+        }
+      ],
+      "@sasvoth/eslint-config": [
+        {
+          "file": "packages/eslint-config/README.md",
+          "hash": "1092748542044076746"
+        },
+        {
+          "file": "packages/eslint-config/base.js",
+          "hash": "5890595504024885448"
+        },
+        {
+          "file": "packages/eslint-config/next.js",
+          "hash": "5381136666892374802"
+        },
+        {
+          "file": "packages/eslint-config/package.json",
+          "hash": "4514190952658347642",
+          "deps": [
+            "npm:@eslint/js",
+            "npm:@next/eslint-plugin-next",
+            "npm:eslint",
+            "npm:eslint-config-prettier",
+            "npm:eslint-plugin-only-warn",
+            "npm:eslint-plugin-react",
+            "npm:eslint-plugin-react-hooks",
+            "npm:eslint-plugin-turbo",
+            "npm:globals@16.4.0",
+            "npm:typescript",
+            "npm:typescript-eslint"
+          ]
+        },
+        {
+          "file": "packages/eslint-config/react-internal.js",
+          "hash": "8739729661497310624"
+        }
+      ],
+      "web": [
+        {
+          "file": "apps/web/.gitignore",
+          "hash": "7845626393799664148"
+        },
+        {
+          "file": "apps/web/README.md",
+          "hash": "9068016540107794099"
+        },
+        {
+          "file": "apps/web/app/dashboard/page.tsx",
+          "hash": "10525763241099077754"
+        },
+        {
+          "file": "apps/web/app/fonts/GeistMonoVF.woff",
+          "hash": "17799230542345324615"
+        },
+        {
+          "file": "apps/web/app/fonts/GeistVF.woff",
+          "hash": "6578897518916770501"
+        },
+        {
+          "file": "apps/web/app/globals.css",
+          "hash": "3391553823493686170"
+        },
+        {
+          "file": "apps/web/app/layout.tsx",
+          "hash": "10143846242584194574"
+        },
+        {
+          "file": "apps/web/app/page.tsx",
+          "hash": "7991230058163879269"
+        },
+        {
+          "file": "apps/web/app/signin/page.tsx",
+          "hash": "2083500848302037381"
+        },
+        {
+          "file": "apps/web/app/signup/page.tsx",
+          "hash": "15970320858996516509"
+        },
+        {
+          "file": "apps/web/app/votes/[id]/page.tsx",
+          "hash": "4058145287072096668"
+        },
+        {
+          "file": "apps/web/eslint.config.js",
+          "hash": "17574372796052946387"
+        },
+        {
+          "file": "apps/web/next.config.js",
+          "hash": "3099306030354460128"
+        },
+        {
+          "file": "apps/web/package.json",
+          "hash": "5418751408695495715",
+          "deps": [
+            "@sasvoth/eslint-config",
+            "@sasvoth/typescript-config",
+            "npm:@types/node@22.18.8",
+            "npm:@types/react",
+            "npm:@types/react-dom",
+            "npm:autoprefixer",
+            "npm:eslint",
+            "npm:postcss@8.5.6",
+            "npm:tailwindcss",
+            "npm:typescript@5.8.2",
+            "@sasvoth/ui",
+            "npm:next",
+            "npm:react",
+            "npm:react-dom"
+          ]
+        },
+        {
+          "file": "apps/web/postcss.config.mjs",
+          "hash": "508870163316443232"
+        },
+        {
+          "file": "apps/web/public/file-text.svg",
+          "hash": "6265815143214731492"
+        },
+        {
+          "file": "apps/web/public/globe.svg",
+          "hash": "9245249619330193570"
+        },
+        {
+          "file": "apps/web/public/lg-logo.svg",
+          "hash": "2270689141496757076"
+        },
+        {
+          "file": "apps/web/public/logo.svg",
+          "hash": "13448221113250496803"
+        },
+        {
+          "file": "apps/web/public/next.svg",
+          "hash": "8300767200008744458"
+        },
+        {
+          "file": "apps/web/public/turborepo-dark.svg",
+          "hash": "11172014054832468123"
+        },
+        {
+          "file": "apps/web/public/turborepo-light.svg",
+          "hash": "7078673580495147275"
+        },
+        {
+          "file": "apps/web/public/vercel.svg",
+          "hash": "6621617372741835036"
+        },
+        {
+          "file": "apps/web/public/window.svg",
+          "hash": "6913546887406634017"
+        },
+        {
+          "file": "apps/web/tsconfig.json",
+          "hash": "8444273254813282563"
+        }
+      ],
+      "@sasvoth/ui": [
+        {
+          "file": "packages/ui/.gitignore",
+          "hash": "3377529041528991192"
+        },
+        {
+          "file": "packages/ui/README.md",
+          "hash": "10464496779355095404"
+        },
+        {
+          "file": "packages/ui/button.tsx",
+          "hash": "2912422848533624847"
+        },
+        {
+          "file": "packages/ui/components.json",
+          "hash": "9337161384031876989"
+        },
+        {
+          "file": "packages/ui/eslint.config.mjs",
+          "hash": "9457570080930645618"
+        },
+        {
+          "file": "packages/ui/input.tsx",
+          "hash": "3709633098714580240"
+        },
+        {
+          "file": "packages/ui/lib/utils.ts",
+          "hash": "6502578908330605140"
+        },
+        {
+          "file": "packages/ui/next.config.ts",
+          "hash": "14615203811043769621"
+        },
+        {
+          "file": "packages/ui/package.json",
+          "hash": "10778162896033098282",
+          "deps": [
+            "@sasvoth/eslint-config",
+            "@sasvoth/typescript-config",
+            "npm:@eslint/eslintrc",
+            "npm:@tailwindcss/postcss",
+            "npm:@types/node@20.19.19",
+            "npm:@types/react",
+            "npm:@types/react-dom",
+            "npm:eslint",
+            "npm:eslint-config-next",
+            "npm:tailwindcss",
+            "npm:tw-animate-css",
+            "npm:typescript",
+            "npm:@radix-ui/react-slot",
+            "npm:class-variance-authority",
+            "npm:clsx",
+            "npm:lucide-react",
+            "npm:next",
+            "npm:react",
+            "npm:react-dom",
+            "npm:tailwind-merge"
+          ]
+        },
+        {
+          "file": "packages/ui/postcss.config.mjs",
+          "hash": "512361679910886401"
+        },
+        {
+          "file": "packages/ui/public/favicon.ico",
+          "hash": "9157999678830540297"
+        },
+        {
+          "file": "packages/ui/public/file.svg",
+          "hash": "15617830351863523835"
+        },
+        {
+          "file": "packages/ui/public/globe.svg",
+          "hash": "9134466864871335697"
+        },
+        {
+          "file": "packages/ui/public/next.svg",
+          "hash": "8300767200008744458"
+        },
+        {
+          "file": "packages/ui/public/vercel.svg",
+          "hash": "3007623926711696394"
+        },
+        {
+          "file": "packages/ui/public/window.svg",
+          "hash": "16677869292061012332"
+        },
+        {
+          "file": "packages/ui/tsconfig.json",
+          "hash": "6284078909163757272"
+        }
+      ],
+      "@sasvoth/typescript-config": [
+        {
+          "file": "packages/typescript-config/base.json",
+          "hash": "2926251808060702929"
+        },
+        {
+          "file": "packages/typescript-config/nextjs.json",
+          "hash": "9526012763141650085"
+        },
+        {
+          "file": "packages/typescript-config/package.json",
+          "hash": "1126678495505954749"
+        },
+        {
+          "file": "packages/typescript-config/react-library.json",
+          "hash": "2476602631139694389"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".gitignore",
+        "hash": "4971587446803738686"
+      },
+      {
+        "file": ".npmrc",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": ".vscode/settings.json",
+        "hash": "15768388142438271746"
+      },
+      {
+        "file": "README.md",
+        "hash": "6694001855276189790"
+      },
+      {
+        "file": "cspell.json",
+        "hash": "7936818693325965600"
+      },
+      {
+        "file": "package.json",
+        "hash": "6078897524551012637"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "hash": "8511397324486916729"
+      },
+      {
+        "file": "pnpm-workspace.yaml",
+        "hash": "18201419468345229271"
+      },
+      {
+        "file": "turbo.json",
+        "hash": "15640634465061069916"
+      }
+    ]
+  },
+  "externalNodesHash": "5719114945324649131"
+}

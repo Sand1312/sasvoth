@@ -9,6 +9,9 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "@nx/nest": "^21.6.2",
+    "@types/mongoose": "^5.11.97",
+    "nx": "^21.6.2",
     "prettier": "catalog:",
     "turbo": "catalog:",
     "typescript": "5.8.3"
@@ -16,5 +19,9 @@
   "packageManager": "pnpm@9.5.0",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@nestjs/mongoose": "^11.0.3",
+    "mongoose": "^8.18.3"
   }
 }
