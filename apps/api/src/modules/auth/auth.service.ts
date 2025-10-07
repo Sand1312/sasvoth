@@ -5,6 +5,8 @@ import { Users, UsersDocument } from '../users/schemas/users.schema';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ethers } from 'ethers';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +14,7 @@ export class AuthService {
     @InjectModel(Users.name)
     private usersModel: Model<UsersDocument>,
     private jwtService: JwtService,
+    @InjectRedis() private readonly redis: Redis,
   ) {}
 
   async signupWithEmail(email: string, password: string, rePassword: string, walletAddress: string, signature?: string) {
@@ -28,13 +31,11 @@ export class AuthService {
       throw new BadRequestException('Invalid wallet address');
     }
 
-    // Kiểm tra trùng lặp walletAddress
     const existingWallet = await this.usersModel.findOne({ walletAddress }).exec();
     if (existingWallet) {
       throw new BadRequestException('This wallet address is already linked to another account');
     }
 
-    // Xác minh chữ ký nếu được cung cấp
     if (signature) {
       const message = 'Sign to register your account';
       const signerAddress = ethers.utils.verifyMessage(message, signature);
@@ -77,13 +78,11 @@ export class AuthService {
       throw new BadRequestException('Invalid wallet address');
     }
 
-    // Kiểm tra trùng lặp walletAddress
     const existingWallet = await this.usersModel.findOne({ walletAddress }).exec();
     if (existingWallet) {
       throw new BadRequestException('This wallet address is already linked to another account');
     }
 
-    // Xác minh chữ ký nếu được cung cấp
     if (signature) {
       const message = 'Sign to register with Google';
       const signerAddress = ethers.utils.verifyMessage(message, signature);
@@ -133,13 +132,11 @@ export class AuthService {
       throw new BadRequestException('Invalid wallet address');
     }
 
-    // Kiểm tra trùng lặp walletAddress
     const existingWallet = await this.usersModel.findOne({ walletAddress }).exec();
     if (existingWallet) {
       throw new BadRequestException('This wallet address is already linked to another account');
     }
 
-    // Xác minh chữ ký nếu được cung cấp
     if (signature) {
       const message = 'Sign to register with Github';
       const signerAddress = ethers.utils.verifyMessage(message, signature);
@@ -202,39 +199,62 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  async changeWalletAddress(userId: string, newWalletAddress: string, signature: string) {
-    if (!ethers.utils.isAddress(newWalletAddress)) {
-      throw new BadRequestException('Invalid wallet address');
+  async refreshAccessToken(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
+
+      const user = await this.usersModel.findById(payload.sub).exec();
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const storedRefreshToken = await this.redis.get(`user:${user._id}:refresh_token`);
+      if (storedRefreshToken !== refreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      return this.generateToken(user);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
     }
+  }
 
-    // Xác minh chữ ký cho ví mới
-    const message = 'Sign to change your wallet address';
-    const signerAddress = ethers.utils.verifyMessage(message, signature);
-    if (signerAddress.toLowerCase() !== newWalletAddress.toLowerCase()) {
-      throw new BadRequestException('Invalid signature');
-    }
-
-    // Kiểm tra trùng lặp walletAddress
-    const existingWallet = await this.usersModel.findOne({ walletAddress: newWalletAddress }).exec();
-    if (existingWallet) {
-      throw new BadRequestException('This wallet address is already linked to another account');
-    }
-
-    const user = await this.usersModel.findById(userId).exec();
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
-
-    user.walletAddress = newWalletAddress;
-    await user.save();
-
-    return this.generateToken(user);
+  async logout(userId: string) {
+    await this.redis.del(`user:${userId}:access_token`);
+    await this.redis.del(`user:${userId}:refresh_token`);
   }
 
   private async generateToken(user: UsersDocument) {
     const payload = { email: user.email, sub: user._id.toString(), walletAddress: user.walletAddress, role: user.role };
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '15m',
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
+    });
+
+    await this.redis.set(
+      `user:${user._id}:access_token`,
+      accessToken,
+      'EX',
+      15 * 60, // 15 minutes
+    );
+    await this.redis.set(
+      `user:${user._id}:refresh_token`,
+      refreshToken,
+      'EX',
+      7 * 24 * 60 * 60, // 7 days
+    );
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken,
     };
   }
 }

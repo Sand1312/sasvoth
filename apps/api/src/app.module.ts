@@ -10,6 +10,7 @@ import { ResultsMetaModule } from './modules/results-meta/results-meta.module';
 import { VoiceCreditsModule } from './modules/voice-credits/voice-credits.module';
 import { VotesMetaModule } from './modules/votes-meta/votes-meta.module';
 import { VotingEventsModule } from './modules/voting-events/voting-events.module';
+import { RedisModule } from "@nestjs-modules/ioredis";
 
 @Module({
   imports: [
@@ -22,6 +23,14 @@ import { VotingEventsModule } from './modules/voting-events/voting-events.module
     }),
     ConfigModule.forRoot({ isGlobal: true ,
       envFilePath: '.env',
+    }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'single',
+        url: configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+      }),
+      inject: [ConfigService],
     }),
     UsersModule,
     VoiceCreditsModule,
