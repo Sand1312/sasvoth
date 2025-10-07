@@ -1,14 +1,15 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { UsersModule } from "./users/users.module";
-import { VoiceCreditsModule } from "./voice-credits/voice-credits.module";
-import { VotingEventModule } from "./voting-event/voting-event.module";
-import { ResultsMetaModule } from "./results-meta/results-meta.module";
-import { RewardsModule } from "./rewards/rewards.module";
-import { VotesMetaModule } from "./votes-meta/votes-meta.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { RewardsModule } from './modules/rewards/rewards.module';
+import { ResultsMetaModule } from './modules/results-meta/results-meta.module';
+import { VoiceCreditsModule } from './modules/voice-credits/voice-credits.module';
+import { VotesMetaModule } from './modules/votes-meta/votes-meta.module';
+import { VotingEventsModule } from './modules/voting-events/voting-events.module';
 
 @Module({
   imports: [
@@ -19,13 +20,17 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
       }),
       inject: [ConfigService],
     }),
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true ,
+      envFilePath: '.env',
+    }),
     UsersModule,
     VoiceCreditsModule,
-    VotingEventModule,
+    VotingEventsModule,
     ResultsMetaModule,
     RewardsModule,
     VotesMetaModule,
+    AuthModule,
+    VotingEventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

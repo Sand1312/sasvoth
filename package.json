@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@nestjs/mongoose": "^11.0.3",
+    "ethers": "5",
     "mongoose": "^8.18.3"
   }
 }
