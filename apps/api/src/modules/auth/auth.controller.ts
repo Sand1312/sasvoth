@@ -21,15 +21,22 @@ export class AuthController {
 
   @Post('signin/email')
   async signinWithEmail(
-    @Body() body: { email: string; password: string; walletAddress: string; signature?: string },
+    @Body() body: { email: string; password: string },
   ) {
     return this.authService.signinWithEmail(
       body.email,
-      body.password,
-      body.walletAddress,
-      body.signature,
+      body.password
     );
   }
+  @Post('signin/wallet')
+  async signinWithWallet(
+    @Body() body: { walletAddress: string; signature: string },
+  ) {
+    return this.authService.signinWithMetamask(
+      body.walletAddress,
+      body.signature
+    );
+  } 
 
   @UseGuards(AuthGuard('google'))
   @Post('signup/google')
@@ -44,11 +51,9 @@ export class AuthController {
 
   @UseGuards(AuthGuard('google'))
   @Post('signin/google')
-  async signinWithGoogle(@Request() req, @Body() body: { walletAddress: string; signature?: string }) {
+  async signinWithGoogle(@Request() req) {
     return this.authService.signinWithGoogle(
       req.user.googleId,
-      body.walletAddress,
-      body.signature,
     );
   }
 
@@ -65,11 +70,9 @@ export class AuthController {
 
   @UseGuards(AuthGuard('github'))
   @Post('signin/github')
-  async signinWithGithub(@Request() req, @Body() body: { walletAddress: string; signature?: string }) {
+  async signinWithGithub(@Request() req) {
     return this.authService.signinWithGithub(
-      req.user.githubId,
-      body.walletAddress,
-      body.signature
+      req.user.githubId
     );
   }
 }

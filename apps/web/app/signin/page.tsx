@@ -32,6 +32,32 @@ function IconButton({
 }
 
 export default function LoginPage() {
+  const [walletError, setWalletError] = useState<string| null>(null);
+  const handleWalletLogin = async () => {
+    setWalletError(null);
+    try{
+      if (!(window as any).ethereum) {
+        setWalletError("MetaMask is not installed.");
+        return;
+      }
+      const accounts = await (window as any).ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const account = accounts[0];
+      const message = "Sign to login with MetaMask";
+      const signature = await (window as any).ethereum.request({
+        method: "personal_sign",
+        params: [message, account],
+      });
+      console.log("Address:", account);
+      console.log("Signature:", signature);
+      // Send walletAddress and signature to backend for verification and login
+    } catch (err: any) {
+      console.error(err);
+      setWalletError("Failed to connect wallet.");
+    } 
+  
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-sm p-8 bg-white rounded shadow">
@@ -101,7 +127,7 @@ export default function LoginPage() {
               />
             </svg>
           </IconButton>
-          <IconButton label="Login with MetaMask">
+          <IconButton label="Login with MetaMask" onClick={handleWalletLogin}>
             <svg className="w-5 h-5" viewBox="0 0 32 32">
               <path
                 fill="#f6851b"

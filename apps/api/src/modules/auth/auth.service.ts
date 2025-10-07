@@ -63,23 +63,10 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  async signinWithEmail(email: string, password: string, walletAddress: string, signature?: string) {
+  async signinWithEmail(email: string, password: string) {
     const user = await this.usersModel.findOne({ email }).exec();
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
-    }
-
-    if (user.walletAddress !== walletAddress) {
-      throw new UnauthorizedException('Invalid wallet address');
-    }
-
-    // Xác minh chữ ký nếu được cung cấp
-    if (signature) {
-      const message = 'Sign to login to your account';
-      const signerAddress = ethers.utils.verifyMessage(message, signature);
-      if (signerAddress.toLowerCase() !== walletAddress.toLowerCase()) {
-        throw new UnauthorizedException('Invalid signature');
-      }
     }
 
     return this.generateToken(user);
@@ -132,23 +119,10 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  async signinWithGoogle(googleId: string, walletAddress: string, signature?: string) {
+  async signinWithGoogle(googleId: string) {
     const user = await this.usersModel.findOne({ googleId }).exec();
     if (!user) {
       throw new UnauthorizedException('Invalid Google account');
-    }
-
-    if (user.walletAddress !== walletAddress) {
-      throw new UnauthorizedException('Invalid wallet address');
-    }
-
-    // Xác minh chữ ký nếu được cung cấp
-    if (signature) {
-      const message = 'Sign to login with Google';
-      const signerAddress = ethers.utils.verifyMessage(message, signature);
-      if (signerAddress.toLowerCase() !== walletAddress.toLowerCase()) {
-        throw new UnauthorizedException('Invalid signature');
-      }
     }
 
     return this.generateToken(user);
@@ -201,23 +175,28 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  async signinWithGithub(githubId: string, walletAddress: string, signature?: string) {
+  async signinWithGithub(githubId: string) {
     const user = await this.usersModel.findOne({ githubId }).exec();
     if (!user) {
       throw new UnauthorizedException('Invalid Github account');
     }
 
-    if (user.walletAddress !== walletAddress) {
-      throw new UnauthorizedException('Invalid wallet address');
+    return this.generateToken(user);
+  }
+
+  async signinWithMetamask(walletAddress: string, signature: string) {
+    if (!ethers.utils.isAddress(walletAddress)) {
+      throw new BadRequestException('Invalid wallet address');
+    }
+    const message = 'Sign to login with Metamask';
+    const signerAddress = ethers.utils.verifyMessage(message, signature);
+    if (signerAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+      throw new BadRequestException('Invalid signature');
     }
 
-    // Xác minh chữ ký nếu được cung cấp
-    if (signature) {
-      const message = 'Sign to login with Github';
-      const signerAddress = ethers.utils.verifyMessage(message, signature);
-      if (signerAddress.toLowerCase() !== walletAddress.toLowerCase()) {
-        throw new UnauthorizedException('Invalid signature');
-      }
+    const user = await this.usersModel.findOne({ walletAddress }).exec();
+    if (!user) {
+      throw new UnauthorizedException('Wallet address not linked to any account');
     }
 
     return this.generateToken(user);
