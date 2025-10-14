@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {toast} from 'react-toastify';
-import { useRouter } from 'next/router';
+import {ethers} from 'ethers';
 // import { navigate } from 'next/navigation'; 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const api = axios.create({
@@ -10,7 +10,6 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-const navigate = useRouter().push;
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -34,13 +33,67 @@ api.interceptors.response.use(
   },
 
 );
-export const signinWithGoogle =  () => {
-  const googleUrl = `${API_BASE_URL}/auth/google`;
-  console.log('Redirecting to Google:', googleUrl); // DEBUG: Check console browser nếu undefined
-  navigate( `${process.env.NEXT_PUBLIC_API_URL}/auth/google`);
-};
+export const signinWithProvider = async (provider: 'google' | 'github' | 'email' | 'wallet', data?: any) => {
+  const baseUrl = `${API_BASE_URL}/auth/signin/${provider}`;
 
-export const signinWithGithub = () => {
-  window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/github`;
+  if (provider === 'google' || provider === 'github') {
+    // OAuth: Redirect GET
+    window.location.href = baseUrl;
+    
+  } else if (provider === 'email' || provider === 'wallet') {
+    // Non-OAuth: POST body
+    try {
+      console.log('👉 baseUrl:', baseUrl);
+console.log('👉 data:', data);
+      const res = await api.post(baseUrl, data);
+      toast.success('Signed in!');
+      // Cookies đã set từ response → Redirect dashboard manual nếu cần
+      window.location.href = '/dashboard';
+      return res;
+    } catch (err) {
+      toast.error('Signin failed');
+      throw err;
+    }
+  }
 };
+export const signupWithEmail = async (email: string, password: string) => {
+  try {
+    const res = await api.post(`${API_BASE_URL}/auth/signup/email`, { email, password });
+    toast.success('Signed up! You can login now.');
+    window.location.href = '/dashboard';
+    return res;
+  } catch (err) {
+    toast.error('Signup failed');
+    throw err;
+  }
+}
+export const signout = async () => {
+  try {
+    await api.post('/auth/logout');
+     if (window.ethereum) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_revokePermissions',
+          params: [{ eth_accounts: {} }],
+        });
+      } catch (err) {
+        console.warn('MetaMask revoke failed:', err);
+      }
+    }
+
+    // 3️⃣ Clear frontend state
+    localStorage.clear();
+    sessionStorage.clear();
+    toast.success('Logged out');
+    window.location.href = '/signin';
+  } catch (err) {
+    toast.error('Logout failed');
+    throw err;
+  }   
+}
+// Export riêng để component gọi dễ
+// export const signinWithGoogle = () => signinWithProvider('google');
+// export const signinWithGithub = () => signinWithProvider('github');
+// export const signinWithEmail = (data: { email: string; password: string }) => signinWithProvider('email', data);
+// export const signinWithWallet = (data: { address: string; signature: string; message: string }) => signinWithProvider('wallet', data);
 export default api;

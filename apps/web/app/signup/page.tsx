@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Input } from "@sasvoth/ui/input";
-import { signupWithEmail,  signinWithWallet, signinWithGithub, signinWithGoogle } from "@/app/api/auth";
+import { signupWithEmail } from "@/app/api/auth";
 const steps = [
   { label: "Account", key: 1 },
   { label: "Wallet", key: 2 },
@@ -72,9 +72,7 @@ export default function SignupPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle sign up logic here, form contains wallet address
-    // try{
-    //   if(form.password !=)
-    // }
+    signupWithEmail(form.email, form.password);
   };
 
   const handleStepNav = (targetStep: number) => {
@@ -90,7 +88,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <form
-        onSubmit={step === 1 ? handleNext : handleSubmit}
+        onSubmit={step === 1 ? handleSubmit : handleSubmit}
         className="bg-white p-6 rounded shadow-md w-full max-w-sm space-y-4"
       >
         <h2 className="text-2xl font-semibold text-center mb-4 text-black">

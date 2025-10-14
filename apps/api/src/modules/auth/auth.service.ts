@@ -27,6 +27,41 @@ export class AuthService {
     return this.usersService.createGoogleUser(profile);
 
   }
+  async validateGithubUser(profile: { githubId: string; email: string; name: string }){ 
+    const user = await this.usersService.findByGithubId(profile.githubId);
+    if (user) {
+      return user;
+    }
+    return this.usersService.createGithubUser(profile);
+
+  }
+  async validateWalletUser(address: string, signature: string) {
+    const user = await this.usersService.findByWalletAddress(address);
+    if (!user) {
+      return this.usersService.createWalletUser(address);
+    }
+    return user;
+  }
+  async signUpEmail(email: string, password: string) {
+    const existingUser = await this.usersService.findByEmail(email);
+    if (existingUser) {
+      throw new BadRequestException('Email already in use');
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return this.usersService.createUser(email, hashedPassword);
+  }
+  
+  async signInEmail(email: string, password: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user || !user.password) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return user;
+  }
 async generateTokens(userId: string) {
     const accessSecret = this.configService.get('JWT_ACCESS_SECRET');
     const refreshSecret = this.configService.get('JWT_REFRESH_SECRET');
