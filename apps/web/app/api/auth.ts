@@ -43,8 +43,6 @@ export const signinWithProvider = async (provider: 'google' | 'github' | 'email'
   } else if (provider === 'email' || provider === 'wallet') {
     // Non-OAuth: POST body
     try {
-      console.log('👉 baseUrl:', baseUrl);
-console.log('👉 data:', data);
       const res = await api.post(baseUrl, data);
       toast.success('Signed in!');
       // Cookies đã set từ response → Redirect dashboard manual nếu cần
