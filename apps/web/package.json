@@ -12,9 +12,13 @@
   },
   "dependencies": {
     "@sasvoth/ui": "workspace:*",
+    "axios": "^1.12.2",
     "next": "catalog:",
+    "next-auth": "^4.24.11",
+    "nprogress": "^0.2.0",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-toastify": "^11.0.5"
   },
   "devDependencies": {
     "@sasvoth/eslint-config": "workspace:*",

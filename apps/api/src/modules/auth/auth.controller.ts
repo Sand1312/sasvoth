@@ -1,126 +1,89 @@
-import { Controller, Post, Body, UseGuards, Request, Res } from '@nestjs/common';
-import { AuthService } from './auth.service';
+// src/modules/auth/auth.controller.ts
+import { Controller, Get, Post, Req, Res, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
+import { AuthService } from './auth.service';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('signup/email')
-  async signupWithEmail(
-    @Body() body: { email: string; password: string; rePassword: string; walletAddress: string; signature?: string },
-    @Res() res: Response,
-  ) {
-    const tokens = await this.authService.signupWithEmail(
-      body.email,
-      body.password,
-      body.rePassword,
-      body.walletAddress,
-      body.signature,
-    );
-    this.setTokenCookies(res, tokens);
-    return res.json({ message: 'Signup successful' });
+  @Get('google') // → http://localhost:8000/auth/google
+  @UseGuards(AuthGuard('google')) // Passport handle redirect đến Google
+  googleAuth(@Req() req: Request) {
+    // Không cần body, Passport tự redirect
   }
 
-  @Post('signin/email')
-  async signinWithEmail(
-    @Body() body: { email: string; password: string },
-    @Res() res: Response,
-  ) {
-    const tokens = await this.authService.signinWithEmail(body.email, body.password);
-    this.setTokenCookies(res, tokens);
-    return res.json({ message: 'Login successful' });
-  }
-
-  @Post('signin/wallet')
-  async signinWithWallet(
-    @Body() body: { walletAddress: string; signature: string },
-    @Res() res: Response,
-  ) {
-    const tokens = await this.authService.signinWithMetamask(body.walletAddress, body.signature);
-    this.setTokenCookies(res, tokens);
-    return res.json({ message: 'Login with wallet successful' });
-  }
-
+  @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  @Post('signup/google')
-  async signupWithGoogle(
-    @Request() req,
-    @Body() body: { walletAddress: string; signature?: string },
-    @Res() res: Response,
-  ) {
-    const tokens = await this.authService.signupWithGoogle(
-      req.user.googleId,
-      req.user.email,
-      body.walletAddress,
-      body.signature,
-    );
-    this.setTokenCookies(res, tokens);
-    return res.json({ message: 'Signup with Google successful' });
+  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+    try {
+    const profile = req.user as { googleId: string; email: string; name: string };
+    if (!profile || !profile.email) {
+      console.error('Google profile invalid:', profile); // DEBUG
+      return res.status(400).send('Invalid Google profile');
+    }
+    const user = await this.authService.validateGoogleUser(profile);
+    const tokens = await this.authService.generateTokens(user._id.toString());
+    this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+    
+    // FIX: Redirect về FE dashboard (hoặc signin nếu fail)
+    return res.redirect('http://localhost:3000/dashboard');
+  } catch (error) {
+    console.error('Google callback error:', error); // DEBUG backend console
+    return res.redirect('http://localhost:3000/signin?error=auth_failed');
+  }
   }
 
-  @UseGuards(AuthGuard('google'))
-  @Post('signin/google')
-  async signinWithGoogle(@Request() req, @Res() res: Response) {
-    const tokens = await this.authService.signinWithGoogle(req.user.googleId);
-    this.setTokenCookies(res, tokens);
-    return res.json({ message: 'Login with Google successful' });
-  }
-
+  @Get('github')
   @UseGuards(AuthGuard('github'))
-  @Post('signup/github')
-  async signupWithGithub(
-    @Request() req,
-    @Body() body: { walletAddress: string; signature?: string },
-    @Res() res: Response,
-  ) {
-    const tokens = await this.authService.signupWithGithub(
-      req.user.githubId,
-      req.user.email,
-      body.walletAddress,
-      body.signature,
-    );
-    this.setTokenCookies(res, tokens);
-    return res.json({ message: 'Signup with Github successful' });
-  }
+  githubAuth() {}
 
-  @UseGuards(AuthGuard('github'))
-  @Post('signin/github')
-  async signinWithGithub(@Request() req, @Res() res: Response) {
-    const tokens = await this.authService.signinWithGithub(req.user.githubId);
-    this.setTokenCookies(res, tokens);
-    return res.json({ message: 'Login with Github successful' });
-  }
+  // @Get('github/callback')
+  // @UseGuards(AuthGuard('github'))
+  // async githubAuthRedirect(@Req() req: Request, @Res() res: Response) {
+  //   const profile = req.user as { githubId: string; email: string; name: string };
+  //   const user = await this.authService.validateGithubUser(profile);
+  //   const tokens = await this.authService.generateTokens(user._id.toString());
+  //   this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+  //   return res.redirect('http://localhost:3000/dashboard');
+  // }
 
   @Post('refresh')
-  async refreshAccessToken(@Body() body: { refreshToken: string }, @Res() res: Response) {
-    const tokens = await this.authService.refreshAccessToken(body.refreshToken);
-    this.setTokenCookies(res, tokens);
-    return res.json({ message: 'Token refreshed successfully' });
+  async refresh(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies.refresh_token;
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token in cookie');
+    }
+    const tokens = await this.authService.refreshToken(refreshToken);
+    this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+    return res.json({ message: 'Tokens refreshed successfully' });
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Post('logout')
-  async logout(@Request() req, @Res() res: Response) {
-    await this.authService.logout(req.user._id);
+  @UseGuards(AuthGuard('jwt'))
+  async logout(@Req() req: Request, @Res() res: Response) {
+    const userId = (req.user as any).userId;
+    await this.authService.logout(userId);
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
     return res.json({ message: 'Logged out successfully' });
   }
 
-  private setTokenCookies(res: Response, tokens: { access_token: string; refresh_token: string }) {
-    res.cookie('access_token', tokens.access_token, {
+  // FIX LỖI: Thêm method private này vào class (bạn quên khai báo trong class)
+  private setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
+    const isProd = process.env.NODE_ENV === 'production';
+    res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProd,
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 15 * 60 * 1000, // 15m
     });
-    res.cookie('refresh_token', tokens.refresh_token, {
+    res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProd,
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
     });
   }
 }

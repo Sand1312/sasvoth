@@ -11,6 +11,9 @@ export class Users {
   @Prop({ required: false })
   password: string; // Hashed password
 
+  @Prop({type:String,required:true,})
+  name:string;
+  
   @Prop({ required: false, unique: true, sparse: true })
   walletAddress?: string; // MetaMask wallet address
 
@@ -23,8 +26,8 @@ export class Users {
   @Prop({ required: true, enum: ["admin", "user"], default: "user" })
   role: string;
 
-  @Prop({ type: String, required: false,default: null })
-  refreshToken: string| null;
+  @Prop({ type:String, required: true, enum:["google","github","email","wallet","all"], default:"email"})
+  authType: string;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

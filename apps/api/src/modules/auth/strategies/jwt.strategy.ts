@@ -1,36 +1,27 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Users, UsersDocument } from '../../users/schemas/users.schema';
+import { Request } from 'express'; // Nếu cần custom extractor sau
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ConfigService,
-    @InjectModel(Users.name)
-    private usersModel: Model<UsersDocument>,
-  ) {
-    const secret = process.env.JWT_SECRET;
-
+  constructor(private configService: ConfigService) { // Inject private để dùng
+    const secret = configService.get<string>('JWT_ACCESS_SECRET');
     if (!secret) {
-    throw new Error('JWT_SECRET is not defined');
-    }   
+      throw new Error('JWT_ACCESS_SECRET is missing in environment variables');
+    }
 
     super({
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    ignoreExpiration: false,
-    secretOrKey: secret,
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => request.cookies?.access_token || null,
+      ]),
+      ignoreExpiration: false,
+      secretOrKey: secret,
     });
   }
 
   async validate(payload: any) {
-    const user = await this.usersModel.findById(payload.sub).exec();
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    return user;
+    return { userId: payload.sub };
   }
 }

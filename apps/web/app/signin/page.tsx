@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { useState } from "react";
-
+import { signinWithGoogle } from "@/app/api/auth";
 function IconButton({
   children,
   label,
@@ -58,6 +58,9 @@ export default function LoginPage() {
     } 
   
   }
+  const handleGoogleLogin = () => {
+    signinWithGoogle();
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-sm p-8 bg-white rounded shadow">
@@ -97,7 +100,7 @@ export default function LoginPage() {
           <div className="flex-grow h-px bg-gray-200" />
         </div>
         <div className="space-y-2">
-          <IconButton label="Login with Google">
+          <IconButton label="Login with Google" onClick = {handleGoogleLogin}>
             <svg className="w-5 h-5" viewBox="0 0 48 48">
               <g>
                 <path

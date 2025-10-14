@@ -11,6 +11,7 @@ import { VoiceCreditsModule } from './modules/voice-credits/voice-credits.module
 import { VotesMetaModule } from './modules/votes-meta/votes-meta.module';
 import { VotingEventsModule } from './modules/voting-events/voting-events.module';
 import { RedisModule } from "@nestjs-modules/ioredis";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -24,14 +25,22 @@ import { RedisModule } from "@nestjs-modules/ioredis";
     ConfigModule.forRoot({ isGlobal: true ,
       envFilePath: '.env',
     }),
-    RedisModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'single',
-        url: configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-      }),
-      inject: [ConfigService],
-    }),
+    // RedisModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     type: 'single',
+    //     url: configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+    //   }),
+    //   inject: [ConfigService],
+    // }),
+    // JwtModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     secret: configService.get('JWT_SECRET'),
+    //     signOptions: { expiresIn: configService.get('1h') },
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     UsersModule,
     VoiceCreditsModule,
     VotingEventsModule,
