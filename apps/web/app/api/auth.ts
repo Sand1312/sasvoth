@@ -70,9 +70,9 @@ export const signupWithEmail = async (email: string, password: string) => {
 export const signout = async () => {
   try {
     await api.post('/auth/logout');
-     if (window.ethereum) {
+     if ((window as any).ethereum) {
       try {
-        await window.ethereum.request({
+        await (window as any ).ethereum.request({
           method: 'wallet_revokePermissions',
           params: [{ eth_accounts: {} }],
         });
@@ -81,7 +81,6 @@ export const signout = async () => {
       }
     }
 
-    // 3️⃣ Clear frontend state
     localStorage.clear();
     sessionStorage.clear();
     toast.success('Logged out');
