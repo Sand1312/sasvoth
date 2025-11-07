@@ -8,7 +8,7 @@ import { ethers } from 'ethers';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-@Get('signin/google')
+  @Get('signin/google')
   @UseGuards(AuthGuard('google')) 
   googleAuth(@Req() req: Request) {
     // Không cần body, Passport tự redirect
@@ -19,8 +19,9 @@ export class AuthController {
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const profile = req.user as { googleId: string; email: string; name: string };
     const user = await this.authService.validateGoogleUser(profile);
+    const role = user.role;
     const tokens = await this.authService.generateTokens(user._id.toString()); 
-    this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+    this.setTokenCookies(res,role, tokens.accessToken, tokens.refreshToken);
     return res.redirect('http://localhost:3000/dashboard');
   }
 
@@ -33,8 +34,9 @@ export class AuthController {
   async githubAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const profile = req.user as { githubId: string; email: string; name: string };
     const user = await this.authService.validateGithubUser(profile);
+    const role = user.role;
     const tokens = await this.authService.generateTokens(user._id.toString());
-    this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+    this.setTokenCookies(res, role, tokens.accessToken, tokens.refreshToken);
     return res.redirect('http://localhost:3000/dashboard');
   }
 
@@ -57,10 +59,11 @@ export class AuthController {
       }
     }
     const user = await this.authService.validateWalletUser(address, signature);
+    const role = user.role;
     const tokens = await this.authService.generateTokens(user._id.toString());
-    this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+    this.setTokenCookies(res,role, tokens.accessToken, tokens.refreshToken);
     console.log('Wallet authenticated:', address);
-    return res.json({ message: 'Wallet authenticated successfully' });
+    return res.json({ message: 'Wallet authenticated successfully' ,user});
   }
   @Post('signin/email')
   async emailSignIn(@Req() req: Request, @Res() res: Response) {
@@ -69,8 +72,9 @@ export class AuthController {
       throw new UnauthorizedException('Email and password are required');
     }
     const user = await this.authService.signInEmail(email, password);
+    const role = user.role;
     const tokens = await this.authService.generateTokens(user._id.toString());
-    this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+    this.setTokenCookies(res,role, tokens.accessToken, tokens.refreshToken);
     return res.json({ message: 'Email signed in successfully' });
   }
   @Post('signup/email')
@@ -80,19 +84,21 @@ export class AuthController {
       throw new UnauthorizedException('Email and password are required');
     }
     const user = await this.authService.signUpEmail(email, password);
+    const role = user.role;
     const tokens = await this.authService.generateTokens(user._id.toString());
-    this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+    this.setTokenCookies(res,role , tokens.accessToken, tokens.refreshToken);
     return res.json({ message: 'Email signed up successfully' });
   }
 
   @Post('refresh')
   async refresh(@Req() req: Request, @Res() res: Response) {
     const refreshToken = req.cookies.refresh_token;
+    const role = req.cookies.role;
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token in cookie');
     }
     const tokens = await this.authService.refreshToken(refreshToken);
-    this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
+    this.setTokenCookies(res,role, tokens.accessToken, tokens.refreshToken);
     return res.json({ message: 'Tokens refreshed successfully' });
   }
 
@@ -107,20 +113,32 @@ export class AuthController {
   }
 
 
-  // FIX LỖI: Thêm method private này vào class (bạn quên khai báo trong class)
-  private setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
-    const isProd = process.env.NODE_ENV === 'production';
-    res.cookie('access_token', accessToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15m
-    });
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
-    });
-  }
+  
+  private setTokenCookies(res: Response, role:string, accessToken: string, refreshToken: string) {
+  const isProd = process.env.NODE_ENV === 'production';
+
+  res.cookie('access_token', accessToken, {
+    httpOnly: true,
+    secure: isProd ,        
+    sameSite: isProd ? 'strict' : 'none', // 'none' cho cross-domain
+   
+    path: '/',
+    maxAge: 15 * 60 * 1000, // 15m
+  });
+
+  res.cookie('refresh_token', refreshToken, {
+    httpOnly: true,
+    secure: isProd ,
+    sameSite: isProd ? 'strict' : 'none',
+    
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
+  });
+  res.cookie('role', role, {
+    httpOnly: false,
+    secure: isProd ,
+    sameSite: isProd ? 'strict' : 'none', 
+  });
+}
+
 }

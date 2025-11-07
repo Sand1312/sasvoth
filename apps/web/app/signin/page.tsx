@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { useState } from "react";
-import { signinWithProvider } from "@/app/api/auth";
+import { useAuth } from "../hooks/useAuth";
 import { sign } from "crypto";
 function IconButton({
   children,
@@ -35,6 +35,7 @@ function IconButton({
 export default function LoginPage() {
   
   const [walletError, setWalletError] = useState<string| null>(null);
+  const { signinWithProvider } = useAuth();
   const handleWalletLogin = async () => {
     setWalletError(null);
     try{

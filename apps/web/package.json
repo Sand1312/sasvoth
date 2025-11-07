@@ -12,24 +12,25 @@
   },
   "dependencies": {
     "@sasvoth/ui": "workspace:*",
+    "@tanstack/react-query": "^5.90.5",
     "axios": "^1.12.2",
     "next": "catalog:",
     "next-auth": "^4.24.11",
     "nprogress": "^0.2.0",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-toastify": "^11.0.5"
+    "react-toastify": "^11.0.5",
+    "wagmi": "^2.19.1"
   },
   "devDependencies": {
     "@sasvoth/eslint-config": "workspace:*",
     "@sasvoth/typescript-config": "workspace:*",
-    "@types/node": "^22.15.3",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.30.0",
     "postcss": "^8.1.0",
     "tailwindcss": "catalog:",
-    "typescript": "5.8.2"
+    "typescript": "5.8.3"
   }
 }

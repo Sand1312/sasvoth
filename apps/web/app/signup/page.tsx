@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Input } from "@sasvoth/ui/input";
-import { signupWithEmail } from "@/app/api/auth";
+import { signupWithEmail } from "@/app/api/auth.api";
 const steps = [
   { label: "Account", key: 1 },
   { label: "Wallet", key: 2 },

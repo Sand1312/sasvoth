@@ -8,7 +8,8 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+       "@sasvoth/contracts": ["../../packages/contracts"]
     }
   },
   "include": [
@@ -16,7 +17,8 @@
     "**/*.tsx",
     "next-env.d.ts",
     "next.config.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+     "../../packages/contracts/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

@@ -12,7 +12,7 @@ async function bootstrap() {
   
   app.enableCors({
     origin: 'http://localhost:3000', // FE origin
-    credentials: true, // FIX: Sửa 'credential' thành 'credentials' để gửi cookies
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // FIX: 'method' thành 'methods'
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'], // Thêm để FE axios mượt
   });
