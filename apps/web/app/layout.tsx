@@ -5,7 +5,7 @@ import "./globals.css";
 import { Button } from "@sasvoth/ui/button";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { Web3Provider } from './providers/Web3Provider';
+import { Web3Provider } from '../providers/Web3Provider';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

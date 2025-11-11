@@ -1,18 +1,22 @@
 "use client";
 import { useRedirect } from "./useRedirect";
-import { pollsApi } from "../api/polls.api";
-import { init } from "next/dist/compiled/webpack/webpack";
+import { pollsApi } from "../api";
+// import { init } from "next/dist/compiled/webpack/webpack";
 
 export function usePolls() {
   const { goTo, replaceTo } = useRedirect();
 
-  const initPoll = async ( options: string[], startTime:Date , endTime:Date ) => {
+  const initPoll = async (
+    options: string[],
+    startTime: Date,
+    endTime: Date
+  ) => {
     try {
-      const res = await pollsApi.createPoll( options, startTime , endTime );
-      goTo('/admin/dashboard');
+      const res = await pollsApi.createPoll(options, startTime, endTime);
+      goTo("/admin/dashboard");
       return res;
     } catch (error) {
-      console.error('Create Poll error:', error);
+      console.error("Create Poll error:", error);
       throw error;
     }
   };
@@ -21,12 +25,12 @@ export function usePolls() {
       const res = await pollsApi.getPollsByType();
       return res;
     } catch (error) {
-      console.error('Get Polls error:', error);
+      console.error("Get Polls error:", error);
       throw error;
     }
   };
-  return{
+  return {
     initPoll,
     getPollsByType,
-  }
-}   
+  };
+}

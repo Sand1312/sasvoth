@@ -2,8 +2,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { useAccount } from "wagmi";
-import { useMACI } from "../../hooks/useMaci";
-import { usePolls } from "../../hooks/usePolls";
+import { useMACI, usePolls } from "../../../hooks";
 
 type VoteOption = { id: string; label: string };
 
@@ -43,7 +42,13 @@ function XIcon(props: { className?: string }) {
 
 export default function CreatePollPage() {
   const { address } = useAccount();
-  const { createPoll, isDeployingPoll, isDeploySuccess, nextPollId, deployError } = useMACI();
+  const {
+    createPoll,
+    isDeployingPoll,
+    isDeploySuccess,
+    nextPollId,
+    deployError,
+  } = useMACI();
   const { initPoll } = usePolls();
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
@@ -119,7 +124,7 @@ export default function CreatePollPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
-    
+
     if (!isValid) {
       console.log("❌ Form validation failed:", errors);
       return;
@@ -130,13 +135,13 @@ export default function CreatePollPage() {
     }
 
     try {
-      console.log('🚀 Starting poll creation...');
+      console.log("🚀 Starting poll creation...");
 
       // Tính UNIX timestamp (giây)
       const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
       const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
 
-      console.log('⏰ Timestamps:', { startTimestamp, endTimestamp });
+      console.log("⏰ Timestamps:", { startTimestamp, endTimestamp });
 
       // Tạo poll parameters theo đúng ABI
       const treeDepths = {
@@ -155,8 +160,12 @@ export default function CreatePollPage() {
         options.length // số lượng options
       );
 
-      console.log('createPoll called, waiting for MetaMask...');
-
+      console.log("createPoll called, waiting for MetaMask...");
+      await initPoll(
+        options.map((o) => o.label),
+        new Date(startTime),
+        new Date(endTime)
+      );
     } catch (error) {
       console.error(" Failed to create poll:", error);
       alert("Failed to create poll. Check console for details.");
@@ -179,7 +188,7 @@ export default function CreatePollPage() {
       {deployError && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-800 font-medium">
-             Error: {deployError.message}
+            Error: {deployError.message}
           </p>
         </div>
       )}
@@ -459,7 +468,7 @@ export default function CreatePollPage() {
                 Creating Poll...
               </div>
             ) : (
-              'Create vote on Blockchain'
+              "Create vote on Blockchain"
             )}
           </Button>
           {!isValid && submitted ? (
@@ -472,10 +481,10 @@ export default function CreatePollPage() {
       <div className="mt-8 p-4 bg-gray-100 rounded-lg">
         <h3 className="font-semibold mb-2">Debug Info:</h3>
         <div className="text-sm space-y-1">
-          <p>Connected: {address ? 'Yes' : ' No'}</p>
-          <p>Address: {address || 'Not connected'}</p>
-          <p>Deploying: {isDeployingPoll ? 'Yes' : 'No'}</p>
-          <p>Success: {isDeploySuccess ? 'Yes' : 'No'}</p>
+          <p>Connected: {address ? "Yes" : " No"}</p>
+          <p>Address: {address || "Not connected"}</p>
+          <p>Deploying: {isDeployingPoll ? "Yes" : "No"}</p>
+          <p>Success: {isDeploySuccess ? "Yes" : "No"}</p>
           <p>Next Poll ID: {nextPollId}</p>
           {deployError && (
             <p className="text-red-600">
