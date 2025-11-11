@@ -7,10 +7,11 @@ export async function POST(req: Request) {
       process.env.NEXT_PUBLIC_API_URL ||
       process.env.API_URL ||
       "http://localhost:8000";
-    const backendUrl = new URL("/auth/validate", apiBase).toString();
+    const backendUrl = new URL("/auth/refresh", apiBase).toString();
 
-    // Forward incoming cookie header to backend (no body needed for validate)
+    // Forward incoming cookie header (refresh token is in cookie)
     const cookie = req.headers.get("cookie") || "";
+    const body = await req.text(); // Though refresh typically has no body
 
     let res;
     try {
@@ -19,17 +20,19 @@ export async function POST(req: Request) {
         headers: {
           cookie,
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
+        body,
         cache: "no-store",
       });
     } catch (fetchErr) {
-      console.error("/api/auth/validate fetch to backend failed:", fetchErr);
+      console.error("/api/auth/refresh fetch to backend failed:", fetchErr);
       return new NextResponse("backend unreachable", { status: 502 });
     }
 
     const text = await res.text();
 
-    // Forward any Set-Cookie header we received from backend (though validate shouldn't set cookies)
+    // Forward Set-Cookie header (new access/refresh tokens)
     const headers: Record<string, string> = {};
     const ct = res.headers.get("content-type");
     if (ct) headers["content-type"] = ct;
@@ -40,7 +43,7 @@ export async function POST(req: Request) {
 
     return new NextResponse(text, { status: res.status, headers });
   } catch (err) {
-    console.error("/api/auth/validate error:", err);
+    console.error("/api/auth/refresh error:", err);
     return new NextResponse("internal proxy error", { status: 500 });
   }
 }
