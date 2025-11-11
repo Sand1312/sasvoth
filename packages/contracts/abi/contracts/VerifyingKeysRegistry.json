@@ -1,0 +1,2397 @@
+[
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_initialOwner",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidKeysParams",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "VerifyingKeyAlreadySet",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "VerifyingKeyNotSet",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "PollJoinedVerifyingKeySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "PollJoiningVerifyingKeySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "ProcessVerifyingKeySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "TallyVerifyingKeySet",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "MESSAGE_DATA_LENGTH",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "generatePollJoinedVerifyingKeySignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "signature",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "generatePollJoiningVerifyingKeySignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "signature",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        }
+      ],
+      "name": "generateProcessVerifyingKeySignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "signature",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "generateTallyVerifyingKeySignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "signature",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPollJoinedVerifyingKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPollJoinedVerifyingKeyBySignature",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPollJoiningVerifyingKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPollJoiningVerifyingKeyBySignature",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "getProcessVerifyingKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "getProcessVerifyingKeyBySignature",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "getTallyVerifyingKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "getTallyVerifyingKeyBySignature",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "hasProcessVerifyingKey",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "hasTallyVerifyingKey",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "isPollJoinedVerifyingKeySet",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "isPollJoiningVerifyingKeySet",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "isProcessVerifyingKeySet",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "isTallyVerifyingKeySet",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_pollJoinedVerifyingSignature",
+          "type": "tuple"
+        }
+      ],
+      "name": "setPollJoinedVerifyingKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_pollJoiningVerifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "setPollJoiningVerifyingKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_processVerifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "setProcessVerifyingKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_tallyVerifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "setTallyVerifyingKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_processVerifyingKey",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_tallyVerifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "setVerifyingKeys",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "stateTreeDepth",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "pollStateTreeDepth",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "tallyProcessingStateTreeDepth",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "voteOptionTreeDepth",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "messageBatchSize",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum DomainObjs.Mode[]",
+              "name": "modes",
+              "type": "uint8[]"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point",
+                  "name": "alpha1",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "beta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "gamma2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "delta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point[]",
+                  "name": "ic",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SnarkCommon.VerifyingKey",
+              "name": "pollJoiningVerifyingKey",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point",
+                  "name": "alpha1",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "beta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "gamma2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "delta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point[]",
+                  "name": "ic",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SnarkCommon.VerifyingKey",
+              "name": "pollJoinedVerifyingKey",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point",
+                  "name": "alpha1",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "beta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "gamma2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "delta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point[]",
+                  "name": "ic",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SnarkCommon.VerifyingKey[]",
+              "name": "processVerifyingKeys",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point",
+                  "name": "alpha1",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "beta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "gamma2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "delta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point[]",
+                  "name": "ic",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SnarkCommon.VerifyingKey[]",
+              "name": "tallyVerifyingKeys",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct IVerifyingKeysRegistry.SetVerifyingKeysBatchArgs",
+          "name": "_args",
+          "type": "tuple"
+        }
+      ],
+      "name": "setVerifyingKeysBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]

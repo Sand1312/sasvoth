@@ -1,0 +1,12 @@
+{
+  "name": "@sasvoth/contracts",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "build": "echo 'No build needed'"
+  },
+  "dependencies": {
+    "ethers": "^6.0.0"
+  }
+}

@@ -3,7 +3,8 @@ import React from "react";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { useState } from "react";
-
+import { useAuth } from "../hooks/useAuth";
+import { sign } from "crypto";
 function IconButton({
   children,
   label,
@@ -32,6 +33,43 @@ function IconButton({
 }
 
 export default function LoginPage() {
+  
+  const [walletError, setWalletError] = useState<string| null>(null);
+  const { signinWithProvider } = useAuth();
+  const handleWalletLogin = async () => {
+    setWalletError(null);
+    try{
+      if (!(window as any).ethereum) {
+        setWalletError("MetaMask is not installed.");
+        return;
+      }
+      const accounts = await (window as any).ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const account = accounts[0];
+      const message = "Sign to login with MetaMask";
+      const signature = await (window as any).ethereum.request({
+        method: "personal_sign",
+        params: [message, account],
+      });
+      console.log("Address:", account);
+      console.log("Signature:", signature);
+      await signinWithProvider("wallet", { address: account, signature, message });
+      
+    } catch (err: any) {
+      console.error(err);
+      setWalletError("Failed to connect wallet.");
+    } 
+  
+  }
+  const handleLogin = (provider:any) => {
+   signinWithProvider(provider);
+  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+  }
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-sm p-8 bg-white rounded shadow">
@@ -71,9 +109,9 @@ export default function LoginPage() {
           <div className="flex-grow h-px bg-gray-200" />
         </div>
         <div className="space-y-2">
-          <IconButton label="Login with Google">
+          <IconButton label="Login with Google" onClick = {handleLogin.bind(null, 'google')}>
             <svg className="w-5 h-5" viewBox="0 0 48 48">
-              <g>
+              <g>handleGoogleLogin
                 <path
                   fill="#4285F4"
                   d="M44.5 20H24v8.5h11.7C34.1 33.7 29.7 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c2.6 0 5 .8 7 2.2l6.4-6.4C33.5 5.1 28.9 3 24 3 12.9 3 4 11.9 4 23s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.2-4z"
@@ -93,7 +131,7 @@ export default function LoginPage() {
               </g>
             </svg>
           </IconButton>
-          <IconButton label="Login with GitHub">
+          <IconButton label="Login with GitHub" onClick = {handleLogin.bind(null, 'github')}>
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
                 fill="#181717"
@@ -101,7 +139,7 @@ export default function LoginPage() {
               />
             </svg>
           </IconButton>
-          <IconButton label="Login with MetaMask">
+          <IconButton label="Login with MetaMask" onClick={handleWalletLogin}>
             <svg className="w-5 h-5" viewBox="0 0 32 32">
               <path
                 fill="#f6851b"
