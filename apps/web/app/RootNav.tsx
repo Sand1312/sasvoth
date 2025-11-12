@@ -83,7 +83,7 @@ export function RootNav() {
         )}
         {isLoggedIn ? (
           <Button variant="outline" onClick={handleLogout}>
-            Sign Out
+            Logout
           </Button>
         ) : showLoginButton ? (
           <Link href="/signin">
