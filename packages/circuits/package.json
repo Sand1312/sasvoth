@@ -1,0 +1,21 @@
+{
+  "name": "@sasvoth/circuits",
+  "version": "1.0.0",
+  "description": "Circom circuits for MACI voting proofs",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "build:docker": "bash scripts/build-docker.sh",
+    "compile": "circom VoteProof.circom --r1cs --wasm -o build/",
+    "setup": "snarkjs groth16 setup build/VoteProof.r1cs pot_final.ptau build/VoteProof_0000.zkey",
+    "verify-setup": "snarkjs zkey verify build/VoteProof.r1cs pot_final.ptau build/VoteProof_0000.zkey",
+    "export-vkey": "snarkjs zkey export verificationkey build/VoteProof_0000.zkey build/verification_key.json",
+    "full-setup": "npm run compile && npm run setup && npm run verify-setup && npm run export-vkey"
+  },
+  "dependencies": {
+    "snarkjs": "^0.7.0"
+  },
+  "devDependencies": {},
+  "keywords": ["circom", "zk", "maci", "voting"],
+  "author": "",
+  "license": "MIT"
+}

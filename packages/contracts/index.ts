@@ -16,6 +16,7 @@ import POSEIDON_T6_ABI from './abi/poseidon/PoseidonT6.json';
 
 export const CLAIM_CONTRACT_ADDRESS = "0x00Ac4330e934EaDeae7D6C686384c190c6890050";
 export const TOKEN_CONTRACT_ADDRESS = "0x7817c6f9972a0C50298613F1B1d4dCE5C6c0fc0e";
+
 export const FreeForAllPolicy= "0xD60c63e972271ad39Ab8b5B62dc74f59588487d0";
 export const  FreeForAllChecker ="0xC169891E4Bb0e663a66931343b0BD0A44fDADc8d";
  export const FreeForAllPolicyFactory= "0x6199f7AB05F9ADB820461254AB77D286FD7aD443";

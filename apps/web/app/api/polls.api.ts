@@ -1,12 +1,13 @@
 import { api } from './base';
 
 export const pollsApi = {
-    createPoll: async ( options: string[], startTime:Date , endTime:Date ) => {
+
+    createPoll: async ( options: string[], startTime:Date , endTime:Date,creatorAddress :string ) => {
         try {
             const pollData = {
                 title: 'New Poll',
                 description: 'Description of the poll',
-                creatorAddress: '0x9adc62ed1627ffe15e94806380782d6fe630c992',
+                creatorAddress: creatorAddress,
                 status: 'active',
                 startTime: startTime,
                 endTime: endTime,

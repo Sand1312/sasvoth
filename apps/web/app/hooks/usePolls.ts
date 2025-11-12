@@ -6,9 +6,9 @@ import { init } from "next/dist/compiled/webpack/webpack";
 export function usePolls() {
   const { goTo, replaceTo } = useRedirect();
 
-  const initPoll = async ( options: string[], startTime:Date , endTime:Date ) => {
+  const initPoll = async ( options: string[], startTime:Date , endTime:Date,creatorAddress:string ) => {
     try {
-      const res = await pollsApi.createPoll( options, startTime , endTime );
+      const res = await pollsApi.createPoll( options, startTime , endTime, creatorAddress );
       goTo('/admin/dashboard');
       return res;
     } catch (error) {

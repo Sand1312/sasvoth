@@ -136,13 +136,13 @@ export default function CreatePollPage() {
       const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
       const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
 
-      console.log('⏰ Timestamps:', { startTimestamp, endTimestamp });
+      console.log(' Timestamps:', { startTimestamp, endTimestamp });
 
       // Tạo poll parameters theo đúng ABI
       const treeDepths = {
         intStateTreeDepth: Number(treeDepth) || 2,
-        messageTreeDepth: 4, // stateTreeDepth
-        voteOptionTreeDepth: 3,
+        messageTreeDepth: 4,// stateTreeDepth
+        voteOptionTreeDepth: 0,
       };
 
       // GỌI createPoll VỚI ĐÚNG THAM SỐ MỚI
@@ -155,6 +155,7 @@ export default function CreatePollPage() {
         options.length // số lượng options
       );
 
+      // await initPoll(options.map(o => o.label), new Date(startTime), new Date(endTime), address );
       console.log('createPoll called, waiting for MetaMask...');
 
     } catch (error) {

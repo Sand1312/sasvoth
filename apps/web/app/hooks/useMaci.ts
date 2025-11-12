@@ -2,13 +2,10 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { contractConfigs } from '../lib/wagmi-config';
 
-// Định nghĩa types cho hook
 interface UseMACIReturn {
-  // Read data
   signUpCount: number;
   nextPollId: number;
   
-  // Poll functions
   createPoll: (
     startTimestamp: number,
     endTimestamp: number,
@@ -26,7 +23,6 @@ interface UseMACIReturn {
   deployPollHash: `0x${string}` | undefined;
   deployError: Error | null;
   
-  // Sign up functions
   signUpUser: (
     pubKey: { x: bigint; y: bigint }, 
     signUpGatekeeperData: `0x${string}`
@@ -35,25 +31,21 @@ interface UseMACIReturn {
   isSignUpSuccess: boolean;
   signUpError: Error | null;
   
-  // Refetch functions
   refetchSignUps: () => void;
   refetchPolls: () => void;
 }
 
 export function useMACI(): UseMACIReturn {
-  // Đọc số lượng signups - SỬA: dùng totalSignups thay vì numSignUps
   const { data: signUpCount, refetch: refetchSignUps } = useReadContract({
     ...contractConfigs.MACI,
     functionName: 'totalSignups',
   });
 
-  // Đọc số lượng polls
   const { data: nextPollId, refetch: refetchPolls } = useReadContract({
     ...contractConfigs.MACI,
     functionName: 'nextPollId',
   });
 
-  // Tạo poll mới
   const { 
     writeContract, 
     data: deployPollHash,
@@ -65,7 +57,6 @@ export function useMACI(): UseMACIReturn {
     hash: deployPollHash,
   });
 
-  // SỬA HOÀN TOÀN HÀM createPoll THEO ABI
   const createPoll = (
     startTimestamp: number,
     endTimestamp: number,
@@ -78,10 +69,9 @@ export function useMACI(): UseMACIReturn {
     messageBatchSize: number,
     optionsCount: number
   ) => {
-    console.log('🦊 === BẮT ĐẦU GỌI DEPLOY POLL ===');
+    console.log('  BẮT ĐẦU GỌI DEPLOY POLL');
 
-    // Tạo coordinator public key (tạm thời dùng giá trị mặc định)
-    // TRONG THỰC TẾ: Bạn cần generate key pair cho coordinator
+    
 
 
     const coordinatorPublicKey = {
@@ -89,7 +79,6 @@ export function useMACI(): UseMACIReturn {
         y: 8338846306573061361250882526116210096833753055882483856275542076402655573710n
     };
 
-    // Chuẩn bị args theo đúng ABI - CHỈ 1 PARAM DUY NHẤT
     const deployPollArgs = {
       startDate: BigInt(startTimestamp),
       endDate: BigInt(endTimestamp),
@@ -100,33 +89,33 @@ export function useMACI(): UseMACIReturn {
       },
       messageBatchSize: Number(messageBatchSize),
       coordinatorPublicKey: coordinatorPublicKey,
-      mode: 0, // 0 = normal mode
-      policy: contractConfigs.FreeForAllPolicy, // Sử dụng FreeForAllPolicy
+      mode: 0, 
+      policy: contractConfigs.FreeForAllPolicy, 
       initialVoiceCreditProxy: contractConfigs.ConstantInitialVoiceCreditProxyFactory.address,
-      relayers: [], // Empty array - không dùng relayers
+      relayers: [], 
       voteOptions: BigInt(optionsCount)
     };
 
-    console.log('📝 DeployPoll args:', deployPollArgs);
-    console.log('🔗 Contract address:', contractConfigs.MACI.address);
+    console.log('DeployPoll args:', deployPollArgs);
+    console.log('Contract address:', contractConfigs.MACI.address);
 
     writeContract({
       address: contractConfigs.MACI.address,
       abi: contractConfigs.MACI.abi,
       functionName: 'deployPoll',
-      args: [deployPollArgs], // CHỈ 1 ARGUMENT DUY NHẤT
+      args: [deployPollArgs], 
     }, {
       onSuccess: (hash) => {
-        console.log('✅ Transaction sent successfully! Hash:', hash);
+        console.log('Transaction sent successfully! Hash:', hash);
+        
       },
       onError: (error) => {
-        console.error('❌ Transaction failed:', error);
-        console.error('💥 Error details:', error.message);
+        console.error('Transaction failed:', error);
+        console.error('Error details:', error.message);
       }
     });
   };
 
-  // Sign up user - SỬA THEO ABI
   const { 
     writeContract: writeSignUp,
     data: signUpHash,
@@ -139,10 +128,10 @@ export function useMACI(): UseMACIReturn {
   });
 
   const signUpUser = (
-    pubKey: { x: bigint; y: bigint }, 
-    signUpGatekeeperData: `0x${string}`
+      pubKey: { x: bigint; y: bigint }, 
+      signUpGatekeeperData: `0x${string}`
   ) => {
-    console.log('🦊 Calling signUp...');
+    console.log(' Calling signUp...');
     
     writeSignUp({
       address: contractConfigs.MACI.address,
@@ -154,10 +143,10 @@ export function useMACI(): UseMACIReturn {
       ],
     }, {
       onSuccess: (hash) => {
-        console.log('✅ SignUp transaction sent! Hash:', hash);
+        console.log('SignUp transaction sent! Hash:', hash);
       },
       onError: (error) => {
-        console.error('❌ SignUp failed:', error);
+        console.error('SignUp failed:', error);
       }
     });
   };

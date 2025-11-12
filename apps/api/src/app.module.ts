@@ -10,6 +10,7 @@ import { ResultsMetaModule } from './modules/results-meta/results-meta.module';
 import { VoiceCreditsModule } from './modules/voice-credits/voice-credits.module';
 import { VotesMetaModule } from './modules/votes-meta/votes-meta.module';
 import { VotingEventsModule } from './modules/voting-events/voting-events.module';
+import { VotingModule } from './modules/voting/voting.module';
 import { PollsModule } from "./modules/polls/polls.module";
 import { RedisModule } from "@nestjs-modules/ioredis";
 import { JwtModule } from "@nestjs/jwt";
@@ -50,6 +51,7 @@ import { JwtModule } from "@nestjs/jwt";
     VotesMetaModule,
     AuthModule,
     VotingEventsModule,
+    VotingModule,
     PollsModule
   ],
   controllers: [AppController],
