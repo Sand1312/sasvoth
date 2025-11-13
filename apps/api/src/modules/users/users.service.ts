@@ -2,10 +2,28 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Users, UsersDocument } from './schemas/users.schema';
+import {createMACIKeypair} from "../../utils/genMaciKey";
+import { UserDto } from '@/dto/user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(Users.name) private usersModel: Model<UsersDocument>) {}
+
+   private mapToUserDto(user: any,privateKey:string): UserDto {
+    return {
+      id: user._id?.toString() || user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      walletAddress: user.walletAddress,
+      authType: user.authType,
+      publicKey: user.publicKey,
+      publicKeyX: user.publicKeyX,
+      publicKeyY: user.publicKeyY,
+      stateIndex: user.stateIndex,
+       privateKey: privateKey 
+    };
+  }
 
   async findByEmail(email: string): Promise<UsersDocument | null> {
     return this.usersModel.findOne({ email }).exec();
@@ -57,13 +75,41 @@ export class UsersService {
     });
     return newUser.save();
   }
-  async createWalletUser(walletAddress: string): Promise<UsersDocument> {
+  async createWalletUser(walletAddress: string): Promise<UserDto> {
+    
     const newUser = new this.usersModel({
       walletAddress,
       name: walletAddress,
       role: 'user', 
       authType: 'wallet',
     });
-    return newUser.save();
+    const genKey =  createMACIKeypair();
+      newUser.publicKey = genKey.publicKey;
+      newUser.publicKeyX = genKey.publicKeyAsContractParam.X;
+      newUser.publicKeyY = genKey.publicKeyAsContractParam.Y;
+      const privateKey = genKey.privateKey;
+
+    return this.mapToUserDto(await newUser.save(), privateKey);
   }
+  
+  async connectWallet(userId: string, walletAddress: string): Promise<any> {
+    const user = await this.usersModel.findById({userId}).exec();
+    if(!user){
+      throw new BadRequestException('User not found');
+    } else if( user.walletAddress== null || user.walletAddress== undefined){
+      user.walletAddress = walletAddress;
+      const genKey =  createMACIKeypair();
+      user.publicKey = genKey.publicKey;
+      user.publicKeyX = genKey.publicKeyAsContractParam.X;
+      user.publicKeyY = genKey.publicKeyAsContractParam.Y;
+      const privateKey = genKey.privateKey;
+      await user.save();
+      
+      return privateKey;
+    } else if(user.walletAddress == walletAddress){
+      return true;
+    } else {
+      throw new BadRequestException('Wallet address already connected to another account');
+    }
+}
 }

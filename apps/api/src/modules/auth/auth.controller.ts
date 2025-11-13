@@ -161,17 +161,13 @@ export class AuthController {
 
     const user = await this.authService.validateWalletUser(address, signature);
     const role = user.role;
-    const tokens = await this.authService.generateTokens(user._id.toString());
+    const tokens = await this.authService.generateTokens(user.id.toString());
 
     this.setTokenCookies(res, role, tokens.accessToken, tokens.refreshToken);
 
     return res.json({
       message: "Wallet authenticated successfully",
-      user: {
-        id: user._id,
-        address,
-        role,
-      },
+      user: user,
       tokens,
     });
   }

@@ -11,7 +11,7 @@ export class PollsService {
         const newPoll = new this.pollsModel(pollData);
         return newPoll.save();
     }
-    async getPollByType(status: string): Promise<PollsDocument[]> {
+    async getPollByStatus(status: string): Promise<PollsDocument[]> {
         return this.pollsModel.find({ status }).exec();
     }
 }

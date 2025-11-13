@@ -32,6 +32,18 @@ export class Users {
   @Prop({default:0})
   balance:number;
 
+  @Prop({required:false , unique:true})
+  publicKey:String;
+
+  @Prop({required:false , unique:true})
+  publicKeyX:String;
+
+   @Prop({required:false , unique:true})
+  publicKeyY:String;
+
+  @Prop({required:false, unique:true})
+  stateIndex:number;
+
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

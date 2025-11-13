@@ -26,6 +26,8 @@ export class Polls {
     @Prop({ required: true ,type:[String]})
     options: string[];
 
+    @Prop({required:true, equals:true})
+    pollIdOnChain: number;
 
 }
 
