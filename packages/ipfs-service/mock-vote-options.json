@@ -1,0 +1,704 @@
+[
+  {
+    "name": "Option A - Solar Project",
+    "description": "Xây hệ thống pin năng lượng mặt trời cho trường học.",
+    "image": "ipfs://QmPicHash123",
+    "details": {
+      "team": "Green Earth",
+      "goal": "10000 DAI"
+    }
+  },
+  {
+    "name": "Option B - Wind Energy Initiative",
+    "description": "Lắp đặt hệ thống điện gió cho cộng đồng địa phương.",
+    "image": "ipfs://QmWindHash456",
+    "details": {
+      "team": "Wind Power Co",
+      "goal": "25000 DAI"
+    }
+  },
+  {
+    "name": "Option C - Ocean Cleanup Campaign",
+    "description": "Chiều khởi động dự án làm sạch đại dương từ rác thải nhựa.",
+    "image": "ipfs://QmOceanHash789",
+    "details": {
+      "team": "Blue Ocean Foundation",
+      "goal": "15000 DAI"
+    }
+  },
+  {
+    "name": "Option D - Urban Farming Project",
+    "description": "Phát triển nông nghiệp đô thị bền vững cho khu vực thành phố.",
+    "image": "ipfs://QmFarmHash101",
+    "details": {
+      "team": "City Farmers",
+      "goal": "8000 DAI"
+    }
+  },
+  {
+    "name": "Option E - Electric Vehicle Charging",
+    "description": "Xây dựng mạng lưới trạm sạc xe điện công cộng.",
+    "image": "ipfs://QmEVHash202",
+    "details": {
+      "team": "E-Mobility Solutions",
+      "goal": "50000 DAI"
+    }
+  },
+  {
+    "name": "Option F - Forest Restoration",
+    "description": "Trồng cây và phục hồi rừng tại các khu vực bị phá hoại.",
+    "image": "ipfs://QmForestHash303",
+    "details": {
+      "team": "Forest Guardians",
+      "goal": "20000 DAI"
+    }
+  },
+  {
+    "name": "Option G - Smart Water Management",
+    "description": "Triển khai hệ thống quản lý nước thông minh cho thành phố.",
+    "image": "ipfs://QmWaterHash404",
+    "details": {
+      "team": "AquaTech Solutions",
+      "goal": "35000 DAI"
+    }
+  },
+  {
+    "name": "Option H - Renewable Energy Storage",
+    "description": "Phát triển hệ thống lưu trữ năng lượng tái tạo hiệu quả.",
+    "image": "ipfs://QmStorageHash505",
+    "details": {
+      "team": "Energy Storage Inc",
+      "goal": "40000 DAI"
+    }
+  },
+  {
+    "name": "Option I - Green Building Initiative",
+    "description": "Xây dựng các tòa nhà xanh thân thiện với môi trường.",
+    "image": "ipfs://QmGreenHash606",
+    "details": {
+      "team": "Eco Architecture",
+      "goal": "75000 DAI"
+    }
+  },
+  {
+    "name": "Option J - Waste Recycling Program",
+    "description": "Triển khai chương trình tái chế rác thải toàn diện.",
+    "image": "ipfs://QmRecycleHash707",
+    "details": {
+      "team": "Recycle Masters",
+      "goal": "18000 DAI"
+    }
+  },
+  {
+    "name": "Option K - Sustainable Transportation",
+    "description": "Phát triển hệ thống giao thông bền vững cho thành phố.",
+    "image": "ipfs://QmTransportHash808",
+    "details": {
+      "team": "Green Transit Co",
+      "goal": "60000 DAI"
+    }
+  },
+  {
+    "name": "Option L - Community Garden Project",
+    "description": "Tạo các khu vườn cộng đồng để trồng thực phẩm hữu cơ.",
+    "image": "ipfs://QmGardenHash909",
+    "details": {
+      "team": "Community Growers",
+      "goal": "12000 DAI"
+    }
+  },
+  {
+    "name": "Option M - Air Quality Monitoring",
+    "description": "Lắp đặt hệ thống giám sát chất lượng không khí thành phố.",
+    "image": "ipfs://QmAirHash111",
+    "details": {
+      "team": "Clean Air Initiative",
+      "goal": "22000 DAI"
+    }
+  },
+  {
+    "name": "Option N - Bike Sharing Program",
+    "description": "Triển khai chương trình chia sẻ xe đạp công cộng.",
+    "image": "ipfs://QmBikeHash222",
+    "details": {
+      "team": "Bike Share Network",
+      "goal": "30000 DAI"
+    }
+  },
+  {
+    "name": "Option O - Plastic-Free Initiative",
+    "description": "Khuyến khích sử dụng vật liệu thay thế nhựa trong cộng đồng.",
+    "image": "ipfs://QmPlasticHash333",
+    "details": {
+      "team": "Plastic Free Future",
+      "goal": "14000 DAI"
+    }
+  },
+  {
+    "name": "Option P - Clean Energy Education",
+    "description": "Chương trình giáo dục về năng lượng sạch cho học sinh.",
+    "image": "ipfs://QmEducationHash444",
+    "details": {
+      "team": "Green Educators",
+      "goal": "9000 DAI"
+    }
+  },
+  {
+    "name": "Option Q - Sustainable Fishery",
+    "description": "Phát triển nghề cá bền vững để bảo vệ đại dương.",
+    "image": "ipfs://QmFishHash555",
+    "details": {
+      "team": "Ocean Sustainable",
+      "goal": "28000 DAI"
+    }
+  },
+  {
+    "name": "Option R - Green Tech Incubator",
+    "description": "Thành lập trung tâm ươm tạo công nghệ xanh.",
+    "image": "ipfs://QmTechHash666",
+    "details": {
+      "team": "Innovation Hub",
+      "goal": "45000 DAI"
+    }
+  },
+  {
+    "name": "Option S - Carbon Footprint Tracker",
+    "description": "Phát triển ứng dụng theo dõi dấu chân carbon cá nhân.",
+    "image": "ipfs://QmCarbonHash777",
+    "details": {
+      "team": "Carbon Solutions",
+      "goal": "16000 DAI"
+    }
+  },
+  {
+    "name": "Option T - Indigenous Land Protection",
+    "description": "Bảo vệ và phục hồi đất đai của các cộng đồng bản địa.",
+    "image": "ipfs://QmLandHash888",
+    "details": {
+      "team": "Indigenous Rights Fund",
+      "goal": "32000 DAI"
+    }
+  },
+  {
+    "name": "Option U - Vertical Farming Tower",
+    "description": "Xây dựng tháp nông nghiệp thẳng đứng trong thành phố.",
+    "image": "ipfs://QmVerticalHash999",
+    "details": {
+      "team": "Vertical Harvest",
+      "goal": "55000 DAI"
+    }
+  },
+  {
+    "name": "Option V - Bee Conservation Program",
+    "description": "Chương trình bảo tồn và phục hồi quần thể ong mật.",
+    "image": "ipfs://QmBeeHash000",
+    "details": {
+      "team": "Bee Guardians",
+      "goal": "11000 DAI"
+    }
+  },
+  {
+    "name": "Option W - Green Roof Initiative",
+    "description": "Lắp đặt mái nhà xanh cho các tòa nhà trong thành phố.",
+    "image": "ipfs://QmRoofHash112",
+    "details": {
+      "team": "Sky Gardens",
+      "goal": "24000 DAI"
+    }
+  },
+  {
+    "name": "Option X - River Cleanup Project",
+    "description": "Làm sạch và phục hồi hệ sinh thái sông nước địa phương.",
+    "image": "ipfs://QmRiverHash223",
+    "details": {
+      "team": "River Restore",
+      "goal": "19000 DAI"
+    }
+  },
+  {
+    "name": "Option Y - Solar-Powered Street Lights",
+    "description": "Lắp đặt đèn đường chạy bằng năng lượng mặt trời.",
+    "image": "ipfs://QmStreetHash334",
+    "details": {
+      "team": "Solar Streets",
+      "goal": "33000 DAI"
+    }
+  },
+  {
+    "name": "Option Z - Composting Network",
+    "description": "Xây dựng mạng lưới ủ phân hữu cơ cộng đồng.",
+    "image": "ipfs://QmCompostHash445",
+    "details": {
+      "team": "Compost Collective",
+      "goal": "13000 DAI"
+    }
+  },
+  {
+    "name": "Option AA - Green Energy Coop",
+    "description": "Thành lập hợp tác xã năng lượng xanh cộng đồng.",
+    "image": "ipfs://QmCoopHash556",
+    "details": {
+      "team": "Energy Cooperative",
+      "goal": "42000 DAI"
+    }
+  },
+  {
+    "name": "Option BB - Eco-Tourism Development",
+    "description": "Phát triển du lịch sinh thái bền vững cho khu vực.",
+    "image": "ipfs://QmTourismHash667",
+    "details": {
+      "team": "Eco Explorers",
+      "goal": "38000 DAI"
+    }
+  },
+  {
+    "name": "Option CC - Climate Research Lab",
+    "description": "Xây dựng phòng thí nghiệm nghiên cứu khí hậu địa phương.",
+    "image": "ipfs://QmClimateHash778",
+    "details": {
+      "team": "Climate Scientists",
+      "goal": "65000 DAI"
+    }
+  },
+  {
+    "name": "Option DD - Sustainable Fashion Hub",
+    "description": "Trung tâm thời trang bền vững và tái chế quần áo.",
+    "image": "ipfs://QmFashionHash889",
+    "details": {
+      "team": "Green Fashion",
+      "goal": "21000 DAI"
+    }
+  },
+  {
+    "name": "Option EE - Wetland Restoration",
+    "description": "Phục hồi và bảo vệ các khu đất ngập nước tự nhiên.",
+    "image": "ipfs://QmWetlandHash990",
+    "details": {
+      "team": "Wetland Warriors",
+      "goal": "27000 DAI"
+    }
+  },
+  {
+    "name": "Option FF - Zero Waste Grocery",
+    "description": "Mở cửa hàng tạp hóa không rác thải đầu tiên.",
+    "image": "ipfs://QmGroceryHash001",
+    "details": {
+      "team": "Zero Waste Store",
+      "goal": "17000 DAI"
+    }
+  },
+  {
+    "name": "Option GG - Marine Protected Area",
+    "description": "Thiết lập khu bảo tồn biển để bảo vệ đa dạng sinh học.",
+    "image": "ipfs://QmMarineHash113",
+    "details": {
+      "team": "Ocean Protectors",
+      "goal": "48000 DAI"
+    }
+  },
+  {
+    "name": "Option HH - Green School Program",
+    "description": "Chương trình biến các trường học thành môi trường xanh.",
+    "image": "ipfs://QmSchoolHash224",
+    "details": {
+      "team": "Green Schools",
+      "goal": "26000 DAI"
+    }
+  },
+  {
+    "name": "Option II - Renewable Energy Fair",
+    "description": "Tổ chức hội chợ năng lượng tái tạo thường niên.",
+    "image": "ipfs://QmFairHash335",
+    "details": {
+      "team": "Energy Fair Org",
+      "goal": "15000 DAI"
+    }
+  },
+  {
+    "name": "Option JJ - Tree Adoption Program",
+    "description": "Chương trình nhận nuôi cây xanh cho mọi gia đình.",
+    "image": "ipfs://QmTreeHash446",
+    "details": {
+      "team": "Tree Adopters",
+      "goal": "12500 DAI"
+    }
+  },
+  {
+    "name": "Option KK - Eco-Friendly Packaging",
+    "description": "Phát triển bao bì thân thiện với môi trường.",
+    "image": "ipfs://QmPackageHash557",
+    "details": {
+      "team": "Green Package Co",
+      "goal": "23000 DAI"
+    }
+  },
+  {
+    "name": "Option LL - Community Solar Farm",
+    "description": "Xây dựng trang trại năng lượng mặt trời cộng đồng.",
+    "image": "ipfs://QmSolarFarmHash668",
+    "details": {
+      "team": "Solar Community",
+      "goal": "80000 DAI"
+    }
+  },
+  {
+    "name": "Option MM - Green Data Center",
+    "description": "Thành lập trung tâm dữ liệu xanh tiết kiệm năng lượng.",
+    "image": "ipfs://QmDataHash779",
+    "details": {
+      "team": "Green Computing",
+      "goal": "95000 DAI"
+    }
+  },
+  {
+    "name": "Option NN - Sustainable Food Lab",
+    "description": "Phòng thí nghiệm nghiên cứu thực phẩm bền vững.",
+    "image": "ipfs://QmFoodLabHash880",
+    "details": {
+      "team": "Food Innovation",
+      "goal": "34000 DAI"
+    }
+  },
+  {
+    "name": "Option OO - Electric Boat Service",
+    "description": "Dịch vụ thuyền điện thân thiện môi trường.",
+    "image": "ipfs://QmBoatHash991",
+    "details": {
+      "team": "Electric Marine",
+      "goal": "41000 DAI"
+    }
+  },
+  {
+    "name": "Option PP - Green Cryptocurrency",
+    "description": "Phát triển tiền điện tử xanh sử dụng năng lượng tái tạo.",
+    "image": "ipfs://QmCryptoHash002",
+    "details": {
+      "team": "Green Crypto Team",
+      "goal": "70000 DAI"
+    }
+  },
+  {
+    "name": "Option QQ - Pollinator Corridor",
+    "description": "Tạo hành lang sinh thái cho côn trùng thụ phấn.",
+    "image": "ipfs://QmPollinatorHash114",
+    "details": {
+      "team": "Pollinator Project",
+      "goal": "16500 DAI"
+    }
+  },
+  {
+    "name": "Option RR - Sustainable Brewery",
+    "description": "Nhà máy bia bền vững sử dụng nguyên liệu địa phương.",
+    "image": "ipfs://QmBreweryHash225",
+    "details": {
+      "team": "Green Brew Co",
+      "goal": "52000 DAI"
+    }
+  },
+  {
+    "name": "Option SS - Climate Action App",
+    "description": "Ứng dụng di động để theo dõi hành động khí hậu cá nhân.",
+    "image": "ipfs://QmAppHash336",
+    "details": {
+      "team": "Climate Tech",
+      "goal": "18500 DAI"
+    }
+  },
+  {
+    "name": "Option TT - Green Museum Exhibit",
+    "description": "Triển lãm bảo tàng về biến đổi khí hậu và giải pháp xanh.",
+    "image": "ipfs://QmMuseumHash447",
+    "details": {
+      "team": "Museum Curators",
+      "goal": "29000 DAI"
+    }
+  },
+  {
+    "name": "Option UU - Seaweed Farm Initiative",
+    "description": "Nuôi trồng rong biển để hấp thụ carbon và sản xuất thực phẩm.",
+    "image": "ipfs://QmSeaweedHash558",
+    "details": {
+      "team": "Ocean Farmers",
+      "goal": "36000 DAI"
+    }
+  },
+  {
+    "name": "Option VV - Smart Grid Pilot",
+    "description": "Triển khai thí điểm lưới điện thông minh tái tạo.",
+    "image": "ipfs://QmGridHash669",
+    "details": {
+      "team": "Smart Energy",
+      "goal": "85000 DAI"
+    }
+  },
+  {
+    "name": "Option WW - Green Coding Bootcamp",
+    "description": "Khóa học lập trình tập trung vào công nghệ xanh.",
+    "image": "ipfs://QmCodingHash770",
+    "details": {
+      "team": "Tech for Good",
+      "goal": "24500 DAI"
+    }
+  },
+  {
+    "name": "Option XX - Habitat Restoration",
+    "description": "Phục hồi môi trường sống tự nhiên cho động vật hoang dã.",
+    "image": "ipfs://QmHabitatHash881",
+    "details": {
+      "team": "Wildlife Restorer",
+      "goal": "31000 DAI"
+    }
+  },
+  {
+    "name": "Option YY - Solar Window Technology",
+    "description": "Phát triển công nghệ cửa sổ thu năng lượng mặt trời.",
+    "image": "ipfs://QmWindowHash992",
+    "details": {
+      "team": "Solar Window Inc",
+      "goal": "67000 DAI"
+    }
+  },
+  {
+    "name": "Option ZZ - Carbon Sequestration",
+    "description": "Dự án cô lập carbon trong đất bằng phương pháp tự nhiên.",
+    "image": "ipfs://QmSequesterHash003",
+    "details": {
+      "team": "Carbon Capture Co",
+      "goal": "58000 DAI"
+    }
+  },
+  {
+    "name": "Option AAA - Green Investment Fund",
+    "description": "Quỹ đầu tư chuyên về các dự án bền vững.",
+    "image": "ipfs://QmInvestHash115",
+    "details": {
+      "team": "Green Investors",
+      "goal": "100000 DAI"
+    }
+  },
+  {
+    "name": "Option BBB - Eco-Village Development",
+    "description": "Phát triển làng sinh thái tự cung tự cấp.",
+    "image": "ipfs://QmVillageHash226",
+    "details": {
+      "team": "Eco Village Builders",
+      "goal": "120000 DAI"
+    }
+  },
+  {
+    "name": "Option CCC - Microplastic Cleanup",
+    "description": "Công nghệ làm sạch vi nhựa trong nước biển.",
+    "image": "ipfs://QmMicroplasticHash337",
+    "details": {
+      "team": "Ocean Clean Tech",
+      "goal": "44000 DAI"
+    }
+  },
+  {
+    "name": "Option DDD - Green Hydrogen Plant",
+    "description": "Nhà máy sản xuất hydro xanh từ năng lượng tái tạo.",
+    "image": "ipfs://QmHydrogenHash448",
+    "details": {
+      "team": "Hydrogen Solutions",
+      "goal": "150000 DAI"
+    }
+  },
+  {
+    "name": "Option EEE - Circular Economy Hub",
+    "description": "Trung tâm kinh tế tuần hoàn và tái sử dụng vật liệu.",
+    "image": "ipfs://QmCircularHash559",
+    "details": {
+      "team": "Circular Innovators",
+      "goal": "47000 DAI"
+    }
+  },
+  {
+    "name": "Option FFF - Climate Refugee Support",
+    "description": "Chương trình hỗ trợ người tị nạn khí hậu.",
+    "image": "ipfs://QmRefugeeHash660",
+    "details": {
+      "team": "Climate Aid Org",
+      "goal": "39000 DAI"
+    }
+  },
+  {
+    "name": "Option GGG - Floating Solar Farm",
+    "description": "Trang trại năng lượng mặt trời nổi trên mặt nước.",
+    "image": "ipfs://QmFloatingHash771",
+    "details": {
+      "team": "Floating Energy",
+      "goal": "92000 DAI"
+    }
+  },
+  {
+    "name": "Option HHH - Green Chemistry Lab",
+    "description": "Phòng thí nghiệm hóa học xanh không độc hại.",
+    "image": "ipfs://QmChemistryHash882",
+    "details": {
+      "team": "Green Chemists",
+      "goal": "54000 DAI"
+    }
+  },
+  {
+    "name": "Option III - Regenerative Agriculture",
+    "description": "Nông nghiệp tái sinh phục hồi độ phì nhiêu đất.",
+    "image": "ipfs://QmAgricultureHash993",
+    "details": {
+      "team": "Regen Farmers",
+      "goal": "43000 DAI"
+    }
+  },
+  {
+    "name": "Option JJJ - Wind-Solar Hybrid",
+    "description": "Hệ thống năng lượng kết hợp gió và mặt trời.",
+    "image": "ipfs://QmHybridHash004",
+    "details": {
+      "team": "Hybrid Energy",
+      "goal": "78000 DAI"
+    }
+  },
+  {
+    "name": "Option KKK - Green Supply Chain",
+    "description": "Chuỗi cung ứng xanh cho các doanh nghiệp địa phương.",
+    "image": "ipfs://QmSupplyHash116",
+    "details": {
+      "team": "Supply Chain Green",
+      "goal": "56000 DAI"
+    }
+  },
+  {
+    "name": "Option LLL - Biodiversity Database",
+    "description": "Cơ sở dữ liệu đa dạng sinh học địa phương.",
+    "image": "ipfs://QmBiodiversityHash227",
+    "details": {
+      "team": "Bio Data Team",
+      "goal": "32500 DAI"
+    }
+  },
+  {
+    "name": "Option MMM - Ocean Wave Energy",
+    "description": "Khai thác năng lượng từ sóng biển.",
+    "image": "ipfs://QmWaveHash338",
+    "details": {
+      "team": "Wave Power Co",
+      "goal": "89000 DAI"
+    }
+  },
+  {
+    "name": "Option NNN - Green Shipping Initiative",
+    "description": "Vận chuyển hàng hóa bằng phương tiện xanh.",
+    "image": "ipfs://QmShippingHash449",
+    "details": {
+      "team": "Green Logistics",
+      "goal": "61000 DAI"
+    }
+  },
+  {
+    "name": "Option OOO - Algae Biofuel Plant",
+    "description": "Nhà máy sản xuất nhiên liệu sinh học từ tảo.",
+    "image": "ipfs://QmAlgaeHash550",
+    "details": {
+      "team": "Algae Energy",
+      "goal": "73000 DAI"
+    }
+  },
+  {
+    "name": "Option PPP - Smart Building Network",
+    "description": "Mạng lưới tòa nhà thông minh tiết kiệm năng lượng.",
+    "image": "ipfs://QmSmartBuildingHash661",
+    "details": {
+      "team": "Smart Architecture",
+      "goal": "105000 DAI"
+    }
+  },
+  {
+    "name": "Option QQQ - Climate Adaptation Plan",
+    "description": "Kế hoạch thích ứng biến đổi khí hậu cho thành phố.",
+    "image": "ipfs://QmAdaptationHash772",
+    "details": {
+      "team": "Climate Planners",
+      "goal": "87000 DAI"
+    }
+  },
+  {
+    "name": "Option RRR - Green Finance Platform",
+    "description": "Nền tảng tài chính xanh cho các dự án bền vững.",
+    "image": "ipfs://QmFinanceHash883",
+    "details": {
+      "team": "Green Finance Team",
+      "goal": "64000 DAI"
+    }
+  },
+  {
+    "name": "Option SSS - Permaculture Education",
+    "description": "Trung tâm giáo dục canh tác bền vững tự nhiên.",
+    "image": "ipfs://QmPermacultureHash994",
+    "details": {
+      "team": "Permaculture Teachers",
+      "goal": "28500 DAI"
+    }
+  },
+  {
+    "name": "Option TTT - Green AI Research",
+    "description": "Nghiên cứu trí tuệ nhân tạo xanh tiết kiệm năng lượng.",
+    "image": "ipfs://QmAIHash005",
+    "details": {
+      "team": "Green AI Lab",
+      "goal": "82000 DAI"
+    }
+  },
+  {
+    "name": "Option UUU - Coastal Restoration",
+    "description": "Phục hồi bờ biển bị xói mòn do biến đổi khí hậu.",
+    "image": "ipfs://QmCoastalHash117",
+    "details": {
+      "team": "Coastal Guardians",
+      "goal": "76000 DAI"
+    }
+  },
+  {
+    "name": "Option VVV - Sustainable Mining",
+    "description": "Công nghệ khai thác khoáng sản bền vững.",
+    "image": "ipfs://QmMiningHash228",
+    "details": {
+      "team": "Clean Mining Co",
+      "goal": "98000 DAI"
+    }
+  },
+  {
+    "name": "Option WWW - Zero Emission Zone",
+    "description": "Tạo khu vực không khí thải trong thành phố.",
+    "image": "ipfs://QmZeroEmissionHash339",
+    "details": {
+      "team": "Zero Emission Team",
+      "goal": "112000 DAI"
+    }
+  },
+  {
+    "name": "Option XXX - Green Internet Infrastructure",
+    "description": "Hạ tầng internet xanh sử dụng năng lượng tái tạo.",
+    "image": "ipfs://QmInternetHash440",
+    "details": {
+      "team": "Green Internet Co",
+      "goal": "134000 DAI"
+    }
+  },
+  {
+    "name": "Option YYY - Mangrove Protection",
+    "description": "Bảo vệ và trồng rừng ngập mặn chống xói mòn.",
+    "image": "ipfs://QmMangroveHash551",
+    "details": {
+      "team": "Mangrove Protectors",
+      "goal": "49000 DAI"
+    }
+  },
+  {
+    "name": "Option ZZZ - Climate Tech Accelerator",
+    "description": "Chương trình tăng tốc công nghệ khí hậu.",
+    "image": "ipfs://QmAcceleratorHash662",
+    "details": {
+      "team": "Climate Tech Hub",
+      "goal": "156000 DAI"
+    }
+  }
+]

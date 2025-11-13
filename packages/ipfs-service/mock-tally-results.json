@@ -1,0 +1,429 @@
+{
+  "tallyResults": {
+    "votingPeriod": {
+      "startTime": "2025-11-01T00:00:00Z",
+      "endTime": "2025-11-07T23:59:59Z",
+      "duration": "7 days",
+      "status": "completed"
+    },
+    "totalStats": {
+      "totalVotes": 55,
+      "totalWeight": 28750,
+      "totalVoters": 52,
+      "duplicateVotes": 3,
+      "validVotes": 55,
+      "invalidVotes": 0
+    },
+    "results": [
+      {
+        "rank": 1,
+        "optionId": 2,
+        "optionName": "Option B - Wind Energy Initiative",
+        "description": "Lắp đặt hệ thống điện gió cho cộng đồng địa phương.",
+        "team": "Wind Power Co",
+        "goal": "25000 DAI",
+        "voteCount": 8,
+        "totalWeight": 4250,
+        "percentage": 14.78,
+        "weightPercentage": 14.78,
+        "averageWeight": 531.25,
+        "voters": [
+          "0x4h3p68P9j9h2P3j65O8R4Q0N8m1P7R5O6n9m3R",
+          "0x7k6s91S2m2k5S6m98R1U7T3Q1p4S0U8R9q2p6U",
+          "0x9m8u13U4o4m7U8o10T3W9V5S3r6U2W0T1s4r8W",
+          "0x1e2f34F5g5e8F9g21D4G1F6C4i7F3G2D3j6i0G",
+          "0x2f3g45G6h6f9G0h32E5H2G7D5j8G4H3E4k7j1H",
+          "0x3g4h56H7i7g0H1i43F6I3H8E6k9H5I4F5l8k2I",
+          "0x4h5i67I8j8h1I2j54G7J4I9F7l0I6J5G6m9l3J",
+          "0x5i6j78J9k9i2J3k65H8K5J0G8m1J7K6H7n0m4K"
+        ]
+      },
+      {
+        "rank": 2,
+        "optionId": 88,
+        "optionName": "Option ZZZ - Climate Tech Accelerator",
+        "description": "Chương trình tăng tốc công nghệ khí hậu.",
+        "team": "Climate Tech Hub",
+        "goal": "156000 DAI",
+        "voteCount": 6,
+        "totalWeight": 3900,
+        "percentage": 10.91,
+        "weightPercentage": 13.56,
+        "averageWeight": 650.00,
+        "voters": [
+          "0x8l7t02T3n3l6T7n09S2V8U4R2q5T1V9S0r3q7V",
+          "0x0n9v24V5p5n8V9p21U4X0W6T4s7V3X1U2t5s9X",
+          "0x6j7k89K0l0j3K4l76I9L6K1H9o2K8L7I8p1o5L",
+          "0x7k8l90L1m1k4L5m87J0M7L2I0p3L9M8J9q2p6M",
+          "0x8l9m01M2n2l5M6n98K1N8M3J1q4M0N9K0r3q7N",
+          "0x9m0n12N3o3m6N7o09L2O9N4K2r5N1O0L1s4r8O"
+        ]
+      },
+      {
+        "rank": 3,
+        "optionId": 67,
+        "optionName": "Option PPP - Smart Building Network",
+        "description": "Mạng lưới tòa nhà thông minh tiết kiệm năng lượng.",
+        "team": "Smart Architecture",
+        "goal": "105000 DAI",
+        "voteCount": 5,
+        "totalWeight": 3200,
+        "percentage": 9.09,
+        "weightPercentage": 11.13,
+        "averageWeight": 640.00,
+        "voters": [
+          "0x5i4q79Q0k0i3Q4k76P9S5R1O9n2Q8S6P7o0n4S",
+          "0x0p1q23Q4r4p7Q8r10M3R0Q5L3s6Q2R1M4t7s3R",
+          "0x1q2r34R5s5q8R9s21N4S1R6M4t7R3S2N5u8t4S",
+          "0x2r3s45S6t6r9S0t32O5T2S7N5u8S4T3O6v9u5T",
+          "0x3s4t56T7u7s0T1u43P6U3T8O6v9T5U4P7w0v6U"
+        ]
+      },
+      {
+        "rank": 4,
+        "optionId": 72,
+        "optionName": "Option TTT - Green AI Research",
+        "description": "Nghiên cứu trí tuệ nhân tạo xanh tiết kiệm năng lượng.",
+        "team": "Green AI Lab",
+        "goal": "82000 DAI",
+        "voteCount": 4,
+        "totalWeight": 2800,
+        "percentage": 7.27,
+        "weightPercentage": 9.74,
+        "averageWeight": 700.00,
+        "voters": [
+          "0x0n9v24V5p5n8V9p21U4X0W6T4s7V3X1U2t5s9X",
+          "0x4u5v67V8w8u1V2w54Q7W4V9P7x0V6W5Q8y1x7W",
+          "0x5v6w78W9x9v2W3x65R8X5W0Q8y1W7X6R9z2y8X",
+          "0x6w7x89X0y0w3X4y76S9Y6X1R9z2X8Y7S0a3z9Y"
+        ]
+      },
+      {
+        "rank": 5,
+        "optionId": 29,
+        "optionName": "Option CC - Climate Research Lab",
+        "description": "Xây dựng phòng thí nghiệm nghiên cứu khí hậu địa phương.",
+        "team": "Climate Scientists",
+        "goal": "65000 DAI",
+        "voteCount": 4,
+        "totalWeight": 2400,
+        "percentage": 7.27,
+        "weightPercentage": 8.35,
+        "averageWeight": 600.00,
+        "voters": [
+          "0x9m8u13U4o4m7U8o10T3W9V5S3r6U2W0T1s4r8W",
+          "0x7x8y90Y1z1x4Y5z87T0Z7Y2S0a3Y9Z8T1b4a0Z",
+          "0x8y9z01Z2a2y5Z6a98U1A8Z3T1b4Z0A9U2c5b1A",
+          "0x9z0a12A3b3z6A7b09V2B9A4U2c5A1B0V3d6c2B"
+        ]
+      },
+      {
+        "rank": 6,
+        "optionId": 5,
+        "optionName": "Option E - Electric Vehicle Charging",
+        "description": "Xây dựng mạng lưới trạm sạc xe điện công cộng.",
+        "team": "E-Mobility Solutions",
+        "goal": "50000 DAI",
+        "voteCount": 3,
+        "totalWeight": 2100,
+        "percentage": 5.45,
+        "weightPercentage": 7.30,
+        "averageWeight": 700.00,
+        "voters": [
+          "0xb84g79G0a083G4a76F9I5H1E9D2G8I6F7e0d4I",
+          "0x0a1b23B4c4a7B8c10W3C0B5V3d6B2C1W4e7d3C",
+          "0x1b2c34C5d5b8C9d21X4D1C6W4e7C3D2X5f8e4D"
+        ]
+      },
+      {
+        "rank": 7,
+        "optionId": 11,
+        "optionName": "Option K - Sustainable Transportation",
+        "description": "Phát triển hệ thống giao thông bền vững cho thành phố.",
+        "team": "Green Transit Co",
+        "goal": "60000 DAI",
+        "voteCount": 3,
+        "totalWeight": 1950,
+        "percentage": 5.45,
+        "weightPercentage": 6.78,
+        "averageWeight": 650.00,
+        "voters": [
+          "0x7k6s91S2m2k5S6m98R1U7T3Q1p4S0U8R9q2p6U",
+          "0x2c3d45D6e6c9D0e32Y5E2D7X5f8D4E3Y6g9f5E",
+          "0x3d4e56E7f7d0E1f43Z6F3E8Y6g9E5F4Z7h0g6F"
+        ]
+      },
+      {
+        "rank": 8,
+        "optionId": 44,
+        "optionName": "Option RR - Sustainable Brewery",
+        "description": "Nhà máy bia bền vững sử dụng nguyên liệu địa phương.",
+        "team": "Green Brew Co",
+        "goal": "52000 DAI",
+        "voteCount": 3,
+        "totalWeight": 1800,
+        "percentage": 5.45,
+        "weightPercentage": 6.26,
+        "averageWeight": 600.00,
+        "voters": [
+          "0x6j5r80R1l1j4R5l87Q0T6S2P0o3R9T7Q8p1o5T",
+          "0x4e5f67F8g8e1F2g54A7G4F9Z7h0F6G5A8i1h7G",
+          "0x5f6g78G9h9f2G3h65B8H5G0A8i1G7H6B9j2i8H"
+        ]
+      },
+      {
+        "rank": 9,
+        "optionId": 8,
+        "optionName": "Option H - Renewable Energy Storage",
+        "description": "Phát triển hệ thống lưu trữ năng lượng tái tạo hiệu quả.",
+        "team": "Energy Storage Inc",
+        "goal": "40000 DAI",
+        "voteCount": 2,
+        "totalWeight": 1400,
+        "percentage": 3.64,
+        "weightPercentage": 4.87,
+        "averageWeight": 700.00,
+        "voters": [
+          "0xfc8k13K4e4c7K8e10J3M9L5I3h6K2M0J1i4h8M",
+          "0x6g7h89H0i0g3H4i76C9I6H1B9j2H8I7C0k3j9I"
+        ]
+      },
+      {
+        "rank": 10,
+        "optionId": 33,
+        "optionName": "Option GG - Marine Protected Area",
+        "description": "Thiết lập khu bảo tồn biển để bảo vệ đa dạng sinh học.",
+        "team": "Ocean Protectors",
+        "goal": "48000 DAI",
+        "voteCount": 2,
+        "totalWeight": 1200,
+        "percentage": 3.64,
+        "weightPercentage": 4.17,
+        "averageWeight": 600.00,
+        "voters": [
+          "0xeb7j02J3d3b6J7d09I2L8K4H2g5J1L9I0h3g7L",
+          "0x7h8i90I1j1h4I5j87D0J7I2C0k3I9J8D1l4k0J"
+        ]
+      },
+      {
+        "rank": 11,
+        "optionId": 7,
+        "optionName": "Option G - Smart Water Management",
+        "description": "Triển khai hệ thống quản lý nước thông minh cho thành phố.",
+        "team": "AquaTech Solutions",
+        "goal": "35000 DAI",
+        "voteCount": 2,
+        "totalWeight": 1000,
+        "percentage": 3.64,
+        "weightPercentage": 3.48,
+        "averageWeight": 500.00,
+        "voters": [
+          "0x962f57Ee8861E2854D7G3F9C7B0E6G4D5C8F9B2G",
+          "0x8i9j01J2k2i5J6k98E1K8J3D1l4J0K9E2m5l1K"
+        ]
+      },
+      {
+        "rank": 12,
+        "optionId": 55,
+        "optionName": "Option CCC - Microplastic Cleanup",
+        "description": "Công nghệ làm sạch vi nhựa trong nước biển.",
+        "team": "Ocean Clean Tech",
+        "goal": "44000 DAI",
+        "voteCount": 2,
+        "totalWeight": 900,
+        "percentage": 3.64,
+        "weightPercentage": 3.13,
+        "averageWeight": 450.00,
+        "voters": [
+          "0x3g2o57O8i8g1O2i54N7Q3P9M7l0O6Q4N5m8l2Q",
+          "0x9j0k12K3l3j6K7l09F2L9K4E2m5K1L0F3n6m2L"
+        ]
+      },
+      {
+        "rank": 13,
+        "optionId": 3,
+        "optionName": "Option C - Ocean Cleanup Campaign",
+        "description": "Chiều khởi động dự án làm sạch đại dương từ rác thải nhựa.",
+        "team": "Blue Ocean Foundation",
+        "goal": "15000 DAI",
+        "voteCount": 1,
+        "totalWeight": 800,
+        "percentage": 1.82,
+        "weightPercentage": 2.78,
+        "averageWeight": 800.00,
+        "voters": [
+          "0x851e46Dd7750D1743C6F2E8B6A9D5F3C4B7E8A1F"
+        ]
+      },
+      {
+        "rank": 14,
+        "optionId": 21,
+        "optionName": "Option U - Vertical Farming Tower",
+        "description": "Xây dựng tháp nông nghiệp thẳng đứng trong thành phố.",
+        "team": "Vertical Harvest",
+        "goal": "55000 DAI",
+        "voteCount": 1,
+        "totalWeight": 750,
+        "percentage": 1.82,
+        "weightPercentage": 2.61,
+        "averageWeight": 750.00,
+        "voters": [
+          "0xc95h80H1b194H5b87G0J6I2F0e3H9J7G8f1e5J"
+        ]
+      },
+      {
+        "rank": 15,
+        "optionId": 15,
+        "optionName": "Option O - Plastic-Free Initiative",
+        "description": "Khuyến khích sử dụng vật liệu thay thế nhựa trong cộng đồng.",
+        "team": "Plastic Free Future",
+        "goal": "14000 DAI",
+        "voteCount": 1,
+        "totalWeight": 650,
+        "percentage": 1.82,
+        "weightPercentage": 2.26,
+        "averageWeight": 650.00,
+        "voters": [
+          "0xda6i91I2c2a5I6c98H1K7J3G1f4I0K8H9g2f6K"
+        ]
+      },
+      {
+        "rank": 16,
+        "optionId": 19,
+        "optionName": "Option S - Carbon Footprint Tracker",
+        "description": "Phát triển ứng dụng theo dõi dấu chân carbon cá nhân.",
+        "team": "Carbon Solutions",
+        "goal": "16000 DAI",
+        "voteCount": 1,
+        "totalWeight": 600,
+        "percentage": 1.82,
+        "weightPercentage": 2.09,
+        "averageWeight": 600.00,
+        "voters": [
+          "0x0d9l24L5f5d8L9f21K4N0M6J4i7L3N1K2j5i9N"
+        ]
+      },
+      {
+        "rank": 17,
+        "optionId": 41,
+        "optionName": "Option OO - Electric Boat Service",
+        "description": "Dịch vụ thuyền điện thân thiện môi trường.",
+        "team": "Electric Marine",
+        "goal": "41000 DAI",
+        "voteCount": 1,
+        "totalWeight": 500,
+        "percentage": 1.82,
+        "weightPercentage": 1.74,
+        "averageWeight": 500.00,
+        "voters": [
+          "0x1e0m35M6g6e9M0g32L5O1N7K5j8M4O2L3k6j0O"
+        ]
+      },
+      {
+        "rank": 18,
+        "optionId": 26,
+        "optionName": "Option Z - Composting Network",
+        "description": "Xây dựng mạng lưới ủ phân hữu cơ cộng đồng.",
+        "team": "Compost Collective",
+        "goal": "13000 DAI",
+        "voteCount": 1,
+        "totalWeight": 450,
+        "percentage": 1.82,
+        "weightPercentage": 1.57,
+        "averageWeight": 450.00,
+        "voters": [
+          "0x2f1n46N7h7f0N1h43M6P2O8L6k9N5P3M4l7k1P"
+        ]
+      },
+      {
+        "rank": 19,
+        "optionId": 12,
+        "optionName": "Option L - Community Garden Project",
+        "description": "Tạo các khu vườn cộng đồng để trồng thực phẩm hữu cơ.",
+        "team": "Community Growers",
+        "goal": "12000 DAI",
+        "voteCount": 1,
+        "totalWeight": 400,
+        "percentage": 1.82,
+        "weightPercentage": 1.39,
+        "averageWeight": 400.00,
+        "voters": [
+          "0xa73f68Ff9972F3965E8H4G0D8C1F7H5E6D9G0C3H"
+        ]
+      },
+      {
+        "rank": 20,
+        "optionId": 1,
+        "optionName": "Option A - Solar Project",
+        "description": "Xây hệ thống pin năng lượng mặt trời cho trường học.",
+        "team": "Green Earth",
+        "goal": "10000 DAI",
+        "voteCount": 1,
+        "totalWeight": 350,
+        "percentage": 1.82,
+        "weightPercentage": 1.22,
+        "averageWeight": 350.00,
+        "voters": [
+          "0x742d35Cc6639C0532c9a3C5D1b4D6E5A7B8F9C0D"
+        ]
+      }
+    ],
+    "winnerInfo": {
+      "winningOption": {
+        "optionId": 2,
+        "optionName": "Option B - Wind Energy Initiative",
+        "team": "Wind Power Co",
+        "goal": "25000 DAI",
+        "voteCount": 8,
+        "totalWeight": 4250,
+        "percentage": 14.78
+      },
+      "runnerUp": {
+        "optionId": 88,
+        "optionName": "Option ZZZ - Climate Tech Accelerator",
+        "team": "Climate Tech Hub",
+        "goal": "156000 DAI",
+        "voteCount": 6,
+        "totalWeight": 3900,
+        "percentage": 10.91
+      },
+      "margin": {
+        "voteCountDifference": 2,
+        "weightDifference": 350,
+        "percentageDifference": 3.87
+      }
+    },
+    "participationStats": {
+      "voterTurnout": "52 unique voters",
+      "averageVoteWeight": 522.73,
+      "medianVoteWeight": 500.00,
+      "largestVote": 800,
+      "smallestVote": 350,
+      "optionsWithVotes": 20,
+      "optionsWithoutVotes": 80,
+      "participationRate": "20% of available options received votes"
+    },
+    "blockchainVerification": {
+      "finalBatchHash": "0x90abcdef1234567890abcdef123456789012345678901234567890123456789012345",
+      "merkleRootVerified": true,
+      "chainIntegrityStatus": "verified",
+      "smartContractAddress": "0xVotingContract123456789abcdef",
+      "gasUsed": "2,150,000",
+      "transactionHashes": [
+        "0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890",
+        "0x2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+        "0x3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
+        "0x4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "0x5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
+      ]
+    },
+    "ipfsStorage": {
+      "tallyResultsHash": "ipfs://QmTallyResults123456789abcdef",
+      "voteDataHash": "ipfs://QmVoteData987654321fedcba",
+      "verificationHash": "ipfs://QmVerification456789123abcdef",
+      "storedAt": "2025-11-07T23:59:59Z",
+      "pinned": true,
+      "replicationNodes": 5
+    }
+  }
+}
