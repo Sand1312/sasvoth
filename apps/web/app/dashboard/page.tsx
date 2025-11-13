@@ -87,7 +87,7 @@ export default function DashboardPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showApproveOnly, setShowApproveOnly] = useState(false);
   const [approveAmount, setApproveAmount] = useState<number | "">("");
-  const { getPollsByType } = usePolls();
+  const { getPolls } = usePolls();
   // Web3 hooks
   const token = useToken();
   const claim = useClaimContract();
@@ -101,7 +101,7 @@ export default function DashboardPage() {
   const loadPolls = async () => {
     try {
       setLoadingPolls(true);
-      const data = await getPollsByType();
+      const data = await getPolls("active");
       setActivePolls(data);
       setPolls(data); // Hiển thị active polls mặc định
     } catch (error) {
