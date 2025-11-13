@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Input } from "@sasvoth/ui/input";
-import { signupWithEmail } from "@/api/auth.api";
+import { authApi } from "@/api";
 const steps = [
   { label: "Account", key: 1 },
   { label: "Wallet", key: 2 },
@@ -72,7 +72,7 @@ export default function SignupPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle sign up logic here, form contains wallet address
-    signupWithEmail(form.email, form.password);
+    authApi.signupWithEmail(form.email, form.password);
   };
 
   const handleStepNav = (targetStep: number) => {
