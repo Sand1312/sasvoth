@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@sasvoth/ui/button";
+import { IdeaUploadForm } from "@/components/idea-upload-form";
 
 type Vote = {
   id: string;
@@ -409,6 +410,22 @@ export default function AdminDashboardPage(): React.ReactElement {
             </ul>
           </div>
         </div>
+      </section>
+
+      <section className="mt-16">
+        <div className="flex flex-col gap-3 mb-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/50">
+            Idea lab
+          </p>
+          <h3 className="text-2xl font-semibold">Upload a new idea</h3>
+          <p className="text-sm text-gray-700 max-w-2xl">
+            Capture a concept with the same monochrome aesthetic from the
+            reference mock. Logos keep the circular crop, age gates stay tight,
+            and the second step mirrors the newsroom layout with an interactive
+            preview modal.
+          </p>
+        </div>
+        <IdeaUploadForm />
       </section>
     </main>
   );

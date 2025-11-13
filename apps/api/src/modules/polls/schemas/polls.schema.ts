@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
+import { PollStatus } from "../enums/poll-status.enum";
 
 export type PollsDocument = HydratedDocument<Polls>;
 
@@ -14,8 +15,8 @@ export class Polls {
     @Prop({ required: true })
     creatorAddress: string;
 
-    @Prop({ required:true})
-    status: string;
+    @Prop({ required:true, enum: PollStatus })
+    status: PollStatus;
 
     @Prop({ required: true })
     startTime: Date;
