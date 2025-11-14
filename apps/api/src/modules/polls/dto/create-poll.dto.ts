@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { PollStatus } from "../enums/poll-status.enum";
+import { z } from 'zod';
+import { PollStatus } from '../enums/poll-status.enum';
 
 const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
 
@@ -8,7 +8,7 @@ export const createPollSchema = z.object({
   description: z.string().trim().min(1).optional(),
   creatorAddress: z
     .string()
-    .regex(ethereumAddressRegex, "Invalid Ethereum address"),
+    .regex(ethereumAddressRegex, 'Invalid Ethereum address'),
   status: z.nativeEnum(PollStatus),
   startTime: z.string().datetime(),
   endTime: z.string().datetime(),

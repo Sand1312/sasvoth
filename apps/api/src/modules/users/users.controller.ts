@@ -3,29 +3,26 @@ import {
   Get,
   UseGuards,
   Req,
-  Res,
-  Post,
   NotFoundException,
-} from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import { Request } from "express";
-import { UsersService } from "./users.service";
-import { Response } from "express";
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import { UsersService } from './users.service';
 
-@Controller("users")
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get("me")
-  @UseGuards(AuthGuard("jwt"))
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
   async me(@Req() req: Request) {
     const userId = (req.user as any)?.userId;
     if (!userId) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException('User not found');
     }
     const user = await this.usersService.findById(userId);
     if (!user) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException('User not found');
     }
 
     // sanitize output (exclude sensitive fields like password, refresh state)
@@ -38,23 +35,4 @@ export class UsersController {
       authType: (user as any).authType,
     };
   }
-  @Post("connectWallet")
-  @UseGuards(AuthGuard("jwt"))
-  async connectWallet(@Req() req: Request, @Res() res: Response) {
-      const userId = req.body();
-      const walletAddress = req.body();
-      try {
-          const result = await this.usersService.connectWallet(userId, walletAddress);
-          if(result == true){
-              return res.status(200).json({ success: true });
-          } else {
-              return res.status(201).json({ privateKey: result });
-          }
-      } catch (error) {
-          return res.status(500).json({ message: 'Error connecting wallet', error });
-      }
-
-
-  }
-  
 }
