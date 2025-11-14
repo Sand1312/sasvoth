@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
-import { IdeasModule } from './ideas/ideas.module';
+import { IdeasModule } from './modules/ideas/ideas.module';
 import { ResultsMetaModule } from './modules/results-meta/results-meta.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
 import { UsersModule } from './modules/users/users.module';
