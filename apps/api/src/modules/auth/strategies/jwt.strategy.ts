@@ -6,7 +6,8 @@ import { Request } from 'express'; // Nếu cần custom extractor sau
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private configService: ConfigService) { // Inject private để dùng
+  constructor(private configService: ConfigService) {
+    // Inject private để dùng
     const secret = configService.get<string>('JWT_ACCESS_SECRET');
     if (!secret) {
       throw new Error('JWT_ACCESS_SECRET is missing in environment variables');

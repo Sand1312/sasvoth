@@ -8,7 +8,7 @@ import { GithubStrategy } from './strategies/github.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { UsersModule } from '../users/users.module';
-import {JwtStrategy} from './strategies/jwt.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 @Module({
   imports: [
     UsersModule,
@@ -22,17 +22,17 @@ import {JwtStrategy} from './strategies/jwt.strategy';
       inject: [ConfigService],
     }),
     RedisModule.forRootAsync({
-          imports: [ConfigModule],
-          useFactory: async (configService: ConfigService) => ({
-            type: 'single',
-            url: configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-          }),
-          inject: [ConfigService],
-        }),
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'single',
+        url: configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+      }),
+      inject: [ConfigService],
+    }),
     ConfigModule,
   ],
-  
+
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, GithubStrategy,JwtStrategy],
+  providers: [AuthService, GoogleStrategy, GithubStrategy, JwtStrategy],
 })
 export class AuthModule {}
