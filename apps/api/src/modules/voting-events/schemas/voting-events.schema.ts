@@ -32,8 +32,7 @@ export class VotingEvents {
     @Prop({ required: false })
     createdAt: Date;
 
-    @Prop({ required: true })
-    coodinatorId: string;
+
 
 }
 

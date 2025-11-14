@@ -2,11 +2,40 @@ import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 import {Rewards, RewardsDocument} from './schemas/rewards.schema';
+import { generateSignatureForClaim , generateIdClaim} from "../../utils/signature";
+import { id } from 'ethers/lib/utils';
 
 @Injectable()
 export class RewardsService {
     constructor(@InjectModel(Rewards.name) private rewardsModel: Model<RewardsDocument>) {}
 
-    async saveReward(userId: string, pollId: string, rewardData: Partial<Rewards>): Promise<void> {
-        let reward = await this.rewardsModel.findOne({ userId, pollId }).exec();
+    async saveReward(userId: string, votingEventsId: string,credit_count :number): Promise<void> {
+        try{
+        const reward = await this.rewardsModel.findOne({ userId: userId, voting_events_id: votingEventsId });
+        if(reward){
+            throw new Error('Reward already exists for this user and voting event');
+        } else  {
+            const amountToken = credit_count * 15; 
+            const idClaim = generateIdClaim();
+            const signature = await generateSignatureForClaim(userId, amountToken, idClaim);
+            const newReward = new this.rewardsModel({
+                userId: userId,
+                voting_events_id: parseInt(votingEventsId),
+                credit_count: credit_count,
+                amountToken: amountToken,
+                status: "pending",
+                _idClaim: idClaim,
+                signature: signature
+            });
+            await newReward.save();
+
+        }
+    }catch (error) {
+        throw new Error('Error saving reward: ' + error.message);
+    }
+    }
+    async getReward(userId: string, votingEventsId: string): Promise<RewardsDocument | null> {
+        return this.rewardsModel.findOne({ userId: userId, voting_events_id: votingEventsId }).exec();
+    }
+
 }
