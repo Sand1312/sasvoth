@@ -1,20 +1,20 @@
-import {Prop,Schema,SchemaFactory} from "@nestjs/mongoose";
-import {HydratedDocument} from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 
-export type VoiceCreditsDocument= HydratedDocument<VoiceCredits>;
+export type VoiceCreditsDocument = HydratedDocument<VoiceCredits>;
 
 @Schema()
-export class VoiceCredits{
-    @Prop({type:String,required:true})
-    userId:string;
-  
-    @Prop({type:Number,required:true,default:0})
-    credits:number;
+export class VoiceCredits {
+  @Prop({ type: String, required: true })
+  userId: string;
 
-    @Prop({type:String ,required:true})
-    pollId:string;
+  @Prop({ type: Number, required: true, default: 0 })
+  credits: number;
 
-    @Prop({type:Boolean,required:true,default:true})
-    isActive:boolean;
+  @Prop({ type: String, required: true })
+  pollId: string;
+
+  @Prop({ type: Boolean, required: true, default: true })
+  isActive: boolean;
 }
-export const VoiceCreditsSchema= SchemaFactory.createForClass(VoiceCredits);
+export const VoiceCreditsSchema = SchemaFactory.createForClass(VoiceCredits);

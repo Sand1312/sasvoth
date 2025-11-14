@@ -1,0 +1,5041 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\BabyJubJub.sol": {
+      "lastModificationDate": 1752083033788,
+      "contentHash": "e10e23dc8954cef9ad7122777c7a425c",
+      "sourceName": "contracts/crypto/BabyJubJub.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "CurveBabyJubJub"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\Poll.sol": {
+      "lastModificationDate": 1752083033760,
+      "contentHash": "e67ba413cab3d3d079580b11fb73ba5d",
+      "sourceName": "contracts/Poll.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Clone.sol",
+        "./utilities/Params.sol",
+        "./crypto/SnarkCommon.sol",
+        "./trees/LazyIMT.sol",
+        "./interfaces/IMACI.sol",
+        "./interfaces/IPoll.sol",
+        "./utilities/Utilities.sol",
+        "./crypto/BabyJubJub.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Poll"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\utilities\\Params.sol": {
+      "lastModificationDate": 1752083033965,
+      "contentHash": "7604ddcf59d552df8d0e13537c8f6a67",
+      "sourceName": "contracts/utilities/Params.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol",
+        "../interfaces/IMACI.sol",
+        "../interfaces/IVerifier.sol",
+        "../interfaces/IVerifyingKeysRegistry.sol",
+        "../interfaces/IInitialVoiceCreditProxy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Params"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\SnarkCommon.sol": {
+      "lastModificationDate": 1752083033822,
+      "contentHash": "d528186e316745ce100cfaf7e32b5874",
+      "sourceName": "contracts/crypto/SnarkCommon.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Pairing.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "SnarkCommon"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\IMACI.sol": {
+      "lastModificationDate": 1752083033866,
+      "contentHash": "4305bb9057b3d338dc259d1e9d4359eb",
+      "sourceName": "contracts/interfaces/IMACI.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utilities/Params.sol",
+        "../utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IMACI"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\trees\\LazyIMT.sol": {
+      "lastModificationDate": 1752083033947,
+      "contentHash": "563b6a06e84a36c268ec094360560b19",
+      "sourceName": "contracts/trees/LazyIMT.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../crypto/PoseidonT3.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "InternalLazyIMT"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\IPoll.sol": {
+      "lastModificationDate": 1752083033878,
+      "contentHash": "761c62dea8d9a67a0ea99c04d5e5c013",
+      "sourceName": "contracts/interfaces/IPoll.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utilities/DomainObjs.sol",
+        "./IMACI.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IPoll"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\utilities\\Utilities.sol": {
+      "lastModificationDate": 1752083033969,
+      "contentHash": "4dfe77f316b4721565cee50189ef8e13",
+      "sourceName": "contracts/utilities/Utilities.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./DomainObjs.sol",
+        "../crypto/Hasher.sol",
+        "../crypto/SnarkConstants.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Utilities"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\proxy\\Clone.sol": {
+      "lastModificationDate": 1752078898577,
+      "contentHash": "6c77d4464a9ac5f5c80b702e54817a38",
+      "sourceName": "@excubiae/contracts/contracts/proxy/Clone.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IClone.sol",
+        "solady/src/utils/LibClone.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Clone"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\IVerifier.sol": {
+      "lastModificationDate": 1752083033904,
+      "contentHash": "a516342abd3c7c8b3bb6e1f6b112cb04",
+      "sourceName": "contracts/interfaces/IVerifier.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../crypto/SnarkCommon.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IVerifier"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\IVerifyingKeysRegistry.sol": {
+      "lastModificationDate": 1752083033908,
+      "contentHash": "2a7b116a7bbf6c1ca93a0214dada6966",
+      "sourceName": "contracts/interfaces/IVerifyingKeysRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../crypto/SnarkCommon.sol",
+        "../utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IVerifyingKeysRegistry"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\IInitialVoiceCreditProxy.sol": {
+      "lastModificationDate": 1752083033863,
+      "contentHash": "dacc05c5171366b559cd50cba1112b70",
+      "sourceName": "contracts/interfaces/IInitialVoiceCreditProxy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IInitialVoiceCreditProxy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\interfaces\\IBasePolicy.sol": {
+      "lastModificationDate": 1752078898575,
+      "contentHash": "fea35841e8a85c7531f772e51290a87b",
+      "sourceName": "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IBasePolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\utilities\\DomainObjs.sol": {
+      "lastModificationDate": 1752083033960,
+      "contentHash": "4b64e8b5734643c0e41bf6c62a65fa36",
+      "sourceName": "contracts/utilities/DomainObjs.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "DomainObjs"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\Pairing.sol": {
+      "lastModificationDate": 1752083033798,
+      "contentHash": "85f250e3c3b52eccf4463969c20b389c",
+      "sourceName": "contracts/crypto/Pairing.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Pairing"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\interfaces\\IPolicy.sol": {
+      "lastModificationDate": 1752078898576,
+      "contentHash": "c2dd98d4d9f70e741fdd3d6a8dbfc1d8",
+      "sourceName": "@excubiae/contracts/contracts/interfaces/IPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\PoseidonT3.sol": {
+      "lastModificationDate": 1752083033802,
+      "contentHash": "81d699b2a361411cbdf3016b244a5c88",
+      "sourceName": "contracts/crypto/PoseidonT3.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "PoseidonT3"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\Hasher.sol": {
+      "lastModificationDate": 1752083033793,
+      "contentHash": "7f0b17880738c7379a33a043bf19fb24",
+      "sourceName": "contracts/crypto/Hasher.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./SnarkConstants.sol",
+        "./PoseidonT3.sol",
+        "./PoseidonT4.sol",
+        "./PoseidonT5.sol",
+        "./PoseidonT6.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Hasher"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\SnarkConstants.sol": {
+      "lastModificationDate": 1752083033825,
+      "contentHash": "97b4a343792aec7ea4175c008971cd13",
+      "sourceName": "contracts/crypto/SnarkConstants.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "SnarkConstants"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\PoseidonT4.sol": {
+      "lastModificationDate": 1752083033807,
+      "contentHash": "31a9657d47876cf43f743319f1371665",
+      "sourceName": "contracts/crypto/PoseidonT4.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "PoseidonT4"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\PoseidonT5.sol": {
+      "lastModificationDate": 1752083033812,
+      "contentHash": "97ab9dc4a7369c4c0d28e678943507c9",
+      "sourceName": "contracts/crypto/PoseidonT5.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "PoseidonT5"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\PoseidonT6.sol": {
+      "lastModificationDate": 1752083033816,
+      "contentHash": "9402efc61658532c858fd946a4a0902f",
+      "sourceName": "contracts/crypto/PoseidonT6.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "PoseidonT6"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\solady@0.1.23\\node_modules\\solady\\src\\utils\\LibClone.sol": {
+      "lastModificationDate": 1752078897019,
+      "contentHash": "cf80532ba4d41528aa35c68efb080824",
+      "sourceName": "solady/src/utils/LibClone.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.4"
+      ],
+      "artifacts": [
+        "LibClone"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\interfaces\\IClone.sol": {
+      "lastModificationDate": 1752078898575,
+      "contentHash": "ba9878cf1884f575df4bc3461a46259e",
+      "sourceName": "@excubiae/contracts/contracts/interfaces/IClone.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IClone"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\PollFactory.sol": {
+      "lastModificationDate": 1752083033765,
+      "contentHash": "123d70002838e95881667b365c937b9c",
+      "sourceName": "contracts/PollFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Factory.sol",
+        "./utilities/Params.sol",
+        "./utilities/DomainObjs.sol",
+        "./Poll.sol",
+        "./interfaces/IPollFactory.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "PollFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\IPollFactory.sol": {
+      "lastModificationDate": 1752083033883,
+      "contentHash": "271a67663d8255e355ebee797912cf8a",
+      "sourceName": "contracts/interfaces/IPollFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utilities/Params.sol",
+        "../utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IPollFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\proxy\\Factory.sol": {
+      "lastModificationDate": 1752078898577,
+      "contentHash": "8ae30d43e6740432607a355ebd11a0dd",
+      "sourceName": "@excubiae/contracts/contracts/proxy/Factory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "solady/src/utils/LibClone.sol",
+        "../interfaces/IFactory.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Factory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\interfaces\\IFactory.sol": {
+      "lastModificationDate": 1752078898575,
+      "contentHash": "a370356bfff8fae05c09eb1e1db0df3c",
+      "sourceName": "@excubiae/contracts/contracts/interfaces/IFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20PolicyFactory.sol": {
+      "lastModificationDate": 1752078898562,
+      "contentHash": "b31ec1f6f6f3e415a3345d46a85b6c4d",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20/ERC20PolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./ERC20Policy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20PolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20Policy.sol": {
+      "lastModificationDate": 1752078898562,
+      "contentHash": "f69247d7df919ceec439b37cce6a207a",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20/ERC20Policy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20Policy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\policy\\BasePolicy.sol": {
+      "lastModificationDate": 1752078898577,
+      "contentHash": "585f602e8e932603747e8e888ab5f5d7",
+      "sourceName": "@excubiae/contracts/contracts/policy/BasePolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IBasePolicy.sol",
+        "./Policy.sol",
+        "../checker/BaseChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "BasePolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\checker\\BaseChecker.sol": {
+      "lastModificationDate": 1752078898558,
+      "contentHash": "27b8baffc08f4032c50b0ed762c42b91",
+      "sourceName": "@excubiae/contracts/contracts/checker/BaseChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IBaseChecker.sol",
+        "../proxy/Clone.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "BaseChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\policy\\Policy.sol": {
+      "lastModificationDate": 1752078898577,
+      "contentHash": "a75a28ab799c10636046a41c5f771d9a",
+      "sourceName": "@excubiae/contracts/contracts/policy/Policy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "../interfaces/IPolicy.sol",
+        "../proxy/Clone.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Policy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\interfaces\\IBaseChecker.sol": {
+      "lastModificationDate": 1752078898575,
+      "contentHash": "bde422a8eb0db80be6ac9904451b8c99",
+      "sourceName": "@excubiae/contracts/contracts/interfaces/IBaseChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IBaseChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\access\\Ownable.sol": {
+      "lastModificationDate": 1752078897055,
+      "contentHash": "d3c790edc9ccf808a17c5a6cd13614fd",
+      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
+      "lastModificationDate": 1752078896925,
+      "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicy.sol": {
+      "lastModificationDate": 1752078898574,
+      "contentHash": "b3f15c17405261c761dca0c58c4adc79",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ZupassPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicyFactory.sol": {
+      "lastModificationDate": 1752078898574,
+      "contentHash": "2598c97843c7067aefb8957d4bb1b025",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./ZupassPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ZupassPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\mocks\\Mocker.sol": {
+      "lastModificationDate": 1752083033937,
+      "contentHash": "bb47cc1244cb02e657494a315d7e3c38",
+      "sourceName": "contracts/mocks/Mocker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/eas/EASCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/eas/EASPolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllPolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportPolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/hats/HatsCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/hats/HatsPolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/merkle/MerkleProofCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/merkle/MerkleProofPolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/semaphore/SemaphorePolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/token/TokenCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/token/TokenPolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/zupass/ZupassCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicyFactory.sol",
+        "@excubiae/contracts/contracts/test/extensions/mocks/MockAnonAadhaar.sol",
+        "@excubiae/contracts/contracts/test/extensions/mocks/MockEAS.sol",
+        "@excubiae/contracts/contracts/test/extensions/mocks/MockGitcoinPassportDecoder.sol",
+        "@excubiae/contracts/contracts/test/extensions/mocks/MockHatsProtocol.sol",
+        "@excubiae/contracts/contracts/test/extensions/mocks/MockToken.sol",
+        "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicy.sol",
+        "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicyFactory.sol",
+        "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesChecker.sol",
+        "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesCheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/erc20/ERC20Checker.sol",
+        "@excubiae/contracts/contracts/extensions/erc20/ERC20CheckerFactory.sol",
+        "@excubiae/contracts/contracts/extensions/erc20/ERC20Policy.sol",
+        "@excubiae/contracts/contracts/extensions/erc20/ERC20PolicyFactory.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Mocker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarCheckerFactory.sol": {
+      "lastModificationDate": 1752078898558,
+      "contentHash": "4cdc15b2b8a04b36743d6a149087e9d3",
+      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./AnonAadhaarChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AnonAadhaarCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicyFactory.sol": {
+      "lastModificationDate": 1752078898558,
+      "contentHash": "6b6ce5ec787b7bd29097841979a154b4",
+      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./AnonAadhaarPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AnonAadhaarPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicyFactory.sol": {
+      "lastModificationDate": 1752078898561,
+      "contentHash": "a9fdce73a930d26385542adc65d17ee8",
+      "sourceName": "@excubiae/contracts/contracts/extensions/eas/EASPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./EASPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "EASPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllCheckerFactory.sol": {
+      "lastModificationDate": 1752078898565,
+      "contentHash": "7d5ff3493a4ee7734c51d9cae289c697",
+      "sourceName": "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./FreeForAllChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "FreeForAllCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllPolicyFactory.sol": {
+      "lastModificationDate": 1752078898566,
+      "contentHash": "728ff867df6698df7b7cbae145751ff9",
+      "sourceName": "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./FreeForAllPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "FreeForAllPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASCheckerFactory.sol": {
+      "lastModificationDate": 1752078898560,
+      "contentHash": "247e8c141c00c3d7b190a878437a4f3d",
+      "sourceName": "@excubiae/contracts/contracts/extensions/eas/EASCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./EASChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "EASCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsCheckerFactory.sol": {
+      "lastModificationDate": 1752078898567,
+      "contentHash": "9aa78dd620c2c5f328a802ceb37d9e2e",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./HatsChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "HatsCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportCheckerFactory.sol": {
+      "lastModificationDate": 1752078898566,
+      "contentHash": "7354af1d8e1ed60665e8052e016ed1b3",
+      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./GitcoinPassportChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "GitcoinPassportCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicyFactory.sol": {
+      "lastModificationDate": 1752078898567,
+      "contentHash": "ed485a6ce3ec67318b7c54c6d9894bc0",
+      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./GitcoinPassportPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "GitcoinPassportPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicyFactory.sol": {
+      "lastModificationDate": 1752078898569,
+      "contentHash": "1845dc7800696bc2dd5e970eaf11ea76",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./HatsPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "HatsPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenPolicyFactory.sol": {
+      "lastModificationDate": 1752078898573,
+      "contentHash": "6c7f260d3dc5a01508de5f0adea20fb4",
+      "sourceName": "@excubiae/contracts/contracts/extensions/token/TokenPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./TokenPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "TokenPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicyFactory.sol": {
+      "lastModificationDate": 1752078898570,
+      "contentHash": "e2a2b36fffabf3476f97e84b2ff77719",
+      "sourceName": "@excubiae/contracts/contracts/extensions/merkle/MerkleProofPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./MerkleProofPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MerkleProofPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenCheckerFactory.sol": {
+      "lastModificationDate": 1752078898573,
+      "contentHash": "a8357804918e6386cba2e88cfc066b53",
+      "sourceName": "@excubiae/contracts/contracts/extensions/token/TokenCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./TokenChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "TokenCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreCheckerFactory.sol": {
+      "lastModificationDate": 1752078898570,
+      "contentHash": "652a69281699d026b8ea832fc2238eab",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./SemaphoreChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SemaphoreCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphorePolicyFactory.sol": {
+      "lastModificationDate": 1752078898571,
+      "contentHash": "e8097fc0db23c73faa079c69fba3ed0f",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphorePolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./SemaphorePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SemaphorePolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofCheckerFactory.sol": {
+      "lastModificationDate": 1752078898570,
+      "contentHash": "fc8a77fb466de24a90ebedf93a5b6d7a",
+      "sourceName": "@excubiae/contracts/contracts/extensions/merkle/MerkleProofCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./MerkleProofChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MerkleProofCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicyFactory.sol": {
+      "lastModificationDate": 1752078898564,
+      "contentHash": "24984cb02115e5249f5c2fe8c135f340",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./ERC20VotesPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20VotesPolicyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicy.sol": {
+      "lastModificationDate": 1752078898564,
+      "contentHash": "be00d99a6e065fc8aa0cacf2e66e4cf8",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20VotesPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesCheckerFactory.sol": {
+      "lastModificationDate": 1752078898563,
+      "contentHash": "9093dcfaa0e9304ca1c0c2cdba73dcc5",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./ERC20VotesChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20VotesCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassCheckerFactory.sol": {
+      "lastModificationDate": 1752078898574,
+      "contentHash": "dfb5c7b12b958f0b211e060ddc89ac4d",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./ZupassChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ZupassCheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20Checker.sol": {
+      "lastModificationDate": 1752078898561,
+      "contentHash": "603a7e7e41e7241b5f5a25c210794548",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20/ERC20Checker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "../../checker/BaseChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20Checker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesChecker.sol": {
+      "lastModificationDate": 1752078898562,
+      "contentHash": "27674b141ffe2dbcec962e29622562d5",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/governance/utils/IVotes.sol",
+        "../../checker/BaseChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20VotesChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20CheckerFactory.sol": {
+      "lastModificationDate": 1752078898561,
+      "contentHash": "92cf2c1bcb67ec9ba39951984e0f683e",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20/ERC20CheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./ERC20Checker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20CheckerFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockGitcoinPassportDecoder.sol": {
+      "lastModificationDate": 1752078898581,
+      "contentHash": "4de0b452a33e419ce48964857f37d856",
+      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockGitcoinPassportDecoder.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MockGitcoinPassportDecoder"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockEAS.sol": {
+      "lastModificationDate": 1752078898581,
+      "contentHash": "1eb57927de036c6bcd5a2f8dd3759106",
+      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockEAS.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../../extensions/eas/IEAS.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MockEAS"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockAnonAadhaar.sol": {
+      "lastModificationDate": 1752078898580,
+      "contentHash": "491d9d22638a2cde054fea5b6d628270",
+      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockAnonAadhaar.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../../extensions/anonAadhaar/IAnonAadhaar.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MockAnonAadhaar"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockToken.sol": {
+      "lastModificationDate": 1752078898582,
+      "contentHash": "d93399099d9babb0692672f802c8db64",
+      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockToken.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MockToken"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockHatsProtocol.sol": {
+      "lastModificationDate": 1752078898582,
+      "contentHash": "f06071c9cebba1a6c2109779bcb9343a",
+      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockHatsProtocol.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MockHatsProtocol"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarChecker.sol": {
+      "lastModificationDate": 1752078898558,
+      "contentHash": "adb3148516c8024b62c0c825a04d191e",
+      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./IAnonAadhaar.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AnonAadhaarChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\IAnonAadhaar.sol": {
+      "lastModificationDate": 1752078898560,
+      "contentHash": "87c1ee23394e066161fc3f478d7f9a5b",
+      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/IAnonAadhaar.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IAnonAadhaar"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicy.sol": {
+      "lastModificationDate": 1752078898558,
+      "contentHash": "cfc7ce4be7e2187f0fd0b10cf7551ef2",
+      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AnonAadhaarPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicy.sol": {
+      "lastModificationDate": 1752078898560,
+      "contentHash": "7d286a82a318c23b9d2c2f70a88e7cba",
+      "sourceName": "@excubiae/contracts/contracts/extensions/eas/EASPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "EASPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllChecker.sol": {
+      "lastModificationDate": 1752078898565,
+      "contentHash": "591da1e07b41264b8401fcc22e5d6203",
+      "sourceName": "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "FreeForAllChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllPolicy.sol": {
+      "lastModificationDate": 1752078898565,
+      "contentHash": "edab4d40e9688f7fdf9665bb9902a86e",
+      "sourceName": "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "FreeForAllPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASChecker.sol": {
+      "lastModificationDate": 1752078898560,
+      "contentHash": "7992b102381dc0fcdbf2c1ad4379cdfb",
+      "sourceName": "@excubiae/contracts/contracts/extensions/eas/EASChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./IEAS.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "EASChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\IEAS.sol": {
+      "lastModificationDate": 1752078898561,
+      "contentHash": "4c0b80070ed05e4483e1bd34d59c8730",
+      "sourceName": "@excubiae/contracts/contracts/extensions/eas/IEAS.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IEAS"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsChecker.sol": {
+      "lastModificationDate": 1752078898567,
+      "contentHash": "cf7778b26699b41df5e1d361ca5d5f20",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./IHats.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "HatsChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\IHats.sol": {
+      "lastModificationDate": 1752078898569,
+      "contentHash": "31526403717f62cd67e026631c87dd4b",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/IHats.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IHats"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportChecker.sol": {
+      "lastModificationDate": 1752078898566,
+      "contentHash": "b7f5de49b3f6ca13a49d7cd0e230c2f2",
+      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./IGitcoinPassportDecoder.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "GitcoinPassportChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\IGitcoinPassportDecoder.sol": {
+      "lastModificationDate": 1752078898567,
+      "contentHash": "bbc718d6a257b0babecbcfadf3496ac3",
+      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/IGitcoinPassportDecoder.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IGitcoinPassportDecoder"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicy.sol": {
+      "lastModificationDate": 1752078898567,
+      "contentHash": "838decbc88c90d4e8b46aae2ab168c97",
+      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol",
+        "./IGitcoinPassportDecoder.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "GitcoinPassportPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicy.sol": {
+      "lastModificationDate": 1752078898569,
+      "contentHash": "62022ef313c0869a96ca1cfe84596c19",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol",
+        "./IHats.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "HatsPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenPolicy.sol": {
+      "lastModificationDate": 1752078898573,
+      "contentHash": "c4dc3b13dff2ecf92e2b261c8944614d",
+      "sourceName": "@excubiae/contracts/contracts/extensions/token/TokenPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "TokenPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol": {
+      "lastModificationDate": 1752078896973,
+      "contentHash": "a7951c81f7037d558c6d2f220b0cb38e",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC721.sol",
+        "./extensions/IERC721Metadata.sol",
+        "./utils/ERC721Utils.sol",
+        "../../utils/Context.sol",
+        "../../utils/Strings.sol",
+        "../../utils/introspection/ERC165.sol",
+        "../../interfaces/draft-IERC6093.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC721"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\interfaces\\draft-IERC6093.sol": {
+      "lastModificationDate": 1752078896942,
+      "contentHash": "267d92fe4de67b1bdb3302c08f387dbf",
+      "sourceName": "@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC1155Errors",
+        "IERC20Errors",
+        "IERC721Errors"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\ERC165.sol": {
+      "lastModificationDate": 1752078896953,
+      "contentHash": "7c03c1e37c3dc24eafb76dc2b8a5c3a6",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC165"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\IERC721.sol": {
+      "lastModificationDate": 1752078897037,
+      "contentHash": "1fdc621cd6747e8985e11fc76ce74511",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../utils/introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC721"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\Strings.sol": {
+      "lastModificationDate": 1752078897074,
+      "contentHash": "13dbc135f563c72a11b1cf4fbb5fb284",
+      "sourceName": "@openzeppelin/contracts/utils/Strings.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./math/Math.sol",
+        "./math/SafeCast.sol",
+        "./math/SignedMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Strings"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\utils\\ERC721Utils.sol": {
+      "lastModificationDate": 1752078896977,
+      "contentHash": "e12814872b31b0af06106796a6621b04",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/utils/ERC721Utils.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC721Receiver.sol",
+        "../../../interfaces/draft-IERC6093.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC721Utils"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\extensions\\IERC721Metadata.sol": {
+      "lastModificationDate": 1752078897040,
+      "contentHash": "12c206f185cb951213799561fdcaa40d",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC721.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC721Metadata"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\IERC165.sol": {
+      "lastModificationDate": 1752078897017,
+      "contentHash": "bf0119eb2a570f219729ff38b6cd1df8",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC165"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SignedMath.sol": {
+      "lastModificationDate": 1752078897072,
+      "contentHash": "ae3528afb8bdb0a7dcfba5b115ee8074",
+      "sourceName": "@openzeppelin/contracts/utils/math/SignedMath.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./SafeCast.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SignedMath"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeCast.sol": {
+      "lastModificationDate": 1752078897068,
+      "contentHash": "2adca1150f58fc6f3d1f0a0f22ee7cca",
+      "sourceName": "@openzeppelin/contracts/utils/math/SafeCast.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SafeCast"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\math\\Math.sol": {
+      "lastModificationDate": 1752078897049,
+      "contentHash": "5ec781e33d3a9ac91ffdc83d94420412",
+      "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../Panic.sol",
+        "./SafeCast.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Math"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\Panic.sol": {
+      "lastModificationDate": 1752078897058,
+      "contentHash": "2133dc13536b4a6a98131e431fac59e1",
+      "sourceName": "@openzeppelin/contracts/utils/Panic.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Panic"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\IERC721Receiver.sol": {
+      "lastModificationDate": 1752078897043,
+      "contentHash": "729ce0904eb533489ffcc3bfe91237d4",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC721Receiver"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicy.sol": {
+      "lastModificationDate": 1752078898570,
+      "contentHash": "dd4c3868c09fddd19c1cf93d24f653b9",
+      "sourceName": "@excubiae/contracts/contracts/extensions/merkle/MerkleProofPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol",
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MerkleProofPolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\MerkleProof.sol": {
+      "lastModificationDate": 1752078897049,
+      "contentHash": "d57b0dba03e8cc7942bf797fc9fe1d29",
+      "sourceName": "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Hashes.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MerkleProof"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\Hashes.sol": {
+      "lastModificationDate": 1752078896997,
+      "contentHash": "073b9c3ce7bc358a876ed2b3479db88c",
+      "sourceName": "@openzeppelin/contracts/utils/cryptography/Hashes.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Hashes"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenChecker.sol": {
+      "lastModificationDate": 1752078898571,
+      "contentHash": "27dd1250778fd161e0ff9efd0d32215e",
+      "sourceName": "@excubiae/contracts/contracts/extensions/token/TokenChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "../../checker/BaseChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "TokenChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreChecker.sol": {
+      "lastModificationDate": 1752078898570,
+      "contentHash": "693af06defd66897b0da5a91fea56998",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./ISemaphore.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SemaphoreChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\ISemaphore.sol": {
+      "lastModificationDate": 1752078898570,
+      "contentHash": "0a74688ed6598f2f1edf480397b72b22",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/ISemaphore.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ISemaphore"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphorePolicy.sol": {
+      "lastModificationDate": 1752078898571,
+      "contentHash": "8dec86c7962895f002f24be4b0ac990b",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphorePolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol",
+        "./ISemaphore.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SemaphorePolicy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofChecker.sol": {
+      "lastModificationDate": 1752078898569,
+      "contentHash": "42d87d93aec8a4f0e8985219c0efbb57",
+      "sourceName": "@excubiae/contracts/contracts/extensions/merkle/MerkleProofChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol",
+        "../../checker/BaseChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MerkleProofChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\governance\\utils\\IVotes.sol": {
+      "lastModificationDate": 1752078897048,
+      "contentHash": "905ffceb29869fee4b5a649abe7e2927",
+      "sourceName": "@openzeppelin/contracts/governance/utils/IVotes.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IVotes"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassChecker.sol": {
+      "lastModificationDate": 1752078898573,
+      "contentHash": "3cf120dfb04bc0738498e0af03429f46",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./ZupassGroth16Verifier.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ZupassChecker"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassGroth16Verifier.sol": {
+      "lastModificationDate": 1752078898574,
+      "contentHash": "15412d828e09382ea8524e2f980a7f2e",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassGroth16Verifier.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ZupassGroth16Verifier"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
+      "lastModificationDate": 1752078897022,
+      "contentHash": "8f19f64d2adadf448840908bbaf431c8",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
+      "lastModificationDate": 1752078896962,
+      "contentHash": "57d79df281f57bbb1b09214c7914f877",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "./extensions/IERC20Metadata.sol",
+        "../../utils/Context.sol",
+        "../../interfaces/draft-IERC6093.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.3.0\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
+      "lastModificationDate": 1752078897024,
+      "contentHash": "794db3115001aa372c79326fcfd44b1f",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC20Metadata"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\MACI.sol": {
+      "lastModificationDate": 1752083033748,
+      "contentHash": "25b631c11f5306cb339aacfdb72a274c",
+      "sourceName": "contracts/MACI.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/interfaces/IBasePolicy.sol",
+        "./interfaces/IPollFactory.sol",
+        "./interfaces/IMessageProcessorFactory.sol",
+        "./interfaces/ITallyFactory.sol",
+        "./interfaces/IVerifier.sol",
+        "./interfaces/IVerifyingKeysRegistry.sol",
+        "./interfaces/IInitialVoiceCreditProxy.sol",
+        "./interfaces/IMACI.sol",
+        "./utilities/Params.sol",
+        "./utilities/DomainObjs.sol",
+        "./crypto/BabyJubJub.sol",
+        "./crypto/Hasher.sol",
+        "./trees/LeanIMT.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MACI"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\IMessageProcessorFactory.sol": {
+      "lastModificationDate": 1752083033875,
+      "contentHash": "ac5d1cf42b46d061c24be0bcb4d9759f",
+      "sourceName": "contracts/interfaces/IMessageProcessorFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IMessageProcessorFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\ITallyFactory.sol": {
+      "lastModificationDate": 1752083033899,
+      "contentHash": "15b65ccb5822d26b5e887c7eb7441f01",
+      "sourceName": "contracts/interfaces/ITallyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ITallyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\trees\\LeanIMT.sol": {
+      "lastModificationDate": 1752083033951,
+      "contentHash": "06e6b992429e73d20cab1d3307b2af04",
+      "sourceName": "contracts/trees/LeanIMT.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../crypto/PoseidonT3.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "InternalLeanIMT"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\VerifyingKeysRegistry.sol": {
+      "lastModificationDate": 1752083033781,
+      "contentHash": "4e9dd9c4cb2a37101a19dd518efccd28",
+      "sourceName": "contracts/VerifyingKeysRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./crypto/SnarkCommon.sol",
+        "./interfaces/IVerifyingKeysRegistry.sol",
+        "./utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "VerifyingKeysRegistry"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\Tally.sol": {
+      "lastModificationDate": 1752083033770,
+      "contentHash": "8f56e7e90b85f3722fd7dea312523cfd",
+      "sourceName": "contracts/Tally.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Clone.sol",
+        "./interfaces/IMACI.sol",
+        "./crypto/Hasher.sol",
+        "./interfaces/IPoll.sol",
+        "./interfaces/ITally.sol",
+        "./interfaces/IMessageProcessor.sol",
+        "./crypto/SnarkCommon.sol",
+        "./interfaces/IVerifier.sol",
+        "./interfaces/IVerifyingKeysRegistry.sol",
+        "./utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Tally"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\ITally.sol": {
+      "lastModificationDate": 1752083033894,
+      "contentHash": "878ef600bb6089db90bb828240103000",
+      "sourceName": "contracts/interfaces/ITally.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ITally"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\IMessageProcessor.sol": {
+      "lastModificationDate": 1752083033871,
+      "contentHash": "20c6d8b8e387ad0db442d9f375f27964",
+      "sourceName": "contracts/interfaces/IMessageProcessor.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IMessageProcessor"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\TallyFactory.sol": {
+      "lastModificationDate": 1752083033775,
+      "contentHash": "d8449db3fab6154cb0a63f0636ebf9f6",
+      "sourceName": "contracts/TallyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Factory.sol",
+        "./Tally.sol",
+        "./interfaces/ITallyFactory.sol",
+        "./utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "TallyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\MessageProcessor.sol": {
+      "lastModificationDate": 1752083033751,
+      "contentHash": "97294be4bd0cb1ebf3ceda1d40f64964",
+      "sourceName": "contracts/MessageProcessor.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Clone.sol",
+        "./interfaces/IMACI.sol",
+        "./interfaces/IPoll.sol",
+        "./crypto/SnarkCommon.sol",
+        "./crypto/Hasher.sol",
+        "./interfaces/IVerifier.sol",
+        "./interfaces/IVerifyingKeysRegistry.sol",
+        "./interfaces/IMessageProcessor.sol",
+        "./utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MessageProcessor"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\MessageProcessorFactory.sol": {
+      "lastModificationDate": 1752083033756,
+      "contentHash": "bf2c024cd101a23a64580b66664843da",
+      "sourceName": "contracts/MessageProcessorFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Factory.sol",
+        "./utilities/Params.sol",
+        "./utilities/DomainObjs.sol",
+        "./MessageProcessor.sol",
+        "./interfaces/IMessageProcessorFactory.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MessageProcessorFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\mocks\\MockVerifier.sol": {
+      "lastModificationDate": 1752083033932,
+      "contentHash": "3ca93043b9a23f5015267610ea47b394",
+      "sourceName": "contracts/mocks/MockVerifier.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../crypto/SnarkConstants.sol",
+        "../crypto/SnarkCommon.sol",
+        "../interfaces/IVerifier.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MockVerifier"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\crypto\\Verifier.sol": {
+      "lastModificationDate": 1752083033830,
+      "contentHash": "734d9286fe9f88d327124e197f59d120",
+      "sourceName": "contracts/crypto/Verifier.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Pairing.sol",
+        "./SnarkConstants.sol",
+        "./SnarkCommon.sol",
+        "../interfaces/IVerifier.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Verifier"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxy.sol": {
+      "lastModificationDate": 1752083033848,
+      "contentHash": "f50335e032517f41d5b7148d6c2507ea",
+      "sourceName": "contracts/initialVoiceCreditProxy/ERC20VotesInitialVoiceCreditProxy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Clone.sol",
+        "@openzeppelin/contracts/governance/utils/IVotes.sol",
+        "../interfaces/IInitialVoiceCreditProxy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ERC20VotesInitialVoiceCreditProxy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxyFactory.sol": {
+      "lastModificationDate": 1752083033852,
+      "contentHash": "1d45286ef7ce1a2f28899a82e3d71311",
+      "sourceName": "contracts/initialVoiceCreditProxy/ERC20VotesInitialVoiceCreditProxyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Factory.sol",
+        "./ERC20VotesInitialVoiceCreditProxy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ERC20VotesInitialVoiceCreditProxyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\initialVoiceCreditProxy\\ConstantInitialVoiceCreditProxy.sol": {
+      "lastModificationDate": 1752083033840,
+      "contentHash": "c6bfe2d0655dccb039e2cf3539931e02",
+      "sourceName": "contracts/initialVoiceCreditProxy/ConstantInitialVoiceCreditProxy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Clone.sol",
+        "../interfaces/IInitialVoiceCreditProxy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ConstantInitialVoiceCreditProxy"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\initialVoiceCreditProxy\\ConstantInitialVoiceCreditProxyFactory.sol": {
+      "lastModificationDate": 1752083033845,
+      "contentHash": "ce2074ff6bfbc37b6973194581ac2cb4",
+      "sourceName": "contracts/initialVoiceCreditProxy/ConstantInitialVoiceCreditProxyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Factory.sol",
+        "./ConstantInitialVoiceCreditProxy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ConstantInitialVoiceCreditProxyFactory"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\mocks\\MockERC20Votes.sol": {
+      "lastModificationDate": 1752083033923,
+      "contentHash": "f44521baf3abee7af98b7e2e197ecd33",
+      "sourceName": "contracts/mocks/MockERC20Votes.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MockERC20Votes"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\mocks\\MockERC20.sol": {
+      "lastModificationDate": 1752083033919,
+      "contentHash": "cf322c0559e2979c842af06ed9640e60",
+      "sourceName": "contracts/mocks/MockERC20.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MockERC20"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\interfaces\\ISemaphore.sol": {
+      "lastModificationDate": 1752083033888,
+      "contentHash": "39d85697180e6bc90066f1c4f0d70eb2",
+      "sourceName": "contracts/interfaces/ISemaphore.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ISemaphore"
+      ]
+    },
+    "D:\\Course\\Thuctap\\sasvoth\\packages\\contracts\\contracts\\mocks\\MockSemaphore.sol": {
+      "lastModificationDate": 1752083033927,
+      "contentHash": "25d2f8ff5879061269323a8dad8f8485",
+      "sourceName": "contracts/mocks/MockSemaphore.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/ISemaphore.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MockSemaphore"
+      ]
+    }
+  }
+}

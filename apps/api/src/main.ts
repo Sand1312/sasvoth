@@ -1,22 +1,24 @@
+import cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug'], // Ok, log levels
+    logger: ['error', 'warn', 'log', 'debug'],
   });
-  
-  const cookieParser = require('cookie-parser');
+
   app.use(cookieParser());
-  
+
   app.enableCors({
-    origin: 'http://localhost:3000', // FE origin
+    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // FIX: 'method' thành 'methods'
-    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'], // Thêm để FE axios mượt
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
   });
-  
-  await app.listen(8000); // Port backend
+
+  const port = Number(process.env.PORT) || 8000;
+  await app.listen(port);
 }
+
 bootstrap();

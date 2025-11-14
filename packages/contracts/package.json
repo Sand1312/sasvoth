@@ -1,10 +1,11 @@
 {
   "name": "@sasvoth/contracts",
   "version": "1.0.0",
+  "private": true,
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {
-    "build": "echo 'No build needed'"
+    "build": "echo \"No build needed\""
   },
   "dependencies": {
     "ethers": "^6.0.0"
