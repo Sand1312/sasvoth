@@ -6,7 +6,10 @@ import { VoiceCredits, VoiceCreditsSchema } from './schemas/voice-credis.schema'
 
 @Module({
      imports: [
-        MongooseModule.forFeature([{name: 'Voice_Credits', schema: VoiceCreditsSchema}]) 
+       MongooseModule.forFeature([{ 
+      name: VoiceCredits.name,  
+      schema: VoiceCreditsSchema 
+    }]) 
     ],
     controllers: [VoiceCreditsController],
     providers: [VoiceCreditsService],
