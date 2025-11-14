@@ -112,8 +112,8 @@ export function useMACI(): UseMACIReturn {
       voteOptions: BigInt(optionsCount),
     };
 
-    console.log("📝 DeployPoll args:", deployPollArgs);
-    console.log("🔗 Contract address:", contractConfigs.MACI.address);
+    console.log(" DeployPoll args:", deployPollArgs);
+    console.log(" Contract address:", contractConfigs.MACI.address);
 
     writeContract(
       {
@@ -151,7 +151,7 @@ export function useMACI(): UseMACIReturn {
     pubKey: { x: bigint; y: bigint },
     signUpGatekeeperData: `0x${string}`
   ) => {
-    console.log("🦊 Calling signUp...");
+    console.log(" Calling signUp...");
 
     writeSignUp(
       {
@@ -165,10 +165,10 @@ export function useMACI(): UseMACIReturn {
       },
       {
         onSuccess: (hash) => {
-          console.log("✅ SignUp transaction sent! Hash:", hash);
+          console.log("SignUp transaction sent! Hash:", hash);
         },
         onError: (error) => {
-          console.error("❌ SignUp failed:", error);
+          console.error("SignUp failed:", error);
         },
       }
     );
