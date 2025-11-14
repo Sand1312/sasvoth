@@ -20,9 +20,9 @@ export function usePolls() {
       throw error;
     }
   };
-  const getPollsByType = async () => {
+  const getPolls = async (status?: string) => {
     try {
-      const res = await pollsApi.getPollsByType();
+      const res = await pollsApi.getPolls(status);
       return res;
     } catch (error) {
       console.error("Get Polls error:", error);
@@ -31,6 +31,6 @@ export function usePolls() {
   };
   return {
     initPoll,
-    getPollsByType,
+    getPolls,
   };
 }
