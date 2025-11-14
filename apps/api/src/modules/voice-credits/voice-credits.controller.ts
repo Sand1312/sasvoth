@@ -26,14 +26,14 @@ export class VoiceCreditsController {
         }
     }
 
-    @Post("sell")
+    @Post("deduct")
     async sellCredits(@Req() req: Request, @Res() res: Response) {
         const { userId, pollId, credits } = req.body;
         try {
-            const updatedCredits = await this.voiceCreditsService.sellCredits(userId, pollId, credits);
+            const updatedCredits = await this.voiceCreditsService.deductCredits(userId, pollId, credits);
             return res.status(200).json({ credits: updatedCredits });
         } catch (error) {
-            return res.status(500).json({ message: 'Error selling credits', error });
+            return res.status(500).json({ message: 'Error deducting credits', error });
         }
     }
 
@@ -45,17 +45,6 @@ export class VoiceCreditsController {
             return res.status(200).json({ credits });
         } catch (error) {
             return res.status(500).json({ message: 'Error fetching credits', error });
-        }
-    }
-
-    @Post("block")
-    async blockCredits(@Req() req: Request, @Res() res: Response) {
-        const { userId, pollId } = req.body;
-        try {
-            await this.voiceCreditsService.blockCredits(userId, pollId);
-            return res.status(200).json({ message: 'Credits blocked successfully' });
-        } catch (error) {
-            return res.status(500).json({ message: 'Error blocking credits', error });
         }
     }
 }

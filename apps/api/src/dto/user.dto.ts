@@ -3,8 +3,6 @@ export class UserDto {
   readonly email: string;
   readonly name: string;
   readonly role: string;
-  readonly googleId?: string;
-  readonly githubId?: string;
   readonly walletAddress?: string;
   readonly authType?: string;
   readonly publicKey?: string;

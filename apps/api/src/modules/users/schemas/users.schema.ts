@@ -29,9 +29,6 @@ export class Users {
   @Prop({ type:String, required: true, enum:["google","github","email","wallet","all"], default:"email"})
   authType: string;
 
-  @Prop({default:0})
-  balance:number;
-
   @Prop({required:false , unique:true})
   publicKey:String;
 

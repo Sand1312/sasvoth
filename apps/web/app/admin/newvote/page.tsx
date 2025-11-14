@@ -164,7 +164,8 @@ export default function CreatePollPage() {
       await initPoll(
         options.map((o) => o.label),
         new Date(startTime),
-        new Date(endTime)
+        new Date(endTime),
+        
       );
     } catch (error) {
       console.error(" Failed to create poll:", error);

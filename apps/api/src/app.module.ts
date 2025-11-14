@@ -8,11 +8,11 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
 import { ResultsMetaModule } from './modules/results-meta/results-meta.module';
 import { VoiceCreditsModule } from './modules/voice-credits/voice-credits.module';
-import { VotesMetaModule } from './modules/votes-meta/votes-meta.module';
-import { VotingEventsModule } from './modules/voting-events/voting-events.module';
-import { PollsModule } from "./modules/polls/polls.module";
+import { VotesModule } from './modules/votes/votes.module';
+import { VotingEventsModule } from "./modules/voting-events/voting-events.module"
 import { RedisModule } from "@nestjs-modules/ioredis";
 import { JwtModule } from "@nestjs/jwt";
+import { IdeasModule } from './ideas/ideas.module';
 
 @Module({
   imports: [
@@ -47,10 +47,10 @@ import { JwtModule } from "@nestjs/jwt";
     VotingEventsModule,
     ResultsMetaModule,
     RewardsModule,
-    VotesMetaModule,
+    VotesModule,
     AuthModule,
     VotingEventsModule,
-    PollsModule
+    IdeasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
