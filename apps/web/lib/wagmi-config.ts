@@ -14,7 +14,7 @@ import {
   TOKEN_ABI,
   CLAIMING_ABI,
   CONSTANT_INITIAL_VOICE_CREDIT_PROXY_FACTORY_ABI
-} from '@sasvoth/contracts';
+} from '@maci-protocol/contracts';
 
 export const config = createConfig({
   chains: [arbitrumSepolia],

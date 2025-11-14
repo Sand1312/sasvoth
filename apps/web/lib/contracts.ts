@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import {MACI_ABI,POLL_FACTORY_ABI,MACI,PollFactory,MessageProcessorFactory,TallyFactory} from '@sasvoth/contracts';
+import {MACI_ABI,POLL_FACTORY_ABI,MACI,PollFactory,MessageProcessorFactory,TallyFactory} from '@maci-protocol/contracts';
 
 export const CONTRACT_ADDRESSES = {
   MACI: MACI as `0x${string}`,

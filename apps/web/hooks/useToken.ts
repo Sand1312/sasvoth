@@ -1,5 +1,5 @@
 import { useAccount, useContractRead, useContractWrite } from 'wagmi';
-import { TOKEN_ABI, TOKEN_CONTRACT_ADDRESS, CLAIM_CONTRACT_ADDRESS } from '@sasvoth/contracts';
+import { TOKEN_ABI, TOKEN_CONTRACT_ADDRESS, CLAIM_CONTRACT_ADDRESS } from '@maci-protocol/contracts';
 import { parseEther, formatEther } from 'viem';
 
 interface UseTokenReturn {

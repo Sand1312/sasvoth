@@ -1,5 +1,5 @@
 import { useAccount, useContractRead, useContractWrite } from 'wagmi';
-import { CLAIMING_ABI, CLAIM_CONTRACT_ADDRESS } from '@sasvoth/contracts';
+import { CLAIMING_ABI, CLAIM_CONTRACT_ADDRESS } from '@maci-protocol/contracts';
 import { parseEther } from 'viem';
 
 interface UseClaimContractReturn {
