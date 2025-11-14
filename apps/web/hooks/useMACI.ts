@@ -23,7 +23,8 @@ interface UseMACIReturn {
     },
     coordinatorAddress: `0x${string}`,
     messageBatchSize: number,
-    optionsCount: number
+    optionsCount: number,
+     onSuccess?: (pollId: number) => void 
   ) => void;
   isDeployingPoll: boolean;
   isDeploySuccess: boolean;

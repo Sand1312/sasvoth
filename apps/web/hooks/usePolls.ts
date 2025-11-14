@@ -1,6 +1,7 @@
 "use client";
 import { useRedirect } from "./useRedirect";
 import { pollsApi } from "../api";
+import { poll } from "ethers/lib/utils";
 // import { init } from "next/dist/compiled/webpack/webpack";
 
 export function usePolls() {
@@ -9,10 +10,11 @@ export function usePolls() {
   const initPoll = async (
     options: string[],
     startTime: Date,
-    endTime: Date
+    endTime: Date,
+    pollIdOnChain: number
   ) => {
     try {
-      const res = await pollsApi.createPoll(options, startTime, endTime);
+      const res = await pollsApi.createPoll(options, startTime, endTime, pollIdOnChain);
       goTo("/admin/dashboard");
       return res;
     } catch (error) {

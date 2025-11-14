@@ -65,8 +65,12 @@ export default function CreatePollPage() {
   useEffect(() => {
     if (isDeploySuccess && nextPollId > 0) {
       console.log(" Poll deployed successfully! Poll ID:", nextPollId);
-      // Có thể gọi API lưu vào DB ở đây
-      // initPoll(options.map(o => o.label), new Date(startTime), new Date(endTime));
+       initPoll(
+            options.map((o) => o.label),
+            new Date(startTime),
+            new Date(endTime),
+            nextPollId
+          );
     }
   }, [isDeploySuccess, nextPollId]);
 
@@ -126,7 +130,7 @@ export default function CreatePollPage() {
     setSubmitted(true);
 
     if (!isValid) {
-      console.log("❌ Form validation failed:", errors);
+      console.log(" Form validation failed:", errors);
       return;
     }
     if (!address) {
@@ -135,13 +139,13 @@ export default function CreatePollPage() {
     }
 
     try {
-      console.log("🚀 Starting poll creation...");
+      console.log(" Starting poll creation...");
 
       // Tính UNIX timestamp (giây)
       const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
       const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
 
-      console.log("⏰ Timestamps:", { startTimestamp, endTimestamp });
+      console.log(" Timestamps:", { startTimestamp, endTimestamp });
 
       // Tạo poll parameters theo đúng ABI
       const treeDepths = {
@@ -159,14 +163,7 @@ export default function CreatePollPage() {
         Number(batchSize),
         options.length // số lượng options
       );
-
-      console.log("createPoll called, waiting for MetaMask...");
-      await initPoll(
-        options.map((o) => o.label),
-        new Date(startTime),
-        new Date(endTime),
-        
-      );
+  
     } catch (error) {
       console.error(" Failed to create poll:", error);
       alert("Failed to create poll. Check console for details.");
