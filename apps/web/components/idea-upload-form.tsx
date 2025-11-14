@@ -4,9 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
-
-const cx = (...classes: Array<string | false | null | undefined>) =>
-  classes.filter(Boolean).join(" ");
+import { cn } from "@sasvoth/ui/lib/utils";
 
 type LayoutItemBase = {
   id: string;
@@ -264,7 +262,7 @@ export function IdeaUploadForm({
 
   return (
     <section
-      className={cx(
+      className={cn(
         "rounded-3xl border border-black/10 bg-white p-6 text-black shadow-[0_25px_60px_-30px_rgba(0,0,0,0.35)] sm:p-10",
         className
       )}
@@ -279,7 +277,7 @@ export function IdeaUploadForm({
               <React.Fragment key={item.id}>
                 <div className="flex items-center gap-3">
                   <span
-                    className={cx(
+                    className={cn(
                       "flex size-9 items-center justify-center rounded-full border text-sm font-semibold",
                       step >= item.id
                         ? "border-black bg-black text-white"
@@ -421,7 +419,7 @@ export function IdeaUploadForm({
                 />
                 <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.25em]">
                   <span
-                    className={cx(
+                    className={cn(
                       "font-semibold",
                       descriptionWords >= 200 ? "text-black" : "text-black/50"
                     )}
