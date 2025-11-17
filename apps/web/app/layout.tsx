@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Web3Provider } from "../providers/Web3Provider";
+import { MockProvider } from "./mock-provider";
 import { RootNav } from "./RootNav";
 
 const geistSans = localFont({
@@ -27,6 +28,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Web3Provider>
+          <MockProvider />
           <RootNav />
           {children}
         </Web3Provider>

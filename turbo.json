@@ -1,6 +1,12 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "API_URL",
+    "NEXT_PUBLIC_API_URL",
+    "BACKEND_URL",
+    "NEXT_PUBLIC_API_MOCKING"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -14,6 +20,10 @@
       "dependsOn": ["^check-types"]
     },
     "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "mock": {
       "cache": false,
       "persistent": true
     }

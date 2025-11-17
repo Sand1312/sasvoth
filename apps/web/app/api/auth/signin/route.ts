@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { forwardSetCookies } from "../../_lib/forward-set-cookie";
 
 export async function GET(req: Request) {
   try {
@@ -38,12 +39,18 @@ export async function GET(req: Request) {
     const location = backendRes.headers.get("location");
     const text = await backendRes.text();
     if (location) {
-      return NextResponse.redirect(location, backendRes.status);
+      const redirectResponse = NextResponse.redirect(
+        location,
+        backendRes.status
+      );
+      forwardSetCookies(backendRes, redirectResponse.headers);
+      return redirectResponse;
     }
 
-    const headers: Record<string, string> = {};
+    const headers = new Headers();
     const ct = backendRes.headers.get("content-type");
-    if (ct) headers["content-type"] = ct;
+    if (ct) headers.set("content-type", ct);
+    forwardSetCookies(backendRes, headers);
     return new NextResponse(text, { status: backendRes.status, headers });
   } catch (err) {
     console.error("/api/auth/signin error:", err);
@@ -90,13 +97,10 @@ export async function POST(req: Request) {
     const text = await res.text();
 
     // Forward any Set-Cookie header we received from backend so browser can store cookies
-    const headers: Record<string, string> = {};
+    const headers = new Headers();
     const ct = res.headers.get("content-type");
-    if (ct) headers["content-type"] = ct;
-    const setCookie = res.headers.get("set-cookie");
-    if (setCookie) {
-      headers["set-cookie"] = setCookie;
-    }
+    if (ct) headers.set("content-type", ct);
+    forwardSetCookies(res, headers);
 
     return new NextResponse(text, { status: res.status, headers });
   } catch (err) {
