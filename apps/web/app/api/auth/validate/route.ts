@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { forwardSetCookies } from "../../_lib/forward-set-cookie";
 
 export async function POST(req: Request) {
   try {
@@ -30,13 +31,10 @@ export async function POST(req: Request) {
     const text = await res.text();
 
     // Forward any Set-Cookie header we received from backend (though validate shouldn't set cookies)
-    const headers: Record<string, string> = {};
+    const headers = new Headers();
     const ct = res.headers.get("content-type");
-    if (ct) headers["content-type"] = ct;
-    const setCookie = res.headers.get("set-cookie");
-    if (setCookie) {
-      headers["set-cookie"] = setCookie;
-    }
+    if (ct) headers.set("content-type", ct);
+    forwardSetCookies(res, headers);
 
     return new NextResponse(text, { status: res.status, headers });
   } catch (err) {

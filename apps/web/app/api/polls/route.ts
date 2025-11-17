@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { forwardSetCookies } from "../_lib/forward-set-cookie";
 
 const apiBase =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -32,11 +33,10 @@ export async function GET(req: Request) {
     }
 
     const text = await res.text();
-    const headers: Record<string, string> = {};
+    const headers = new Headers();
     const contentType = res.headers.get("content-type");
-    if (contentType) headers["content-type"] = contentType;
-    const setCookie = res.headers.get("set-cookie");
-    if (setCookie) headers["set-cookie"] = setCookie;
+    if (contentType) headers.set("content-type", contentType);
+    forwardSetCookies(res, headers);
 
     return new NextResponse(text, { status: res.status, headers });
   } catch (err) {
@@ -70,11 +70,10 @@ export async function POST(req: Request) {
     }
 
     const text = await res.text();
-    const headers: Record<string, string> = {};
+    const headers = new Headers();
     const resContentType = res.headers.get("content-type");
-    if (resContentType) headers["content-type"] = resContentType;
-    const setCookie = res.headers.get("set-cookie");
-    if (setCookie) headers["set-cookie"] = setCookie;
+    if (resContentType) headers.set("content-type", resContentType);
+    forwardSetCookies(res, headers);
 
     return new NextResponse(text, { status: res.status, headers });
   } catch (err) {
