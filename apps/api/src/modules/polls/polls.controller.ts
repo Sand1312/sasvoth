@@ -1,4 +1,4 @@
-import {Controller, Get} from '@nestjs/common';
+import {Controller, Get, Patch} from '@nestjs/common';
 import { PollsService } from './polls.service';
 import { create } from 'domain';
 import { Post, Req, Res , Param } from '@nestjs/common';
@@ -19,13 +19,23 @@ export class PollsController {
         }
     }
 
-    @Get("Get/:status")
+    @Get("get/:status")
     async getPollsByStatus(@Param("status") status: string, @Res() res: Response) {
         try {
             const polls = await this.pollsService.getPollByStatus(status);
             return res.status(200).json(polls);
         } catch (error) {
             return res.status(500).json({ message: 'Error fetching polls', error });
+        }
+    }
+    @Patch("updateStatus")
+    async updatePollStatus( @Req() req: Request, @Res() res: Response) {
+        const { pollId, status } = req.body;
+        try {
+            const updatedPoll = await this.pollsService.updatePollStatus(pollId, status);
+            return res.status(200).json(updatedPoll);
+        } catch (error) {
+            return res.status(500).json({ message: 'Error updating poll status', error });
         }
     }
 }

@@ -17,4 +17,7 @@ export class PollsService {
     async getPollByStatus(status: string): Promise<PollsDocument[]> {
         return this.pollsModel.find({ status }).exec();
     }
+    async updatePollStatus(pollId: string, status: string): Promise<PollsDocument | null> {
+        return this.pollsModel.findByIdAndUpdate(pollId, { status }, { new: true }).exec();
+    }   
 }
