@@ -9,9 +9,9 @@ import { id } from 'ethers/lib/utils';
 export class RewardsService {
     constructor(@InjectModel(Rewards.name) private rewardsModel: Model<RewardsDocument>) {}
 
-    async saveReward(userId: string, votingEventsId: string,credit_count :number): Promise<void> {
+    async saveReward(userId: string, pollId: string,credit_count :number): Promise<void> {
         try{
-        const reward = await this.rewardsModel.findOne({ userId: userId, voting_events_id: votingEventsId });
+        const reward = await this.rewardsModel.findOne({ userId: userId, voting_events_id: pollId });
         if(reward){
             throw new Error('Reward already exists for this user and voting event');
         } else  {
@@ -20,7 +20,7 @@ export class RewardsService {
             const signature = await generateSignatureForClaim(userId, amountToken, idClaim);
             const newReward = new this.rewardsModel({
                 userId: userId,
-                voting_events_id: parseInt(votingEventsId),
+                voting_events_id: parseInt(pollId),
                 credit_count: credit_count,
                 amountToken: amountToken,
                 status: "pending",
@@ -34,8 +34,8 @@ export class RewardsService {
         throw new Error('Error saving reward: ' + error.message);
     }
     }
-    async getReward(userId: string, votingEventsId: string): Promise<RewardsDocument | null> {
-        return this.rewardsModel.findOne({ userId: userId, voting_events_id: votingEventsId }).exec();
+    async getReward(userId: string, pollId: string): Promise<RewardsDocument | null> {
+        return this.rewardsModel.findOne({ userId: userId, voting_events_id: pollId }).exec();
     }
 
 }

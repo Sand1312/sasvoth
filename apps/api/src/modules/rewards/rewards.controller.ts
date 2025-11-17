@@ -20,9 +20,9 @@ export class RewardsController {
     // @UseGuards(AuthGuard("jwt"))
     async getReward(@Req() req: Request, @Res() res: Response) {
         const userId = req.query.userId as string;
-        const votingEventsId = req.query.votingEventsId as string;
+        const pollId = req.query.pollId as string;
         try{
-            const reward = await this.rewardsService.getReward(userId, votingEventsId);
+            const reward = await this.rewardsService.getReward(userId, pollId);
             if(!reward){
                 return res.status(400).json({ message: 'Reward not found' });
             }
@@ -35,9 +35,9 @@ export class RewardsController {
     @Post("save")
     // @UseGuards(AuthGuard("jwt"))
     async saveReward(@Req() req: Request, @Res() res: Response) {
-        const { userId, votingEventsId, credit_count } = req.body;
+        const { userId, pollId, credit_count } = req.body;
         try {
-            await this.rewardsService.saveReward(userId, votingEventsId, credit_count);
+            await this.rewardsService.saveReward(userId, pollId, credit_count);
             return  res.status(201).json({ message: 'Reward saved successfully' });
         } catch (error) {
             return res.status(500).json({ message: 'Error saving reward', error: error.message });

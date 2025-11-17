@@ -9,17 +9,17 @@ export class ResultsMetaController {
     @Post("save")
     async saveResultsMeta(@Req() req:Request, @Res() res: Response) {
         try {
-            const {votingEventsId, result_cid, outCome} = req.body;
-            const savedMeta = await this.resultsMetaService.saveResultsMeta(votingEventsId, result_cid, outCome);
+            const {pollId, result_cid, outCome} = req.body;
+            const savedMeta = await this.resultsMetaService.saveResultsMeta(pollId, result_cid, outCome);
             return res.status(201).json(savedMeta);
         } catch (error) {
             return res.status(500).json({ message: 'Error saving results meta', error });
         }
 }
-    @Get("get/:votingEventsId")
-    async getResultsMeta(@Param("votingEventsId") votingEventsId: string, @Res() res: Response) {
+    @Get("get/:pollId")
+    async getResultsMeta(@Param("pollId") pollId: string, @Res() res: Response) {
         try {
-            const resultsMeta = await this.resultsMetaService.getOutComeByVotingEventId(votingEventsId);
+            const resultsMeta = await this.resultsMetaService.getOutComeByVotingEventId(pollId);
             return res.status(200).json(resultsMeta);
         } catch (error) {
             return res.status(500).json({ message: 'Error fetching results meta', error });

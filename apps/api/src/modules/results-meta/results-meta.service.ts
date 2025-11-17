@@ -6,12 +6,12 @@ import { Model } from "mongoose";
 export class ResultsMetaService {
     constructor(@InjectModel('ResultsMeta') private resultsMetaModel: Model<any>) {}
 
-    async saveResultsMeta(votingEventsId: string, result_cid: string, outCome: string): Promise<any> {
-        const resultsMeta = new this.resultsMetaModel({ votingEventsId, result_cid, outCome });
+    async saveResultsMeta(pollId: string, result_cid: string, outCome: string): Promise<any> {
+        const resultsMeta = new this.resultsMetaModel({ pollId, result_cid, outCome });
         return resultsMeta.save();
     }
-    async getOutComeByVotingEventId(votingEventsId: string): Promise<any> {
-        const resultsMeta = await this.resultsMetaModel.findOne({ votingEventsId }).exec();
+    async getOutComeByVotingEventId(pollId: string): Promise<any> {
+        const resultsMeta = await this.resultsMetaModel.findOne({ pollId }).exec();
         if (!resultsMeta) {
             throw new Error("ResultsMeta not found");
         }
