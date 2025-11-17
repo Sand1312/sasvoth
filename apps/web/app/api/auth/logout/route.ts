@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { forwardSetCookies } from "../../_lib/forward-set-cookie";
 
 function getCookieValue(cookieHeader: string, name: string): string | null {
   if (!cookieHeader) return null;
@@ -24,21 +25,21 @@ export async function POST(req: Request) {
     const cookieHeader = req.headers.get("cookie") || "";
     const accessToken = getCookieValue(cookieHeader, "access_token");
 
-    const headers: Record<string, string> = {
+    const requestHeaders: Record<string, string> = {
       cookie: cookieHeader,
       Accept: "application/json",
       "Content-Type": "application/json",
     };
     // Some JWT guards expect Authorization header instead of cookies.
     if (accessToken) {
-      headers["authorization"] = `Bearer ${accessToken}`;
+      requestHeaders["authorization"] = `Bearer ${accessToken}`;
     }
 
     let res;
     try {
       res = await fetch(backendUrl, {
         method: "POST",
-        headers,
+        headers: requestHeaders,
         cache: "no-store",
       });
     } catch (fetchErr) {
@@ -49,11 +50,10 @@ export async function POST(req: Request) {
     const text = await res.text();
 
     // Forward any Set-Cookie headers (to clear cookies on client)
-    const resHeaders: Record<string, string> = {};
+    const resHeaders = new Headers();
     const ct = res.headers.get("content-type");
-    if (ct) resHeaders["content-type"] = ct;
-    const setCookie = res.headers.get("set-cookie");
-    if (setCookie) resHeaders["set-cookie"] = setCookie;
+    if (ct) resHeaders.set("content-type", ct);
+    forwardSetCookies(res, resHeaders);
 
     return new NextResponse(text, { status: res.status, headers: resHeaders });
   } catch (err) {
