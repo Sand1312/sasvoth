@@ -34,6 +34,10 @@ function IconButton({
 
 export default function LoginPage() {
   const [walletError, setWalletError] = useState<string | null>(null);
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { signinWithProvider } = useAuth();
   const handleWalletLogin = async () => {
     setWalletError(null);
@@ -66,8 +70,26 @@ export default function LoginPage() {
   const handleLogin = (provider: any) => {
     signinWithProvider(provider);
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+    if (!identifier || !password) {
+      setFormError("Username/email and password are required.");
+      return;
+    }
+    try {
+      setIsSubmitting(true);
+      await signinWithProvider("email", {
+        username: identifier,
+        email: identifier,
+        password,
+      });
+    } catch (err: any) {
+      console.error("Email signin failed:", err);
+      setFormError(err?.response?.data?.message || "Signin failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -83,24 +105,34 @@ export default function LoginPage() {
             Sign up
           </a>
         </div>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <Input
             type="text"
             placeholder="Username or Email"
             className="w-full"
             autoComplete="username"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
           />
           <Input
             type="password"
             placeholder="Password"
             className="w-full"
             autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
+          {formError && (
+            <p className="text-sm text-red-600" role="alert">
+              {formError}
+            </p>
+          )}
           <Button
             type="submit"
-            className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            disabled={isSubmitting}
+            className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
           >
-            Login
+            {isSubmitting ? "Signing in..." : "Login"}
           </Button>
         </form>
         <div className="my-6 flex items-center">

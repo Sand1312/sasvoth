@@ -18,6 +18,7 @@ const PUBLIC_FILE = /\.(.*)$/;
 export async function middleware(req: NextRequest) {
   const { nextUrl, cookies } = req;
   const pathname = nextUrl.pathname;
+  const isMocking = process.env.NEXT_PUBLIC_API_MOCKING === "enabled";
 
   if (
     pathname.startsWith("/_next") ||
@@ -50,6 +51,12 @@ export async function middleware(req: NextRequest) {
   );
 
   if (hasAuthCookie) {
+    if (isMocking) {
+      console.log(
+        "Mock mode enabled - trusting cookie without backend validation."
+      );
+      return NextResponse.next();
+    }
     // perform server-side validation by calling our internal API which proxies the request
     try {
       const validateUrl = new URL("/api/auth/validate", req.url);
