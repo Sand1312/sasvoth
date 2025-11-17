@@ -45,7 +45,10 @@ export class UsersController {
       const walletAddress = req.body();
       try {
           const result = await this.usersService.connectWallet(userId, walletAddress);
-          return res.status(200).json({ success: result });
+          if (result ===true){
+              return res.status(200).json({ message: 'Wallet already connected' });
+          }
+          return res.status(201).json({ success: result });
       } catch (error) {
           return res.status(500).json({ message: 'Error connecting wallet', error });
       }
