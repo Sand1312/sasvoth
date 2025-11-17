@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 
-export type VotingEventsDocument = HydratedDocument<VotingEvents>;
+export type PollsDocument = HydratedDocument<Polls>;
 
 @Schema()
-export class VotingEvents {
+export class Polls {
     @Prop({ required: false })
     title: string;
 
@@ -36,4 +36,4 @@ export class VotingEvents {
 
 }
 
-export const VotingEventsSchema = SchemaFactory.createForClass(VotingEvents);
+export const PollsSchema = SchemaFactory.createForClass(Polls);

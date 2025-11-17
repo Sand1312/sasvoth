@@ -11,7 +11,7 @@ import { RewardsModule } from './modules/rewards/rewards.module';
 import { UsersModule } from './modules/users/users.module';
 import { VoiceCreditsModule } from './modules/voice-credits/voice-credits.module';
 import { VotesModule } from './modules/votes/votes.module';
-import { VotingEventsModule } from './modules/voting-events/voting-events.module';
+import { PollsModule } from './modules/polls/polls.module';
 import { RedisModule } from "@nestjs-modules/ioredis";
 import { JwtModule } from "@nestjs/jwt";
 // import { IdeasModule } from './modules/ideas/ideas.module';
@@ -32,13 +32,12 @@ import { JwtModule } from "@nestjs/jwt";
     }),
     UsersModule,
     VoiceCreditsModule,
-    VotingEventsModule,
+    PollsModule,
     ResultsMetaModule,
     RewardsModule,
     VotesModule,
     AuthModule,
     IdeasModule,
-    VotingEventsModule,
     // IdeasModule,
   ],
   controllers: [AppController],

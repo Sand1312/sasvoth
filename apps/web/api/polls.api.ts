@@ -1,7 +1,7 @@
 import { api } from "./base";
 
 export const pollsApi = {
-  createPoll: async (options: string[], startTime: Date, endTime: Date) => {
+  createPoll: async (options: string[], startTime: Date, endTime: Date,pollIdOnChain:number) => {
     try {
       const pollData = {
         title: "New Poll",
@@ -11,6 +11,7 @@ export const pollsApi = {
         startTime: startTime,
         endTime: endTime,
         options: options,
+        pollIdOnChain: pollIdOnChain,
       };
       const response = await api.post("/polls", pollData);
       return response.data;
