@@ -5,7 +5,7 @@ export type IdeasDocument = HydratedDocument<Ideas>;
 
 @Schema()
 export class Ideas {
-  @Prop({ required: false })
+    @Prop({ required: false })
     title: string;
 
     @Prop({ required: false })
@@ -25,5 +25,9 @@ export class Ideas {
 
     @Prop({ required: true ,type:String})
     imgsSrc: string[];
+
+    @Prop({required:true, type:String})
+    creatorIdea:String;
+
 }
 export const IdeasSchema = SchemaFactory.createForClass(Ideas);
