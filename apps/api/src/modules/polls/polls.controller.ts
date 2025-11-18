@@ -38,4 +38,35 @@ export class PollsController {
             return res.status(500).json({ message: 'Error updating poll status', error });
         }
     }
+
+    @Patch("addIdea")
+    async addIdeaToPoll( @Req() req: Request, @Res() res: Response) {
+        const { pollId, ideaId } = req.body;
+        try {
+            const updatedPoll = await this.pollsService.addIdeaToPoll(pollId, ideaId);
+            return res.status(200).json(updatedPoll);
+        } catch (error) {
+            return res.status(500).json({ message: 'Error adding idea to poll', error });
+        }
+    }
+    @Patch("approveIdea")
+    async approveIdeaInPoll( @Req() req: Request, @Res() res: Response) {
+        const { pollId, ideaId } = req.body;
+        try {
+            const updatedPoll = await this.pollsService.approveIdeaInPoll(pollId, ideaId);
+            return res.status(200).json(updatedPoll);
+        } catch (error) {
+            return res.status(500).json({ message: 'Error approving idea in poll', error });
+        }
+    }
+    @Patch("saveOnChainId")
+    async savePollOnChainId( @Req() req: Request, @Res() res: Response) {
+        const { pollId, pollIdOnChain } = req.body;
+        try {
+            const updatedPoll = await this.pollsService.savePollOnChainId(pollId, pollIdOnChain);
+            return res.status(200).json(updatedPoll);
+        } catch (error) {
+            return res.status(500).json({ message: 'Error saving poll on-chain ID', error });
+        }
+    }
 }

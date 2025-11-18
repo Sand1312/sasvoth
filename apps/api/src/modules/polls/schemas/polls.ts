@@ -23,17 +23,17 @@ export class Polls {
     @Prop({ required: true })
     endTime: Date;
 
-    @Prop({ required: true ,type:[String]})
-    options: string[];
+    @Prop({ required: false ,type:[String]})
+    ideas: string[];// danh sách chờ duyệt
 
-    @Prop({required:true, equals:true})
+    @Prop({ required: false ,type:[Number]})
+    options:string[];// danh sách option đã được duyệt
+
+    @Prop({required:false, equals:true})
     pollIdOnChain: number;
 
     @Prop({ required: false })
     createdAt: Date;
-
-
-
 }
 
 export const PollsSchema = SchemaFactory.createForClass(Polls);
