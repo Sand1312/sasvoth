@@ -16,7 +16,8 @@ export async function POST(req: Request) {
     let res;
     try {
       res = await fetch(backendUrl, {
-        method: "POST",
+        // Backend validate endpoint is a GET, even though we expose POST to clients.
+        method: "GET",
         headers: {
           cookie,
           Accept: "application/json",
