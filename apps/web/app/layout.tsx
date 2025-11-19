@@ -27,11 +27,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Web3Provider>
-          <MockProvider />
-          <RootNav />
-          {children}
-        </Web3Provider>
+        <MockProvider />
+        <RootNav />
+        <Web3Provider>{children}</Web3Provider>
       </body>
     </html>
   );

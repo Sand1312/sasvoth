@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@sasvoth/ui/button";
 import React, { useState, useEffect, useMemo } from "react";
-import { useToken, useClaimContract, usePolls } from "../../hooks";
-import { useAccount } from "wagmi";
+import { usePolls } from "../../hooks";
 // Types cho Poll
 type Poll = {
   _id: string;
@@ -32,65 +33,90 @@ type Poll = {
   };
 };
 
-type Move = {
+type VotePhase = "prepare" | "voting" | "tally";
+type VoteCard = {
   id: number;
-  to: string;
-  amount: number;
-};
-
-type Notification = {
-  id: number;
-  message: string;
+  title: string;
+  highlight: string;
   date: string;
+  amount: number;
+  token: string;
+  phase: VotePhase;
+  rewarded?: boolean;
 };
 
-const mockMoves: Move[] = [
-  { id: 1, to: "Alice", amount: 120 },
-  { id: 2, to: "Bob", amount: 75 },
-  { id: 3, to: "Charlie", amount: 200 },
-  { id: 4, to: "Diana", amount: 50 },
+const mockVotes: VoteCard[] = [
+  {
+    id: 1,
+    title: "Tên cuộc vote",
+    highlight: "#1 silk song",
+    date: "2024-06-10",
+    amount: 30,
+    token: "HD",
+    phase: "voting",
+  },
+  {
+    id: 2,
+    title: "Civic mixtape",
+    highlight: "#3 east market",
+    date: "2024-06-12",
+    amount: 22,
+    token: "HD",
+    phase: "prepare",
+  },
+  {
+    id: 3,
+    title: "Futures residency",
+    highlight: "#8 sonic bloom",
+    date: "2024-06-05",
+    amount: 45,
+    token: "HD",
+    phase: "tally",
+    rewarded: true,
+  },
+  {
+    id: 4,
+    title: "Tên cuộc vote",
+    highlight: "#6 river pulse",
+    date: "2024-06-02",
+    amount: 18,
+    token: "HD",
+    phase: "prepare",
+  },
 ];
 
-const mockNotifications: Notification[] = [
-  { id: 1, message: "Balance updated: +$120", date: "2024-06-10" },
-  { id: 2, message: "Balance updated: -$75", date: "2024-06-09" },
-  { id: 3, message: "Balance updated: +$200", date: "2024-06-08" },
-  { id: 4, message: "Balance updated: -$50", date: "2024-06-07" },
-];
+const phaseStyles: Record<VotePhase, { label: string; accent: string }> = {
+  prepare: {
+    label: "Prepare",
+    accent: "#1E40AF",
+  },
+  voting: {
+    label: "Voting",
+    accent: "#0B8A44",
+  },
+  tally: {
+    label: "Tally",
+    accent: "#B45309",
+  },
+};
 
 // API functions
 
 export default function DashboardPage() {
-  const { address, isConnected } = useAccount();
   const [isClient, setIsClient] = useState(false);
-  const [hiddenIds, setHiddenIds] = useState<number[]>([]);
-  const [sortBy, setSortBy] = useState<"date" | "amount">("date");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState<{
+    key: "name" | "date" | "token";
+    direction: "asc" | "desc";
+  }>({ key: "date", direction: "desc" });
+  const [phaseFilter, setPhaseFilter] = useState<"all" | VotePhase>("all");
 
   // --- Polls state ---
   const [polls, setPolls] = useState<Poll[]>([]);
   const [activePolls, setActivePolls] = useState<Poll[]>([]);
   const [loadingPolls, setLoadingPolls] = useState(true);
   const [pollError, setPollError] = useState<string>("");
-
-  // --- Deposit/Mua Token state ---
-  const [showDeposit, setShowDeposit] = useState(false);
-  const [depositAmount, setDepositAmount] = useState<number | "">("");
-
-  // --- Rút tiền/Bán Token state ---
-  const [showWithdraw, setShowWithdraw] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState<number | "">("");
-
-  // --- Mua Voice Credits state ---
-  const [showBuyCredits, setShowBuyCredits] = useState(false);
-  const [creditsAmount, setCreditsAmount] = useState<number | "">("");
-  const [purchasedCredits, setPurchasedCredits] = useState<number>(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showApproveOnly, setShowApproveOnly] = useState(false);
-  const [approveAmount, setApproveAmount] = useState<number | "">("");
   const { getPolls } = usePolls();
-  // Web3 hooks
-  const token = useToken();
-  const claim = useClaimContract();
 
   useEffect(() => {
     setIsClient(true);
@@ -112,177 +138,64 @@ export default function DashboardPage() {
     }
   };
 
-  // Theo dõi sự thay đổi của voice credits
-  useEffect(() => {
-    if (claim.voiceCredits && isConnected) {
-      console.log("Voice credits updated:", claim.voiceCredits);
-    }
-  }, [claim.voiceCredits, isConnected]);
-
-  // Logic approve cho Voice Credits
-  const needsApproval = useMemo(() => {
-    if (!creditsAmount || !claim.creditRate || !token.allowance) return true;
-
-    const requiredAmount = Number(creditsAmount) * Number(claim.creditRate);
-    return Number(token.allowance) < requiredAmount;
-  }, [creditsAmount, claim.creditRate, token.allowance]);
-
-  // Tính số token cần approve
-  const requiredAmount = useMemo(() => {
-    if (!creditsAmount || !claim.creditRate) return 0;
-    return Number(creditsAmount) * Number(claim.creditRate);
-  }, [creditsAmount, claim.creditRate]);
-
-  // Hàm approve riêng
-  const handleApproveOnly = () => {
-    if (!approveAmount || approveAmount <= 0) {
-      alert("Vui lòng nhập số lượng token cần approve");
-      return;
-    }
-
-    token.approve(claim.contractAddress, approveAmount.toString());
-    alert(`Đang approve ${approveAmount} token...`);
-  };
-
-  // Hàm duy nhất xử lý cả approve và buy
-  const handleBuyVoiceCredits = () => {
-    if (!creditsAmount || !claim.creditRate) return;
-
-    setIsProcessing(true);
-    setPurchasedCredits(Number(creditsAmount));
-
-    if (needsApproval) {
-      console.log("🔐 Thực hiện approve trước...");
-      // Thực hiện approve
-      token.approve(claim.contractAddress, requiredAmount.toString());
-
-      // ĐỢI 8 GIÂY RỒI TỰ ĐỘNG BUY
-      setTimeout(() => {
-        console.log(" Approve xong, thực hiện buy...");
-        // Refetch allowance để kiểm tra
-        token.refetchAllowance?.();
-
-        // Thực hiện buy
-        const creditsString = creditsAmount.toString();
-        claim.buyVoiceCredits(creditsString);
-
-        // Reset form sau 3 giây
-        setTimeout(() => {
-          setCreditsAmount("");
-          setShowBuyCredits(false);
-          setIsProcessing(false);
-          // Refetch voice credits sau khi mua
-          claim.refetchVoiceCredits?.();
-        }, 3000);
-      }, 8000); // ĐỢI 8 GIÂY
-    } else {
-      // Nếu đã approve rồi thì mua luôn
-      const creditsString = creditsAmount.toString();
-      claim.buyVoiceCredits(creditsString);
-
-      // Reset form sau 3 giây
-      setTimeout(() => {
-        setCreditsAmount("");
-        setShowBuyCredits(false);
-        setIsProcessing(false);
-        // Refetch voice credits sau khi mua
-        claim.refetchVoiceCredits?.();
-      }, 3000);
-    }
-  };
-
-  // Hàm mua trực tiếp (khi đã approve đủ)
-  const handleBuyDirect = () => {
-    if (!creditsAmount) return;
-
-    const creditsString = creditsAmount.toString();
-    claim.buyVoiceCredits(creditsString);
-
-    setTimeout(() => {
-      setCreditsAmount("");
-      setShowBuyCredits(false);
-      // Refetch voice credits sau khi mua
-      claim.refetchVoiceCredits?.();
-    }, 3000);
-  };
-
-  const toggleHidden = (id: number) => {
-    setHiddenIds((prev) =>
-      prev.includes(id) ? prev.filter((hid) => hid !== id) : [...prev, id]
-    );
-  };
-
-  // Hàm mua token với ETH
-  const handleBuyToken = () => {
-    if (typeof depositAmount === "number" && depositAmount > 0) {
-      const ethAmountString = depositAmount.toString();
-      claim.buyHD(ethAmountString);
-      setDepositAmount("");
-      setShowDeposit(false);
-      alert(`Đang mua token với ${depositAmount} ETH...`);
-    } else {
-      alert("Vui lòng nhập số ETH hợp lệ");
-    }
-  };
-
-  // Hàm rút tiền (bán token lấy ETH)
-  const handleWithdraw = () => {
-    if (typeof withdrawAmount === "number" && withdrawAmount > 0) {
-      const tokenAmountString = withdrawAmount.toString();
-      claim.sellHD(tokenAmountString);
-      setWithdrawAmount("");
-      setShowWithdraw(false);
-
-      if (claim.rate) {
-        const ethReceived = Number(withdrawAmount) / Number(claim.rate);
-        alert(
-          `Đang bán ${withdrawAmount} token để rút ${ethReceived.toFixed(6)} ETH...`
-        );
-      } else {
-        alert(`Đang bán ${withdrawAmount} token để rút ETH...`);
+  const handleSortClick = (key: "name" | "date" | "token") => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return {
+          key,
+          direction: prev.direction === "asc" ? "desc" : "asc",
+        };
       }
-    } else {
-      alert("Vui lòng nhập số token hợp lệ");
-    }
+
+      return { key, direction: key === "name" ? "asc" : "desc" };
+    });
   };
 
-  const movesWithDate = mockMoves.map((move, idx) => ({
-    ...move,
-    date: mockNotifications[idx]?.date ?? "2024-06-01",
-  }));
+  const visibleVotes = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    let data = [...mockVotes];
 
-  const sortedMoves = [...movesWithDate].sort((a, b) => {
-    if (sortBy === "amount") {
-      return b.amount - a.amount;
-    } else {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (normalizedSearch) {
+      data = data.filter((vote) =>
+        [vote.title, vote.highlight]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedSearch)
+      );
     }
-  });
+    if (phaseFilter !== "all") {
+      data = data.filter((vote) => vote.phase === phaseFilter);
+    }
 
-  // Biến cho disabled states
-  const isDepositDisabled = Boolean(
-    claim.isBuying || !depositAmount || Number(depositAmount) < 0.001
-  );
+    return data.sort((a, b) => {
+      if (sortConfig.key === "name") {
+        const nameCompare = a.highlight.localeCompare(b.highlight);
+        return sortConfig.direction === "asc" ? nameCompare : -nameCompare;
+      }
+      if (sortConfig.key === "token") {
+        const tokenCompare = a.token.localeCompare(b.token);
+        return sortConfig.direction === "asc" ? tokenCompare : -tokenCompare;
+      }
 
-  const isWithdrawDisabled = Boolean(
-    claim.isSelling ||
-      !withdrawAmount ||
-      Number(withdrawAmount) > Number(token.balance) ||
-      Number(withdrawAmount) <= 0
-  );
+      const dateCompare =
+        new Date(a.date).getTime() - new Date(b.date).getTime();
+      return sortConfig.direction === "asc" ? dateCompare : -dateCompare;
+    });
+  }, [searchTerm, sortConfig, phaseFilter]);
 
-  const isBuyCreditsDisabled = Boolean(
-    isProcessing ||
-      claim.isBuyingCredits ||
-      token.isApproving ||
-      !creditsAmount ||
-      requiredAmount <= 0 ||
-      requiredAmount > Number(token.balance)
-  );
-
-  const isApproveDisabled = Boolean(
-    token.isApproving || !approveAmount || Number(approveAmount) <= 0
-  );
+  const legendEntries = Object.entries(phaseStyles);
+  const phaseFilters: Array<{
+    key: "all" | VotePhase;
+    label: string;
+    accent: string;
+  }> = [
+    { key: "all", label: "All statuses", accent: "#111827" },
+    ...Object.entries(phaseStyles).map(([key, value]) => ({
+      key: key as VotePhase,
+      label: value.label,
+      accent: value.accent,
+    })),
+  ];
 
   // Loading state cho SSR
   if (!isClient) {
@@ -290,44 +203,25 @@ export default function DashboardPage() {
       <div className="flex gap-8 mt-8 items-start justify-center px-6 py-6">
         {/* LEFT: Your Vote Skeleton */}
         <div className="flex-1">
-          <div className="flex justify-between items-center mb-4">
-            <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
+          <div className="mb-4 flex flex-wrap items-center gap-4">
+            <div className="h-8 w-32 rounded bg-gray-200 animate-pulse"></div>
+            <div className="h-10 flex-1 min-w-[200px] rounded-full bg-gray-200 animate-pulse"></div>
             <div className="flex gap-2">
-              <div className="h-8 bg-gray-200 rounded w-24 animate-pulse"></div>
-              <div className="h-8 bg-gray-200 rounded w-20 animate-pulse"></div>
+              <div className="h-8 w-20 rounded-full bg-gray-200 animate-pulse"></div>
+              <div className="h-8 w-20 rounded-full bg-gray-200 animate-pulse"></div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white border rounded-lg shadow px-5 py-4 h-32 animate-pulse"
+                className="h-32 rounded-[20px] border border-black/5 bg-gray-200 px-5 py-4 shadow animate-pulse"
               >
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-3 mx-auto"></div>
-                <div className="h-6 bg-gray-200 rounded w-1/2 mb-2 mx-auto"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/3 mx-auto"></div>
+                <div className="mb-3 h-4 w-3/4 rounded bg-gray-300"></div>
+                <div className="mb-2 h-6 w-1/2 rounded bg-gray-300"></div>
+                <div className="h-3 w-1/3 rounded bg-gray-300"></div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* RIGHT: Balance Skeleton */}
-        <div className="flex-1 flex flex-col items-end pr-8">
-          <div className="w-full max-w-[340px] space-y-4">
-            <div className="flex justify-between items-center mb-2">
-              <div className="h-8 bg-gray-200 rounded w-40 animate-pulse"></div>
-              <div className="flex gap-2">
-                <div className="h-8 bg-gray-200 rounded w-20 animate-pulse"></div>
-                <div className="h-8 bg-gray-200 rounded w-20 animate-pulse"></div>
-              </div>
-            </div>
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-gray-200 rounded-lg px-5 py-4 h-16 animate-pulse"
-              ></div>
-            ))}
-            <div className="bg-gray-200 rounded-lg px-5 py-4 h-20 animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -336,338 +230,153 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="flex gap-8 mt-8 items-start justify-center px-6 py-6">
+      <div className="mx-auto mt-8 flex w-full max-w-6xl flex-col gap-10 px-6 py-6">
         {/* LEFT: Your Vote */}
-        <div className="flex-1">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Your Vote</h2>
-            <div className="flex gap-2">
-              <button
-                className="text-xs px-3 py-1 rounded bg-slate-100 hover:bg-slate-200 transition"
-                onClick={() =>
-                  setSortBy((prev) => (prev === "date" ? "amount" : "date"))
-                }
+        <div className="w-full">
+          <div className="mb-6 space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-4xl font-black tracking-tight text-gray-900 sm:text-5xl">
+                Your Vote
+              </h2>
+              <p className="text-sm text-gray-500">
+                Browse ideas you&apos;ve backed. Filter by status, search, or
+                sort them by name, date, or token.
+              </p>
+            </div>
+
+            <div className="relative w-full max-w-lg">
+              <svg
+                viewBox="0 0 24 24"
+                className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
               >
-                Sort by {sortBy === "date" ? "Amount" : "Date"}
-              </button>
-              <button
-                className="text-xs px-3 py-1 rounded bg-slate-100 hover:bg-slate-200 transition"
-                onClick={() => {
-                  if (hiddenIds.length === mockMoves.length) {
-                    setHiddenIds([]);
-                  } else {
-                    setHiddenIds(mockMoves.map((move) => move.id));
-                  }
-                }}
-              >
-                {hiddenIds.length === mockMoves.length
-                  ? "Show All"
-                  : "Hide All"}
-              </button>
+                <circle cx="11" cy="11" r="7" />
+                <path d="m16.5 16.5 3 3" strokeLinecap="round" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-full border border-black/10 bg-white py-3 pl-12 pr-4 text-sm text-gray-900 placeholder:text-gray-400 shadow focus:border-black focus:outline-none"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {(["name", "date", "token"] as const).map((key) => {
+                const isActive = sortConfig.key === key;
+                const directionArrow =
+                  sortConfig.direction === "asc" ? "↑" : "↓";
+                const label =
+                  key === "name" ? "Name" : key === "date" ? "Date" : "Token";
+                return (
+                  <button
+                    key={key}
+                    className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
+                      isActive
+                        ? "border-black bg-black text-white"
+                        : "border-black/20 bg-white text-gray-700 hover:border-black/60"
+                    }`}
+                    onClick={() => handleSortClick(key)}
+                  >
+                    {label} {isActive ? directionArrow : "↕"}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {phaseFilters.map(({ key, label, accent }) => {
+                const isActive = phaseFilter === key;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setPhaseFilter(key)}
+                    className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
+                      isActive
+                        ? "text-white"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                    style={{
+                      borderColor: accent,
+                      backgroundColor: isActive ? accent : "transparent",
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold uppercase tracking-wide text-gray-600">
+              {legendEntries.map(([key, value]) => (
+                <div key={key} className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-3 w-3 rounded-full"
+                    style={{ backgroundColor: value.accent }}
+                  />
+                  {value.label}
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {sortedMoves.map((move) => (
-              <div
-                key={move.id}
-                className="bg-white border rounded-lg shadow px-5 py-4 flex flex-col items-center justify-center"
-              >
-                <div className="text-base font-semibold mb-2">
-                  {hiddenIds.includes(move.id) ? "****" : move.to}
-                </div>
-                <div className="text-lg font-bold">
-                  {hiddenIds.includes(move.id) ? "****" : `$${move.amount}`}
-                </div>
-                <div className="text-xs text-slate-400 mb-1">{move.date}</div>
-                <button
-                  className="mt-2 text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 transition"
-                  onClick={() => toggleHidden(move.id)}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {visibleVotes.map((vote) => {
+              const style = phaseStyles[vote.phase];
+              return (
+                <div
+                  key={vote.id}
+                  className="relative overflow-hidden rounded-[20px] border border-black/5 bg-[#E7E7E7] p-5 shadow-sm"
                 >
-                  {hiddenIds.includes(move.id) ? "Show" : "Hide"}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* RIGHT: Balance + Deposit + Withdraw */}
-        <div className="flex-1 flex flex-col items-end pr-8">
-          <div className="w-full max-w-[340px] flex flex-col gap-4">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-bold">Balance Notification</h2>
-              <div className="flex gap-2">
-                <Button
-                  className="text-sm"
-                  onClick={() => setShowWithdraw((prev) => !prev)}
-                >
-                  Withdraw
-                </Button>
-                <Button
-                  className="text-sm"
-                  onClick={() => setShowDeposit((prev) => !prev)}
-                >
-                  Deposit
-                </Button>
-              </div>
-            </div>
-
-            {/* Deposit Form - Dùng để mua token */}
-            {showDeposit && (
-              <div className="bg-white border rounded-lg p-4 shadow flex flex-col gap-2">
-                <h3 className="font-semibold text-lg mb-2">Mua HD Token</h3>
-
-                <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Số ETH muốn dùng để mua token:
-                  </label>
-                  <input
-                    type="number"
-                    step="0.001"
-                    min="0.001"
-                    placeholder="0.001"
-                    value={depositAmount}
-                    onChange={(e) =>
-                      setDepositAmount(
-                        e.target.value ? Number(e.target.value) : ""
-                      )
-                    }
-                    className="border px-3 py-2 rounded text-sm focus:outline-none w-full"
+                  <span
+                    className="absolute right-0 top-0 h-10 w-10"
+                    style={{
+                      backgroundColor: style.accent,
+                      clipPath: "polygon(0 0, 100% 0, 100% 100%)",
+                    }}
+                    aria-hidden
                   />
-                </div>
-
-                {/* Thông tin tỷ giá */}
-                {claim.rate && (
-                  <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
-                    <div className="text-sm text-blue-800">
-                      <p>
-                        <strong>Tỷ giá hiện tại:</strong>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-md font-semibold text-gray-900 uppercase tracking-wide">
+                        {vote.title}
+                      </h3>
+                      <p className="text-base font-semibold text-red-600">
+                        {vote.highlight}
                       </p>
-                      <p>
-                        1 ETH = {Number(claim.rate).toLocaleString()}{" "}
-                        {token.symbol}
+                      <p className="text-xs text-gray-600">{vote.date}</p>
+                    </div>
+                    <div className="flex flex-col items-end text-right">
+                      <p className="text-3xl font-black text-gray-900 leading-tight">
+                        {vote.amount}{" "}
+                        <span className="text-lg font-semibold">
+                          {vote.token}
+                        </span>
                       </p>
-                      {depositAmount && (
-                        <p className="mt-1 font-bold">
-                          Bạn sẽ nhận được:{" "}
-                          {(
-                            Number(depositAmount) * Number(claim.rate)
-                          ).toLocaleString()}{" "}
-                          {token.symbol}
-                        </p>
-                      )}
+                      {vote.rewarded ? (
+                        <div className="mt-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-gray-600">
+                          <Image
+                            src="/sunflower.svg"
+                            alt="Reward earned"
+                            width={32}
+                            height={32}
+                            className="h-8 w-8"
+                          />
+                          Reward
+                        </div>
+                      ) : null}
                     </div>
                   </div>
-                )}
-
-                {/* Thông báo kết nối ví */}
-                {!isConnected ? (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-3">
-                    <p className="text-sm text-yellow-800">
-                      Vui lòng kết nối ví để mua token
-                    </p>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={handleBuyToken}
-                    disabled={isDepositDisabled}
-                    className="w-full"
-                  >
-                    {claim.isBuying
-                      ? "Đang xử lý..."
-                      : `Mua Token với ${depositAmount || 0} ETH`}
-                  </Button>
-                )}
-              </div>
-            )}
-
-            {/* Withdraw Form - Dùng để bán token lấy ETH */}
-            {showWithdraw && (
-              <div className="bg-white border rounded-lg p-4 shadow flex flex-col gap-2">
-                <h3 className="font-semibold text-lg mb-2">
-                  Rút Tiền (Bán Token)
-                </h3>
-
-                <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Số token muốn bán để rút ETH:
-                  </label>
-                  <input
-                    type="number"
-                    step="1"
-                    min="1"
-                    placeholder="100"
-                    value={withdrawAmount}
-                    onChange={(e) =>
-                      setWithdrawAmount(
-                        e.target.value ? Number(e.target.value) : ""
-                      )
-                    }
-                    className="border px-3 py-2 rounded text-sm focus:outline-none w-full"
-                  />
                 </div>
+              );
+            })}
 
-                {/* Thông tin tỷ giá và số ETH sẽ nhận */}
-                {claim.rate && withdrawAmount && (
-                  <div className="bg-green-50 border border-green-200 rounded p-3 mb-3">
-                    <div className="text-sm text-green-800">
-                      <p>
-                        <strong>Tỷ giá hiện tại:</strong>
-                      </p>
-                      <p>
-                        1 ETH = {Number(claim.rate).toLocaleString()}{" "}
-                        {token.symbol}
-                      </p>
-                      <p>
-                        1 {token.symbol} = {(1 / Number(claim.rate)).toFixed(8)}{" "}
-                        ETH
-                      </p>
-                      <p className="mt-2 font-bold text-lg">
-                        Bán {withdrawAmount} {token.symbol} ={" "}
-                        {(Number(withdrawAmount) / Number(claim.rate)).toFixed(
-                          6
-                        )}{" "}
-                        ETH
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Thông báo kết nối ví và số dư */}
-                {!isConnected ? (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-3">
-                    <p className="text-sm text-yellow-800">
-                      Vui lòng kết nối ví để rút tiền
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 border border-gray-200 rounded p-3">
-                      <p className="text-sm text-gray-700">
-                        <strong>Số dư khả dụng:</strong> {token.balance}{" "}
-                        {token.symbol}
-                      </p>
-                    </div>
-                    <Button
-                      onClick={handleWithdraw}
-                      disabled={isWithdrawDisabled}
-                      className="w-full"
-                    >
-                      {claim.isSelling
-                        ? "Đang xử lý..."
-                        : `Rút ${withdrawAmount || 0} ${token.symbol}`}
-                    </Button>
-                    {withdrawAmount &&
-                      Number(withdrawAmount) > Number(token.balance) && (
-                        <p className="text-red-500 text-sm text-center">
-                          Số dư không đủ
-                        </p>
-                      )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Web3 Wallet Info với Voice Credits */}
-            {isConnected && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="font-semibold text-blue-800 mb-2">Ví Web3</div>
-                <div className="text-sm text-blue-700 space-y-1">
-                  <p>
-                    Địa chỉ: {address?.slice(0, 8)}...{address?.slice(-6)}
-                  </p>
-                  <p>
-                    Số dư {token.symbol}: {token.balance}
-                  </p>
-                  {/* HIỂN THỊ VOICE CREDITS */}
-                  <p className="font-bold text-purple-700">
-                    Voice Credits:{" "}
-                    {claim.voiceCredits ? claim.voiceCredits.toString() : "0"}
-                  </p>
-                  {token.name && <p>Token: {token.name}</p>}
-                  {/* THÔNG TIN ALLOWANCE */}
-                  <p className="text-xs text-gray-600">
-                    Allowance:{" "}
-                    {token.allowance ? token.allowance.toString() : "0"}{" "}
-                    {token.symbol}
-                  </p>
-                </div>
-
-                {/* NÚT APPROVE RIÊNG */}
-                <div className="mt-3 pt-3 border-t border-blue-300">
-                  <Button
-                    className="w-full text-xs bg-orange-500 hover:bg-orange-600 mb-2"
-                    onClick={() => setShowApproveOnly((prev) => !prev)}
-                  >
-                    {showApproveOnly ? "Ẩn Approve" : "Approve Token"}
-                  </Button>
-
-                  {showApproveOnly && (
-                    <div className="bg-orange-50 border border-orange-200 rounded p-3">
-                      <label className="block text-xs font-medium text-orange-800 mb-1">
-                        Số token muốn approve:
-                      </label>
-                      <input
-                        type="number"
-                        step="1"
-                        min="1"
-                        placeholder="1000"
-                        value={approveAmount}
-                        onChange={(e) =>
-                          setApproveAmount(
-                            e.target.value ? Number(e.target.value) : ""
-                          )
-                        }
-                        className="border border-orange-300 px-2 py-1 rounded text-xs focus:outline-none w-full mb-2"
-                      />
-                      <Button
-                        onClick={handleApproveOnly}
-                        disabled={isApproveDisabled}
-                        className="w-full text-xs bg-orange-600 hover:bg-orange-700"
-                      >
-                        {token.isApproving
-                          ? "Đang approve..."
-                          : `Approve ${approveAmount || 0} ${token.symbol}`}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Notifications */}
-            {mockNotifications.slice(0, 3).map((notif) => (
-              <div
-                key={notif.id}
-                className="bg-slate-50 rounded-lg px-5 py-4 shadow flex flex-col items-start"
-              >
-                <div className="font-semibold text-sm mb-1">
-                  {notif.message.replace(/^Balance updated: /, "")}
-                </div>
-                <div className="text-xs text-slate-400">{notif.date}</div>
-              </div>
-            ))}
-
-            {/* Token Balance Display với Voice Credits */}
-            {isConnected && (
-              <div className="bg-white border rounded-lg shadow px-5 py-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold text-gray-700">
-                    Token Balance:
-                  </span>
-                  <span className="font-bold text-lg text-blue-600">
-                    {token.balance} {token.symbol}
-                  </span>
-                </div>
-                {/* HIỂN THỊ VOICE CREDITS */}
-                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                  <span className="font-semibold text-purple-700">
-                    Voice Credits:
-                  </span>
-                  <span className="font-bold text-lg text-purple-600">
-                    {claim.voiceCredits ? claim.voiceCredits.toString() : "0"}
-                  </span>
-                </div>
+            {visibleVotes.length === 0 && (
+              <div className="col-span-1 rounded-2xl border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500 md:col-span-2">
+                No votes match your filters yet.
               </div>
             )}
           </div>
@@ -682,20 +391,12 @@ export default function DashboardPage() {
               Active Votes
             </h2>
             <div className="flex gap-2">
-              {/* NÚT REFRESH VOICE CREDITS */}
               <Button
-                className="text-sm bg-green-600 hover:bg-green-700"
-                onClick={() => claim.refetchVoiceCredits?.()}
-              >
-                Refresh Credits
-              </Button>
-              <Button
+                asChild
                 className="text-sm bg-purple-600 hover:bg-purple-700"
-                onClick={() => setShowBuyCredits((prev) => !prev)}
               >
-                Buy Voice Credits
+                <Link href="/transactions">Manage Transactions</Link>
               </Button>
-              {/* NÚT RELOAD POLLS */}
               <Button
                 className="text-sm bg-blue-600 hover:bg-blue-700"
                 onClick={loadPolls}
@@ -705,135 +406,6 @@ export default function DashboardPage() {
               </Button>
             </div>
           </div>
-
-          {/* Buy Voice Credits Form */}
-          {showBuyCredits && (
-            <div className="w-full max-w-md bg-white border-2 border-purple-200 rounded-lg p-6 shadow-lg mb-8">
-              <h3 className="font-semibold text-xl mb-4 text-purple-800 text-center">
-                Mua Voice Credits
-              </h3>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Số Voice Credits muốn mua:
-                </label>
-                <input
-                  type="number"
-                  step="1"
-                  min="1"
-                  placeholder="10"
-                  value={creditsAmount}
-                  onChange={(e) =>
-                    setCreditsAmount(
-                      e.target.value ? Number(e.target.value) : ""
-                    )
-                  }
-                  className="border border-purple-300 px-4 py-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 w-full"
-                />
-              </div>
-
-              {claim.creditRate && creditsAmount && (
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
-                  <div className="text-sm text-purple-800">
-                    <p>
-                      <strong>Tỷ giá hiện tại:</strong>
-                    </p>
-                    <p>
-                      1 Voice Credit ={" "}
-                      {Number(claim.creditRate).toLocaleString()} {token.symbol}
-                    </p>
-                    <p className="mt-2 font-bold text-lg">
-                      Tổng cần thanh toán: {requiredAmount.toLocaleString()}{" "}
-                      {token.symbol}
-                    </p>
-                    {token.balance && (
-                      <p
-                        className={`text-sm mt-2 ${
-                          requiredAmount > Number(token.balance)
-                            ? "text-red-600 font-bold"
-                            : "text-green-600"
-                        }`}
-                      >
-                        Số dư khả dụng: {token.balance} {token.symbol}
-                      </p>
-                    )}
-                    {/* THÔNG TIN ALLOWANCE */}
-                    <p
-                      className={`text-sm mt-1 ${
-                        needsApproval ? "text-orange-600" : "text-green-600"
-                      }`}
-                    >
-                      Allowance:{" "}
-                      {token.allowance ? token.allowance.toString() : "0"} /{" "}
-                      {requiredAmount} {token.symbol}
-                      {needsApproval && " (Cần approve thêm)"}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Thông báo kết nối ví */}
-              {!isConnected ? (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-yellow-800 text-center">
-                    Vui lòng kết nối ví để mua Voice Credits
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {/* NÚT CHO TRƯỜNG HỢP CHƯA APPROVE */}
-                  {needsApproval ? (
-                    <Button
-                      onClick={handleBuyVoiceCredits}
-                      disabled={isBuyCreditsDisabled}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3"
-                    >
-                      {isProcessing ||
-                      claim.isBuyingCredits ||
-                      token.isApproving
-                        ? "Đang xử lý..."
-                        : `Approve & Mua ${creditsAmount} Credits`}
-                    </Button>
-                  ) : (
-                    /* NÚT CHO TRƯỜNG HỢP ĐÃ APPROVE */
-                    <Button
-                      onClick={handleBuyDirect}
-                      disabled={isBuyCreditsDisabled}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white py-3"
-                    >
-                      {claim.isBuyingCredits
-                        ? "Đang xử lý..."
-                        : `Mua ${creditsAmount} Credits`}
-                    </Button>
-                  )}
-
-                  {/* HIỂN THỊ TRẠNG THÁI */}
-                  {isProcessing && (
-                    <div className="text-center">
-                      <p className="text-green-600 text-sm font-medium">
-                        {token.isApproving
-                          ? "Đang approve token..."
-                          : claim.isBuyingCredits
-                            ? "Đang mua Voice Credits..."
-                            : "Đã mua thành công!"}
-                      </p>
-                      {purchasedCredits > 0 && (
-                        <p className="text-purple-600 font-bold text-lg mt-2">
-                          Đã mua: {purchasedCredits} Voice Credits
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {creditsAmount && requiredAmount > Number(token.balance) && (
-                    <p className="text-red-500 text-sm text-center font-medium">
-                      Số dư không đủ để mua {creditsAmount} Voice Credits
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Polls Loading State */}
           {loadingPolls && (
