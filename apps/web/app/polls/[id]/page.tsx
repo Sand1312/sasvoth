@@ -176,7 +176,11 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
   return (
     <main className="min-h-screen bg-white px-4 py-10 text-black">
       <section className="mx-auto flex w-full max-w-6xl flex-col gap-10">
-        <PollHero poll={mockPoll} pollId={pollId} badge={phaseBadges[activePhase]} />
+        <PollHero
+          poll={mockPoll}
+          pollId={pollId}
+          badge={phaseBadges[activePhase]}
+        />
         <PhaseComponent poll={{ ...mockPoll, phase: activePhase }} />
       </section>
     </main>
@@ -200,7 +204,9 @@ function PollHero({
             Poll #{pollId}
           </p>
           <h1 className="mt-2 text-4xl font-semibold">{poll.title}</h1>
-          <p className="mt-4 max-w-xl text-sm text-black/70">{poll.description}</p>
+          <p className="mt-4 max-w-xl text-sm text-black/70">
+            {poll.description}
+          </p>
         </div>
         <span className="self-end text-xs uppercase tracking-[0.3em] text-black">
           {badge}
@@ -230,7 +236,9 @@ function PrepareSection({ poll }: PhaseSectionProps) {
         <p className="text-xs uppercase tracking-[0.3em] text-black/60">
           Public ideas
         </p>
-        <h2 className="text-3xl font-semibold">Explore community submissions</h2>
+        <h2 className="text-3xl font-semibold">
+          Explore community submissions
+        </h2>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -271,7 +279,7 @@ function PrepareSection({ poll }: PhaseSectionProps) {
 function VotingSection({ poll }: PhaseSectionProps) {
   const highlightedIdeaId =
     poll.ideas.reduce(
-      (top, idea) => (idea.credits > top.credits ? idea : top),
+      (top, idea) => (idea.credits > (top?.credits ?? -Infinity) ? idea : top),
       poll.ideas[0]
     )?.id ?? poll.ideas[0]?.id;
 
@@ -373,7 +381,9 @@ function TallySection({ poll }: PhaseSectionProps) {
                 {index + 1}
               </div>
               <div>
-                <p className="text-lg font-semibold uppercase">{result.label}</p>
+                <p className="text-lg font-semibold uppercase">
+                  {result.label}
+                </p>
                 <p className="text-xs uppercase tracking-[0.3em] text-black/60">
                   {result.author}
                 </p>

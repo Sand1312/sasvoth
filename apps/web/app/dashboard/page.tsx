@@ -291,7 +291,7 @@ export default function DashboardPage() {
               {phaseFilters.map(({ key, label, accent }) => {
                 const isActive = phaseFilter === key;
                 return (
-                  <button
+                  <Button
                     key={key}
                     onClick={() => setPhaseFilter(key)}
                     className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
@@ -305,7 +305,7 @@ export default function DashboardPage() {
                     }}
                   >
                     {label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
