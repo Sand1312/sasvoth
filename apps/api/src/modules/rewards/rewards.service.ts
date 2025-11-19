@@ -20,7 +20,7 @@ export class RewardsService {
             const signature = await generateSignatureForClaim(userId, amountToken, idClaim);
             const newReward = new this.rewardsModel({
                 userId: userId,
-                voting_events_id: parseInt(pollId),
+                pollId: pollId,
                 credit_count: credit_count,
                 amountToken: amountToken,
                 status: "pending",
@@ -35,7 +35,7 @@ export class RewardsService {
     }
     }
     async getReward(userId: string, pollId: string): Promise<RewardsDocument | null> {
-        return this.rewardsModel.findOne({ userId: userId, voting_events_id: pollId }).exec();
+        return this.rewardsModel.findOne({ userId: userId, pollId: pollId }).exec();
     }
 
 }

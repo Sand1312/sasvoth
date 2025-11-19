@@ -21,21 +21,29 @@ export class VotesService {
     //         timestamp: voteDto.timestamp,
     //     };
     // }
-    async get(userId: string, pollId: string): Promise<VotesDocument | null> {
-        return this.votesModel.findOne({ userId, pollId }).exec();
+    async get(voterId: string, pollId: string): Promise<VotesDocument | null> {
+        return this.votesModel.findOne({ voterId, pollId }).exec();
     };
 
-    async create(voteData: VoteDtoReq): Promise<void> {
+    async create(voteData: any): Promise<void> {
         try {
-        const existingVote = await this.votesModel.findOne({ userId: voteData.userId, pollId: voteData.pollId }).exec();
+            console.log('Creating vote with data:', voteData);
+        const existingVote = await this.votesModel.findOne({ voterId: voteData.voterId, pollId: voteData.pollId }).exec();
+        console.log('Existing vote check result:', existingVote);
         if (existingVote) {
             throw new Error("User has already voted in this poll");
         }
-        const newVote = new this.votesModel(voteData);
+        const timestamp = new Date();
+        // const voteCommitment = 
+        const newVote = new this.votesModel({
+            ...voteData,
+            timestamp: timestamp
+        });
         await newVote.save();
         // Deduct voice credits after casting the vote
         await this.voiceCreditsService.deductCredits(voteData.userId, voteData.pollId, voteData.weight);
     } catch (error) {
+        console.log('Error creating vote:', error);
         throw new Error(`Error creating vote: ${error.message}`);
     }
 }

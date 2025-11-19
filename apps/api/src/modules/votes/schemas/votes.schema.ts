@@ -20,8 +20,7 @@ export class Votes {
     @Prop({ required: true })
     weight: number;
 
-    @Prop({ required: true })
-    userId: string;
+
 
     @Prop({ required: true })
     voteCommitment: string;

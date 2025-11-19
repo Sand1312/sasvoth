@@ -26,7 +26,7 @@ export class Polls {
     @Prop({ required: false ,type:[String]})
     ideas: string[];// danh sách chờ duyệt
 
-    @Prop({ required: false ,type:[Number]})
+    @Prop({ required: false ,type:[String]})
     options:string[];// danh sách option đã được duyệt
 
     @Prop({required:false, equals:true})

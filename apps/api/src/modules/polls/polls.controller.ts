@@ -62,6 +62,7 @@ export class PollsController {
     @Patch("saveOnChainId")
     async savePollOnChainId( @Req() req: Request, @Res() res: Response) {
         const { pollId, pollIdOnChain } = req.body;
+        
         try {
             const updatedPoll = await this.pollsService.savePollOnChainId(pollId, pollIdOnChain);
             return res.status(200).json(updatedPoll);

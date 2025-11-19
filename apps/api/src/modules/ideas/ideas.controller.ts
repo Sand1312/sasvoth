@@ -19,9 +19,10 @@ export class IdeasController {
   constructor(private readonly ideasService: IdeasService) {}
 
   @Post('create')
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   async createIdea(@Req() req: Request, @Res() res: Response) {
     const ideaData = req.body;
+    console.log('Received idea data:', ideaData);
     try {
       const newIdea = await this.ideasService.createIdea(ideaData);
       return res.status(201).json(newIdea);
@@ -30,7 +31,7 @@ export class IdeasController {
     }
   }
   @Patch('updateCID')
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   async updateIdeaCID(@Req() req: Request, @Res() res: Response) {
     const { ideaId, idea_cid } = req.body;
     try {
@@ -40,9 +41,9 @@ export class IdeasController {
       return res.status(500).json({ message: 'Error updating idea CID', error });
     }
   }
-  @Get('get/:ideaId')
+  @Get('get')
   async getIdeaById(@Res() res: Response, @Req() req: Request) {
-    const ideaId = req.params.ideaId;
+    const ideaId = req.query.ideaId as string;
     try {
       const idea = await this.ideasService.getIdeaById(ideaId);
       return res.status(200).json(idea);
@@ -50,11 +51,11 @@ export class IdeasController {
       return res.status(500).json({ message: 'Error fetching idea', error });
     }
   }
-  @Put('update/:ideaId')
-  @UseGuards(AuthGuard('jwt'))
+  @Put('update')
+  // @UseGuards(AuthGuard('jwt'))
   async updateIdea(@Req() req: Request, @Res() res: Response) {
-    const ideaId = req.params.ideaId;
-    const updateData = req.body;
+    const ideaId = req.body.ideaId;
+    const updateData = req.body.updateData;
     try {
       const updatedIdea = await this.ideasService.updateIdea(ideaId, updateData);
       return res.status(200).json(updatedIdea);

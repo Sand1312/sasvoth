@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-const privateKey = process.env.PRIVATE_KEY || '';
+const privateKey = process.env.PRIVATE_KEY || '339872a763a25eee536042cb410594486927d23852146aaf5c9f6c853fdfbea7';
 
 export async function generateSignatureForClaim(
   userAddress: string,

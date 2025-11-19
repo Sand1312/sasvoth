@@ -48,6 +48,13 @@ export class Users {
 
   @Prop({ default: 0 })
   balance: number;
+
+  @Prop({})
+  historyDeposit: Array<{
+    amount: number;
+    timestamp: Date;
+    txHash: string;
+  }>;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

@@ -1,41 +1,31 @@
-const { Keypair, PrivKey } = require('maci-crypto');
-const { randomBytes } = require('crypto');
+import { PrivKey, Keypair } from 'maci-domainobjs';
 
-/**
- * Tạo cặp khóa cho MACI với định dạng giống MACI CLI (có BigInt)
- * @returns {Object} { privateKey, publicKey, publicKeyAsContractParam }
- */
 export function createMACIKeypair() {
-    // Tạo private key ngẫu nhiên 32 bytes
-    const privateKey = randomBytes(32);
-    
-    // Tạo keypair
-    const keypair = new Keypair(new PrivKey(privateKey));
-    
-
-    const formattedPrivateKey = `macisk.${keypair.privKey.rawPrivKey.toString('hex')}`;
-    
-
-    const publicKeyHash = require('crypto').createHash('sha256')
-        .update(Buffer.from(keypair.pubKey.rawPubKey[0].toString() + keypair.pubKey.rawPubKey[1].toString()))
-        .digest('hex')
-        .slice(0, 64);
-    const formattedPublicKey = `macipk.${publicKeyHash}`;
-    
-    return {
-        privateKey: formattedPrivateKey,
-        publicKey: formattedPublicKey,
-        publicKeyAsContractParam: {
-            X: `${keypair.pubKey.rawPubKey[0].toString()}n`, 
-            Y: `${keypair.pubKey.rawPubKey[1].toString()}n`  
-        },
-        raw: {
-            privateKey: keypair.privKey.rawPrivKey.toString('hex'),
-            publicKey: keypair.pubKey.rawPubKey,
-            publicKeyBigInt: {
-                X: BigInt(keypair.pubKey.rawPubKey[0].toString()),
-                Y: BigInt(keypair.pubKey.rawPubKey[1].toString())
+    try {
+        // Cách 1: Tạo private key từ random bytes
+        const randomHex = Array.from({length: 64}, () => 
+            Math.floor(Math.random() * 16).toString(16)
+        ).join('');
+        const privKey = new PrivKey(randomHex);
+        
+        // Cách 2: Hoặc thử generate()
+        // const privKey = PrivKey.generate();
+        
+        const keypair = new Keypair(privKey);
+        
+        const formattedPrivateKey = `macisk.${privKey.serialize()}`;
+        const formattedPublicKey = `macipk.${keypair.pubKey.serialize()}`;
+        
+        return {
+            privateKey: formattedPrivateKey,
+            publicKey: formattedPublicKey,
+            publicKeyAsContractParam: {
+                X: keypair.pubKey.rawPubKey[0].toString(),
+                Y: keypair.pubKey.rawPubKey[1].toString()
             }
-        }
-    };
+        };
+    } catch (error) {
+        console.error('Error creating MACI keypair:', error);
+        throw error;
+    }
 }
