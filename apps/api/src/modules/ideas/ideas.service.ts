@@ -8,7 +8,7 @@ import { Model } from 'mongoose';
 export class IdeasService {
     constructor(@InjectModel("Ideas") private ideasModel:Model<any>) {}
 
-    async createIdea(idea:IdeasDTOReq  ): Promise<any> {
+    async createIdea(idea:any  ): Promise<any> {
         const newIdea = new this.ideasModel({
             ...idea,
             createdAt: new Date(),
@@ -20,9 +20,13 @@ export class IdeasService {
         return this.ideasModel.findByIdAndUpdate(ideaId, { idea_cid }, { new: true }).exec();
     }
     async getIdeaById(ideaId:string):Promise<any>{
-        return this.ideasModel.findById(ideaId).exec();
+        console.log('Fetching idea with ID:', ideaId);
+        const idea = await this.ideasModel.findById(ideaId).exec();
+        console.log('Fetched idea:', idea);
+        return idea;
     }
-    async updateIdea(ideaId:string, updateData:Partial<IdeasDTOReq>):Promise<any>{
+    async updateIdea(ideaId:string, updateData:any):Promise<any>{
+        console.log('Updating idea with ID:', ideaId, 'with data:', updateData);
         return this.ideasModel.findByIdAndUpdate(ideaId, updateData, { new: true }).exec();
     }
 }

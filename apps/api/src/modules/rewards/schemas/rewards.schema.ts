@@ -8,7 +8,7 @@ export class Rewards {
     userId: string;
     
     @Prop({ type: String, required: true })
-    voting_events_id : number;
+    pollId : number;
 
     @Prop({ type: Number, required: true })
     credit_count: number;

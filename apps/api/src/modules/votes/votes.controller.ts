@@ -17,9 +17,9 @@ export class VotesController {
 
     @Get("get")
     async getVotes(@Req() req: Request, @Res() res: Response) {
-        const { pollId, userId } = req.query;
+        const { pollId, voterId } = req.query;
         try {
-            const votes = await this.votesService.get(userId as string, pollId as string);
+            const votes = await this.votesService.get(voterId as string, pollId as string);
             return res.status(200).json({ votes });
         } catch (error) {
             return res.status(500).json({ message: 'Error fetching votes', error });

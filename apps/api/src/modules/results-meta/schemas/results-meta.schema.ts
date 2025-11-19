@@ -5,7 +5,7 @@ export type ResultsMetaDocument= HydratedDocument<ResultsMeta>;
 @Schema()
 export class ResultsMeta{
     @Prop({type:String,required:true})
-    votingEventsId:string;
+    pollId:string;
     
     @Prop({type:String,required:true})
     result_cid:string;

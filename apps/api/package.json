@@ -11,7 +11,6 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -45,6 +44,7 @@
     "jsonwebtoken": "^9.0.2",
     "maci": "^0.0.1",
     "maci-crypto": "^2.5.0",
+    "maci-domainobjs": "^2.5.0",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
@@ -52,6 +52,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "snarkjs": "^0.7.5",
+    "turbo": "catalog:",
     "typeorm": "^0.3.27",
     "zod": "^4.1.12"
   },
