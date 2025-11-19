@@ -1,6 +1,13 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { cn } from "@sasvoth/ui/lib/utils";
@@ -96,7 +103,12 @@ export default function SettingsPage() {
   const { user, isLoading } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [avatarObjectUrl, setAvatarObjectUrl] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const [pendingAvatar, setPendingAvatar] = useState<{
+    preview: string;
+    file: File;
+  } | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     current: "",
     next: "",
@@ -115,18 +127,10 @@ export default function SettingsPage() {
   useEffect(() => {
     if (!user) return;
     setDisplayName(user?.name ?? user?.username ?? user?.email ?? "");
-    if (user?.avatarUrl) {
-      setAvatarPreview(user.avatarUrl);
-    }
+    setAvatarPreview(user?.avatarUrl ?? null);
+    setPendingAvatar(null);
+    setIsConfirmOpen(false);
   }, [user]);
-
-  useEffect(() => {
-    return () => {
-      if (avatarObjectUrl) {
-        URL.revokeObjectURL(avatarObjectUrl);
-      }
-    };
-  }, [avatarObjectUrl]);
 
   const visibleIdeas = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
@@ -151,14 +155,19 @@ export default function SettingsPage() {
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    if (avatarObjectUrl) {
-      URL.revokeObjectURL(avatarObjectUrl);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setPendingAvatar({
+          preview: reader.result,
+          file,
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+    if (avatarInputRef.current) {
+      avatarInputRef.current.value = "";
     }
-
-    const nextUrl = URL.createObjectURL(file);
-    setAvatarPreview(nextUrl);
-    setAvatarObjectUrl(nextUrl);
   };
 
   const handleProfileSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -166,6 +175,30 @@ export default function SettingsPage() {
     setProfileMessage("Profile saved. Your changes will reflect across SaSvoth shortly.");
     setTimeout(() => setProfileMessage(null), 4000);
   };
+
+  const handleAvatarCancel = () => {
+    setPendingAvatar(null);
+    if (avatarInputRef.current) {
+      avatarInputRef.current.value = "";
+    }
+  };
+
+  const handleAvatarSave = () => {
+    if (!pendingAvatar) return;
+    setIsConfirmOpen(true);
+  };
+
+  const confirmAvatarSave = () => {
+    if (!pendingAvatar) {
+      setIsConfirmOpen(false);
+      return;
+    }
+    setAvatarPreview(pendingAvatar.preview);
+    setPendingAvatar(null);
+    setIsConfirmOpen(false);
+  };
+
+  const currentAvatarSrc = pendingAvatar?.preview ?? avatarPreview;
 
   const toggleSortKey = () => {
     setSortKey((prev) => (prev === "date" ? "name" : "date"));
@@ -276,7 +309,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10 lg:py-16">
+    <>
+      <main className="mx-auto max-w-5xl px-4 py-10 lg:py-16">
       <div className="mb-10">
         <p className="text-xs font-semibold uppercase tracking-[0.5em] text-gray-400">
           Controls
@@ -295,45 +329,50 @@ export default function SettingsPage() {
           </p>
           <div className="mt-6 flex flex-col items-center text-center">
             <div className="relative">
-              {avatarPreview ? (
-                <img
-                  src={avatarPreview}
-                  alt="Avatar preview"
-                  className="h-24 w-24 rounded-full object-cover"
-                />
-              ) : (
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 text-2xl font-semibold text-gray-500">
-                  {getInitials(displayName)}
-                </div>
-              )}
-            </div>
-            <div className="mt-4 flex items-center gap-2">
               <input
-                id="avatarUpload"
+                ref={avatarInputRef}
                 type="file"
                 accept="image/*"
                 className="hidden"
                 onChange={handleAvatarChange}
               />
-              <Button variant="outline" size="sm" asChild>
-                <label htmlFor="avatarUpload" className="cursor-pointer px-4 py-2">
-                  Change avatar
-                </label>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  if (avatarObjectUrl) {
-                    URL.revokeObjectURL(avatarObjectUrl);
-                    setAvatarObjectUrl(null);
-                  }
-                  setAvatarPreview(null);
-                }}
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                className="group relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-transparent focus-visible:border-gray-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black/10"
+                aria-label="Edit avatar"
               >
-                Remove
-              </Button>
+                {currentAvatarSrc ? (
+                  <img
+                    src={currentAvatarSrc}
+                    alt="Avatar preview"
+                    className="h-full w-full object-cover transition-all group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gray-100 text-2xl font-semibold text-gray-500 transition-all group-hover:bg-gray-200">
+                    {getInitials(displayName)}
+                  </div>
+                )}
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-xs font-semibold uppercase tracking-[0.5em] text-white opacity-0 transition-opacity group-hover:opacity-100">
+                  Edit
+                </div>
+              </button>
+              {pendingAvatar ? (
+                <button
+                  type="button"
+                  onClick={handleAvatarCancel}
+                  className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-base font-semibold text-gray-800 shadow-md"
+                  aria-label="Cancel avatar change"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              ) : null}
             </div>
+            {pendingAvatar ? (
+              <Button type="button" className="mt-6 w-full max-w-[180px]" onClick={handleAvatarSave}>
+                Save avatar
+              </Button>
+            ) : null}
           </div>
 
           <form className="mt-8 space-y-4" onSubmit={handleProfileSubmit}>
@@ -518,5 +557,26 @@ export default function SettingsPage() {
         </div>
       </section>
     </main>
+      {isConfirmOpen ? (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4 py-6">
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+          >
+            <h3 className="text-lg font-semibold text-gray-900">Save new avatar?</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              We&apos;ll update your profile image for SaSvoth once you confirm.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button variant="ghost" onClick={() => setIsConfirmOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={confirmAvatarSave}>Confirm</Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
