@@ -7,15 +7,27 @@ export function forwardSetCookies(from: Response, to: Headers) {
   const fromHelper =
     headerWithHelper.getSetCookie?.() ?? headerWithHelper.getAll?.("set-cookie");
 
+  const setCookies: string[] = [];
+
   if (fromHelper && fromHelper.length) {
-    fromHelper.forEach((cookie) => {
-      to.append("set-cookie", cookie);
+    setCookies.push(...fromHelper);
+  } else {
+    // Fallback for environments where getSetCookie/getAll are unavailable.
+    from.headers.forEach((value, key) => {
+      if (key.toLowerCase() === "set-cookie") {
+        setCookies.push(value);
+      }
     });
-    return;
   }
 
-  const single = from.headers.get("set-cookie");
-  if (single) {
-    to.append("set-cookie", single);
+  if (!setCookies.length) {
+    const single = from.headers.get("set-cookie");
+    if (single) {
+      setCookies.push(single);
+    }
   }
+
+  setCookies.forEach((cookie) => {
+    to.append("set-cookie", cookie);
+  });
 }

@@ -12,12 +12,12 @@ export default async function handler(
     const backendUrl = `${process.env.BACKEND_URL}/auth/validate`;
 
     const response = await fetch(backendUrl, {
-      method: "POST",
+      // Backend validate endpoint only supports GET.
+      method: "GET",
       headers: {
         cookie: req.headers.cookie || "",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({}),
     });
 
     if (response.ok) {
