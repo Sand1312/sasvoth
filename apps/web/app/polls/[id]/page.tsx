@@ -1,8 +1,8 @@
 import { Button } from "@sasvoth/ui/button";
+import { IdeaSubmitFormTrigger } from "@/components/idea-submit-form-trigger";
 
-// TODO: replace prevote with another wording term
 const enum PollPhase {
-  Prevote = "prevote",
+  Prepare = "prepare",
   Voting = "voting",
   Tally = "tally",
 }
@@ -29,6 +29,7 @@ type TallyResult = {
   label: string;
   votes: number;
   percentage: number;
+  author: string;
 };
 
 type PollData = {
@@ -55,7 +56,7 @@ const mockPoll: PollData = {
   timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
   credits: { spent: 36, total: 120, remaining: 84 },
   status: "In progress",
-  phase: PollPhase.Voting,
+  phase: PollPhase.Prepare,
   ideas: [
     {
       id: "01",
@@ -118,9 +119,27 @@ const mockPoll: PollData = {
     },
   ],
   results: [
-    { id: "opt-03", label: "Residency Network", votes: 1620, percentage: 48 },
-    { id: "opt-01", label: "Storyverse Tools", votes: 1120, percentage: 33 },
-    { id: "opt-02", label: "Signal Relay", votes: 620, percentage: 19 },
+    {
+      id: "opt-03",
+      label: "Residency Network",
+      votes: 1620,
+      percentage: 48,
+      author: "OpenHall",
+    },
+    {
+      id: "opt-01",
+      label: "Storyverse Tools",
+      votes: 1120,
+      percentage: 33,
+      author: "Drift Studio",
+    },
+    {
+      id: "opt-02",
+      label: "Signal Relay",
+      votes: 620,
+      percentage: 19,
+      author: "Aiko Lab",
+    },
   ],
 };
 
@@ -130,15 +149,15 @@ const phaseRenderers: Record<
   PollPhase,
   (props: PhaseSectionProps) => React.ReactElement
 > = {
-  [PollPhase.Prevote]: PrevoteSection,
+  [PollPhase.Prepare]: PrepareSection,
   [PollPhase.Voting]: VotingSection,
   [PollPhase.Tally]: TallySection,
 };
 
-const phaseLabels: Record<PollPhase, string> = {
-  [PollPhase.Prevote]: "Idea shortlisting",
-  [PollPhase.Voting]: "Voting phase",
-  [PollPhase.Tally]: "Results & tally",
+const phaseBadges: Record<PollPhase, string> = {
+  [PollPhase.Prepare]: "Ideas in review",
+  [PollPhase.Voting]: "Opening",
+  [PollPhase.Tally]: "Ended",
 };
 
 export default function PollPage({ params, searchParams }: PollPageProps) {
@@ -147,7 +166,7 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
     | PollPhase
     | undefined;
   const isPhase = (value: string | undefined): value is PollPhase =>
-    value === PollPhase.Prevote ||
+    value === PollPhase.Prepare ||
     value === PollPhase.Voting ||
     value === PollPhase.Tally;
 
@@ -155,235 +174,226 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
   const PhaseComponent = phaseRenderers[activePhase];
 
   return (
-    <main className="min-h-screen bg-white px-4 py-12 text-black">
-      <section className="mx-auto flex w-full max-w-5xl flex-col gap-10">
-        <header className="rounded-[32px] border border-black px-10 py-12 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-black/60">
-            Poll #{pollId} · {phaseLabels[activePhase]}
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold">{mockPoll.title}</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-black/70">
-            {mockPoll.description}
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-2 text-sm uppercase tracking-[0.2em] text-black/60">
-            <span>Timeline</span>
-            <span className="text-lg font-semibold tracking-tight text-black">
-              {mockPoll.timeframe.start} — {mockPoll.timeframe.end}
-            </span>
-          </div>
-        </header>
-
-        <div className="grid gap-6 md:grid-cols-[320px_1fr]">
-          <SharedSidebar poll={mockPoll} />
-          <section className="rounded-[28px] border border-black p-7">
-            <PhaseComponent poll={{ ...mockPoll, phase: activePhase }} />
-          </section>
-        </div>
+    <main className="min-h-screen bg-white px-4 py-10 text-black">
+      <section className="mx-auto flex w-full max-w-6xl flex-col gap-10">
+        <PollHero poll={mockPoll} pollId={pollId} badge={phaseBadges[activePhase]} />
+        <PhaseComponent poll={{ ...mockPoll, phase: activePhase }} />
       </section>
     </main>
   );
 }
 
-function SharedSidebar({ poll }: { poll: PollData }) {
+function PollHero({
+  poll,
+  pollId,
+  badge,
+}: {
+  poll: PollData;
+  pollId: string;
+  badge: string;
+}) {
   return (
-    <aside className="rounded-[28px] border border-black p-7">
-      <p className="text-xs uppercase tracking-[0.3em] text-black/60">
-        Credits spent
+    <section className="rounded-[40px] border border-black px-8 py-10 shadow-[0_10px_0_#0505050d]">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+            Poll #{pollId}
+          </p>
+          <h1 className="mt-2 text-4xl font-semibold">{poll.title}</h1>
+          <p className="mt-4 max-w-xl text-sm text-black/70">{poll.description}</p>
+        </div>
+        <span className="self-end text-xs uppercase tracking-[0.3em] text-black">
+          {badge}
+        </span>
+      </div>
+      <div className="mt-8 h-20 w-full rounded-[28px] border border-black bg-black/5" />
+      <p className="mt-6 text-center text-base font-semibold md:text-left">
+        {poll.timeframe.start} — {poll.timeframe.end}
       </p>
-      <div className="mt-4 flex items-end gap-2">
-        <span className="text-5xl font-semibold">{poll.credits.spent}</span>
-        <span className="text-base text-black/60">/ {poll.credits.total}</span>
-      </div>
-      {typeof poll.credits.remaining === "number" && (
-        <p className="mt-1 text-sm text-black/70">
-          {poll.credits.remaining} credits still available.
-        </p>
-      )}
-
-      <div className="mt-8 space-y-3 text-sm">
-        <div className="flex items-center justify-between border-t border-black/20 pt-3">
-          <span className="uppercase tracking-[0.2em] text-black/60">
-            Status
-          </span>
-          <span className="font-semibold">{poll.status}</span>
-        </div>
-        <div className="flex items-center justify-between border-t border-black/20 pt-3">
-          <span className="uppercase tracking-[0.2em] text-black/60">
-            Start
-          </span>
-          <span>{poll.timeframe.start}</span>
-        </div>
-        <div className="flex items-center justify-between border-t border-black/20 pt-3">
-          <span className="uppercase tracking-[0.2em] text-black/60">End</span>
-          <span>{poll.timeframe.end}</span>
-        </div>
-      </div>
-
-      <div className="mt-8 flex flex-col gap-3">
-        {poll.phase === PollPhase.Voting && (
-          <Button className="w-full rounded-full border border-black bg-black px-6 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-black">
-            Buy credits
-          </Button>
-        )}
-        <Button
-          variant="ghost"
-          className="w-full rounded-full border border-black px-6 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-black hover:bg-black/5"
-        >
-          View ledger
-        </Button>
-      </div>
-    </aside>
+    </section>
   );
 }
 
-function PrevoteSection({ poll }: PhaseSectionProps) {
+function PrepareSection({ poll }: PhaseSectionProps) {
   return (
-    <>
-      <div className="flex flex-col gap-3 border-b border-black/20 pb-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-black/60">
-            Ideas in review
-          </p>
-          <h2 className="text-2xl font-semibold">
-            {poll.ideas.length} shortlisted concepts
-          </h2>
-          <p className="text-sm text-black/70">
-            Use your remaining credits to signal conviction.
-          </p>
-        </div>
-        <Button className="rounded-full border border-black bg-black px-6 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white hover:bg-black">
+    <section className="space-y-8">
+      <div className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 text-center md:flex-row md:items-center md:justify-between md:text-left">
+        <p className="text-lg font-semibold">
+          Have your own idea? Bring it to the world.
+        </p>
+        <IdeaSubmitFormTrigger className="rounded-full border border-black bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white hover:bg-black">
           Submit new idea
-        </Button>
+        </IdeaSubmitFormTrigger>
       </div>
 
-      <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-black/60">
+          Public ideas
+        </p>
+        <h2 className="text-3xl font-semibold">Explore community submissions</h2>
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {poll.ideas.map((idea) => (
           <article
             key={idea.id}
-            className="flex h-full flex-col gap-4 rounded-3xl border border-black p-5"
+            className="flex h-full flex-col gap-4 rounded-[32px] border border-black bg-white p-6"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[0.65rem] uppercase tracking-[0.35em] text-black/50">
-                  Idea {idea.id}
-                </p>
-                <h3 className="mt-1 text-xl font-semibold">{idea.title}</h3>
-              </div>
+            <div className="h-24 rounded-2xl border border-black bg-black/5" />
+            <div>
+              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-black/50">
+                Idea {idea.id}
+              </p>
+              <h3 className="mt-1 text-xl font-semibold">{idea.title}</h3>
+              <p className="mt-2 text-sm text-black/70">{idea.summary}</p>
+              <p className="mt-2 text-xs uppercase tracking-[0.3em] text-black/60">
+                Creator · {idea.creator}
+              </p>
+            </div>
+            <div className="mt-auto flex items-center justify-between pt-2">
               <span className="rounded-full border border-black px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]">
                 {idea.credits} cr
               </span>
-            </div>
-            <p className="text-sm leading-relaxed text-black/75">
-              {idea.summary}
-            </p>
-            <div className="flex flex-col gap-1 text-xs uppercase tracking-[0.2em] text-black/60">
-              <span>Votes · {idea.votes}</span>
-              <span>Creator · {idea.creator}</span>
-            </div>
-            <Button
-              variant="ghost"
-              className="mt-auto rounded-full border border-black px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black hover:bg-black/5"
-            >
-              Read detail
-            </Button>
-          </article>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function VotingSection({ poll }: PhaseSectionProps) {
-  return (
-    <>
-      <div className="flex flex-col gap-2 border-b border-black/20 pb-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-black/60">
-          Active ballot
-        </p>
-        <h2 className="text-2xl font-semibold">
-          Allocate your votes to the finalists
-        </h2>
-        <p className="text-sm text-black/70">
-          Each weight equals one vote credit. You currently have{" "}
-          {poll.credits.remaining} credits to distribute.
-        </p>
-      </div>
-
-      <div className="mt-6 flex flex-col gap-4">
-        {poll.options.map((option) => (
-          <article
-            key={option.id}
-            className="flex flex-col gap-4 rounded-3xl border border-black p-5 md:flex-row md:items-center md:justify-between"
-          >
-            <div className="md:max-w-xl">
-              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-black/50">
-                Option {option.id.replace("opt-", "")}
-              </p>
-              <h3 className="mt-1 text-xl font-semibold">{option.label}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-black/75">
-                {option.description}
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 text-right">
-              <span className="text-xs uppercase tracking-[0.3em] text-black/60">
-                Weight {option.weight}x
-              </span>
-              <Button className="rounded-full border border-black bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white hover:bg-black">
-                Vote
+              <Button
+                variant="ghost"
+                className="rounded-full border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-black hover:bg-black/5"
+              >
+                Read detail
               </Button>
             </div>
           </article>
         ))}
       </div>
-    </>
+    </section>
+  );
+}
+
+function VotingSection({ poll }: PhaseSectionProps) {
+  const highlightedIdeaId =
+    poll.ideas.reduce(
+      (top, idea) => (idea.credits > top.credits ? idea : top),
+      poll.ideas[0]
+    )?.id ?? poll.ideas[0]?.id;
+
+  return (
+    <section className="space-y-8">
+      <div className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-black/60">
+            Spend credit
+          </p>
+          <p className="text-3xl font-semibold">
+            {poll.credits.spent}{" "}
+            <span className="text-black/40">/ {poll.credits.total}</span>
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 text-xs font-semibold uppercase tracking-[0.3em] sm:flex-row">
+          <Button
+            variant="ghost"
+            className="rounded-full border border-black px-6 py-3 text-black hover:bg-black/5"
+          >
+            View ledger
+          </Button>
+          <Button className="rounded-full border border-black bg-black px-6 py-3 text-white hover:bg-black">
+            Buy credit
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        {poll.ideas.map((idea) => {
+          const isHighlighted = idea.id === highlightedIdeaId;
+          return (
+            <article
+              key={idea.id}
+              className={`relative flex h-full flex-col gap-4 rounded-[32px] border bg-white p-6 ${
+                isHighlighted
+                  ? "border-[#2563eb] shadow-[0_0_0_2px_#2563eb33]"
+                  : "border-black"
+              }`}
+            >
+              <div className="h-24 rounded-2xl border border-black bg-black/5" />
+              <div>
+                <h3 className="text-xl font-semibold">{idea.title}</h3>
+                <p className="mt-2 text-sm text-black/70">{idea.summary}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.3em] text-black/60">
+                  Creator · {idea.creator}
+                </p>
+              </div>
+              <span className="absolute right-6 top-6 rounded-full border border-black bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]">
+                {idea.credits} cr
+              </span>
+              <Button
+                variant="ghost"
+                className="mt-auto rounded-full border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-black hover:bg-black/5"
+              >
+                Read detail
+              </Button>
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
 function TallySection({ poll }: PhaseSectionProps) {
   return (
-    <>
-      <div className="flex flex-col gap-2 border-b border-black/20 pb-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-black/60">
-          Final tally
-        </p>
-        <h2 className="text-2xl font-semibold">
-          Community decision and ranking
-        </h2>
-        <p className="text-sm text-black/70">
-          Results locked on-chain at {poll.timeframe.end}.
-        </p>
+    <section className="space-y-8">
+      <div className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-black/60">
+            Spend credit
+          </p>
+          <p className="text-3xl font-semibold">
+            {poll.credits.spent}{" "}
+            <span className="text-black/40">/ {poll.credits.total}</span>
+          </p>
+        </div>
+        <Button
+          variant="ghost"
+          className="rounded-full border border-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black hover:bg-black/5"
+        >
+          View ledger
+        </Button>
       </div>
 
-      <div className="mt-6 flex flex-col gap-5">
+      <div className="space-y-5">
         {poll.results.map((result, index) => (
           <article
             key={result.id}
-            className="flex flex-col gap-4 rounded-3xl border border-black p-5 md:flex-row md:items-center"
+            className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 md:flex-row md:items-center"
           >
-            <div className="h-32 w-full rounded-2xl border border-black bg-gradient-to-b from-white to-black/[0.04] text-center text-xs uppercase tracking-[0.3em] text-black/50 md:w-40">
-              <div className="flex h-full items-center justify-center">
-                Image {index + 1}
+            <div className="flex items-center gap-4 md:w-64">
+              <div
+                className={`flex h-12 w-12 items-center justify-center rounded-full border border-black text-base font-semibold ${
+                  index === 0 ? "bg-black text-white" : "bg-white text-black"
+                }`}
+              >
+                {index + 1}
+              </div>
+              <div>
+                <p className="text-lg font-semibold uppercase">{result.label}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-black/60">
+                  {result.author}
+                </p>
               </div>
             </div>
             <div className="flex-1">
-              <p className="text-[0.65rem] uppercase tracking-[0.35em] text-black/50">
-                Rank {index + 1}
-              </p>
-              <h3 className="mt-1 text-xl font-semibold">{result.label}</h3>
-              <div className="mt-3 h-3 w-full overflow-hidden rounded-full border border-black bg-white">
+              <div className="flex items-center justify-between text-sm font-semibold text-black/70">
+                <span>{result.votes} votes</span>
+                <span>{result.percentage}%</span>
+              </div>
+              <div className="mt-2 h-4 w-full overflow-hidden rounded-full border border-black bg-white">
                 <div
                   className="h-full bg-black"
                   style={{ width: `${result.percentage}%` }}
                 />
               </div>
-              <div className="mt-2 flex justify-between text-sm text-black/70">
-                <span>{result.votes} votes</span>
-                <span>{result.percentage}%</span>
-              </div>
             </div>
           </article>
         ))}
       </div>
-    </>
+    </section>
   );
 }
