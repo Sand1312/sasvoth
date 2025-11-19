@@ -1,0 +1,13 @@
+{
+  "privateKey": "123456",
+  "vote": "1",
+  "voiceCredits": "100",
+  "nonce": "1",
+  "pollId": "1", 
+  "pubkeyX": "0",
+  "pubkeyY": "0",
+  "voiceCreditBalance": "100",
+  "voterIndex": "1",
+  "voteCommitment": "19855665722367691320805704945407454469682203142569642883719496700380472326117",
+  "outcome": "1"
+}
