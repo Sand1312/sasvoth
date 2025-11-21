@@ -59,15 +59,17 @@ export class PollsController {
             return res.status(500).json({ message: 'Error approving idea in poll', error });
         }
     }
-    @Patch("saveOnChainId")
+    @Patch("saveOnChain")
     async savePollOnChainId( @Req() req: Request, @Res() res: Response) {
-        const { pollId, pollIdOnChain } = req.body;
+        const { pollId, pollIdOnChain, pollAddressOnchain } = req.body;
         
         try {
-            const updatedPoll = await this.pollsService.savePollOnChainId(pollId, pollIdOnChain);
+            const updatedPoll = await this.pollsService.savePollOnChainId(pollId, pollIdOnChain,pollAddressOnchain);
             return res.status(200).json(updatedPoll);
         } catch (error) {
             return res.status(500).json({ message: 'Error saving poll on-chain ID', error });
         }
     }
+
+
 }

@@ -1,5 +1,5 @@
 {
-  "name": "circuits",
+  "name": "@sasvoth/circuits",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,9 +12,9 @@
   "packageManager": "pnpm@10.22.0",
   "dependencies": {
     "circomlib": "^2.0.5",
-    "circomlibjs": "^0.1.7"
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.5"
   },
   "devDependencies": {
-    "snarkjs": "^0.7.5"
   }
 }

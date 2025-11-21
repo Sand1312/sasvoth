@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 import {Rewards, RewardsDocument} from './schemas/rewards.schema';
-import { generateSignatureForClaim , generateIdClaim} from "../../utils/signature";
+import { generateSignatureForClaim , generateIdClaim , generateSignature } from "../../utils/signature";
 import { id } from 'ethers/lib/utils';
 
 @Injectable()
@@ -36,6 +36,11 @@ export class RewardsService {
     }
     async getReward(userId: string, pollId: string): Promise<RewardsDocument | null> {
         return this.rewardsModel.findOne({ userId: userId, pollId: pollId }).exec();
+    }
+
+    async test(): Promise<any>{
+        const signature = await generateSignature();
+        return signature;
     }
 
 }

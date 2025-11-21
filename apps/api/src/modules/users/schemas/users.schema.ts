@@ -34,16 +34,16 @@ export class Users {
   })
   authType: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   publicKey?: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   publicKeyX?: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   publicKeyY?: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   stateIndex?: number;
 
   @Prop({ default: 0 })

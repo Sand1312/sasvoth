@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 
-export type VotesDocument = HydratedDocument<Votes>;
+export type JoinPollsDocument = HydratedDocument<JoinPolls>;
 
 @Schema()
-export class Votes {
+export class JoinPolls {
     @Prop({ required: true })
     voterId: string;
 
@@ -25,4 +25,4 @@ export class Votes {
     @Prop({ required: true })
     voteCommitment: string;
 }
-export const VotesSchema = SchemaFactory.createForClass(Votes);
+export const JoinPollsSchema = SchemaFactory.createForClass(JoinPolls);

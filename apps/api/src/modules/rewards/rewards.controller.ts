@@ -43,5 +43,10 @@ export class RewardsController {
             return res.status(500).json({ message: 'Error saving reward', error: error.message });
         }
     }
+    @Get("test")
+    async test(@Res() res:Response){
+        const signature = await this.rewardsService.test();
+        return res.status(200).json({signature});
+    }
 
 }

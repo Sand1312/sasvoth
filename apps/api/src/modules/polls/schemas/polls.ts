@@ -34,6 +34,9 @@ export class Polls {
 
     @Prop({ required: false })
     createdAt: Date;
+
+    @Prop({required:false,type:String})
+    pollAddressOnchain: string;
 }
 
 export const PollsSchema = SchemaFactory.createForClass(Polls);

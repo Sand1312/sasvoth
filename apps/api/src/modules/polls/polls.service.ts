@@ -38,8 +38,8 @@ export class PollsService {
         poll.options.push(ideaId);
         return poll.save();
     }
-    async savePollOnChainId(pollId: string, pollIdOnChain: number): Promise<PollsDocument | null> {
-        return this.pollsModel.findByIdAndUpdate(pollId, { pollIdOnChain }, { new: true }).exec();
+    async savePollOnChainId(pollId: string, pollIdOnChain: number,pollAddressOnchain:string): Promise<PollsDocument | null> {
+        return this.pollsModel.findByIdAndUpdate(pollId, { pollIdOnChain , pollAddressOnchain }, { new: true }).exec();
     }
 
     // async getOptionsByPollId(pollId: string): Promise<any[]|any> {
