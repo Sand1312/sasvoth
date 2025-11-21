@@ -56,7 +56,7 @@ const mockPoll: PollData = {
   timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
   credits: { spent: 36, total: 120, remaining: 84 },
   status: "In progress",
-  phase: PollPhase.Prepare,
+  phase: PollPhase.Tally,
   ideas: [
     {
       id: "01",
