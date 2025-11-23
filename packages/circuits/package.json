@@ -1,10 +1,10 @@
 {
   "name": "@sasvoth/circuits",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -p tsconfig.json && cpx \"voteProof_js/**\" dist/voteProof_js && cpx \"*.zkey\" dist && cpx \"verification_key.json\" dist"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +16,6 @@
     "snarkjs": "^0.7.5"
   },
   "devDependencies": {
+    "cpx": "^1.5.0"
   }
 }

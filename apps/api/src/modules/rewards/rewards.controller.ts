@@ -49,4 +49,15 @@ export class RewardsController {
         return res.status(200).json({signature});
     }
 
+    @Post("generate-proof")
+    async generateProof(@Req() req: Request, @Res() res: Response) {
+        const input = req.body;
+        try {
+            const proof = await this.rewardsService.generateProof(input);
+            return res.status(200).json(proof);
+        } catch (error) {
+            return res.status(500).json({ message: 'Error generating proof', error: error.message });
+        }
+    }
+
 }
