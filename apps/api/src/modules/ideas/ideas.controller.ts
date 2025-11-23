@@ -5,21 +5,74 @@ import {
   Req,
   Post,
   Res,
-  NotFoundException,
   Patch,
   Put
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { Response } from 'express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { IdeasService } from './ideas.service';
 
+class CreateIdeaDto {
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  creatorAddress: string;
+
+  @ApiProperty()
+  imgSrc: string;
+}
+
+class UpdateIdeaCidDto {
+  @ApiProperty()
+  ideaId: string;
+
+  @ApiProperty()
+  idea_cid: string;
+}
+
+class UpdateIdeaDto {
+  @ApiPropertyOptional()
+  title?: string;
+
+  @ApiPropertyOptional()
+  description?: string;
+
+  @ApiPropertyOptional()
+  descriptionMore?: string;
+
+  @ApiPropertyOptional()
+  imgSrc?: string;
+
+  @ApiPropertyOptional()
+  creatorIdea?: string;
+}
+
 @Controller('ideas')
+@ApiTags('Ideas')
+@ApiBearerAuth()
 export class IdeasController {
   constructor(private readonly ideasService: IdeasService) {}
 
   @Post('create')
   @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Create a new idea' })
+  @ApiBody({ type: CreateIdeaDto })
+  @ApiResponse({ status: 201, description: 'Idea created successfully' })
   async createIdea(@Req() req: Request, @Res() res: Response) {
     const ideaData = req.body;
     try {
@@ -31,6 +84,9 @@ export class IdeasController {
   }
   @Patch('updateCID')
   @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Update the IPFS CID for an idea' })
+  @ApiBody({ type: UpdateIdeaCidDto })
+  @ApiResponse({ status: 200, description: 'Idea CID updated' })
   async updateIdeaCID(@Req() req: Request, @Res() res: Response) {
     const { ideaId, idea_cid } = req.body;
     try {
@@ -41,6 +97,9 @@ export class IdeasController {
     }
   }
   @Get('get/:ideaId')
+  @ApiOperation({ summary: 'Get idea details by ID' })
+  @ApiParam({ name: 'ideaId', type: String })
+  @ApiResponse({ status: 200, description: 'Idea details retrieved' })
   async getIdeaById(@Res() res: Response, @Req() req: Request) {
     const ideaId = req.params.ideaId;
     try {
@@ -52,6 +111,10 @@ export class IdeasController {
   }
   @Put('update/:ideaId')
   @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Update an idea' })
+  @ApiParam({ name: 'ideaId', type: String })
+  @ApiBody({ type: UpdateIdeaDto })
+  @ApiResponse({ status: 200, description: 'Idea updated' })
   async updateIdea(@Req() req: Request, @Res() res: Response) {
     const ideaId = req.params.ideaId;
     const updateData = req.body;
