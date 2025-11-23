@@ -9,11 +9,14 @@ import { ideasApi, IdeaPayload, ipfsApi, pollsApi } from "@/api";
 // Types coming from backend models
 type PollRecord = {
   _id?: string;
+  id?: string;
   title?: string;
   description?: string;
   status?: string;
   ideas?: string[];
+  ideaIds?: string[];
   options?: string[];
+  approvedIdeaIds?: string[];
 };
 
 type IdeaRecord = {
@@ -29,6 +32,11 @@ type IdeaRecord = {
 };
 
 type PollWithIdeas = PollRecord & { ideaMap: Record<string, IdeaRecord> };
+
+type IdeaIpfsLink = {
+  cid: string;
+  url: string;
+};
 
 type IdeaFormState = {
   title: string;
@@ -58,7 +66,7 @@ export default function AdminPollsPage(): React.ReactElement {
   const [polls, setPolls] = useState<PollWithIdeas[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [ipfsLinks, setIpfsLinks] = useState<Record<string, string>>({});
+  const [ipfsLinks, setIpfsLinks] = useState<Record<string, IdeaIpfsLink>>({});
   const [busyIdea, setBusyIdea] = useState<string | null>(null);
   const [busyPoll, setBusyPoll] = useState<string | null>(null);
   const preparePolls = useMemo(
@@ -69,6 +77,13 @@ export default function AdminPollsPage(): React.ReactElement {
   useEffect(() => {
     refreshPolls();
   }, []);
+  function toGatewayUrl(cid?: string) {
+    if (!cid) return undefined;
+    const normalized = cid.startsWith("ipfs://")
+      ? cid.replace("ipfs://", "")
+      : cid;
+    return `/api/ipfs/${normalized}`;
+  }
   async function refreshPolls() {
     setLoading(true);
     setError(null);
@@ -76,7 +91,11 @@ export default function AdminPollsPage(): React.ReactElement {
       const data: PollRecord[] = await pollsApi.getPolls();
       const hydrated: PollWithIdeas[] = await Promise.all(
         (data || []).map(async (poll) => {
-          const ideaIds = [...(poll.ideas ?? []), ...(poll.options ?? [])];
+          const ideaIds = [
+            ...(poll.ideaIds ?? []),
+            ...(poll.ideas ?? []),
+            ...(poll.approvedIdeaIds ?? poll.options ?? []),
+          ].filter((id): id is string => Boolean(id));
           const pairs = await Promise.all(
             ideaIds.map(async (ideaId) => {
               try {
@@ -119,10 +138,19 @@ export default function AdminPollsPage(): React.ReactElement {
         creator: idea.creatorIdea,
         approvedAt: new Date().toISOString(),
       };
-      const { cid, url } = await ipfsApi.uploadMetadata(metadata);
-      setIpfsLinks((prev) => ({ ...prev, [ideaId]: url }));
+      const { cid, cidUri, url } = await ipfsApi.uploadMetadata(metadata);
+      const storedCid = cidUri || cid;
+      setIpfsLinks((prev) => ({
+        ...prev,
+        [ideaId]: {
+          cid: storedCid.startsWith("ipfs://")
+            ? storedCid
+            : `ipfs://${storedCid}`,
+          url,
+        },
+      }));
       try {
-        await ideasApi.updateIdeaCID(ideaId, cid);
+        await ideasApi.updateIdeaCID(ideaId, cidUri || cid);
       } catch (err) {
         console.warn("Unable to persist idea CID", err);
       }
@@ -210,8 +238,8 @@ export default function AdminPollsPage(): React.ReactElement {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {preparePolls.map((poll) => {
-          const ideaIds = poll.ideas ?? [];
-          const approved = poll.options ?? [];
+          const ideaIds = poll.ideaIds ?? poll.ideas ?? [];
+          const approved = poll.approvedIdeaIds ?? poll.options ?? [];
           return (
             <section
               key={poll._id ?? poll.title}
@@ -263,9 +291,9 @@ export default function AdminPollsPage(): React.ReactElement {
                           </p>
                         </div>
                         <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-1">
-                          {ipfsLinks[ideaId] && (
+                          {ipfsLinks[ideaId]?.url && (
                             <a
-                              href={ipfsLinks[ideaId]}
+                              href={ipfsLinks[ideaId].url}
                               target="_blank"
                               rel="noreferrer"
                               className="text-xs font-semibold text-emerald-700 underline"
@@ -312,7 +340,8 @@ export default function AdminPollsPage(): React.ReactElement {
                   )}
                   {approved.map((ideaId) => {
                     const idea = poll.ideaMap[ideaId];
-                    const cid = idea?.idea_cid || ipfsLinks[ideaId];
+                    const cid = idea?.idea_cid || ipfsLinks[ideaId]?.cid;
+                    const href = toGatewayUrl(cid) || ipfsLinks[ideaId]?.url;
                     return (
                       <div
                         key={`${ideaId}-approved`}
@@ -324,14 +353,14 @@ export default function AdminPollsPage(): React.ReactElement {
                         <div className="text-xs text-emerald-800">
                           {idea?.description || "Approved idea"}
                         </div>
-                        {cid && (
+                        {href && (
                           <a
-                            href={cid.startsWith("http") ? cid : cid}
+                            href={href}
                             target="_blank"
                             rel="noreferrer"
                             className="text-[11px] font-semibold uppercase tracking-[0.2em] underline"
                           >
-                            {cid}
+                            {cid || href}
                           </a>
                         )}
                       </div>

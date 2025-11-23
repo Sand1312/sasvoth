@@ -51,34 +51,31 @@ export const pollsApi = {
   getPollById: async (pollId: string) => {
     try {
       const response = await api.get(`/v1/polls/${pollId}`);
-      return response.data;
+      return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
     }
   },
   updatePollStatus: async (pollId: string, status: string) => {
     try {
-      const response = await api.patch("/polls/update-status", {
-        pollId,
-        status,
-      });
-      return response.data;
+      const response = await api.patch(`/v1/polls/${pollId}/status`, { status });
+      return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
     }
   },
   addIdeaToPoll: async (pollId: string, ideaId: string) => {
     try {
-      const response = await api.patch("/polls/add-idea", { pollId, ideaId });
-      return response.data;
+      const response = await api.patch(`/v1/polls/${pollId}/ideas`, { ideaId });
+      return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
     }
   },
   approveIdeaInPoll: async (pollId: string, ideaId: string) => {
     try {
-      const response = await api.patch("/polls/approve", { pollId, ideaId });
-      return response.data;
+      const response = await api.patch(`/v1/polls/${pollId}/approve`, { ideaId });
+      return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
     }
