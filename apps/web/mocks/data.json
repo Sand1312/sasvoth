@@ -30,7 +30,11 @@
       "status": "in_progress",
       "startTime": "2024-10-12T00:00:00.000Z",
       "endTime": "2024-11-24T00:00:00.000Z",
-      "options": ["Support builders", "Run open town halls", "Launch residency"],
+      "options": [
+        "Support builders",
+        "Run open town halls",
+        "Launch residency"
+      ],
       "pollIdOnChain": 101,
       "ideaIds": ["idea-1", "idea-2"],
       "approvedIdeaIds": ["idea-1"]
@@ -43,6 +47,19 @@
       "status": "draft",
       "startTime": "2024-12-01T00:00:00.000Z",
       "endTime": "2025-01-15T00:00:00.000Z",
+      "options": ["Streaming toolkit", "Fan economy", "World editor"],
+      "pollIdOnChain": null,
+      "ideaIds": [],
+      "approvedIdeaIds": []
+    },
+    {
+      "id": "poll-3",
+      "title": "Hollow Knight: Silksong Support",
+      "description": "Vote for the demo day lineup and publishing support packages.",
+      "creatorAddress": "0xDd00000000000000000000000000000000000004",
+      "status": "prepare",
+      "startTime": "2025-12-01T00:00:00.000Z",
+      "endTime": "2025-12-15T00:00:00.000Z",
       "options": ["Streaming toolkit", "Fan economy", "World editor"],
       "pollIdOnChain": null,
       "ideaIds": [],
@@ -83,7 +100,5 @@
       "updatedAt": "2024-10-26T00:00:00.000Z"
     }
   ],
-  "rewards": [
-    { "userId": "user-1", "pollId": "poll-1", "credit_count": 20 }
-  ]
+  "rewards": [{ "userId": "user-1", "pollId": "poll-1", "credit_count": 20 }]
 }

@@ -36,6 +36,7 @@ const ideaTargets = {
 const pollTargets = {
   create: buildTargets("/v1/polls"),
   list: buildTargets("/v1/polls"),
+  byId: (id: string) => buildTargets(`/v1/polls/${id}`),
   updateStatus: (id: string) => buildTargets(`/v1/polls/${id}/status`),
   addIdea: (id: string) => buildTargets(`/v1/polls/${id}/ideas`),
   approveIdea: (id: string) => buildTargets(`/v1/polls/${id}/approve`),
@@ -73,7 +74,7 @@ const invalid = (message: string) =>
   HttpResponse.json({ message }, { status: 400 });
 
 const ensureBody = async <T>(request: Request) =>
-  ((await request.json().catch(() => ({}))) as T);
+  (await request.json().catch(() => ({}))) as T;
 
 const withLatency = async <T>(result: T, ms = 150) => {
   await delay(ms);
@@ -84,9 +85,10 @@ export const v1Handlers = [
   // Ideas
   ...ideaTargets.create.map((target) =>
     http.post(target, async ({ request }) => {
-      const body = await ensureBody<{ pollData?: Partial<(typeof db.ideas)[number]>; idea?: Partial<(typeof db.ideas)[number]> }>(
-        request
-      );
+      const body = await ensureBody<{
+        pollData?: Partial<(typeof db.ideas)[number]>;
+        idea?: Partial<(typeof db.ideas)[number]>;
+      }>(request);
       const payload = body.pollData ?? body.idea;
       if (!payload?.title) {
         return invalid("title is required");
@@ -99,7 +101,9 @@ export const v1Handlers = [
         imgSrc:
           payload.imgSrc ??
           "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
-        creatorAddress: payload.creatorAddress ?? "0x0000000000000000000000000000000000000000",
+        creatorAddress:
+          payload.creatorAddress ??
+          "0x0000000000000000000000000000000000000000",
         creatorIdea: payload.creatorIdea ?? "anonymous",
         idea_cid: payload.idea_cid ?? null,
       } satisfies (typeof db.ideas)[number];
@@ -117,7 +121,9 @@ export const v1Handlers = [
   ),
   ...ideaTargets.updateCid(":id").map((target) =>
     http.patch(target, async ({ params, request }) => {
-      const body = await ensureBody<{ idea_cid?: string; ideaId?: string }>(request);
+      const body = await ensureBody<{ idea_cid?: string; ideaId?: string }>(
+        request
+      );
       const idea = db.ideas.find(
         (item) => item.id === (params.id || body.ideaId)
       );
@@ -129,9 +135,10 @@ export const v1Handlers = [
   ),
   ...ideaTargets.byId(":id").map((target) =>
     http.patch(target, async ({ params, request }) => {
-      const body = await ensureBody<{ ideaId?: string; updateData?: Partial<(typeof db.ideas)[number]> }>(
-        request
-      );
+      const body = await ensureBody<{
+        ideaId?: string;
+        updateData?: Partial<(typeof db.ideas)[number]>;
+      }>(request);
       const idea = db.ideas.find(
         (item) => item.id === (params.id || body.ideaId)
       );
@@ -145,7 +152,9 @@ export const v1Handlers = [
   // Polls
   ...pollTargets.create.map((target) =>
     http.post(target, async ({ request }) => {
-      const body = await ensureBody<{ pollData?: Partial<(typeof db.polls)[number]> }>(request);
+      const body = await ensureBody<{
+        pollData?: Partial<(typeof db.polls)[number]>;
+      }>(request);
       const payload = body.pollData ?? body;
       if (!payload.title || !payload.status) {
         return invalid("title and status are required");
@@ -154,7 +163,9 @@ export const v1Handlers = [
         id: nextId("poll"),
         title: payload.title,
         description: payload.description ?? "",
-        creatorAddress: payload.creatorAddress ?? "0x0000000000000000000000000000000000000000",
+        creatorAddress:
+          payload.creatorAddress ??
+          "0x0000000000000000000000000000000000000000",
         status: payload.status,
         startTime: payload.startTime ?? new Date().toISOString(),
         endTime:
@@ -180,9 +191,19 @@ export const v1Handlers = [
       return ok({ polls });
     })
   ),
+  ...pollTargets.byId(":pollId").map((target) =>
+    http.get(target, async ({ params }) => {
+      const poll = db.polls.find((item) => item.id === params.pollId);
+      await delay(100);
+      if (!poll) return notFound("Poll not found");
+      return ok(poll);
+    })
+  ),
   ...pollTargets.updateStatus(":pollId").map((target) =>
     http.patch(target, async ({ params, request }) => {
-      const body = await ensureBody<{ pollId?: string; status?: string }>(request);
+      const body = await ensureBody<{ pollId?: string; status?: string }>(
+        request
+      );
       const poll = db.polls.find(
         (item) => item.id === (params.pollId || body.pollId)
       );
@@ -194,7 +215,9 @@ export const v1Handlers = [
   ),
   ...pollTargets.addIdea(":pollId").map((target) =>
     http.patch(target, async ({ params, request }) => {
-      const body = await ensureBody<{ pollId?: string; ideaId?: string }>(request);
+      const body = await ensureBody<{ pollId?: string; ideaId?: string }>(
+        request
+      );
       const poll = db.polls.find(
         (item) => item.id === (params.pollId || body.pollId)
       );
@@ -208,7 +231,9 @@ export const v1Handlers = [
   ),
   ...pollTargets.approveIdea(":pollId").map((target) =>
     http.patch(target, async ({ params, request }) => {
-      const body = await ensureBody<{ pollId?: string; ideaId?: string }>(request);
+      const body = await ensureBody<{ pollId?: string; ideaId?: string }>(
+        request
+      );
       const poll = db.polls.find(
         (item) => item.id === (params.pollId || body.pollId)
       );
@@ -222,9 +247,10 @@ export const v1Handlers = [
   ),
   ...pollTargets.saveOnChainId(":pollId").map((target) =>
     http.patch(target, async ({ params, request }) => {
-      const body = await ensureBody<{ pollId?: string; pollIdOnChain?: number | null }>(
-        request
-      );
+      const body = await ensureBody<{
+        pollId?: string;
+        pollIdOnChain?: number | null;
+      }>(request);
       const poll = db.polls.find(
         (item) => item.id === (params.pollId || body.pollId)
       );
@@ -251,9 +277,9 @@ export const v1Handlers = [
   ),
   ...voteTargets.create.map((target) =>
     http.post(target, async ({ request }) => {
-      const body = await ensureBody<{ voteData?: Partial<(typeof db.votes)[number]> }>(
-        request
-      );
+      const body = await ensureBody<{
+        voteData?: Partial<(typeof db.votes)[number]>;
+      }>(request);
       const payload = body.voteData ?? body;
       if (!payload.pollId || !payload.userId || !payload.selectedOption) {
         return invalid("pollId, userId, and selectedOption are required");
@@ -324,7 +350,9 @@ export const v1Handlers = [
       if (!body.pollId || !body.result_cid) {
         return invalid("pollId and result_cid are required");
       }
-      const existing = db.resultsMeta.find((result) => result.pollId === body.pollId);
+      const existing = db.resultsMeta.find(
+        (result) => result.pollId === body.pollId
+      );
       const payload = {
         pollId: body.pollId,
         result_cid: body.result_cid,
@@ -341,7 +369,9 @@ export const v1Handlers = [
   ),
   ...resultMetaTargets.byPoll(":pollId").map((target) =>
     http.get(target, async ({ params }) => {
-      const result = db.resultsMeta.find((item) => item.pollId === params.pollId);
+      const result = db.resultsMeta.find(
+        (item) => item.pollId === params.pollId
+      );
       await delay(60);
       if (!result) return notFound("Result not found");
       return ok({ result });
@@ -358,7 +388,8 @@ export const v1Handlers = [
   ...rewardTargets.create.map((target) =>
     http.post(target, async ({ request }) => {
       const body = await ensureBody<RewardPayload>(request);
-      if (!body.userId || !body.pollId) return invalid("userId and pollId are required");
+      if (!body.userId || !body.pollId)
+        return invalid("userId and pollId are required");
       const existing = db.rewards.find(
         (item) => item.userId === body.userId && item.pollId === body.pollId
       );
@@ -393,7 +424,12 @@ export const v1Handlers = [
 
 type VoicePayload = { userId: string; pollId: string; credits: number };
 type ResultPayload = { pollId: string; result_cid: string; outcome?: string };
-type RewardPayload = { userId: string; pollId: string; credit_count?: number; creditCount?: number };
+type RewardPayload = {
+  userId: string;
+  pollId: string;
+  credit_count?: number;
+  creditCount?: number;
+};
 
 function findVoiceCredit(userId?: string, pollId?: string) {
   if (!userId || !pollId) return undefined;

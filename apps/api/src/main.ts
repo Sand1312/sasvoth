@@ -2,12 +2,18 @@ import * as cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import { NestPinoLogger } from './common/logger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  const appLogger = new NestPinoLogger();
+
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug'],
+    bufferLogs: true,
+    logger: appLogger,
   });
+
+  app.useLogger(appLogger);
 
   app.use(cookieParser());
 
@@ -30,6 +36,8 @@ async function bootstrap() {
 
   const port = Number(process.env.PORT) || 8000;
   await app.listen(port);
+
+  appLogger.log(`API listening on port ${port}`, 'Bootstrap');
 }
 
 bootstrap();

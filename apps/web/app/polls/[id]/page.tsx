@@ -1,13 +1,13 @@
+"use client";
+import type { ReactElement } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { IdeaSubmitFormTrigger } from "@/components/idea-submit-form-trigger";
-
-const enum PollPhase {
-  Prepare = "prepare",
-  Voting = "voting",
-  Tally = "tally",
-}
-
+import { PollStatus } from "@/types/polls";
+import { usePolls } from "@/hooks";
+import { formatDate, parseDate } from "@/lib/date";
 type Timeline = { start: string; end: string };
+
 type Idea = {
   id: string;
   title: string;
@@ -37,8 +37,7 @@ type PollData = {
   description: string;
   timeframe: Timeline;
   credits: { spent: number; total: number; remaining?: number };
-  status: string;
-  phase: PollPhase;
+  status: PollStatus;
   ideas: Idea[];
   options: VoteOption[];
   results: TallyResult[];
@@ -49,14 +48,13 @@ type PollPageProps = {
   searchParams?: { phase?: string };
 };
 
-const mockPoll: PollData = {
-  title: "Future of Play",
+const fallbackPoll: PollData = {
+  title: "Future of Play (Offline Data)",
   description:
     "A curated shortlist of ideas exploring how social games, creative tools, and fan communities will evolve next year.",
   timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
   credits: { spent: 36, total: 120, remaining: 84 },
-  status: "In progress",
-  phase: PollPhase.Tally,
+  status: PollStatus.InProgress,
   ideas: [
     {
       id: "01",
@@ -143,45 +141,102 @@ const mockPoll: PollData = {
   ],
 };
 
-type PhaseSectionProps = { poll: PollData };
+type StatusSectionProps = { poll: PollData };
 
-const phaseRenderers: Record<
-  PollPhase,
-  (props: PhaseSectionProps) => React.ReactElement
+const statusRenderers: Partial<
+  Record<PollStatus, (props: StatusSectionProps) => ReactElement>
 > = {
-  [PollPhase.Prepare]: PrepareSection,
-  [PollPhase.Voting]: VotingSection,
-  [PollPhase.Tally]: TallySection,
+  [PollStatus.Prepare]: PrepareSection,
+  [PollStatus.InProgress]: VotingSection,
+  [PollStatus.Ended]: EndedSection,
 };
 
-const phaseBadges: Record<PollPhase, string> = {
-  [PollPhase.Prepare]: "Ideas in review",
-  [PollPhase.Voting]: "Opening",
-  [PollPhase.Tally]: "Ended",
+const statusBadges: Partial<Record<PollStatus, string>> = {
+  [PollStatus.Prepare]: "Ideas in review",
+  [PollStatus.InProgress]: "Opening",
+  [PollStatus.Ended]: "Ended",
 };
 
 export default function PollPage({ params, searchParams }: PollPageProps) {
   const pollId = params.id;
-  const requestedPhase = searchParams?.phase?.toLowerCase() as
-    | PollPhase
-    | undefined;
-  const isPhase = (value: string | undefined): value is PollPhase =>
-    value === PollPhase.Prepare ||
-    value === PollPhase.Voting ||
-    value === PollPhase.Tally;
+  const { getPollById } = usePolls();
 
-  const activePhase = isPhase(requestedPhase) ? requestedPhase : mockPoll.phase;
-  const PhaseComponent = phaseRenderers[activePhase];
+  const requestedPhase = searchParams?.phase?.toLowerCase() as
+    | PollStatus
+    | undefined;
+
+  const isPhase = (value: string | undefined): value is PollStatus =>
+    value === PollStatus.Prepare ||
+    value === PollStatus.InProgress ||
+    value === PollStatus.Ended;
+
+  const [poll, setPoll] = useState<PollData>(() => fallbackPoll);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const response = await getPollById(pollId);
+
+        // Map backend data to PollData format
+        const mapped: PollData = {
+          title: response?.title || fallbackPoll.title,
+          description: response?.description || fallbackPoll.description,
+          timeframe: {
+            start: response?.startTime
+              ? formatDate(response.startTime)
+              : fallbackPoll.timeframe.start,
+            end: response?.endTime
+              ? formatDate(response.endTime)
+              : fallbackPoll.timeframe.end,
+          },
+          credits: response?.credits || fallbackPoll.credits,
+          status: response?.status || fallbackPoll.status,
+          ideas: response?.ideas || fallbackPoll.ideas,
+          options: response?.options || fallbackPoll.options,
+          results: response?.results || fallbackPoll.results,
+        };
+
+        if (mounted) {
+          setPoll(mapped);
+          setError(null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch poll, using fallback data:", err);
+        if (mounted) {
+          setPoll(fallbackPoll);
+          setError("Unable to reach the polls service. Showing offline data.");
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [pollId]);
+
+  const activeStatus = isPhase(requestedPhase) ? requestedPhase : poll.status;
+
+  const pollWithStatus: PollData = { ...poll, status: activeStatus };
+  const StatusComponent = statusRenderers[activeStatus] ?? PrepareSection;
 
   return (
     <main className="min-h-screen bg-white px-4 py-10 text-black">
       <section className="mx-auto flex w-full max-w-6xl flex-col gap-10">
         <PollHero
-          poll={mockPoll}
+          poll={pollWithStatus}
           pollId={pollId}
-          badge={phaseBadges[activePhase]}
+          badge={statusBadges[activeStatus] ?? ""}
         />
-        <PhaseComponent poll={{ ...mockPoll, phase: activePhase }} />
+        {error && <p className="text-sm text-orange-600">{error}</p>}
+        <StatusComponent poll={pollWithStatus} />
       </section>
     </main>
   );
@@ -220,7 +275,7 @@ function PollHero({
   );
 }
 
-function PrepareSection({ poll }: PhaseSectionProps) {
+function PrepareSection({ poll }: StatusSectionProps) {
   return (
     <section className="space-y-8">
       <div className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 text-center md:flex-row md:items-center md:justify-between md:text-left">
@@ -276,12 +331,13 @@ function PrepareSection({ poll }: PhaseSectionProps) {
   );
 }
 
-function VotingSection({ poll }: PhaseSectionProps) {
+function VotingSection({ poll }: StatusSectionProps) {
   const highlightedIdeaId =
-    poll.ideas.reduce(
-      (top, idea) => (idea.credits > (top?.credits ?? -Infinity) ? idea : top),
-      poll.ideas[0]
-    )?.id ?? poll.ideas[0]?.id;
+    poll.ideas.length > 0
+      ? poll.ideas.reduce((top, idea) =>
+          idea.credits > top.credits ? idea : top
+        ).id
+      : undefined;
 
   return (
     <section className="space-y-8">
@@ -310,7 +366,9 @@ function VotingSection({ poll }: PhaseSectionProps) {
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {poll.ideas.map((idea) => {
-          const isHighlighted = idea.id === highlightedIdeaId;
+          const isHighlighted =
+            highlightedIdeaId != null && idea.id === highlightedIdeaId;
+
           return (
             <article
               key={idea.id}
@@ -345,7 +403,7 @@ function VotingSection({ poll }: PhaseSectionProps) {
   );
 }
 
-function TallySection({ poll }: PhaseSectionProps) {
+function EndedSection({ poll }: StatusSectionProps) {
   return (
     <section className="space-y-8">
       <div className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 md:flex-row md:items-center md:justify-between">

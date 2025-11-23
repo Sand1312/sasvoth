@@ -9,7 +9,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-       "@maci-protocol/contracts": ["../../packages/contracts"]
+       "@maci-protocol/contracts": ["../../packages/contracts"],
+       "@ipfs-service/*": ["../../packages/ipfs-service/src/*"]
     }
   },
   "include": [

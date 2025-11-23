@@ -1,0 +1,85 @@
+import { NextResponse } from "next/server";
+import { forwardSetCookies } from "../../_lib/forward-set-cookie";
+
+const apiBase =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.API_URL ||
+  "http://localhost:8000";
+
+const METHODS_WITH_BODY = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+type RouteContext = { params: { path?: string[] } };
+
+async function proxyRequest(
+  req: Request,
+  method: string,
+  context: RouteContext
+) {
+  try {
+    const segments = context.params.path ?? [];
+    const targetPath = `/v1/${segments.join("/")}`;
+
+    const incomingUrl = new URL(req.url);
+    const backendUrl = new URL(targetPath, apiBase);
+    backendUrl.search = incomingUrl.search;
+
+    const cookie = req.headers.get("cookie") || "";
+    const contentType = req.headers.get("content-type") || "application/json";
+
+    const init: RequestInit = {
+      method,
+      headers: {
+        cookie,
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    };
+
+    if (METHODS_WITH_BODY.has(method.toUpperCase())) {
+      init.body = await req.text();
+      init.headers = {
+        ...init.headers,
+        "Content-Type": contentType,
+      };
+    }
+
+    let res: Response;
+    try {
+      res = await fetch(backendUrl.toString(), init);
+    } catch (err) {
+      console.error(`/api/v1 proxy ${method} backend fetch failed:`, err);
+      return new NextResponse("backend unreachable", { status: 502 });
+    }
+
+    const text = await res.text();
+    const headers = new Headers();
+    const resContentType = res.headers.get("content-type");
+    if (resContentType) headers.set("content-type", resContentType);
+    forwardSetCookies(res, headers);
+
+    return new NextResponse(text, { status: res.status, headers });
+  } catch (err) {
+    console.error(`/api/v1 proxy ${method} error:`, err);
+    return new NextResponse("internal proxy error", { status: 500 });
+  }
+}
+
+export async function GET(req: Request, context: RouteContext) {
+  return proxyRequest(req, "GET", context);
+}
+
+export async function POST(req: Request, context: RouteContext) {
+  return proxyRequest(req, "POST", context);
+}
+
+export async function PUT(req: Request, context: RouteContext) {
+  return proxyRequest(req, "PUT", context);
+}
+
+export async function PATCH(req: Request, context: RouteContext) {
+  return proxyRequest(req, "PATCH", context);
+}
+
+export async function DELETE(req: Request, context: RouteContext) {
+  return proxyRequest(req, "DELETE", context);
+}
