@@ -7,7 +7,7 @@ export const authApi = {
     data?: any
   ) => {
     if (provider === "google" || provider === "github") {
-      window.location.href = `/api/auth/signin?type=${provider}`;
+      window.location.href = `/api/v1/auth/signin?type=${provider}`;
       return;
     }
 

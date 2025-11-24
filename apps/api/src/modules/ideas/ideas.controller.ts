@@ -69,7 +69,7 @@ export class IdeasController {
   constructor(private readonly ideasService: IdeasService) {}
 
   @Post('create')
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Create a new idea' })
   @ApiBody({ type: CreateIdeaDto })
   @ApiResponse({ status: 201, description: 'Idea created successfully' })

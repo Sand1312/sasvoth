@@ -2,23 +2,28 @@
 import { useRedirect } from "./useRedirect";
 import { pollsApi } from "../api";
 import { PollStatus } from "@/types/polls";
+import { useState } from "react";
 // import { init } from "next/dist/compiled/webpack/webpack";
 
 export function usePolls() {
   const { goTo, replaceTo } = useRedirect();
-
+  const [selectedPollId, setSelectedPollId] = useState<string>("");
   const initPoll = async (
-    options: string[],
+     title: string,
+    description: string,
+    creatorAddress: string,
+    numberOptions: number,
     startTime: Date,
     endTime: Date,
-    pollIdOnChain: number
   ) => {
     try {
       const res = await pollsApi.createPoll(
-        options,
+        title,
+        description,
+        creatorAddress,
+        numberOptions,
         startTime,
         endTime,
-        pollIdOnChain
       );
       goTo("/admin/dashboard");
       return res;
@@ -45,9 +50,22 @@ export function usePolls() {
       throw error;
     }
   };
+
+  const updatePollStatus= pollsApi.updatePollStatus;
+   const addIdeaToPoll= pollsApi.addIdeaToPoll;
+   const approveIdeaInPoll= pollsApi.approveIdeaInPoll;
+   const saveOnChainId= pollsApi.saveOnChainId;
+
+
   return {
     initPoll,
     getPolls,
     getPollById,
+    updatePollStatus ,
+    addIdeaToPoll,
+    approveIdeaInPoll,
+    saveOnChainId,
+    selectedPollId,
+    setSelectedPollId,
   };
 }

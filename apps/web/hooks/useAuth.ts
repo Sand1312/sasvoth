@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRedirect } from "./useRedirect";
 import { authApi } from "../api";
 import { api } from "../api/base";
+import {useMaci} from "./useMACI"
 
 //TODOs: define user type
 type User = any;
@@ -11,6 +12,7 @@ export function useAuth() {
   const { goTo, replaceTo } = useRedirect();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { signupToMaci } = useMaci();
 
   // refresh session and load current user on mount
   useEffect(() => {
@@ -79,20 +81,24 @@ export function useAuth() {
   ) => {
     try {
       const res = await authApi.signinWithProvider(provider, data);
-      console.log("signinWithProvider response:", res);
+      // console.log("signinWithProvider response:", res.user);
 
       // if sign in returned user info, set it locally
-      const returnedUser = res?.data?.user ?? res?.data ?? null;
-      console.log("Extracted user:", returnedUser);
+      const returnedUser =  res.user;
+      // console.log("Extracted user:", returnedUser.publicKeyX);
 
       if (returnedUser) {
         setUser(returnedUser);
       } else if (res && (provider === "email" || provider === "wallet")) {
         // even if no explicit user data, if signin succeeded, treat as authenticated
-        console.log("Signin succeeded, navigating to dashboard");
         setUser({ authenticated: true } as any);
       }
 
+      if(returnedUser.privateKey){
+        setUser(returnedUser);
+        await signupToMaci(returnedUser.publicKeyX, returnedUser.publicKeyY);
+        console.log("User private key:", returnedUser.privateKey.slice(0,10)+"...");
+      }
       // navigate based on provider and user role
       if (provider === "email" || provider === "wallet") {
         const role = returnedUser?.role;

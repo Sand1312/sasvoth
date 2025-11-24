@@ -1,25 +1,27 @@
+import { title } from "process";
 import { api } from "./base";
 import { PollStatus } from "@/types/polls";
 
 export const pollsApi = {
   createPoll: async (
-    options: string[],
+    title: string,
+    description: string,
+    creatorAddress: string,
+    numberOptions: number,
     startTime: Date,
     endTime: Date,
-    pollIdOnChain: number
   ) => {
     try {
       const pollData = {
-        title: "New Poll",
-        description: "Description of the poll",
-        creatorAddress: "0x9adc62ed1627ffe15e94806380782d6fe630c992",
+        title: title,
+        description: description,
+        creatorAddress: creatorAddress,
         status: PollStatus.Prepare,
         startTime: startTime,
         endTime: endTime,
-        options: options,
-        pollIdOnChain: pollIdOnChain,
+        numberOptions: numberOptions,
       };
-      const response = await api.post("/v1/polls", pollData);
+      const response = await api.post("/polls/create", pollData);
       return response.data;
     } catch (error) {
       throw error;
@@ -27,12 +29,17 @@ export const pollsApi = {
   },
   getPolls: async (status?: PollStatus) => {
     try {
-      const response = await api.get("/v1/polls", {
-        params: status ? { status } : undefined,
-      });
+      let response;
+      if (status) {
+        response = await api.get(`/polls/status/${status}`);
+      } else {
+        response = await api.get("/polls");
+      }
       const polls = Array.isArray(response.data?.polls)
         ? response.data.polls
-        : [];
+        : Array.isArray(response.data)
+          ? response.data
+          : [];
 
       return polls.map((poll: Record<string, unknown>) => ({
         ...poll,
@@ -50,7 +57,7 @@ export const pollsApi = {
   },
   getPollById: async (pollId: string) => {
     try {
-      const response = await api.get(`/v1/polls/${pollId}`);
+      const response = await api.get(`/polls/`, { params: { pollId } });
       return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
@@ -58,7 +65,7 @@ export const pollsApi = {
   },
   updatePollStatus: async (pollId: string, status: string) => {
     try {
-      const response = await api.patch(`/v1/polls/${pollId}/status`, { status });
+      const response = await api.patch(`/polls/updateStatus`, { pollId, status });
       return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
@@ -66,7 +73,7 @@ export const pollsApi = {
   },
   addIdeaToPoll: async (pollId: string, ideaId: string) => {
     try {
-      const response = await api.patch(`/v1/polls/${pollId}/ideas`, { ideaId });
+      const response = await api.patch(`/polls/${pollId}/ideas`, { ideaId });
       return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
@@ -74,7 +81,18 @@ export const pollsApi = {
   },
   approveIdeaInPoll: async (pollId: string, ideaId: string) => {
     try {
-      const response = await api.patch(`/v1/polls/${pollId}/approve`, { ideaId });
+      const response = await api.patch(`/polls/${pollId}/approve`, { ideaId });
+      return response.data?.poll ?? response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  saveOnChainId: async (pollId: string, pollIdOnChain: string) => {
+    try {
+      const response = await api.patch(`/polls/saveOnChain`, {
+        pollId,
+        pollIdOnChain,
+      });
       return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;

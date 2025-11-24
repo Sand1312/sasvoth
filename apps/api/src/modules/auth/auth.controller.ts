@@ -166,6 +166,7 @@ export class AuthController {
 
     this.setTokenCookies(res, role, tokens.accessToken, tokens.refreshToken);
 
+    // console.log("Wallet authenticated successfully for user:", user);
     return res.json({
       message: 'Wallet authenticated successfully',
       user: user,

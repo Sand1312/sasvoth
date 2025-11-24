@@ -5,6 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { ideasApi, IdeaPayload, ipfsApi, pollsApi } from "@/api";
+import {useMaci} from "@/hooks";
+import {usePolls} from "@/hooks";
+import { PollStatus } from "@/types/polls";
+
+
 
 // Types coming from backend models
 type PollRecord = {
@@ -17,6 +22,9 @@ type PollRecord = {
   ideaIds?: string[];
   options?: string[];
   approvedIdeaIds?: string[];
+  startTime?: string | Date;
+  endTime?: string | Date;
+  numberOptions?: number;
 };
 
 type IdeaRecord = {
@@ -63,6 +71,8 @@ function normalizeIdeaId(idea: IdeaRecord | string | undefined) {
 }
 
 export default function AdminPollsPage(): React.ReactElement {
+  const {deployPoll,getPollContracts} = useMaci();
+  const {updatePollStatus,saveOnChainId} = usePolls();
   const [polls, setPolls] = useState<PollWithIdeas[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,7 +94,40 @@ export default function AdminPollsPage(): React.ReactElement {
       : cid;
     return `/api/ipfs/${normalized}`;
   }
+  async function handleDeployPoll(poll: PollRecord) {
+    const pollId = poll._id || poll.id;
+    if (!pollId) return;
+    setBusyPoll(pollId);
+    setError(null);
+    try {
+      const startDate = Math.floor(
+        typeof poll.startTime === 'string'
+          ? new Date(poll.startTime).getTime()
+          : (poll.startTime?.getTime() ?? 0)
+      ) / 1000;
+      const endDate = Math.floor(
+        typeof poll.endTime === 'string'
+          ? new Date(poll.endTime).getTime()
+          : (poll.endTime?.getTime() ?? 0)
+      ) / 1000;
 
+      // const startDate = Math.floor(Date.now() / 1000) + 60
+
+      // const endDate = Math.floor(Date.now() / 1000) + 300
+      // Deploy poll onchain
+      const deployed = await deployPoll({ startDate, endDate, voteOptions: poll.numberOptions });
+      // Nếu deploy thành công, tiếp tục update status và lưu onchainId
+      if (deployed && deployed.pollId) {
+        const status = PollStatus.InProgress;
+        await updatePollStatus(pollId, status);
+        await saveOnChainId(pollId, deployed.pollId);
+      }
+    } catch (err) {
+      setError("Unable to deploy poll.");
+    } finally {
+      setBusyPoll(null);
+    }
+  }
   async function refreshPolls() {
     setLoading(true);
     setError(null);
@@ -260,6 +303,14 @@ export default function AdminPollsPage(): React.ReactElement {
                   <p className="text-sm text-slate-600">
                     {poll.description || "No description"}
                   </p>
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    <span className="text-xs text-slate-500">
+                      <b>Start:</b> {poll.startTime ? new Date(poll.startTime).toLocaleString() : "-"}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      <b>End:</b> {poll.endTime ? new Date(poll.endTime).toLocaleString() : "-"}
+                    </span>
+                  </div>
                   <p className="mt-1 text-xs font-medium uppercase tracking-[0.15em] text-amber-600">
                     Status: {poll.status}
                   </p>
@@ -330,16 +381,26 @@ export default function AdminPollsPage(): React.ReactElement {
                   <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-700">
                     Approved options
                   </h3>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handlePublishApproved(poll)}
-                    disabled={busyPoll === poll._id || approved.length === 0}
-                  >
-                    {busyPoll === poll._id
-                      ? "Publishing…"
-                      : "Publish all to IPFS"}
-                  </Button>
+                  <div className="flex gap-2 mb-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handlePublishApproved(poll)}
+                      disabled={busyPoll === poll._id || approved.length === 0}
+                    >
+                      {busyPoll === poll._id
+                        ? "Publishing…"
+                        : "Publish all to IPFS"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeployPoll(poll)}
+                      disabled={busyPoll === (poll._id || poll.id)}
+                    >
+                      {busyPoll === (poll._id || poll.id) ? "Deploying…" : "Deploy poll"}
+                    </Button>
+                  </div>
                   {approved.length === 0 && (
                     <p className="text-sm text-slate-500">
                       No approved options yet.

@@ -82,7 +82,7 @@ export class PollsController {
     }
   }
 
-  @Get('get/:status')
+  @Get('/status/:status')
   @ApiOperation({ summary: 'List polls by status' })
   @ApiParam({ name: 'status', type: String })
   @ApiResponse({ status: 200, description: 'Polls retrieved' })
@@ -175,10 +175,25 @@ export class PollsController {
   @Get("")
   async get( @Res() res: Response) {
     try {
+      console.log("Fetching all polls");
         const polls =  await this.pollsService.getAll();
         return res.status(200).json(polls);
     } catch (error) {
         return res.status(500).json({ message: 'Error fetching polls', error });
     }
 }
+
+  @Get(':pollId')
+  async getById(
+    @Param('pollId') pollId: string,
+    @Res() res: Response,
+  ) {
+    try {
+      console.log("Fetching poll by ID:", pollId);
+      const polls = await this.pollsService.getPollById(pollId);
+      return res.status(200).json(polls);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error fetching polls', error });
+    }
+  }
 }

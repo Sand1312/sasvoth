@@ -5,7 +5,9 @@ import Image from "next/image";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { cn } from "@sasvoth/ui/lib/utils";
-
+import { useAccount } from "wagmi";
+import { useIdeas } from "../hooks/useIdeas";
+import {usePolls} from "../hooks/usePolls";
 type LayoutItemBase = {
   id: string;
   title: string;
@@ -43,6 +45,9 @@ export function IdeaUploadForm({
 }: {
   className?: string;
 }): React.ReactElement {
+  const { address } = useAccount();
+  const { createIdea } = useIdeas();
+  const {  addIdeaToPoll, selectedPollId } = usePolls();
   const [step, setStep] = React.useState(1);
   const [logoFile, setLogoFile] = React.useState<File | null>(null);
   const [logoPreview, setLogoPreview] = React.useState<string | null>(null);
@@ -236,9 +241,9 @@ export function IdeaUploadForm({
     setIsPreviewOpen(false);
   }
 
-  function handleFinalSubmit() {
+  async function handleFinalSubmit() {
     if (!canSaveDraft) return;
-    const payload = {
+    const load = {
       logo: logoFile?.name ?? "",
       ageLimit,
       description: description.trim(),
@@ -257,7 +262,18 @@ export function IdeaUploadForm({
             }
       ),
     };
+    const payload = {
+    title: "Uchiha Clan Emblem",
+    description: description,
+    imgSrc: logoFile?.name ?? "",
+    creatorIdea:address ?? "",
+    }
+    const idea = await createIdea(payload);
+    
     console.table(payload);
+    await addIdeaToPoll(selectedPollId, idea._id);
+    handlePreviewClose();
+
   }
 
   return (

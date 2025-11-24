@@ -29,6 +29,9 @@ export class Polls {
     @Prop({ required: false ,type:[String]})
     options:string[];// danh sách option đã được duyệt
 
+    @Prop()
+    numberOptions: number;
+
     @Prop({required:false, equals:true})
     pollIdOnChain: number;
 

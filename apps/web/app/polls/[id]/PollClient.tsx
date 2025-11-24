@@ -1,5 +1,4 @@
 "use client";
-import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { IdeaSubmitFormTrigger } from "@/components/idea-submit-form-trigger";
@@ -34,6 +33,29 @@ type TallyResult = {
   author: string;
 };
 
+type ApiIdea = {
+  id?: string;
+  title?: string;
+  description?: string;
+  descriptionMore?: string;
+  creatorIdea?: string;
+  creatorAddress?: string;
+};
+
+type ApiPoll = {
+  title?: string;
+  description?: string;
+  startTime?: string | Date;
+  endTime?: string | Date;
+  timeframe?: Timeline;
+  credits?: PollData["credits"];
+  status?: PollStatus;
+  ideas?: Idea[];
+  ideaIds?: string[];
+  options?: VoteOption[];
+  results?: TallyResult[];
+};
+
 type PollData = {
   title: string;
   description: string;
@@ -44,6 +66,46 @@ type PollData = {
   approvedIdeasId?: string[];
   options: VoteOption[];
   results: TallyResult[];
+};
+
+const fallbackPoll: PollData = {
+  title: "Future of Play (Offline Data)",
+  description:
+    "A curated shortlist of ideas exploring how social games, creative tools, and fan communities will evolve next year.",
+  timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
+  credits: { spent: 36, total: 120, remaining: 84 },
+  status: PollStatus.InProgress,
+  ideas: [],
+  approvedIdeasId: [],
+  options: [],
+  results: [],
+};
+
+const normalizeIdea = (idea: ApiIdea, fallbackId: string): Idea => ({
+  id: idea.id ?? fallbackId,
+  title: idea.title ?? "Untitled idea",
+  summary: idea.description ?? idea.descriptionMore ?? "",
+  credits: 0,
+  votes: 0,
+  creator: idea.creatorIdea ?? idea.creatorAddress ?? "",
+});
+
+const resolveIdeas = async (source: ApiPoll) => {
+  if (Array.isArray(source.ideas)) {
+    return source.ideas;
+  }
+
+  if (Array.isArray(source.ideaIds) && source.ideaIds.length > 0) {
+    const fetched = await Promise.all(
+      source.ideaIds.map(async (id) => {
+        const response = (await ideasApi.getIdeaById(id)) as ApiIdea;
+        return normalizeIdea(response, id);
+      })
+    );
+    return fetched;
+  }
+
+  return fallbackPoll.ideas;
 };
 
 export default function PollClient({
@@ -65,73 +127,39 @@ export default function PollClient({
     value === PollStatus.Ended ||
     value === PollStatus.Counting;
 
-  const fallbackPoll: PollData = {
-    title: "Future of Play (Offline Data)",
-    description:
-      "A curated shortlist of ideas exploring how social games, creative tools, and fan communities will evolve next year.",
-    timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
-    credits: { spent: 36, total: 120, remaining: 84 },
-    status: PollStatus.InProgress,
-    ideas: [],
-    approvedIdeasId: [],
-    options: [],
-    results: [],
-  };
-
   const [poll, setPoll] = useState<PollData>(() => fallbackPoll);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
     const load = async () => {
-      setLoading(true);
       try {
         const response = await getPollById(pollId);
-        const src = response ?? ({} as any);
-
-        // If the poll contains idea IDs (not full idea objects), fetch each idea
-        let ideas: Idea[] | undefined = (src as any).ideas;
-        if (!ideas && Array.isArray((src as any).ideaIds)) {
-          try {
-            const ids: string[] = (src as any).ideaIds;
-            const fetched = await Promise.all(
-              ids.map((id) => ideasApi.getIdeaById(id))
-            );
-            ideas = fetched.map((it: any) => ({
-              id: it.id,
-              title: it.title,
-              summary: it.description ?? it.descriptionMore ?? "",
-              credits: 0,
-              votes: 0,
-              creator: it.creatorIdea ?? it.creatorAddress ?? "",
-            }));
-          } catch (err) {
-            // eslint-disable-next-line no-console
-            console.warn(
-              "Failed to fetch ideas for poll, falling back to empty list",
-              err
-            );
-            ideas = fallbackPoll.ideas;
-          }
-        }
+        const source = (response ?? {}) as ApiPoll;
+        const ideas = await resolveIdeas(source);
+        const timeframeStart =
+          (typeof source.startTime === "string"
+            ? source.startTime
+            : source.startTime?.toString()) ??
+          source.timeframe?.start;
+        const timeframeEnd =
+          (typeof source.endTime === "string"
+            ? source.endTime
+            : source.endTime?.toString()) ??
+          source.timeframe?.end;
 
         const mapped: PollData = {
-          title: src.title ?? fallbackPoll.title,
-          description: src.description ?? fallbackPoll.description,
+          title: source.title ?? fallbackPoll.title,
+          description: source.description ?? fallbackPoll.description,
           timeframe: {
-            start: src.startTime
-              ? formatDate(src.startTime)
-              : (src.timeframe?.start ?? fallbackPoll.timeframe.start),
-            end: src.endTime
-              ? formatDate(src.endTime)
-              : (src.timeframe?.end ?? fallbackPoll.timeframe.end),
+            start: timeframeStart ? formatDate(timeframeStart) : fallbackPoll.timeframe.start,
+            end: timeframeEnd ? formatDate(timeframeEnd) : fallbackPoll.timeframe.end,
           },
-          credits: src.credits ?? fallbackPoll.credits,
-          status: src.status ?? fallbackPoll.status,
-          ideas: ideas ?? src.ideas ?? fallbackPoll.ideas,
-          options: src.options ?? fallbackPoll.options,
-          results: src.results ?? fallbackPoll.results,
+          credits: source.credits ?? fallbackPoll.credits,
+          status: source.status ?? fallbackPoll.status,
+          ideas,
+          options: source.options ?? fallbackPoll.options,
+          results: source.results ?? fallbackPoll.results,
         };
 
         if (mounted) {
@@ -139,14 +167,13 @@ export default function PollClient({
           setError(null);
         }
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error("Failed to fetch poll, using fallback data:", err);
         if (mounted) {
           setPoll(fallbackPoll);
           setError("Unable to reach the polls service. Showing offline data.");
         }
       } finally {
-        if (mounted) setLoading(false);
+        // nothing to clean up
       }
     };
 
@@ -154,7 +181,7 @@ export default function PollClient({
     return () => {
       mounted = false;
     };
-  }, [pollId, getPollById]);
+  }, [pollId]);
 
   const activeStatus = isPhase(requestedPhase) ? requestedPhase : poll.status;
 

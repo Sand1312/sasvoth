@@ -425,6 +425,7 @@ export default function PollsPage() {
 }
 
 function ListView({ polls }: { polls: PollWithMeta[] }) {
+  const {setSelectedPollId} = usePolls();
   return (
     <div>
       <div className="hidden border-b border-black/10 px-6 py-3 text-xs uppercase tracking-[0.3em] text-black/50 md:grid md:grid-cols-[minmax(0,1.6fr)_repeat(2,minmax(120px,1fr))_auto]">
@@ -472,6 +473,7 @@ function ListView({ polls }: { polls: PollWithMeta[] }) {
               </div>
               <div className="flex flex-col gap-3 md:items-end">
                 <Link
+                  onClick={() => setSelectedPollId(poll._id || "")}
                   href={poll._id ? `/polls/${poll._id}` : "#"}
                   className={cn(
                     buttonVariants({ variant: "ghost", size: "sm" }),

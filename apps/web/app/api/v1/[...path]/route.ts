@@ -17,7 +17,7 @@ async function proxyRequest(
 ) {
   try {
     const segments = context.params.path ?? [];
-    const targetPath = `/v1/${segments.join("/")}`;
+    const targetPath = `/api/v1/${segments.join("/")}`;
 
     const incomingUrl = new URL(req.url);
     const backendUrl = new URL(targetPath, apiBase);
@@ -25,7 +25,14 @@ async function proxyRequest(
 
     const cookie = req.headers.get("cookie") || "";
     const contentType = req.headers.get("content-type") || "application/json";
-
+    console.log(' API Call:', {
+      method: method,
+      clientUrl: req.url,
+      proxyUrl: backendUrl.toString(),
+      path: targetPath,
+      query: incomingUrl.search,
+      timestamp: new Date().toISOString()
+    });
     const init: RequestInit = {
       method,
       headers: {
