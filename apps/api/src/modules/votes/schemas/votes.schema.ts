@@ -18,7 +18,7 @@ export class Votes {
     timestamp: Date;
 
     @Prop({ required: true })
-    weight: number;
+    voiceCredits: number;
 
 
 

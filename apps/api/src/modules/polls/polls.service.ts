@@ -39,7 +39,7 @@ export class PollsService {
         return poll.save();
     }
     async savePollOnChainId(pollId: string, pollIdOnChain: number): Promise<PollsDocument | null> {
-        return this.pollsModel.findByIdAndUpdate(pollId, { pollIdOnChain }, { new: true }).exec();
+        return this.pollsModel.findByIdAndUpdate(pollId, { pollIdOnChain  }, { new: true }).exec();
     }
 
     // async getOptionsByPollId(pollId: string): Promise<any[]|any> {

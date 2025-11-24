@@ -39,9 +39,10 @@ export class VotesService {
             ...voteData,
             timestamp: timestamp
         });
-        await newVote.save();
+
         // Deduct voice credits after casting the vote
         await this.voiceCreditsService.deductCredits(voteData.userId, voteData.pollId, voteData.weight);
+         await newVote.save();
     } catch (error) {
         console.log('Error creating vote:', error);
         throw new Error(`Error creating vote: ${error.message}`);

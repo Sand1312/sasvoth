@@ -59,7 +59,7 @@ export class PollsController {
             return res.status(500).json({ message: 'Error approving idea in poll', error });
         }
     }
-    @Patch("saveOnChainId")
+    @Patch("saveOnChain")
     async savePollOnChainId( @Req() req: Request, @Res() res: Response) {
         const { pollId, pollIdOnChain } = req.body;
         
@@ -70,4 +70,6 @@ export class PollsController {
             return res.status(500).json({ message: 'Error saving poll on-chain ID', error });
         }
     }
+
+
 }

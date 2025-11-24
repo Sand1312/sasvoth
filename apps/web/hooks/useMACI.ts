@@ -24,21 +24,25 @@ interface UseMACIReturn {
     coordinatorAddress: `0x${string}`,
     messageBatchSize: number,
     optionsCount: number,
-     onSuccess?: (pollId: number) => void 
+    onSuccess?: (pollId: number, pollAddress: string) => void
   ) => void;
   isDeployingPoll: boolean;
   isDeploySuccess: boolean;
   deployPollHash: `0x${string}` | undefined;
   deployError: Error | null;
 
+  getPollAddress: (pollId: number) => string | null;
+  
   // Sign up functions
   signUpUser: (
     pubKey: { x: bigint; y: bigint },
-    signUpGatekeeperData: `0x${string}`
+    signUpGatekeeperData: `0x${string}`,
+    onSuccess?: (stateIndex: number) => void
   ) => void;
   isSigningUp: boolean;
   isSignUpSuccess: boolean;
   signUpError: Error | null;
+  stateIndex: number | null;
 
   // Refetch functions
   refetchSignUps: () => void;
@@ -46,7 +50,7 @@ interface UseMACIReturn {
 }
 
 export function useMACI(): UseMACIReturn {
-  // Đọc số lượng signups - SỬA: dùng totalSignups thay vì numSignUps
+  // Đọc số lượng signups
   const { data: signUpCount, refetch: refetchSignUps } = useReadContract({
     ...contractConfigs.MACI,
     functionName: "totalSignups",
@@ -56,6 +60,15 @@ export function useMACI(): UseMACIReturn {
   const { data: nextPollId, refetch: refetchPolls } = useReadContract({
     ...contractConfigs.MACI,
     functionName: "nextPollId",
+  });
+
+  const { data: pollContracts } = useReadContract({
+    ...contractConfigs.MACI,
+    functionName: "getPoll",
+    args: nextPollId !== undefined ? [BigInt(Number(nextPollId) - 1)] : undefined,
+    query: {
+      enabled: nextPollId !== undefined && Number(nextPollId) > 0,
+    },
   });
 
   // Tạo poll mới
@@ -71,7 +84,6 @@ export function useMACI(): UseMACIReturn {
       hash: deployPollHash,
     });
 
-  // SỬA HOÀN TOÀN HÀM createPoll THEO ABI
   const createPoll = (
     startTimestamp: number,
     endTimestamp: number,
@@ -82,19 +94,14 @@ export function useMACI(): UseMACIReturn {
     },
     coordinatorAddress: `0x${string}`,
     messageBatchSize: number,
-    optionsCount: number
+    optionsCount: number,
+    onSuccess?: (pollId: number, pollAddress: string) => void
   ) => {
-    console.log("🦊 === BẮT ĐẦU GỌI DEPLOY POLL ===");
-
-    // Tạo coordinator public key (tạm thời dùng giá trị mặc định)
-    // TRONG THỰC TẾ: Bạn cần generate key pair cho coordinator
-
     const coordinatorPublicKey = {
       x: 1914084334308300076364284755888878029999531713558627255028864877663222785795n,
       y: 8338846306573061361250882526116210096833753055882483856275542076402655573710n,
     };
 
-    // Chuẩn bị args theo đúng ABI - CHỈ 1 PARAM DUY NHẤT
     const deployPollArgs = {
       startDate: BigInt(startTimestamp),
       endDate: BigInt(endTimestamp),
@@ -105,37 +112,54 @@ export function useMACI(): UseMACIReturn {
       },
       messageBatchSize: Number(messageBatchSize),
       coordinatorPublicKey: coordinatorPublicKey,
-      mode: 0, // 0 = normal mode
-      policy: contractConfigs.FreeForAllPolicy, // Sử dụng FreeForAllPolicy
+      mode: 0,
+      policy: contractConfigs.FreeForAllPolicy,
       initialVoiceCreditProxy:
         contractConfigs.ConstantInitialVoiceCreditProxyFactory.address,
-      relayers: [], // Empty array - không dùng relayers
+      relayers: [],
       voteOptions: BigInt(optionsCount),
     };
 
-    console.log(" DeployPoll args:", deployPollArgs);
-    console.log(" Contract address:", contractConfigs.MACI.address);
+    console.log("DeployPoll args:", deployPollArgs);
+    console.log("Contract address:", contractConfigs.MACI.address);
 
     writeContract(
       {
         address: contractConfigs.MACI.address,
         abi: contractConfigs.MACI.abi,
         functionName: "deployPoll",
-        args: [deployPollArgs], // CHỈ 1 ARGUMENT DUY NHẤT
+        args: [deployPollArgs],
       },
       {
         onSuccess: (hash) => {
-          console.log("✅ Transaction sent successfully! Hash:", hash);
+          console.log("Transaction sent successfully! Hash:", hash);
+          refetchPolls();
+          
+          // Gọi callback khi thành công
+          if (onSuccess && nextPollId) {
+            const newPollId = Number(nextPollId);
+            const pollAddress = getPollAddress(newPollId);
+            if (pollAddress) {
+              onSuccess(newPollId, pollAddress);
+            }
+          }
         },
         onError: (error) => {
-          console.error("❌ Transaction failed:", error);
-          console.error("💥 Error details:", error.message);
+          console.error("Transaction failed:", error);
+          console.error("Error details:", error.message);
         },
       }
     );
   };
 
-  // Sign up user - SỬA THEO ABI
+  const getPollAddress = (pollId: number): string | null => {
+    if (pollContracts && Number(nextPollId) === pollId + 1) {
+      return (pollContracts as { poll: string }).poll;
+    }
+    return null;
+  };
+
+  // Sign up user với stateIndex
   const {
     writeContract: writeSignUp,
     data: signUpHash,
@@ -148,11 +172,21 @@ export function useMACI(): UseMACIReturn {
       hash: signUpHash,
     });
 
+  // Theo dõi event SignUp để lấy stateIndex
+  const { data: stateIndex, refetch: refetchStateIndex } = useReadContract({
+    ...contractConfigs.MACI,
+    functionName: "totalSignups",
+    query: {
+      enabled: isSignUpSuccess,
+    },
+  });
+
   const signUpUser = (
     pubKey: { x: bigint; y: bigint },
-    signUpGatekeeperData: `0x${string}`
+    signUpGatekeeperData: `0x${string}`,
+    onSuccess?: (stateIndex: number) => void
   ) => {
-    console.log(" Calling signUp...");
+    console.log("Calling signUp...");
 
     writeSignUp(
       {
@@ -160,13 +194,25 @@ export function useMACI(): UseMACIReturn {
         abi: contractConfigs.MACI.abi,
         functionName: "signUp",
         args: [
-          pubKey, // { x: bigint, y: bigint }
-          signUpGatekeeperData, // chỉ 2 params theo ABI
+          pubKey,
+          signUpGatekeeperData,
         ],
       },
       {
         onSuccess: (hash) => {
           console.log("SignUp transaction sent! Hash:", hash);
+          
+          // Sau khi transaction thành công, refetch để lấy stateIndex mới nhất
+          setTimeout(() => {
+            refetchSignUps().then(() => {
+              if (onSuccess && signUpCount !== undefined) {
+                // stateIndex = totalSignups trước khi signUp + 1
+                const newStateIndex = Number(signUpCount) + 1;
+                console.log("SignUp successful! State Index:", newStateIndex);
+                onSuccess(newStateIndex);
+              }
+            });
+          }, 2000); // Đợi 2s để blockchain cập nhật
         },
         onError: (error) => {
           console.error("SignUp failed:", error);
@@ -192,6 +238,9 @@ export function useMACI(): UseMACIReturn {
     isSigningUp: isSigningUp || isConfirmingSignUp,
     isSignUpSuccess,
     signUpError,
+    stateIndex: stateIndex ? Number(stateIndex) : null,
+
+    getPollAddress,
 
     // Refetch functions
     refetchSignUps: refetchSignUps as () => void,
