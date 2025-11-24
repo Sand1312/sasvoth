@@ -172,4 +172,13 @@ export class PollsController {
         .json({ message: 'Error saving poll on-chain ID', error });
     }
   }
+  @Get("")
+  async get( @Res() res: Response) {
+    try {
+        const polls =  await this.pollsService.getAll();
+        return res.status(200).json(polls);
+    } catch (error) {
+        return res.status(500).json({ message: 'Error fetching polls', error });
+    }
+}
 }

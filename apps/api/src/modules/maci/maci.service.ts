@@ -85,7 +85,7 @@ async deployPoll(config: {
             endDate: config.endDate,
             mode: 1,
             tallyProcessingStateTreeDepth: 1,
-            messageBatchSize: 20,
+            messageBatchSize: 2,
             pollStateTreeDepth: 10,
             voteOptionTreeDepth: 2,
             policy: {
@@ -179,57 +179,98 @@ async deployPoll(config: {
 
       this.logger.log(`Request body: ${JSON.stringify(requestBody)}`);
 
-      // Tăng timeout vì generate proofs mất rất nhiều thời gian (có thể gần 1 giờ)
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3600000); // 60 phút
+      // Proof generation can take a very long time (hours). Increase timeout
+      // and add retries for transient network errors (ECONNRESET, connection resets).
+      const MAX_TIMEOUT_MS = 2 * 60 * 60 * 1000; // 2 hours
+      const MAX_RETRIES = 3;
 
-      try {
-        const response = await fetch(`${this.coordinatorUrl}/v1/proof/generate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': authToken,
-          },
-          body: JSON.stringify(requestBody),
-          signal: controller.signal,
-        });
+      const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-        clearTimeout(timeout);
+      let attempt = 0;
+      while (attempt < MAX_RETRIES) {
+        attempt += 1;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), MAX_TIMEOUT_MS);
 
-        this.logger.log(`Response status: ${response.status}`);
+        try {
+          this.logger.log(`Attempt ${attempt} to call coordinator (timeout ${MAX_TIMEOUT_MS}ms)`);
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          this.logger.error(`HTTP Error ${response.status}: ${errorText}`);
-          throw new HttpException(`Coordinator returned ${response.status}: ${errorText}`, response.status);
+          const response = await fetch(`${this.coordinatorUrl}/v1/proof/generate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': authToken,
+            },
+            body: JSON.stringify(requestBody),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeout);
+
+          this.logger.log(`Response status: ${response.status}`);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            this.logger.error(`HTTP Error ${response.status}: ${errorText}`);
+            throw new HttpException(`Coordinator returned ${response.status}: ${errorText}`, response.status);
+          }
+
+          const result = await response.json();
+          this.logger.log(`Response: ${JSON.stringify(result)}`);
+
+          if (result.statusCode === 500) {
+            this.logger.error(`Coordinator internal error: ${result.message}`);
+            // If coordinator indicates an internal error, retry a few times before failing
+            if (attempt < MAX_RETRIES) {
+              this.logger.log(`Retrying after coordinator error (attempt ${attempt}/${MAX_RETRIES})`);
+              await sleep(2000 * attempt);
+              continue;
+            }
+            throw new HttpException(result.message, 500);
+          }
+
+          if (!result.results) {
+            throw new HttpException(`No results in proof generation. Full response: ${JSON.stringify(result)}`, 500);
+          }
+
+          this.logger.log(`✅ Proofs generated successfully for poll ${pollId}`);
+
+          return {
+            results: result.results,
+            tally: result.results.tally,
+            totalSpentVoiceCredits: result.totalSpentVoiceCredits?.spent || result.totalSpentVoiceCredits,
+            commitment: result.results.commitment,
+          };
+        } catch (fetchError: any) {
+          clearTimeout(timeout);
+
+          // Handle Abort (timeout) separately
+          if (fetchError.name === 'AbortError') {
+            this.logger.error(`Attempt ${attempt} aborted due to timeout (${MAX_TIMEOUT_MS}ms)`);
+            if (attempt >= MAX_RETRIES) {
+              throw new HttpException(`Request timeout: Proof generation took too long (> ${MAX_TIMEOUT_MS} ms)`, 504);
+            }
+            await sleep(1000 * attempt);
+            continue;
+          }
+
+          // Retry on network resets / transient connection errors
+          const msg = fetchError?.message || '';
+          if (msg.includes('ECONNRESET') || msg.includes('connection reset') || msg.includes('ECONNREFUSED')) {
+            this.logger.warn(`Transient network error on attempt ${attempt}: ${msg}`);
+            if (attempt < MAX_RETRIES) {
+              await sleep(1500 * attempt);
+              continue;
+            }
+          }
+
+          // If not retriable or out of attempts, rethrow
+          throw fetchError;
         }
-
-        const result = await response.json();
-        this.logger.log(`Response: ${JSON.stringify(result)}`);
-
-        if (result.statusCode === 500) {
-          throw new HttpException(result.message, 500);
-        }
-
-        if (!result.results) {
-          throw new HttpException(`No results in proof generation. Full response: ${JSON.stringify(result)}`, 500);
-        }
-
-        this.logger.log(`✅ Proofs generated successfully for poll ${pollId}`);
-
-        return {
-          results: result.results,
-          tally: result.results.tally,
-          totalSpentVoiceCredits: result.totalSpentVoiceCredits?.spent || result.totalSpentVoiceCredits,
-          commitment: result.results.commitment,
-        };
-      } catch (fetchError) {
-        clearTimeout(timeout);
-        if (fetchError.name === 'AbortError') {
-          throw new HttpException('Request timeout: Proof generation took too long (>60 minutes)', 504);
-        }
-        throw fetchError;
       }
+
+      // If we exit loop without returning, fail
+      throw new HttpException('Failed to generate proofs after multiple attempts', 500);
     } catch (error) {
       this.logger.error('Generate proofs failed', error);
       if (error instanceof HttpException) {

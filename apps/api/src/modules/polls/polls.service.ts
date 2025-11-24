@@ -48,4 +48,7 @@ export class PollsService {
     //         throw new BadRequestException('Poll not found');
     //     }
 
+    async getAll(): Promise<PollsDocument[]> {
+        return this.pollsModel.find().exec();
+    }   
 }

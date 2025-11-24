@@ -27,11 +27,11 @@ export function useMaci() {
 
   const getPublicClient = () => {
     // Fallback RPC URLs for Arbitrum Sepolia
-    const rpcUrls = [
-      'https://sepolia-rollup.arbitrum.io/rpc',
-      'https://arbitrum-sepolia.blockpi.network/v1/rpc/public',
-      'https://arbitrum-sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // Public Infura key
-    ];
+   const rpcUrls = [
+  'https://arbitrum-sepolia.drpc.org',
+  'https://arbitrum-sepolia-rpc.publicnode.com',
+  'https://sepolia-rollup.arbitrum.io/rpc',
+];
     
     return createPublicClient({
       chain: arbitrumSepolia,

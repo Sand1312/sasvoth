@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useMaci } from './useHook';
 
-const POLL_ID = '22';
+const POLL_ID = '28'
 
 export default function TestPage() {
   const { keypair, loading, status: hookStatus, signupToMaci, submitVote, checkPollStatus } = useMaci();

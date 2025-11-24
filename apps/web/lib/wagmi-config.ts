@@ -2,9 +2,6 @@ import { createConfig, http } from 'wagmi';
 import { arbitrumSepolia } from 'wagmi/chains';
 import { 
   MACI,
-  PollFactory,
-  TallyFactory,
-  MessageProcessorFactory,
   TOKEN_CONTRACT_ADDRESS,
   CLAIM_CONTRACT_ADDRESS,
   MACI_ABI,
@@ -28,18 +25,6 @@ export const contractConfigs = {
   MACI: {
     address: MACI as `0x${string}`,
     abi: MACI_ABI,
-  },
-  PollFactory: {
-    address: PollFactory as `0x${string}`,
-    abi: POLL_FACTORY_ABI,
-  },
-  TallyFactory: {
-    address: TallyFactory as `0x${string}`,
-    abi: TALLY_FACTORY_ABI,
-  },
-  MessageProcessorFactory: {
-    address: MessageProcessorFactory as `0x${string}`,
-    abi: MESSAGE_PROCESSOR_FACTORY_ABI,
   },
   Token: {
     address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
