@@ -18,10 +18,9 @@ export class Votes {
     timestamp: Date;
 
     @Prop({ required: true })
-    weight: number;
+    voiceCredits: number;
 
-    @Prop({ required: true })
-    userId: string;
+
 
     @Prop({ required: true })
     voteCommitment: string;

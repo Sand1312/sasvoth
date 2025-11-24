@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Users, UsersDocument } from './schemas/users.schema';
 import {createMACIKeypair} from "../../utils/genMaciKey";
 import { UserDto } from '@/dto/user.dto';
+import { InternalServerErrorException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -92,24 +93,63 @@ export class UsersService {
     return this.mapToUserDto(await newUser.save(), privateKey);
   }
   
-  async connectWallet(userId: string, walletAddress: string): Promise<any> {
-    const user = await this.usersModel.findById({userId}).exec();
-    if(!user){
+ async connectWallet(userId: string, walletAddress: string): Promise<any> {
+  try {
+    
+    const user = await this.usersModel.findById(userId).exec();
+    
+    if (!user) {
       throw new BadRequestException('User not found');
-    } else if( user.walletAddress== null || user.walletAddress== undefined){
+    }
+
+
+    const currentWallet = user.walletAddress?.toLowerCase();
+    const newWallet = walletAddress.toLowerCase();
+
+    if (!currentWallet) {
       user.walletAddress = walletAddress;
-      const genKey =  createMACIKeypair();
+      const genKey = createMACIKeypair();
       user.publicKey = genKey.publicKey;
       user.publicKeyX = genKey.publicKeyAsContractParam.X;
       user.publicKeyY = genKey.publicKeyAsContractParam.Y;
       const privateKey = genKey.privateKey;
-      await user.save();
+      
+      await user.save();      
       
       return privateKey;
-    } else if(user.walletAddress == walletAddress){
+    } 
+    else if (currentWallet === newWallet) {
       return true;
-    } else {
+    } 
+    else {
       throw new BadRequestException('Wallet address already connected to another account');
     }
+  } catch (error) {
+
+    throw error;
+  }
 }
+async getHistoryDeposit(userId: string): Promise<any[]> {
+    const user = await this.usersModel.findById(userId).exec(); 
+    if (!user) {
+      throw new InternalServerErrorException('User not found');
+    }
+    return user.historyDeposit || [];
+  }
+async updateBalance(userId: string, amount: number,txHash:string): Promise<UsersDocument | null> {
+  let user = await this.usersModel.findById(userId).exec();
+  if (!user) {
+      throw new InternalServerErrorException('User not found');
+    }
+     user.historyDeposit.push({
+      amount,
+      timestamp: new Date(),
+      txHash,
+    });
+     
+    user.balance += amount;
+
+    await user.save()
+    return user;
+  }
 }

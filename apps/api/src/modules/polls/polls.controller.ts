@@ -137,13 +137,10 @@ export class PollsController {
             return res.status(500).json({ message: 'Error approving idea in poll', error });
         }
     }
-    @Patch("saveOnChainId")
-    @ApiOperation({ summary: 'Persist on-chain poll id' })
-    @ApiBody({ type: PollOnChainDto })
-    @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'On-chain ID saved' })
+    @Patch("saveOnChain")
     async savePollOnChainId( @Req() req: Request, @Res() res: Response) {
         const { pollId, pollIdOnChain } = req.body;
+        
         try {
             const updatedPoll = await this.pollsService.savePollOnChainId(pollId, pollIdOnChain);
             return res.status(200).json(updatedPoll);
@@ -151,4 +148,6 @@ export class PollsController {
             return res.status(500).json({ message: 'Error saving poll on-chain ID', error });
         }
     }
+
+
 }

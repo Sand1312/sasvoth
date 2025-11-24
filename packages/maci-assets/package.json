@@ -1,0 +1,14 @@
+{
+  "name": "@sasvoth/maci-assets",
+  "version": "1.0.0",
+  "description": "MACI zkeys and utilities",
+  "main": "./index.js",
+  "files": [
+    "zkeys/**/*",
+    "scripts/**/*"
+  ],
+  "scripts": {
+    "generate-auth": "node scripts/generate-auth.js",
+    "encrypt": "node scripts/encrypt-helper.js"
+  }
+}

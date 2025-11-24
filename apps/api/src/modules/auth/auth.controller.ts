@@ -151,6 +151,7 @@ export class AuthController {
     if (!address || !signature)
       throw new UnauthorizedException('Address and signature are required');
 
+
     if (!ethers.utils.isAddress(address))
       throw new BadRequestException('Invalid wallet address');
 

@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@maci-protocol/sdk": "0.0.0-ci.26f28d6",
     "@nestjs-modules/ioredis": "^2.0.2",
     "@nestjs/common": "^11.1.6",
     "@nestjs/config": "^4.0.2",
@@ -31,6 +32,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.3",
     "@nestjs/typeorm": "^11.0.0",
+    "@sasvoth/contracts": "workspace:*",
     "@sendgrid/mail": "^8.1.5",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
@@ -39,12 +41,14 @@
     "config": "3.2.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.1",
+    "ethers": "^5.8.0",
     "form-data": "^4.0.4",
     "ioredis": "^5.8.1",
     "ipfs-http-client": "^60.0.1",
     "jsonwebtoken": "^9.0.2",
     "maci": "^0.0.1",
     "maci-crypto": "^2.5.0",
+    "maci-domainobjs": "^2.5.0",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
@@ -53,8 +57,9 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "snarkjs": "^0.7.5",
-    "swagger-ui-express": "^5.0.1",
+    "turbo": "catalog:",
     "typeorm": "^0.3.27",
+    "viem": "^2.39.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
