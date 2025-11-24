@@ -1,6 +1,6 @@
 declare global {
   // eslint-disable-next-line no-var
-  var __MSW_SERVER_STARTED__?: boolean;
+  var __MSW_SERVER_STARTED__: boolean | undefined;
 }
 
 export async function register() {
