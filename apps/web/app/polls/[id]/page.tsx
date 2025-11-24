@@ -38,7 +38,8 @@ type PollData = {
   timeframe: Timeline;
   credits: { spent: number; total: number; remaining?: number };
   status: PollStatus;
-  ideas: Idea[];
+  ideasId: string[];
+  approvedIdeasId?: string[];
   options: VoteOption[];
   results: TallyResult[];
 };
@@ -55,44 +56,8 @@ const fallbackPoll: PollData = {
   timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
   credits: { spent: 36, total: 120, remaining: 84 },
   status: PollStatus.InProgress,
-  ideas: [
-    {
-      id: "01",
-      title: "Pocket Worlds SDK",
-      summary:
-        "Starter kit so any studio can launch a playable social hub in weeks instead of months.",
-      credits: 12,
-      votes: 214,
-      creator: "Drift Studio",
-    },
-    {
-      id: "02",
-      title: "Spectator Signals",
-      summary:
-        "Lightweight overlays that turn Twitch chat reactions into real-time buffs for players.",
-      credits: 8,
-      votes: 189,
-      creator: "Aiko Lab",
-    },
-    {
-      id: "03",
-      title: "Civic Season Pass",
-      summary:
-        "Membership system that lets fans sponsor civic projects and unlock behind-the-scenes drops.",
-      credits: 6,
-      votes: 132,
-      creator: "Studio North",
-    },
-    {
-      id: "04",
-      title: "Residency Nights",
-      summary:
-        "Monthly remote residencies where creators remix each other’s prototypes live for the community.",
-      credits: 10,
-      votes: 156,
-      creator: "OpenHall",
-    },
-  ],
+  ideasId: ["01", "02", "03", "04"],
+  approvedIdeasId: ["01", "02", "04"],
   options: [
     {
       id: "opt-01",
@@ -168,11 +133,13 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
   const isPhase = (value: string | undefined): value is PollStatus =>
     value === PollStatus.Prepare ||
     value === PollStatus.InProgress ||
-    value === PollStatus.Ended;
+    value === PollStatus.Ended ||
+    value === PollStatus.Counting;
 
   const [poll, setPoll] = useState<PollData>(() => fallbackPoll);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const logPrefix = "[PollPage]";
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -181,24 +148,27 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
       setLoading(true);
       try {
         const response = await getPollById(pollId);
-
-        // Map backend data to PollData format
+        const src = response ?? fallbackPoll;
+        const needsOptions =
+          src.status === PollStatus.InProgress ||
+          src.status === PollStatus.Counting ||
+          src.status === PollStatus.Ended;
+        const needsIdeasMeta = src.status === PollStatus.Prepare;
         const mapped: PollData = {
-          title: response?.title || fallbackPoll.title,
-          description: response?.description || fallbackPoll.description,
+          title: src.title,
+          description: src.description,
           timeframe: {
-            start: response?.startTime
-              ? formatDate(response.startTime)
-              : fallbackPoll.timeframe.start,
-            end: response?.endTime
-              ? formatDate(response.endTime)
-              : fallbackPoll.timeframe.end,
+            start: src.startTime
+              ? formatDate(src.startTime)
+              : src.timeframe.start,
+            end: src.endTime ? formatDate(src.endTime) : src.timeframe.end,
           },
-          credits: response?.credits || fallbackPoll.credits,
-          status: response?.status || fallbackPoll.status,
-          ideas: response?.ideas || fallbackPoll.ideas,
-          options: response?.options || fallbackPoll.options,
-          results: response?.results || fallbackPoll.results,
+          credits: src.credits,
+          status: src.status,
+          ideasId: src.ideasId,
+          approvedIdeasId: src.approvedIdeasId,
+          options: src.options,
+          results: src.results,
         };
 
         if (mounted) {
