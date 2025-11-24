@@ -1,0 +1,104 @@
+{
+  "ideas": [
+    {
+      "id": "idea-1",
+      "title": "Decentralized Grant Hub",
+      "description": "Lightweight portal for grant proposals with encrypted peer feedback.",
+      "descriptionMore": "Combines IPFS storage for proposals with zero-knowledge attestations of reviewer credentials.",
+      "imgSrc": "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=80",
+      "creatorAddress": "0xAa00000000000000000000000000000000000001",
+      "creatorIdea": "griff",
+      "idea_cid": "bafy-idea-cid-1"
+    },
+    {
+      "id": "idea-2",
+      "title": "Quadratic Town Hall",
+      "description": "Weekly town-hall streams with quadratic voting on agenda topics.",
+      "descriptionMore": "Uses real-time credit metering and zk proofs to keep votes private while tallying outcomes on-chain.",
+      "imgSrc": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=80",
+      "creatorAddress": "0xBb00000000000000000000000000000000000002",
+      "creatorIdea": "molly",
+      "idea_cid": null
+    }
+  ],
+  "polls": [
+    {
+      "id": "poll-1",
+      "title": "Q4 Civic Experiments",
+      "description": "Choose the top two community experiments to fund this quarter.",
+      "creatorAddress": "0xCc00000000000000000000000000000000000003",
+      "status": "in_progress",
+      "startTime": "2024-10-12T00:00:00.000Z",
+      "endTime": "2024-11-24T00:00:00.000Z",
+      "options": [
+        "Support builders",
+        "Run open town halls",
+        "Launch residency"
+      ],
+      "pollIdOnChain": 101,
+      "ideaIds": ["idea-1", "idea-2"],
+      "approvedIdeaIds": ["idea-1"]
+    },
+    {
+      "id": "poll-2",
+      "title": "Game Lab Showcase",
+      "description": "Vote for the demo day lineup and publishing support packages.",
+      "creatorAddress": "0xDd00000000000000000000000000000000000004",
+      "status": "draft",
+      "startTime": "2024-12-01T00:00:00.000Z",
+      "endTime": "2025-01-15T00:00:00.000Z",
+      "options": ["Streaming toolkit", "Fan economy", "World editor"],
+      "pollIdOnChain": null,
+      "ideaIds": [],
+      "approvedIdeaIds": []
+    },
+    {
+      "id": "poll-3",
+      "title": "Hollow Knight: Silksong Support",
+      "description": "Vote for the demo day lineup and publishing support packages.",
+      "creatorAddress": "0xDd00000000000000000000000000000000000004",
+      "status": "prepare",
+      "startTime": "2025-12-01T00:00:00.000Z",
+      "endTime": "2025-12-15T00:00:00.000Z",
+      "options": ["Streaming toolkit", "Fan economy", "World editor"],
+      "pollIdOnChain": null,
+      "ideaIds": ["idea-2"],
+      "approvedIdeaIds": []
+    }
+  ],
+  "votes": [
+    {
+      "id": "vote-1",
+      "voterId": "voter-1",
+      "pollId": "poll-1",
+      "selectedOption": "Support builders",
+      "timestamp": "2024-10-20T12:00:00.000Z",
+      "weight": 10,
+      "userId": "user-1",
+      "voteCommitment": "commitment-1"
+    },
+    {
+      "id": "vote-2",
+      "voterId": "voter-2",
+      "pollId": "poll-1",
+      "selectedOption": "Launch residency",
+      "timestamp": "2024-10-21T15:30:00.000Z",
+      "weight": 5,
+      "userId": "user-2",
+      "voteCommitment": "commitment-2"
+    }
+  ],
+  "voiceCredits": [
+    { "userId": "user-1", "pollId": "poll-1", "credits": 120 },
+    { "userId": "user-2", "pollId": "poll-1", "credits": 80 }
+  ],
+  "resultsMeta": [
+    {
+      "pollId": "poll-1",
+      "result_cid": "bafy-result-cid-1",
+      "outcome": "Support builders",
+      "updatedAt": "2024-10-26T00:00:00.000Z"
+    }
+  ],
+  "rewards": [{ "userId": "user-1", "pollId": "poll-1", "credit_count": 20 }]
+}

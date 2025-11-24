@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@sasvoth/ui/button";
 import React, { useState, useEffect, useMemo } from "react";
 import { usePolls } from "../../hooks";
+import { PollStatus } from "@/types/polls";
 // Types cho Poll
 type Poll = {
   _id: string;
@@ -12,13 +13,7 @@ type Poll = {
   description: string;
   category: string;
   onChainPollId: number;
-  status:
-    | "draft"
-    | "active"
-    | "ended"
-    | "cancelled"
-    | "processing"
-    | "tallying";
+  status: PollStatus;
   startTime: string;
   endTime: string;
   options: {
@@ -127,7 +122,7 @@ export default function DashboardPage() {
   const loadPolls = async () => {
     try {
       setLoadingPolls(true);
-      const data = await getPolls("active");
+      const data = await getPolls(PollStatus.InProgress);
       setActivePolls(data);
       setPolls(data); // Hiển thị active polls mặc định
     } catch (error) {
@@ -291,7 +286,7 @@ export default function DashboardPage() {
               {phaseFilters.map(({ key, label, accent }) => {
                 const isActive = phaseFilter === key;
                 return (
-                  <button
+                  <Button
                     key={key}
                     onClick={() => setPhaseFilter(key)}
                     className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
@@ -305,7 +300,7 @@ export default function DashboardPage() {
                     }}
                   >
                     {label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -484,7 +479,9 @@ export default function DashboardPage() {
                           window.location.href = `/votes/${poll.onChainPollId}`;
                         }}
                       >
-                        {poll.status === "active" ? "Vote Now" : "View Poll"}
+                        {poll.status === PollStatus.InProgress
+                          ? "Vote Now"
+                          : "View Poll"}
                       </Button>
                     </div>
                   </div>

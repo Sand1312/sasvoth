@@ -68,6 +68,11 @@ export function RootNavClient({
     }
   };
 
+  const handleSettingsClick = () => {
+    closeMenu();
+    router.push("/settings");
+  };
+
   if (shouldHideNav) {
     return null;
   }
@@ -131,7 +136,6 @@ export function RootNavClient({
       </div>
 
       <div className="flex items-center gap-4">
-        <Link href="/settings"></Link>
         <div className="relative" ref={menuRef}>
           <Button
             aria-haspopup="menu"
@@ -143,7 +147,10 @@ export function RootNavClient({
           </Button>
           {isMenuOpen ? (
             <div className="absolute right-0 mt-3 w-40 rounded-md border border-gray-200 bg-white py-1 text-sm text-gray-700 shadow-lg">
-              <Button className="flex w-full items-center px-4 py-2 text-left hover:bg-gray-50">
+              <Button
+                className="flex w-full items-center px-4 py-2 text-left hover:bg-gray-50"
+                onClick={handleSettingsClick}
+              >
                 Settings
               </Button>
               <Button

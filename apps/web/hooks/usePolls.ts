@@ -1,7 +1,7 @@
 "use client";
 import { useRedirect } from "./useRedirect";
 import { pollsApi } from "../api";
-import { poll } from "ethers/lib/utils";
+import { PollStatus } from "@/types/polls";
 // import { init } from "next/dist/compiled/webpack/webpack";
 
 export function usePolls() {
@@ -14,7 +14,12 @@ export function usePolls() {
     pollIdOnChain: number
   ) => {
     try {
-      const res = await pollsApi.createPoll(options, startTime, endTime, pollIdOnChain);
+      const res = await pollsApi.createPoll(
+        options,
+        startTime,
+        endTime,
+        pollIdOnChain
+      );
       goTo("/admin/dashboard");
       return res;
     } catch (error) {
@@ -22,7 +27,7 @@ export function usePolls() {
       throw error;
     }
   };
-  const getPolls = async (status?: string) => {
+  const getPolls = async (status?: PollStatus) => {
     try {
       const res = await pollsApi.getPolls(status);
       return res;
@@ -31,8 +36,18 @@ export function usePolls() {
       throw error;
     }
   };
+  const getPollById = async (pollId: string) => {
+    try {
+      const res = await pollsApi.getPollById(pollId);
+      return res;
+    } catch (error) {
+      console.error("Get Poll By ID error:", error);
+      throw error;
+    }
+  };
   return {
     initPoll,
     getPolls,
+    getPollById,
   };
 }

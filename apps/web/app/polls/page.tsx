@@ -10,19 +10,14 @@ import { Input } from "@sasvoth/ui/input";
 import { cn } from "@sasvoth/ui/lib/utils";
 
 import { usePolls } from "@/hooks";
+import { PollStatus } from "@/types/polls";
+import { formatDate, parseDate } from "@/lib/date";
 
 type PollRecord = {
   _id?: string;
   title?: string;
   description?: string;
-  status?:
-    | "draft"
-    | "active"
-    | "ended"
-    | "cancelled"
-    | "processing"
-    | "tallying"
-    | string;
+  status?: PollStatus;
   startTime?: string;
   endTime?: string;
   createdAt?: string;
@@ -42,7 +37,7 @@ const fallbackPolls: PollRecord[] = [
     title: "Future of Play",
     description:
       "A curated shortlist of ideas exploring how social games and civic tech overlap.",
-    status: "active",
+    status: PollStatus.Prepare,
     startTime: "2024-10-12T09:00:00.000Z",
     endTime: "2024-11-24T23:00:00.000Z",
     createdAt: "2024-10-01T12:00:00.000Z",
@@ -53,7 +48,7 @@ const fallbackPolls: PollRecord[] = [
     title: "Commons Treasury",
     description:
       "Prioritise open-source infrastructure upgrades for new community-owned treasuries.",
-    status: "processing",
+    status: PollStatus.InProgress,
     startTime: "2024-08-04T09:00:00.000Z",
     endTime: "2024-09-04T23:00:00.000Z",
     createdAt: "2024-07-28T10:10:00.000Z",
@@ -64,7 +59,7 @@ const fallbackPolls: PollRecord[] = [
     title: "Neighborhood Canvas",
     description:
       "Funding round for public artists to reimagine civic billboards and pocket parks.",
-    status: "tallying",
+    status: PollStatus.Counting,
     startTime: "2024-06-01T09:00:00.000Z",
     endTime: "2024-06-20T23:00:00.000Z",
     createdAt: "2024-05-10T08:00:00.000Z",
@@ -75,7 +70,7 @@ const fallbackPolls: PollRecord[] = [
     title: "Civic Sandbox Residency",
     description:
       "Prototype residency proposals that combine play, stewardship, and tactical urbanism.",
-    status: "ended",
+    status: PollStatus.Ended,
     startTime: "2024-03-10T09:00:00.000Z",
     endTime: "2024-04-10T23:00:00.000Z",
     createdAt: "2024-02-20T13:00:00.000Z",
@@ -86,7 +81,7 @@ const fallbackPolls: PollRecord[] = [
     title: "All Hands Assembly",
     description:
       "Cross-coalition vote to select facilitators for the 2025 impact assembly tour.",
-    status: "draft",
+    status: PollStatus.Draft,
     startTime: "2025-01-05T09:00:00.000Z",
     endTime: "2025-02-05T23:00:00.000Z",
     createdAt: "2024-12-01T09:45:00.000Z",
@@ -103,46 +98,40 @@ const membershipPattern: ParticipationFilter[][] = [
 ];
 
 const statusThemes: Record<
-  string,
+  PollStatus,
   { badge: string; text: string; accent: string }
 > = {
-  active: {
+  [PollStatus.Prepare]: {
     badge: "bg-green-50 border-green-200 text-green-700",
     text: "text-green-700",
     accent: "bg-green-100",
   },
-  processing: {
+  [PollStatus.InProgress]: {
     badge: "bg-orange-50 border-orange-200 text-orange-700",
     text: "text-orange-700",
     accent: "bg-orange-100",
   },
-  tallying: {
+  [PollStatus.Counting]: {
     badge: "bg-indigo-50 border-indigo-200 text-indigo-700",
     text: "text-indigo-700",
     accent: "bg-indigo-100",
   },
-  ended: {
+  [PollStatus.Ended]: {
     badge: "bg-slate-50 border-slate-200 text-slate-700",
     text: "text-slate-700",
     accent: "bg-slate-100",
   },
-  draft: {
+  [PollStatus.Draft]: {
     badge: "bg-yellow-50 border-yellow-200 text-yellow-800",
     text: "text-yellow-800",
     accent: "bg-yellow-100",
   },
-  cancelled: {
+  [PollStatus.Cancelled]: {
     badge: "bg-red-50 border-red-200 text-red-700",
     text: "text-red-700",
     accent: "bg-red-100",
   },
 };
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
 
 const annotatePolls = (data: PollRecord[]): PollWithMeta[] =>
   data.map((poll, index) => ({
@@ -151,23 +140,6 @@ const annotatePolls = (data: PollRecord[]): PollWithMeta[] =>
       "joined",
     ],
   }));
-
-const parseDate = (value?: string | number | Date | null) => {
-  if (!value) {
-    return null;
-  }
-  const parsed =
-    typeof value === "string" || typeof value === "number"
-      ? new Date(value)
-      : value;
-
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-};
-
-const formatDate = (value?: string) => {
-  const parsed = parseDate(value);
-  return parsed ? dateFormatter.format(parsed) : "—";
-};
 
 const getSortMetric = (poll: PollWithMeta, key: SortKey) => {
   switch (key) {
@@ -192,12 +164,12 @@ const sortOptions: { key: SortKey; label: string }[] = [
 ];
 
 const statusLegend = [
-  { key: "active", label: "Active" },
-  { key: "processing", label: "Processing" },
-  { key: "tallying", label: "Tallying" },
-  { key: "ended", label: "Ended" },
-  { key: "draft", label: "Draft" },
-  { key: "cancelled", label: "Cancelled" },
+  { key: PollStatus.Prepare, label: "Prepare" },
+  { key: PollStatus.InProgress, label: "In progress" },
+  { key: PollStatus.Counting, label: "Counting" },
+  { key: PollStatus.Ended, label: "Ended" },
+  { key: PollStatus.Draft, label: "Draft" },
+  { key: PollStatus.Cancelled, label: "Cancelled" },
 ];
 
 export default function PollsPage() {
@@ -470,7 +442,8 @@ function ListView({ polls }: { polls: PollWithMeta[] }) {
             <span
               className={cn(
                 "absolute right-0 top-0 h-10 w-10 rounded-bl-3xl",
-                statusThemes[poll.status ?? ""]?.accent ?? "bg-black/10"
+                statusThemes[poll.status ?? PollStatus.Draft]?.accent ??
+                  "bg-black/10"
               )}
               aria-hidden
             />
@@ -530,7 +503,8 @@ function GridView({ polls }: { polls: PollWithMeta[] }) {
           <span
             className={cn(
               "absolute right-0 top-0 h-12 w-12 rounded-bl-[30px]",
-              statusThemes[poll.status ?? ""]?.accent ?? "bg-black/10"
+              statusThemes[poll.status ?? PollStatus.Draft]?.accent ??
+                "bg-black/10"
             )}
             aria-hidden
           />

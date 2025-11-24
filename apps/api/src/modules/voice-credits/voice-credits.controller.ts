@@ -1,21 +1,44 @@
 import {
   Controller,
   Get,
-  UseGuards,
   Req,
   Res,
   Post,
-  NotFoundException,
 } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { Response } from "express";
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiProperty,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { VoiceCreditsService } from "./voice-credits.service";
+
+class ModifyCreditsDto {
+  @ApiProperty()
+  userId: string;
+
+  @ApiProperty()
+  pollId: string;
+
+  @ApiProperty()
+  credits: number;
+}
+
+@ApiTags('Voice Credits')
+@ApiBearerAuth()
 @Controller('voice-credits')
 export class VoiceCreditsController {
     constructor(private readonly voiceCreditsService:VoiceCreditsService) { };
 
     @Post("buy")
+    @ApiOperation({ summary: 'Buy voting credits' })
+    @ApiBody({ type: ModifyCreditsDto })
+    @ApiResponse({ status: 200, description: 'Credits purchased' })
     async buyCredits(@Req() req: Request, @Res() res: Response) {
         const { userId, pollId, credits } = req.body;
         try {
@@ -27,6 +50,9 @@ export class VoiceCreditsController {
     }
 
     @Post("deduct")
+    @ApiOperation({ summary: 'Deduct credits when voting' })
+    @ApiBody({ type: ModifyCreditsDto })
+    @ApiResponse({ status: 200, description: 'Credits deducted' })
     async sellCredits(@Req() req: Request, @Res() res: Response) {
         const { userId, pollId, credits } = req.body;
         try {
@@ -38,6 +64,10 @@ export class VoiceCreditsController {
     }
 
     @Get("get")
+    @ApiOperation({ summary: 'Get available credits for a user and poll' })
+    @ApiQuery({ name: 'userId', required: true })
+    @ApiQuery({ name: 'pollId', required: true })
+    @ApiResponse({ status: 200, description: 'Credits fetched' })
     async getCredits(@Req() req: Request, @Res() res: Response) {
         const { userId, pollId } = req.query;
         try {
