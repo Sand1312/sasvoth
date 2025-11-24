@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack --port 3000",
+    "dev": "next dev --turbopack --port 3002",
     "mock": "cross-env NEXT_PUBLIC_API_MOCKING=enabled next dev --turbopack --port 3000",
     "build": "next build",
     "start": "next start",
@@ -12,6 +12,10 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@maci-protocol/crypto": "0.0.0-ci.5e114d776",
+    "@maci-protocol/domainobjs": "0.0.0-ci.26f28d6",
+    "@sasvoth/contracts": "workspace:*",
+    "@sasvoth/maci-assets": "workspace:*",
     "@sasvoth/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.5",
     "axios": "^1.12.2",
@@ -22,6 +26,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-toastify": "^11.0.5",
+    "snarkjs": "^0.7.5",
     "wagmi": "^2.19.1"
   },
   "devDependencies": {

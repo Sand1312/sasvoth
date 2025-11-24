@@ -34,20 +34,27 @@ export class Users {
   })
   authType: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   publicKey?: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   publicKeyX?: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   publicKeyY?: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   stateIndex?: number;
 
   @Prop({ default: 0 })
   balance: number;
+
+  @Prop({})
+  historyDeposit: Array<{
+    amount: number;
+    timestamp: Date;
+    txHash: string;
+  }>;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

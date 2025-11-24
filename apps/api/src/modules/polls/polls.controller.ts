@@ -65,90 +65,111 @@ class PollOnChainDto {
 @Controller('polls')
 @ApiTags('Polls')
 export class PollsController {
-    constructor(private pollsService :PollsService ) {};
+  constructor(private pollsService: PollsService) {}
 
-    @Post("create")
-    @ApiOperation({ summary: 'Create a poll' })
-    @ApiBody({ type: CreatePollDto })
-    @ApiBearerAuth()
-    @ApiResponse({ status: 201, description: 'Poll created successfully' })
-    async createPoll(@Req() req: Request, @Res() res: Response) {
-        const pollData = req.body;
-        try {
-            const newPoll = await this.pollsService.createPoll(pollData);
-            return res.status(201).json(newPoll);
-        } catch (error) {
-            return res.status(500).json({ message: 'Error creating poll', error });
-        }
+  @Post('create')
+  @ApiOperation({ summary: 'Create a poll' })
+  @ApiBody({ type: CreatePollDto })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 201, description: 'Poll created successfully' })
+  async createPoll(@Req() req: Request, @Res() res: Response) {
+    const pollData = req.body;
+    try {
+      const newPoll = await this.pollsService.createPoll(pollData);
+      return res.status(201).json(newPoll);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error creating poll', error });
     }
+  }
 
-    @Get("get/:status")
-    @ApiOperation({ summary: 'List polls by status' })
-    @ApiParam({ name: 'status', type: String })
-    @ApiResponse({ status: 200, description: 'Polls retrieved' })
-    async getPollsByStatus(@Param("status") status: string, @Res() res: Response) {
-        try {
-            const polls = await this.pollsService.getPollByStatus(status);
-            return res.status(200).json(polls);
-        } catch (error) {
-            return res.status(500).json({ message: 'Error fetching polls', error });
-        }
+  @Get('get/:status')
+  @ApiOperation({ summary: 'List polls by status' })
+  @ApiParam({ name: 'status', type: String })
+  @ApiResponse({ status: 200, description: 'Polls retrieved' })
+  async getPollsByStatus(
+    @Param('status') status: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const polls = await this.pollsService.getPollByStatus(status);
+      return res.status(200).json(polls);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error fetching polls', error });
     }
-    @Patch("updateStatus")
-    @ApiOperation({ summary: 'Update poll status' })
-    @ApiBody({ type: PollStatusDto })
-    @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'Poll status updated' })
-    async updatePollStatus( @Req() req: Request, @Res() res: Response) {
-        const { pollId, status } = req.body;
-        try {
-            const updatedPoll = await this.pollsService.updatePollStatus(pollId, status);
-            return res.status(200).json(updatedPoll);
-        } catch (error) {
-            return res.status(500).json({ message: 'Error updating poll status', error });
-        }
+  }
+  @Patch('updateStatus')
+  @ApiOperation({ summary: 'Update poll status' })
+  @ApiBody({ type: PollStatusDto })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Poll status updated' })
+  async updatePollStatus(@Req() req: Request, @Res() res: Response) {
+    const { pollId, status } = req.body;
+    try {
+      const updatedPoll = await this.pollsService.updatePollStatus(
+        pollId,
+        status,
+      );
+      return res.status(200).json(updatedPoll);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Error updating poll status', error });
     }
+  }
 
-    @Patch("addIdea")
-    @ApiOperation({ summary: 'Add an idea to a poll' })
-    @ApiBody({ type: PollIdeaDto })
-    @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'Idea added to poll' })
-    async addIdeaToPoll( @Req() req: Request, @Res() res: Response) {
-        const { pollId, ideaId } = req.body;
-        try {
-            const updatedPoll = await this.pollsService.addIdeaToPoll(pollId, ideaId);
-            return res.status(200).json(updatedPoll);
-        } catch (error) {
-            return res.status(500).json({ message: 'Error adding idea to poll', error });
-        }
+  @Patch('addIdea')
+  @ApiOperation({ summary: 'Add an idea to a poll' })
+  @ApiBody({ type: PollIdeaDto })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Idea added to poll' })
+  async addIdeaToPoll(@Req() req: Request, @Res() res: Response) {
+    const { pollId, ideaId } = req.body;
+    try {
+      const updatedPoll = await this.pollsService.addIdeaToPoll(pollId, ideaId);
+      return res.status(200).json(updatedPoll);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Error adding idea to poll', error });
     }
-    @Patch("approveIdea")
-    @ApiOperation({ summary: 'Approve an idea for a poll' })
-    @ApiBody({ type: PollIdeaDto })
-    @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'Idea approved for poll' })
-    async approveIdeaInPoll( @Req() req: Request, @Res() res: Response) {
-        const { pollId, ideaId } = req.body;
-        try {
-            const updatedPoll = await this.pollsService.approveIdeaInPoll(pollId, ideaId);
-            return res.status(200).json(updatedPoll);
-        } catch (error) {
-            return res.status(500).json({ message: 'Error approving idea in poll', error });
-        }
+  }
+  @Patch('approveIdea')
+  @ApiOperation({ summary: 'Approve an idea for a poll' })
+  @ApiBody({ type: PollIdeaDto })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Idea approved for poll' })
+  async approveIdeaInPoll(@Req() req: Request, @Res() res: Response) {
+    const { pollId, ideaId } = req.body;
+    try {
+      const updatedPoll = await this.pollsService.approveIdeaInPoll(
+        pollId,
+        ideaId,
+      );
+      return res.status(200).json(updatedPoll);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Error approving idea in poll', error });
     }
-    @Patch("saveOnChainId")
-    @ApiOperation({ summary: 'Persist on-chain poll id' })
-    @ApiBody({ type: PollOnChainDto })
-    @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'On-chain ID saved' })
-    async savePollOnChainId( @Req() req: Request, @Res() res: Response) {
-        const { pollId, pollIdOnChain } = req.body;
-        try {
-            const updatedPoll = await this.pollsService.savePollOnChainId(pollId, pollIdOnChain);
-            return res.status(200).json(updatedPoll);
-        } catch (error) {
-            return res.status(500).json({ message: 'Error saving poll on-chain ID', error });
-        }
+  }
+  @Patch('saveOnChain')
+  @ApiOperation({ summary: 'Persist on-chain poll id' })
+  @ApiBody({ type: PollOnChainDto })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'On-chain ID saved' })
+  async savePollOnChainId(@Req() req: Request, @Res() res: Response) {
+    const { pollId, pollIdOnChain } = req.body;
+
+    try {
+      const updatedPoll = await this.pollsService.savePollOnChainId(
+        pollId,
+        pollIdOnChain,
+      );
+      return res.status(200).json(updatedPoll);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Error saving poll on-chain ID', error });
     }
+  }
 }

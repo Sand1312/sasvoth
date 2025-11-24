@@ -6,7 +6,7 @@ import {
   Post,
   Res,
   Patch,
-  Put
+  Put,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -75,6 +75,7 @@ export class IdeasController {
   @ApiResponse({ status: 201, description: 'Idea created successfully' })
   async createIdea(@Req() req: Request, @Res() res: Response) {
     const ideaData = req.body;
+    console.log('Received idea data:', ideaData);
     try {
       const newIdea = await this.ideasService.createIdea(ideaData);
       return res.status(201).json(newIdea);
@@ -90,10 +91,15 @@ export class IdeasController {
   async updateIdeaCID(@Req() req: Request, @Res() res: Response) {
     const { ideaId, idea_cid } = req.body;
     try {
-      const updatedIdea = await this.ideasService.updateIdeaCID(ideaId, idea_cid);
+      const updatedIdea = await this.ideasService.updateIdeaCID(
+        ideaId,
+        idea_cid,
+      );
       return res.status(200).json(updatedIdea);
     } catch (error) {
-      return res.status(500).json({ message: 'Error updating idea CID', error });
+      return res
+        .status(500)
+        .json({ message: 'Error updating idea CID', error });
     }
   }
   @Get('get/:ideaId')
@@ -101,7 +107,7 @@ export class IdeasController {
   @ApiParam({ name: 'ideaId', type: String })
   @ApiResponse({ status: 200, description: 'Idea details retrieved' })
   async getIdeaById(@Res() res: Response, @Req() req: Request) {
-    const ideaId = req.params.ideaId;
+    const ideaId = req.query.ideaId as string;
     try {
       const idea = await this.ideasService.getIdeaById(ideaId);
       return res.status(200).json(idea);
@@ -116,14 +122,16 @@ export class IdeasController {
   @ApiBody({ type: UpdateIdeaDto })
   @ApiResponse({ status: 200, description: 'Idea updated' })
   async updateIdea(@Req() req: Request, @Res() res: Response) {
-    const ideaId = req.params.ideaId;
-    const updateData = req.body;
+    const ideaId = req.body.ideaId;
+    const updateData = req.body.updateData;
     try {
-      const updatedIdea = await this.ideasService.updateIdea(ideaId, updateData);
+      const updatedIdea = await this.ideasService.updateIdea(
+        ideaId,
+        updateData,
+      );
       return res.status(200).json(updatedIdea);
     } catch (error) {
       return res.status(500).json({ message: 'Error updating idea', error });
     }
   }
-
 }
