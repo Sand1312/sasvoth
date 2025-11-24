@@ -1,14 +1,77 @@
-import {Controller, Get, Patch} from '@nestjs/common';
+import { Controller, Get, Patch } from '@nestjs/common';
 import { PollsService } from './polls.service';
-import { create } from 'domain';
-import { Post, Req, Res , Param } from '@nestjs/common';
+import { Post, Req, Res, Param } from '@nestjs/common';
 import { Request, Response } from 'express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiProperty,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+
+class CreatePollDto {
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  creatorAddress: string;
+
+  @ApiProperty()
+  status: string;
+
+  @ApiProperty({ type: String, format: 'date-time' })
+  startTime: Date;
+
+  @ApiProperty({ type: String, format: 'date-time' })
+  endTime: Date;
+
+  @ApiProperty({ type: [String] })
+  options: string[];
+
+  @ApiProperty()
+  pollIdOnChain: number;
+}
+
+class PollStatusDto {
+  @ApiProperty()
+  pollId: string;
+
+  @ApiProperty()
+  status: string;
+}
+
+class PollIdeaDto {
+  @ApiProperty()
+  pollId: string;
+
+  @ApiProperty()
+  ideaId: string;
+}
+
+class PollOnChainDto {
+  @ApiProperty()
+  pollId: string;
+
+  @ApiProperty()
+  pollIdOnChain: number;
+}
 
 @Controller('polls')
+@ApiTags('Polls')
 export class PollsController {
     constructor(private pollsService :PollsService ) {};
 
     @Post("create")
+    @ApiOperation({ summary: 'Create a poll' })
+    @ApiBody({ type: CreatePollDto })
+    @ApiBearerAuth()
+    @ApiResponse({ status: 201, description: 'Poll created successfully' })
     async createPoll(@Req() req: Request, @Res() res: Response) {
         const pollData = req.body;
         try {
@@ -20,6 +83,9 @@ export class PollsController {
     }
 
     @Get("get/:status")
+    @ApiOperation({ summary: 'List polls by status' })
+    @ApiParam({ name: 'status', type: String })
+    @ApiResponse({ status: 200, description: 'Polls retrieved' })
     async getPollsByStatus(@Param("status") status: string, @Res() res: Response) {
         try {
             const polls = await this.pollsService.getPollByStatus(status);
@@ -29,6 +95,10 @@ export class PollsController {
         }
     }
     @Patch("updateStatus")
+    @ApiOperation({ summary: 'Update poll status' })
+    @ApiBody({ type: PollStatusDto })
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Poll status updated' })
     async updatePollStatus( @Req() req: Request, @Res() res: Response) {
         const { pollId, status } = req.body;
         try {
@@ -40,6 +110,10 @@ export class PollsController {
     }
 
     @Patch("addIdea")
+    @ApiOperation({ summary: 'Add an idea to a poll' })
+    @ApiBody({ type: PollIdeaDto })
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Idea added to poll' })
     async addIdeaToPoll( @Req() req: Request, @Res() res: Response) {
         const { pollId, ideaId } = req.body;
         try {
@@ -50,6 +124,10 @@ export class PollsController {
         }
     }
     @Patch("approveIdea")
+    @ApiOperation({ summary: 'Approve an idea for a poll' })
+    @ApiBody({ type: PollIdeaDto })
+    @ApiBearerAuth()
+    @ApiResponse({ status: 200, description: 'Idea approved for poll' })
     async approveIdeaInPoll( @Req() req: Request, @Res() res: Response) {
         const { pollId, ideaId } = req.body;
         try {

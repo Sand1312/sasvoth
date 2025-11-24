@@ -1,32 +1,13 @@
-import React from "react";
-import PollClient from "./PollClient";
-
-type PollPageProps = {
-  params: { id: string } | Promise<{ id: string }>;
-  searchParams?: { phase?: string } | Promise<{ phase?: string }>;
-};
-
-export default function PollPage({ params, searchParams }: PollPageProps) {
-  // Next.js may pass `params` and `searchParams` as Promises — unwrap with React.use()
-  const resolvedParams = React.use(params as any) as { id: string };
-  const resolvedSearch = searchParams
-    ? (React.use(searchParams as any) as { phase?: string })
-    : undefined;
-
-  const pollId = resolvedParams.id;
-
-  return <PollClient pollId={pollId} searchParams={resolvedSearch} />;
-}
-("use client");
+"use client";
 import type { ReactElement } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { IdeaSubmitFormTrigger } from "@/components/idea-submit-form-trigger";
 import { PollStatus } from "@/types/polls";
 import { usePolls } from "@/hooks";
 import { ideasApi } from "@/api";
 import { formatDate } from "@/lib/date";
-import createLogger from "@/lib/logger";
+
 type Timeline = { start: string; end: string };
 
 type Idea = {
@@ -65,119 +46,13 @@ type PollData = {
   results: TallyResult[];
 };
 
-type PollPageProps = {
-  params: { id: string };
+export default function PollClient({
+  pollId,
+  searchParams,
+}: {
+  pollId: string;
   searchParams?: { phase?: string };
-};
-
-const fallbackPoll: PollData = {
-  title: "Future of Play (Offline Data)",
-  description:
-    "A curated shortlist of ideas exploring how social games, creative tools, and fan communities will evolve next year.",
-  timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
-  credits: { spent: 36, total: 120, remaining: 84 },
-  status: PollStatus.InProgress,
-  ideas: [
-    {
-      id: "01",
-      title: "Pocket Worlds SDK",
-      summary: "A strong SDK for rapid creation",
-      credits: 12,
-      votes: 214,
-      creator: "Drift Studio",
-    },
-    {
-      id: "02",
-      title: "Spectator Signals",
-      summary: "Signals that let viewers amplify things",
-      credits: 8,
-      votes: 189,
-      creator: "Aiko Lab",
-    },
-    {
-      id: "03",
-      title: "Civic Season Pass",
-      summary: "Subscription for voters",
-      credits: 6,
-      votes: 132,
-      creator: "Studio North",
-    },
-    {
-      id: "04",
-      title: "Residency Nights",
-      summary: "Short residencies for creators",
-      credits: 10,
-      votes: 156,
-      creator: "OpenHall",
-    },
-  ],
-  approvedIdeasId: ["01", "02"],
-  options: [
-    {
-      id: "opt-01",
-      label: "Storyverse Tools",
-      description:
-        "Workflow layer that lets teams remix lore documents live while building quests.",
-      weight: 2,
-    },
-    {
-      id: "opt-02",
-      label: "Signal Relay",
-      description:
-        "Open protocol so spectator chats can power in-game stat boosts.",
-      weight: 1,
-    },
-    {
-      id: "opt-03",
-      label: "Residency Network",
-      description:
-        "Traveling residency for hybrid creators with livestreamed critiques.",
-      weight: 3,
-    },
-  ],
-  results: [
-    {
-      id: "opt-03",
-      label: "Residency Network",
-      votes: 1620,
-      percentage: 48,
-      author: "OpenHall",
-    },
-    {
-      id: "opt-01",
-      label: "Storyverse Tools",
-      votes: 1120,
-      percentage: 33,
-      author: "Drift Studio",
-    },
-    {
-      id: "opt-02",
-      label: "Signal Relay",
-      votes: 620,
-      percentage: 19,
-      author: "Aiko Lab",
-    },
-  ],
-};
-
-type StatusSectionProps = { poll: PollData };
-
-const statusRenderers: Partial<
-  Record<PollStatus, (props: StatusSectionProps) => ReactElement>
-> = {
-  [PollStatus.Prepare]: PrepareSection,
-  [PollStatus.InProgress]: VotingSection,
-  [PollStatus.Ended]: EndedSection,
-};
-
-const statusBadges: Partial<Record<PollStatus, string>> = {
-  [PollStatus.Prepare]: "Ideas in review",
-  [PollStatus.InProgress]: "Opening",
-  [PollStatus.Ended]: "Ended",
-};
-
-export default function PollPage({ params, searchParams }: PollPageProps) {
-  const pollId = params.id;
+}) {
   const { getPollById } = usePolls();
 
   const requestedPhase = searchParams?.phase?.toLowerCase() as
@@ -190,6 +65,19 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
     value === PollStatus.Ended ||
     value === PollStatus.Counting;
 
+  const fallbackPoll: PollData = {
+    title: "Future of Play (Offline Data)",
+    description:
+      "A curated shortlist of ideas exploring how social games, creative tools, and fan communities will evolve next year.",
+    timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
+    credits: { spent: 36, total: 120, remaining: 84 },
+    status: PollStatus.InProgress,
+    ideas: [],
+    approvedIdeasId: [],
+    options: [],
+    results: [],
+  };
+
   const [poll, setPoll] = useState<PollData>(() => fallbackPoll);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -200,7 +88,7 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
       setLoading(true);
       try {
         const response = await getPollById(pollId);
-        const src = response ?? fallbackPoll;
+        const src = response ?? ({} as any);
 
         // If the poll contains idea IDs (not full idea objects), fetch each idea
         let ideas: Idea[] | undefined = (src as any).ideas;
@@ -221,27 +109,29 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
           } catch (err) {
             // eslint-disable-next-line no-console
             console.warn(
-              "Failed to fetch ideas for poll, falling back to existing list",
+              "Failed to fetch ideas for poll, falling back to empty list",
               err
             );
-            ideas = (src as any).ideas ?? fallbackPoll.ideas;
+            ideas = fallbackPoll.ideas;
           }
         }
 
         const mapped: PollData = {
-          title: src.title,
-          description: src.description,
+          title: src.title ?? fallbackPoll.title,
+          description: src.description ?? fallbackPoll.description,
           timeframe: {
             start: src.startTime
               ? formatDate(src.startTime)
-              : src.timeframe?.start,
-            end: src.endTime ? formatDate(src.endTime) : src.timeframe?.end,
+              : (src.timeframe?.start ?? fallbackPoll.timeframe.start),
+            end: src.endTime
+              ? formatDate(src.endTime)
+              : (src.timeframe?.end ?? fallbackPoll.timeframe.end),
           },
-          credits: src.credits,
-          status: src.status,
-          ideas: src.ideas,
-          options: src.options,
-          results: src.results,
+          credits: src.credits ?? fallbackPoll.credits,
+          status: src.status ?? fallbackPoll.status,
+          ideas: ideas ?? src.ideas ?? fallbackPoll.ideas,
+          options: src.options ?? fallbackPoll.options,
+          results: src.results ?? fallbackPoll.results,
         };
 
         if (mounted) {
@@ -269,7 +159,17 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
   const activeStatus = isPhase(requestedPhase) ? requestedPhase : poll.status;
 
   const pollWithStatus: PollData = { ...poll, status: activeStatus };
-  const StatusComponent = statusRenderers[activeStatus] ?? PrepareSection;
+  const StatusComponent = (() => {
+    switch (activeStatus) {
+      case PollStatus.Prepare:
+        return PrepareSection;
+      case PollStatus.InProgress:
+        return VotingSection;
+      case PollStatus.Ended:
+      default:
+        return EndedSection;
+    }
+  })();
 
   return (
     <main className="min-h-screen bg-white px-4 py-10 text-black">
@@ -277,7 +177,13 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
         <PollHero
           poll={pollWithStatus}
           pollId={pollId}
-          badge={statusBadges[activeStatus] ?? ""}
+          badge={
+            activeStatus === PollStatus.Prepare
+              ? "Ideas in review"
+              : activeStatus === PollStatus.InProgress
+                ? "Opening"
+                : "Ended"
+          }
         />
         {error && <p className="text-sm text-orange-600">{error}</p>}
         <StatusComponent poll={pollWithStatus} />
@@ -319,7 +225,7 @@ function PollHero({
   );
 }
 
-function PrepareSection({ poll }: StatusSectionProps) {
+function PrepareSection({ poll }: { poll: PollData }) {
   return (
     <section className="space-y-8">
       <div className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 text-center md:flex-row md:items-center md:justify-between md:text-left">
@@ -375,7 +281,7 @@ function PrepareSection({ poll }: StatusSectionProps) {
   );
 }
 
-function VotingSection({ poll }: StatusSectionProps) {
+function VotingSection({ poll }: { poll: PollData }) {
   const highlightedIdeaId =
     poll.ideas.length > 0
       ? poll.ideas.reduce((top, idea) =>
@@ -416,11 +322,7 @@ function VotingSection({ poll }: StatusSectionProps) {
           return (
             <article
               key={idea.id}
-              className={`relative flex h-full flex-col gap-4 rounded-[32px] border bg-white p-6 ${
-                isHighlighted
-                  ? "border-[#2563eb] shadow-[0_0_0_2px_#2563eb33]"
-                  : "border-black"
-              }`}
+              className={`relative flex h-full flex-col gap-4 rounded-[32px] border bg-white p-6 ${isHighlighted ? "border-[#2563eb] shadow-[0_0_0_2px_#2563eb33]" : "border-black"}`}
             >
               <div className="h-24 rounded-2xl border border-black bg-black/5" />
               <div>
@@ -447,7 +349,7 @@ function VotingSection({ poll }: StatusSectionProps) {
   );
 }
 
-function EndedSection({ poll }: StatusSectionProps) {
+function EndedSection({ poll }: { poll: PollData }) {
   return (
     <section className="space-y-8">
       <div className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 md:flex-row md:items-center md:justify-between">
@@ -476,9 +378,7 @@ function EndedSection({ poll }: StatusSectionProps) {
           >
             <div className="flex items-center gap-4 md:w-64">
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-full border border-black text-base font-semibold ${
-                  index === 0 ? "bg-black text-white" : "bg-white text-black"
-                }`}
+                className={`flex h-12 w-12 items-center justify-center rounded-full border border-black text-base font-semibold ${index === 0 ? "bg-black text-white" : "bg-white text-black"}`}
               >
                 {index + 1}
               </div>

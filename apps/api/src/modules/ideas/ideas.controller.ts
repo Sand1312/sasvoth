@@ -5,16 +5,66 @@ import {
   Req,
   Post,
   Res,
-  NotFoundException,
   Patch,
   Put
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { Response } from 'express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { IdeasService } from './ideas.service';
 
+class CreateIdeaDto {
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  creatorAddress: string;
+
+  @ApiProperty()
+  imgSrc: string;
+}
+
+class UpdateIdeaCidDto {
+  @ApiProperty()
+  ideaId: string;
+
+  @ApiProperty()
+  idea_cid: string;
+}
+
+class UpdateIdeaDto {
+  @ApiPropertyOptional()
+  title?: string;
+
+  @ApiPropertyOptional()
+  description?: string;
+
+  @ApiPropertyOptional()
+  descriptionMore?: string;
+
+  @ApiPropertyOptional()
+  imgSrc?: string;
+
+  @ApiPropertyOptional()
+  creatorIdea?: string;
+}
+
 @Controller('ideas')
+@ApiTags('Ideas')
+@ApiBearerAuth()
 export class IdeasController {
   constructor(private readonly ideasService: IdeasService) {}
 

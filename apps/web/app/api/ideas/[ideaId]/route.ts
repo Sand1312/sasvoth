@@ -1,31 +1,28 @@
 import { NextResponse } from "next/server";
-import { forwardSetCookies } from "../_lib/forward-set-cookie";
+
+import { forwardSetCookies } from "../../_lib/forward-set-cookie";
 
 const apiBase =
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.API_URL ||
-  "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "http://localhost:8000";
 
-export async function GET(req: Request) {
+export async function GET(
+  _req: Request,
+  { params }: { params: { ideaId: string } }
+) {
   try {
-    const url = new URL(req.url);
-    const status = url.searchParams.get("status") || "active";
-    const backendUrl = new URL(`/polls/get/${encodeURIComponent(status)}`, apiBase);
-
-    const cookie = req.headers.get("cookie") || "";
+    const backendUrl = new URL(`/ideas/get/${encodeURIComponent(params.ideaId)}`, apiBase);
 
     let res: Response;
     try {
-      res = await fetch(backendUrl.toString(), {
+      res = await fetch(backendUrl, {
         method: "GET",
         headers: {
-          cookie,
           Accept: "application/json",
         },
         cache: "no-store",
       });
     } catch (err) {
-      console.error("/api/polls GET backend fetch failed:", err);
+      console.error("/api/ideas/[ideaId] GET backend fetch failed:", err);
       return new NextResponse("backend unreachable", { status: 502 });
     }
 
@@ -37,14 +34,17 @@ export async function GET(req: Request) {
 
     return new NextResponse(text, { status: res.status, headers });
   } catch (err) {
-    console.error("/api/polls GET error:", err);
+    console.error("/api/ideas/[ideaId] GET error:", err);
     return new NextResponse("internal proxy error", { status: 500 });
   }
 }
 
-export async function POST(req: Request) {
+export async function PUT(
+  req: Request,
+  { params }: { params: { ideaId: string } }
+) {
   try {
-    const backendUrl = new URL("/polls/create", apiBase).toString();
+    const backendUrl = new URL(`/ideas/update/${encodeURIComponent(params.ideaId)}`, apiBase);
     const cookie = req.headers.get("cookie") || "";
     const body = await req.text();
     const contentType = req.headers.get("content-type") || "application/json";
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     let res: Response;
     try {
       res = await fetch(backendUrl, {
-        method: "POST",
+        method: "PUT",
         headers: {
           cookie,
           Accept: "application/json",
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
         cache: "no-store",
       });
     } catch (err) {
-      console.error("/api/polls POST backend fetch failed:", err);
+      console.error("/api/ideas/[ideaId] PUT backend fetch failed:", err);
       return new NextResponse("backend unreachable", { status: 502 });
     }
 
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
 
     return new NextResponse(text, { status: res.status, headers });
   } catch (err) {
-    console.error("/api/polls POST error:", err);
+    console.error("/api/ideas/[ideaId] PUT error:", err);
     return new NextResponse("internal proxy error", { status: 500 });
   }
 }
