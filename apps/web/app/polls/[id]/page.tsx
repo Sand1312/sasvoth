@@ -1,32 +1,11 @@
-import React from "react";
-import PollClient from "./PollClient";
-
-type PollPageProps = {
-  params: { id: string } | Promise<{ id: string }>;
-  searchParams?: { phase?: string } | Promise<{ phase?: string }>;
-};
-
-export default function PollPage({ params, searchParams }: PollPageProps) {
-  // Next.js may pass `params` and `searchParams` as Promises — unwrap with React.use()
-  const resolvedParams = React.use(params as any) as { id: string };
-  const resolvedSearch = searchParams
-    ? (React.use(searchParams as any) as { phase?: string })
-    : undefined;
-
-  const pollId = resolvedParams.id;
-
-  return <PollClient pollId={pollId} searchParams={resolvedSearch} />;
-}
-("use client");
+"use client";
 import type { ReactElement } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { IdeaSubmitFormTrigger } from "@/components/idea-submit-form-trigger";
 import { PollStatus } from "@/types/polls";
 import { usePolls } from "@/hooks";
-import { ideasApi } from "@/api";
-import { formatDate } from "@/lib/date";
-import createLogger from "@/lib/logger";
+import { formatDate, parseDate } from "@/lib/date";
 type Timeline = { start: string; end: string };
 
 type Idea = {
@@ -59,7 +38,7 @@ type PollData = {
   timeframe: Timeline;
   credits: { spent: number; total: number; remaining?: number };
   status: PollStatus;
-  ideas: Idea[];
+  ideasId: string[];
   approvedIdeasId?: string[];
   options: VoteOption[];
   results: TallyResult[];
@@ -77,41 +56,8 @@ const fallbackPoll: PollData = {
   timeframe: { start: "12 Oct 2024", end: "24 Nov 2024" },
   credits: { spent: 36, total: 120, remaining: 84 },
   status: PollStatus.InProgress,
-  ideas: [
-    {
-      id: "01",
-      title: "Pocket Worlds SDK",
-      summary: "A strong SDK for rapid creation",
-      credits: 12,
-      votes: 214,
-      creator: "Drift Studio",
-    },
-    {
-      id: "02",
-      title: "Spectator Signals",
-      summary: "Signals that let viewers amplify things",
-      credits: 8,
-      votes: 189,
-      creator: "Aiko Lab",
-    },
-    {
-      id: "03",
-      title: "Civic Season Pass",
-      summary: "Subscription for voters",
-      credits: 6,
-      votes: 132,
-      creator: "Studio North",
-    },
-    {
-      id: "04",
-      title: "Residency Nights",
-      summary: "Short residencies for creators",
-      credits: 10,
-      votes: 156,
-      creator: "OpenHall",
-    },
-  ],
-  approvedIdeasId: ["01", "02"],
+  ideasId: ["01", "02", "03", "04"],
+  approvedIdeasId: ["01", "02", "04"],
   options: [
     {
       id: "opt-01",
@@ -193,7 +139,9 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
   const [poll, setPoll] = useState<PollData>(() => fallbackPoll);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const logPrefix = "[PollPage]";
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let mounted = true;
     const load = async () => {
@@ -201,45 +149,24 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
       try {
         const response = await getPollById(pollId);
         const src = response ?? fallbackPoll;
-
-        // If the poll contains idea IDs (not full idea objects), fetch each idea
-        let ideas: Idea[] | undefined = (src as any).ideas;
-        if (!ideas && Array.isArray((src as any).ideaIds)) {
-          try {
-            const ids: string[] = (src as any).ideaIds;
-            const fetched = await Promise.all(
-              ids.map((id) => ideasApi.getIdeaById(id))
-            );
-            ideas = fetched.map((it: any) => ({
-              id: it.id,
-              title: it.title,
-              summary: it.description ?? it.descriptionMore ?? "",
-              credits: 0,
-              votes: 0,
-              creator: it.creatorIdea ?? it.creatorAddress ?? "",
-            }));
-          } catch (err) {
-            // eslint-disable-next-line no-console
-            console.warn(
-              "Failed to fetch ideas for poll, falling back to existing list",
-              err
-            );
-            ideas = (src as any).ideas ?? fallbackPoll.ideas;
-          }
-        }
-
+        const needsOptions =
+          src.status === PollStatus.InProgress ||
+          src.status === PollStatus.Counting ||
+          src.status === PollStatus.Ended;
+        const needsIdeasMeta = src.status === PollStatus.Prepare;
         const mapped: PollData = {
           title: src.title,
           description: src.description,
           timeframe: {
             start: src.startTime
               ? formatDate(src.startTime)
-              : src.timeframe?.start,
-            end: src.endTime ? formatDate(src.endTime) : src.timeframe?.end,
+              : src.timeframe.start,
+            end: src.endTime ? formatDate(src.endTime) : src.timeframe.end,
           },
           credits: src.credits,
           status: src.status,
-          ideas: src.ideas,
+          ideasId: src.ideasId,
+          approvedIdeasId: src.approvedIdeasId,
           options: src.options,
           results: src.results,
         };
@@ -249,7 +176,6 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
           setError(null);
         }
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error("Failed to fetch poll, using fallback data:", err);
         if (mounted) {
           setPoll(fallbackPoll);
@@ -264,7 +190,7 @@ export default function PollPage({ params, searchParams }: PollPageProps) {
     return () => {
       mounted = false;
     };
-  }, [pollId, getPollById]);
+  }, [pollId]);
 
   const activeStatus = isPhase(requestedPhase) ? requestedPhase : poll.status;
 
