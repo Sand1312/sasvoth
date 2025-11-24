@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Use same-origin proxy for dev to ensure cookies are set and sent correctly.
 // Client will call `/api/...` on the Next.js app which will proxy to the backend.
-const API_BASE_URL = "/api";
+const API_BASE_URL = "/api/v1";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

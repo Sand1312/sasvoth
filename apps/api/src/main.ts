@@ -24,6 +24,9 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
   });
 
+  // Add API version prefix so all controllers are served under /api/v1
+  app.setGlobalPrefix('api/v1');
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('SASVoth API')
     .setDescription('API documentation for SASVoth services')
@@ -32,7 +35,8 @@ async function bootstrap() {
     .build();
 
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, swaggerDocument);
+  // Serve Swagger UI under /api/v1/docs
+  SwaggerModule.setup('api/v1/docs', app, swaggerDocument);
 
   const port = Number(process.env.PORT) || 8000;
   await app.listen(port);
