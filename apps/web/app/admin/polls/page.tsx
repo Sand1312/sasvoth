@@ -84,6 +84,7 @@ export default function AdminPollsPage(): React.ReactElement {
       : cid;
     return `/api/ipfs/${normalized}`;
   }
+
   async function refreshPolls() {
     setLoading(true);
     setError(null);
@@ -187,7 +188,13 @@ export default function AdminPollsPage(): React.ReactElement {
             approvedAt: new Date().toISOString(),
           };
           const { cid, url } = await ipfsApi.uploadMetadata(metadata);
-          setIpfsLinks((prev) => ({ ...prev, [ideaId]: url }));
+          setIpfsLinks((prev) => ({
+            ...prev,
+            [ideaId]: {
+              cid: cid,
+              url,
+            },
+          }));
           try {
             await ideasApi.updateIdeaCID(ideaId, cid);
           } catch (err) {
