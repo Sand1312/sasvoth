@@ -9,17 +9,39 @@ export class IpfsService {
   private readonly mockStorage = new Map<string, Buffer>(); // Mock storage
 
   constructor() {
+    console.log(process.env.USE_MOCK_IPFS);
     this.useMock = process.env.USE_MOCK_IPFS === 'true';
 
     if (!this.useMock) {
-      try {
-        this.ipfs = create({
-          host: 'localhost',
-          port: 5001,
-          protocol: 'http',
-        });
+      const hasCustomEndpoint =
+        Boolean(process.env.IPFS_API_URL) ||
+        Boolean(process.env.IPFS_API_HOST) ||
+        Boolean(process.env.IPFS_API_PORT) ||
+        Boolean(process.env.IPFS_API_PROTOCOL);
 
-        this.logger.log('Connected to IPFS node on 127.0.0.1:5001');
+      if (!hasCustomEndpoint) {
+        this.logger.warn(
+          'No IPFS endpoint configured; using mock client. Set IPFS_API_URL or IPFS_API_HOST/IPFS_API_PORT when your IPFS daemon is running.',
+        );
+        this.useMock = true;
+      }
+    }
+
+    if (!this.useMock) {
+      try {
+        const rawApiUrl =
+          process.env.IPFS_API_URL ||
+          `${process.env.IPFS_API_PROTOCOL || 'http'}://${
+            process.env.IPFS_API_HOST || 'localhost'
+          }:${process.env.IPFS_API_PORT || 5001}/api/v0`;
+
+        const apiUrl = rawApiUrl.endsWith('/api/v0')
+          ? rawApiUrl
+          : `${rawApiUrl.replace(/\/+$/, '')}/api/v0`;
+
+        this.ipfs = create({ url: apiUrl });
+
+        this.logger.log(`Connected to IPFS node at ${apiUrl}`);
       } catch (err) {
         this.logger.warn(
           `Failed to connect to IPFS node, falling back to mock: ${(err as Error).message}`,

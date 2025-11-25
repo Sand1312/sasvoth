@@ -1,11 +1,20 @@
 "use client";
 import { Button } from "@sasvoth/ui/button";
-import { notFound } from "next/navigation";
-import React, { useState } from "react";
-
+import React, { use, useEffect, useState } from "react";
+import { useIPFS } from "@/hooks/useIPFS";
 type Props = {
-  params: { id: string };
+  params: { id: string }; // id = CID
 };
+
+type VoteData = {
+  pollId: string;
+  ideaId: string;
+  title: string;
+  description: string;
+  creator: string;
+  approvedAt: string;
+};
+
 const screenshots = [
   "/screenshots/1.jpg",
   "/screenshots/2.jpg",
@@ -20,9 +29,7 @@ const screenshots = [
 function ScreenshotGallery() {
   const [mainIndex, setMainIndex] = useState(0);
 
-  // Top thumbnails: first 4 images
   const topThumbs = screenshots.slice(0, 4);
-  // Bottom grid: remaining images
   const bottomGrid = screenshots.slice(4);
 
   return (
@@ -79,27 +86,86 @@ function ScreenshotGallery() {
 }
 
 export default function VotePage({ params }: Props) {
-  const { id } = params;
-  const validIds = ["1", "2", "3", "4", "5", "6"];
-  if (!validIds.includes(id)) {
-    notFound();
+  const { id } = params; // id = CID từ URL
+
+  const [data, setData] = useState<VoteData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await useIPFS().fetchMetadata(id);
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
+
+        const json = (await res.json()) as VoteData;
+
+        if (!cancelled) {
+          setData(json);
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          setError(err.message ?? "Failed to load IPFS data");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <main className="p-4">
+        <p className="text-black">Loading vote data from IPFS…</p>
+      </main>
+    );
   }
+
+  if (error || !data) {
+    return (
+      <main className="p-4">
+        <p className="text-red-600">
+          Failed to load vote data from IPFS: {error ?? "Unknown error"}
+        </p>
+      </main>
+    );
+  }
+
+  const approvedAt = new Date(data.approvedAt);
 
   return (
     <main className="p-4">
-      <h1 className="text-2xl font-bold">Vote #{id}</h1>
+      <h1 className="text-2xl font-bold">Vote #{data.pollId}</h1>
       <div className="min-h-screen w-full flex flex-col md:flex-row gap-8 rounded-lg">
-        {/* Left side: */}
+        {/* Left side */}
         <section className="md:w-2/3 w-full flex flex-col items-center justify-start p-6 overflow-y-auto max-h-[90vh]">
           <div className="w-full aspect-video border border-black rounded-xl flex items-center justify-center mb-6">
             <span className="text-black text-lg">Trailer / Screenshot</span>
           </div>
+
+          {/* (giữ UI cũ hoặc tua lại logic cho hợp) */}
           <div className="flex items-center gap-2 w-full justify-center">
             <Button
               variant="ghost"
               className="rounded-full p-2 text-black hover:bg-gray-100"
               aria-label="Previous"
             >
+              {/* ... icon ... */}
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                 <path
                   d="M15 19l-7-7 7-7"
@@ -141,10 +207,10 @@ export default function VotePage({ params }: Props) {
           <ScreenshotGallery />
         </section>
 
-        {/* Right side: */}
+        {/* Right side */}
         <section className="md:w-1/3 w-full flex flex-col gap-6 p-6 border border-black rounded-xl">
           <div>
-            <h2 className="text-3xl font-bold text-black mb-2">Title</h2>
+            <h2 className="text-3xl font-bold text-black mb-2">{data.title}</h2>
             <div className="flex gap-8 border-b border-black mb-4">
               <button className="pb-2 text-black font-semibold border-b-2 border-black">
                 Overview
@@ -154,9 +220,26 @@ export default function VotePage({ params }: Props) {
               </button>
             </div>
           </div>
+
           <div className="w-32 h-32 border border-black rounded-lg flex items-center justify-center mb-4">
             <span className="text-black text-sm">Logo</span>
           </div>
+
+          <div className="text-black text-sm mb-2">
+            <p className="mb-2">{data.description}</p>
+            <p className="text-xs">
+              Creator: <span className="font-mono">{data.creator}</span>
+            </p>
+            <p className="text-xs">
+              Approved at:{" "}
+              {approvedAt.toLocaleString(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}
+            </p>
+            <p className="text-xs">Idea ID: {data.ideaId}</p>
+          </div>
+
           <div className="flex items-center gap-3 mb-2">
             <div className="border border-black rounded-md px-3 py-1 text-black font-bold text-lg">
               18+
@@ -165,10 +248,12 @@ export default function VotePage({ params }: Props) {
               Extreme Violence, Strong Language
             </span>
           </div>
+
           <div className="text-black text-xs uppercase tracking-wider mb-1">
             Base Game
           </div>
           <div className="text-2xl font-bold text-black mb-4">₫209,000</div>
+
           <div className="flex flex-col gap-3">
             <Button className="border border-black text-black font-bold text-lg py-3 rounded-lg hover:bg-gray-100 transition-colors">
               Vote

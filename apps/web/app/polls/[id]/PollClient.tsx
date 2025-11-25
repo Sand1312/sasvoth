@@ -8,6 +8,7 @@ import { ideasApi } from "@/api";
 import { formatDate } from "@/lib/date";
 import Link from "next/dist/client/link";
 import { usePollContext } from "./PollContext";
+import { useIPFS } from "@/hooks/useIPFS";
 
 type Timeline = { start: string; end: string };
 
@@ -144,20 +145,22 @@ export default function PollClient({
         const timeframeStart =
           (typeof source.startTime === "string"
             ? source.startTime
-            : source.startTime?.toString()) ??
-          source.timeframe?.start;
+            : source.startTime?.toString()) ?? source.timeframe?.start;
         const timeframeEnd =
           (typeof source.endTime === "string"
             ? source.endTime
-            : source.endTime?.toString()) ??
-          source.timeframe?.end;
+            : source.endTime?.toString()) ?? source.timeframe?.end;
 
         const mapped: PollData = {
           title: source.title ?? fallbackPoll.title,
           description: source.description ?? fallbackPoll.description,
           timeframe: {
-            start: timeframeStart ? formatDate(timeframeStart) : fallbackPoll.timeframe.start,
-            end: timeframeEnd ? formatDate(timeframeEnd) : fallbackPoll.timeframe.end,
+            start: timeframeStart
+              ? formatDate(timeframeStart)
+              : fallbackPoll.timeframe.start,
+            end: timeframeEnd
+              ? formatDate(timeframeEnd)
+              : fallbackPoll.timeframe.end,
           },
           credits: source.credits ?? fallbackPoll.credits,
           status: source.status ?? fallbackPoll.status,
@@ -313,17 +316,16 @@ function PrepareSection({ poll }: { poll: PollData }) {
 }
 
 function VotingSection({ poll }: { poll: PollData }) {
-  const { getIdeaById } = useIdeas();
+  const { fetchMetadata } = useIPFS();
   const [ideas, setIdeas] = useState<Idea[]>([]);
   useEffect(() => {
-    Promise.all(poll.options.map(id => getIdeaById(id))).then(setIdeas);
-  }, [poll.options, getIdeaById]);
+    Promise.all(poll.options.map((id) => fetchMetadata(id))).then(setIdeas);
+  }, [poll.options, fetchMetadata]);
   console.log("Resolved ideas for voting:", ideas);
   const highlightedIdeaId =
     ideas.length > 0
-      ? ideas.reduce((top, idea) =>
-          idea.credits > top.credits ? idea : top
-        )._id
+      ? ideas.reduce((top, idea) => (idea.credits > top.credits ? idea : top))
+          ._id
       : undefined;
 
   return (

@@ -64,6 +64,13 @@ const defaultForm: IdeaFormState = {
   extraNotes: "",
 };
 
+const ipfsGatewayBase = (() => {
+  const gateway = process.env.NEXT_PUBLIC_IPFS_GATEWAY;
+  if (!gateway) return "/api/v1/ipfs/";
+  if (gateway.endsWith("/")) return gateway;
+  return `${gateway}/`;
+})();
+
 function normalizeIdeaId(idea: IdeaRecord | string | undefined) {
   if (!idea) return undefined;
   if (typeof idea === "string") return idea;
@@ -92,7 +99,7 @@ export default function AdminPollsPage(): React.ReactElement {
     const normalized = cid.startsWith("ipfs://")
       ? cid.replace("ipfs://", "")
       : cid;
-    return `/api/v1/ipfs/${normalized}`;
+    return `${ipfsGatewayBase}${normalized}`;
   }
   async function handleDeployPoll(poll: PollRecord) {
     const pollId = poll._id || poll.id;
@@ -185,11 +192,12 @@ export default function AdminPollsPage(): React.ReactElement {
       const { cid, url } = await ipfsApi.uploadMetadata(metadata);
       const storedCid = `ipfs://${cid}`;
       const ipfsData = await ipfsApi.fetchMetadata(cid);
+      const gatewayUrl = toGatewayUrl(cid) || url || "";
       setIpfsLinks((prev) => ({
         ...prev,
         [ideaId]: {
           cid: storedCid,
-          url: url || toGatewayUrl(cid) || "",
+          url: gatewayUrl,
           metadata: ipfsData,
         },
       }));
@@ -233,11 +241,12 @@ export default function AdminPollsPage(): React.ReactElement {
           const { cid, url } = await ipfsApi.uploadMetadata(metadata);
           const storedCid = `ipfs://${cid}`;
           const ipfsData = await ipfsApi.fetchMetadata(cid);
+          const gatewayUrl = toGatewayUrl(cid) || url || "";
           setIpfsLinks((prev) => ({
             ...prev,
             [ideaId]: {
               cid: storedCid,
-              url: url || toGatewayUrl(cid) || "",
+              url: gatewayUrl,
               metadata: ipfsData,
             },
           }));
