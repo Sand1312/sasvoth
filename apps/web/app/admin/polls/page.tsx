@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@sasvoth/ui/button";
-import { Input } from "@sasvoth/ui/input";
 import { ideasApi, IdeaPayload, ipfsApi, pollsApi } from "@/api";
 import {useMaci} from "@/hooks";
 import {usePolls} from "@/hooks";
@@ -44,6 +43,7 @@ type PollWithIdeas = PollRecord & { ideaMap: Record<string, IdeaRecord> };
 type IdeaIpfsLink = {
   cid: string;
   url: string;
+  metadata?: unknown;
 };
 
 type IdeaFormState = {
@@ -92,7 +92,7 @@ export default function AdminPollsPage(): React.ReactElement {
     const normalized = cid.startsWith("ipfs://")
       ? cid.replace("ipfs://", "")
       : cid;
-    return `/api/ipfs/${normalized}`;
+    return `/api/v1/ipfs/${normalized}`;
   }
   async function handleDeployPoll(poll: PollRecord) {
     const pollId = poll._id || poll.id;
@@ -182,19 +182,19 @@ export default function AdminPollsPage(): React.ReactElement {
         creator: idea.creatorIdea,
         approvedAt: new Date().toISOString(),
       };
-      const { cid, cidUri, url } = await ipfsApi.uploadMetadata(metadata);
-      const storedCid = cidUri || cid;
+      const { cid, url } = await ipfsApi.uploadMetadata(metadata);
+      const storedCid = `ipfs://${cid}`;
+      const ipfsData = await ipfsApi.fetchMetadata(cid);
       setIpfsLinks((prev) => ({
         ...prev,
         [ideaId]: {
-          cid: storedCid.startsWith("ipfs://")
-            ? storedCid
-            : `ipfs://${storedCid}`,
-          url,
+          cid: storedCid,
+          url: url || toGatewayUrl(cid) || "",
+          metadata: ipfsData,
         },
       }));
       try {
-        await approveIdeaInPoll(pollId, ideaId, cidUri || cid);
+        await approveIdeaInPoll(pollId, ideaId, storedCid);
       } catch (err) {
         console.warn("Unable to persist idea CID", err);
       }
@@ -231,15 +231,18 @@ export default function AdminPollsPage(): React.ReactElement {
             approvedAt: new Date().toISOString(),
           };
           const { cid, url } = await ipfsApi.uploadMetadata(metadata);
+          const storedCid = `ipfs://${cid}`;
+          const ipfsData = await ipfsApi.fetchMetadata(cid);
           setIpfsLinks((prev) => ({
             ...prev,
             [ideaId]: {
-              cid: cid,
-              url,
+              cid: storedCid,
+              url: url || toGatewayUrl(cid) || "",
+              metadata: ipfsData,
             },
           }));
           try {
-            await ideasApi.updateIdeaCID(ideaId, cid);
+            await ideasApi.updateIdeaCID(ideaId, storedCid);
           } catch (err) {
             console.warn("Unable to persist idea CID", err);
           }
@@ -410,6 +413,7 @@ export default function AdminPollsPage(): React.ReactElement {
                     const idea = poll.ideaMap[ideaId];
                     const cid = idea?.idea_cid || ipfsLinks[ideaId]?.cid;
                     const href = toGatewayUrl(cid) || ipfsLinks[ideaId]?.url;
+                    const metadata = ipfsLinks[ideaId]?.metadata;
                     return (
                       <div
                         key={`${ideaId}-approved`}
@@ -430,6 +434,11 @@ export default function AdminPollsPage(): React.ReactElement {
                           >
                             {cid || href}
                           </a>
+                        )}
+                        {metadata && (
+                          <pre className="mt-2 overflow-auto rounded bg-white/70 p-2 text-[11px] text-emerald-800">
+                            {JSON.stringify(metadata, null, 2)}
+                          </pre>
                         )}
                       </div>
                     );

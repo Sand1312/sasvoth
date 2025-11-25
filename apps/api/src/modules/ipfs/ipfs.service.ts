@@ -1,14 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { create, IPFSHTTPClient } from 'ipfs-http-client';
+import mockIpfs from '@sasvoth/ipfs-service/src/ipfs/mock-ipfs.client';
 
 @Injectable()
 export class IpfsService {
   private readonly logger = new Logger(IpfsService.name);
   private readonly ipfs?: IPFSHTTPClient;
   private readonly useMock: boolean;
-  private readonly mockStorage = new Map<string, Buffer>(); // Mock storage
 
   constructor() {
+    this.useMock = process.env.USE_MOCK_IPFS === 'true';
+
+    if (!this.useMock) {
+      try {
+        this.ipfs = create({
+          host: 'localhost',
+          port: 5001,
+          protocol: 'http',
+        });
     this.useMock = process.env.USE_MOCK_IPFS === 'true';
 
     if (!this.useMock) {
@@ -34,47 +43,46 @@ export class IpfsService {
     return this.useMock || !this.ipfs;
   }
 
+  private usingMock(): boolean {
+    return this.useMock || !this.ipfs;
+  }
+
   /** Upload file to IPFS */
   async addFile(file: Buffer, filename?: string): Promise<string> {
-    if (!this.usingMock()) {
-      try {
-        const { cid } = await this.ipfs!.add(file);
-        return cid.toString();
-      } catch (err) {
-        this.logger.warn(
-          `Real IPFS add failed, switching to mock: ${(err as Error).message}`,
-        );
-      }
+    if (this.usingMock()) {
+      return mockIpfs.add(file, filename);
     }
 
-    const fakeCid = `mock-${Date.now()}-${Math.random().toString(36).substring(2)}`;
-    this.mockStorage.set(fakeCid, file);
-    this.logger.log(`Stored file in mock IPFS with CID: ${fakeCid}`);
-    return fakeCid;
+    try {
+      const { cid } = await this.ipfs!.add(file);
+      return cid.toString();
+    } catch (err) {
+      this.logger.warn(
+        `Real IPFS add failed, falling back to mock: ${(err as Error).message}`,
+      );
+      return mockIpfs.add(file, filename);
+    }
   }
 
   /** Fetch file from IPFS */
   async getFile(cid: string): Promise<Buffer> {
-    if (!this.usingMock()) {
-      try {
-        const chunks: Uint8Array[] = [];
-
-        for await (const chunk of this.ipfs!.cat(cid)) {
-          chunks.push(chunk);
-        }
-
-        return Buffer.concat(chunks);
-      } catch (err) {
-        this.logger.warn(
-          `Real IPFS cat failed, switching to mock: ${(err as Error).message}`,
-        );
-      }
+    if (this.usingMock()) {
+      return mockIpfs.cat(cid);
     }
 
-    // MOCK fallback
-    const data = this.mockStorage.get(cid);
-    if (!data) {
-      throw new Error(`Mock IPFS: CID ${cid} not found`);
+    try {
+      const chunks: Uint8Array[] = [];
+
+      for await (const chunk of this.ipfs!.cat(cid)) {
+        chunks.push(chunk);
+      }
+
+      return Buffer.concat(chunks);
+    } catch (err) {
+      this.logger.warn(
+        `Real IPFS cat failed, falling back to mock: ${(err as Error).message}`,
+      );
+      return mockIpfs.cat(cid);
     }
 
     return data;
