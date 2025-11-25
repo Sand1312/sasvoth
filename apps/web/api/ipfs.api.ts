@@ -14,6 +14,7 @@ export const ipfsApi = {
     const response = await api.post("/ipfs", form, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+    console.log("IPFS upload response:", response.data);
     return response.data as { cid: string; cidUri?: string; url: string };
   },
 };
