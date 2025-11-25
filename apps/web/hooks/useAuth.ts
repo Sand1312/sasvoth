@@ -4,6 +4,7 @@ import { useRedirect } from "./useRedirect";
 import { authApi } from "../api";
 import { api } from "../api/base";
 import {useMaci} from "./useMACI"
+import { useUser } from "./useUser";
 
 //TODOs: define user type
 type User = any;
@@ -13,6 +14,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { signupToMaci } = useMaci();
+  const { saveStateIndex } = useUser();
 
   // refresh session and load current user on mount
   useEffect(() => {
@@ -96,8 +98,11 @@ export function useAuth() {
 
       if(returnedUser.privateKey){
         setUser(returnedUser);
-        await signupToMaci(returnedUser.publicKeyX, returnedUser.publicKeyY);
-        console.log("User private key:", returnedUser.privateKey.slice(0,10)+"...");
+        const maciResult = await signupToMaci(returnedUser.publicKeyX, returnedUser.publicKeyY);
+        if(maciResult.stateIndex) {
+        await saveStateIndex(returnedUser.walletAddress, maciResult.stateIndex);
+        }
+        console.log("User private key:", returnedUser.privateKey);
       }
       // navigate based on provider and user role
       if (provider === "email" || provider === "wallet") {

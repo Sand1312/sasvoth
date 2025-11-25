@@ -20,8 +20,6 @@ export class Votes {
     @Prop({ required: true })
     voiceCredits: number;
 
-
-
     @Prop({ required: true })
     voteCommitment: string;
 }

@@ -77,9 +77,29 @@ const getWalletClient = async () => {
           ],
           account,
         });
+
+         let stateIndex: number | null = null;
+              try {
+                const publicKeyHash = await publicClient.readContract({
+                  address: MACI_ADDRESS as `0x${string}`,
+                  abi: MACI_ABI,
+                  functionName: 'hash2',
+                  args: [[pubKeyX, pubKeyY]],
+                }) as bigint;
+                // Gọi getStateIndex(publicKeyHash)
+                stateIndex = Number(await publicClient.readContract({
+                  address: MACI_ADDRESS as `0x${string}`,
+                  abi: MACI_ABI,
+                  functionName: 'getStateIndex',
+                  args: [publicKeyHash],
+                }));
+              } catch (e) {
+                console.warn('Không lấy được stateIndex từ contract:', e);
+              }
   
         return {
           txHash: hash,
+          stateIndex,
          
         };
       } catch (error: any) {
@@ -129,7 +149,7 @@ const getWalletClient = async () => {
         }) as any;
   
         const pollAddress = pollData.poll;
-        console.log('📍 Poll address:', pollAddress);
+        console.log('Poll address:', pollAddress);
   
         // For publishMessage, we need a proper MACI message (10 uint256 array)
         // This is simplified - in production you'd encrypt the message properly
@@ -137,10 +157,10 @@ const getWalletClient = async () => {
         const message = {
           data: [
             BigInt(voteOptionIndex), // msgType or stateIndex
-            BigInt(voteWeight), // voteOptionIndex
-            BigInt(0), // newVoteWeight
-            BigInt(0), // nonce
-            BigInt(0), // pollId
+            BigInt(voteOptionIndex), // voteOptionIndex
+            BigInt(voteWeight), // newVoteWeight
+            BigInt(1), // nonce
+            BigInt(pollId), // pollId
             BigInt(0), // salt
             BigInt(0), // padding
             BigInt(0), // padding

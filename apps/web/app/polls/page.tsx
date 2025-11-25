@@ -196,6 +196,7 @@ export default function PollsPage() {
         const response = await getPolls();
         if (Array.isArray(response) && response.length > 0) {
           setPolls(annotatePolls(response));
+          console.log("Loaded Polls:", annotatePolls(response));
           setError(null);
         } else {
           setPolls(annotatePolls(fallbackPolls));

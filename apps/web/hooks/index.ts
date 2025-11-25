@@ -5,3 +5,5 @@ export * from "./useRedirect";
 export * from "./useToken";
 export * from "./useIdeas";
 export * from "./useMACI";
+export * from "./useVote";
+export * from "./useUser";
