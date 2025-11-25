@@ -15,6 +15,7 @@ import { PollsModule } from './modules/polls/polls.module';
 import { MaciModule } from './modules/maci/maci.module';
 import { RedisModule } from "@nestjs-modules/ioredis";
 import { JwtModule } from "@nestjs/jwt";
+import { IpfsModule } from './modules/ipfs/ipfs.module';
 // import { IdeasModule } from './modules/ideas/ideas.module';
 
 
@@ -41,6 +42,7 @@ import { JwtModule } from "@nestjs/jwt";
     IdeasModule,
     MaciModule,
     // IdeasModule,
+    IpfsModule
   ],
   controllers: [AppController],
   providers: [AppService],

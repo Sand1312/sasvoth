@@ -43,7 +43,7 @@ export function usePolls() {
   };
   const getPollById = async (pollId: string) => {
     try {
-      const res = await pollsApi.getPollById(pollId);
+      const res = await pollsApi.getPollById(pollId); 
       return res;
     } catch (error) {
       console.error("Get Poll By ID error:", error);

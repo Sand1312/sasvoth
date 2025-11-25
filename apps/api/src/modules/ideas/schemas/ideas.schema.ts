@@ -16,11 +16,11 @@ export class Ideas {
     @Prop({ required: true ,type:String})
     imgSrc: string;
 
-    @Prop({ required: false ,type:String})
+    @Prop({ required: false ,type:[String]})
     imgsSrc: string[];
 
     @Prop({required:true, type:String})
-    creatorIdea:String;
+    creatorIdea:string;
 
 
     @Prop({ required: false ,type:String})

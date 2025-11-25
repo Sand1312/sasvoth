@@ -7,6 +7,7 @@ import {
   Res,
   Patch,
   Put,
+  Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -75,9 +76,9 @@ export class IdeasController {
   @ApiResponse({ status: 201, description: 'Idea created successfully' })
   async createIdea(@Req() req: Request, @Res() res: Response) {
     const ideaData = req.body;
-    console.log('Received idea data:', ideaData);
+    // console.log('Received idea data:', ideaData);
     try {
-      const newIdea = await this.ideasService.createIdea(ideaData);
+      const newIdea = await this.ideasService.createIdea(ideaData.idea);
       return res.status(201).json(newIdea);
     } catch (error) {
       return res.status(500).json({ message: 'Error creating idea', error });
@@ -102,12 +103,11 @@ export class IdeasController {
         .json({ message: 'Error updating idea CID', error });
     }
   }
-  @Get('get/:ideaId')
+  @Get(':ideaId')
   @ApiOperation({ summary: 'Get idea details by ID' })
   @ApiParam({ name: 'ideaId', type: String })
   @ApiResponse({ status: 200, description: 'Idea details retrieved' })
-  async getIdeaById(@Res() res: Response, @Req() req: Request) {
-    const ideaId = req.query.ideaId as string;
+  async getIdeaById(@Res() res: Response, @Param('ideaId') ideaId: string) {
     try {
       const idea = await this.ideasService.getIdeaById(ideaId);
       return res.status(200).json(idea);

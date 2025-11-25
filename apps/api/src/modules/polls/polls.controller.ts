@@ -11,6 +11,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { poll } from 'viem/_types/utils/poll';
 
 class CreatePollDto {
   @ApiProperty()
@@ -125,6 +126,8 @@ export class PollsController {
   async addIdeaToPoll(@Req() req: Request, @Res() res: Response) {
     const { pollId, ideaId } = req.body;
     try {
+      console.log("Adding idea to poll1:", pollId);
+      console.log("Adding idea to poll2:", ideaId);
       const updatedPoll = await this.pollsService.addIdeaToPoll(pollId, ideaId);
       return res.status(200).json(updatedPoll);
     } catch (error) {
@@ -139,11 +142,13 @@ export class PollsController {
   @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'Idea approved for poll' })
   async approveIdeaInPoll(@Req() req: Request, @Res() res: Response) {
-    const { pollId, ideaId } = req.body;
+    const { pollId,ideaId, ideaCid } = req.body;
     try {
       const updatedPoll = await this.pollsService.approveIdeaInPoll(
         pollId,
+
         ideaId,
+        ideaCid,
       );
       return res.status(200).json(updatedPoll);
     } catch (error) {

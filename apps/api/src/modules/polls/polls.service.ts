@@ -29,13 +29,13 @@ export class PollsService {
         return poll.save();
     }
 
-    async approveIdeaInPoll(pollId: string, ideaId: string): Promise<PollsDocument | null> {
+    async approveIdeaInPoll(pollId: string, ideaId: string, ideaCid: string): Promise<PollsDocument | null> {
         let poll = await this.pollsModel.findById(pollId).exec();
         if (!poll) {
             throw new BadRequestException('Poll not found');
         }
         poll.ideas = poll.ideas.filter(id => id !== ideaId);
-        poll.options.push(ideaId);
+        poll.options.push(ideaCid);
         return poll.save();
     }
     async savePollOnChainId(pollId: string, pollIdOnChain: number): Promise<PollsDocument | null> {

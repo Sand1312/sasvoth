@@ -11,7 +11,7 @@ export type IdeaPayload = {
 
 export const ideasApi = {
   createIdea: async (payload: IdeaPayload) => {
-    const response = await api.post("/ideas", { idea: payload });
+    const response = await api.post("/ideas/create", { idea: payload });
     return response.data?.idea ?? response.data;
   },
   getIdeaById: async (ideaId: string) => {
@@ -19,7 +19,7 @@ export const ideasApi = {
     return response.data?.idea ?? response.data;
   },
   updateIdeaCID: async (ideaId: string, idea_cid: string) => {
-    const response = await api.patch(`/ideas/${ideaId}/cid`, { idea_cid });
+    const response = await api.patch(`/ideas/updateCID`, {ideaId, idea_cid });
     return response.data?.idea ?? response.data;
   },
   updateIdea: async (ideaId: string, updateData: Partial<IdeaPayload>) => {

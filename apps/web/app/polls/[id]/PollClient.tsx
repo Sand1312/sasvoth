@@ -3,14 +3,16 @@ import { useEffect, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { IdeaSubmitFormTrigger } from "@/components/idea-submit-form-trigger";
 import { PollStatus } from "@/types/polls";
-import { usePolls } from "@/hooks";
+import { usePolls, useIdeas } from "@/hooks";
 import { ideasApi } from "@/api";
 import { formatDate } from "@/lib/date";
+import Link from "next/dist/client/link";
+import { usePollContext } from "./PollContext";
 
 type Timeline = { start: string; end: string };
 
 type Idea = {
-  id: string;
+  _id: string;
   title: string;
   summary: string;
   credits: number;
@@ -34,7 +36,7 @@ type TallyResult = {
 };
 
 type ApiIdea = {
-  id?: string;
+  _id?: string;
   title?: string;
   description?: string;
   descriptionMore?: string;
@@ -43,6 +45,7 @@ type ApiIdea = {
 };
 
 type ApiPoll = {
+  _id?: string;
   title?: string;
   description?: string;
   startTime?: string | Date;
@@ -52,7 +55,7 @@ type ApiPoll = {
   status?: PollStatus;
   ideas?: Idea[];
   ideaIds?: string[];
-  options?: VoteOption[];
+  options?: string[];
   results?: TallyResult[];
 };
 
@@ -64,7 +67,7 @@ type PollData = {
   status: PollStatus;
   ideas: Idea[];
   approvedIdeasId?: string[];
-  options: VoteOption[];
+  options: string[];
   results: TallyResult[];
 };
 
@@ -82,7 +85,7 @@ const fallbackPoll: PollData = {
 };
 
 const normalizeIdea = (idea: ApiIdea, fallbackId: string): Idea => ({
-  id: idea.id ?? fallbackId,
+  _id: idea._id ?? fallbackId,
   title: idea.title ?? "Untitled idea",
   summary: idea.description ?? idea.descriptionMore ?? "",
   credits: 0,
@@ -109,12 +112,11 @@ const resolveIdeas = async (source: ApiPoll) => {
 };
 
 export default function PollClient({
-  pollId,
   searchParams,
 }: {
-  pollId: string;
   searchParams?: { phase?: string };
 }) {
+  const { pollId } = usePollContext();
   const { getPollById } = usePolls();
 
   const requestedPhase = searchParams?.phase?.toLowerCase() as
@@ -134,7 +136,9 @@ export default function PollClient({
     let mounted = true;
     const load = async () => {
       try {
+        console.log("Loading poll data for ID:", pollId);
         const response = await getPollById(pollId);
+        console.log("Fetched poll data:", response);
         const source = (response ?? {}) as ApiPoll;
         const ideas = await resolveIdeas(source);
         const timeframeStart =
@@ -276,13 +280,13 @@ function PrepareSection({ poll }: { poll: PollData }) {
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {poll.ideas.map((idea) => (
           <article
-            key={idea.id}
+            key={idea._id}
             className="flex h-full flex-col gap-4 rounded-[32px] border border-black bg-white p-6"
           >
             <div className="h-24 rounded-2xl border border-black bg-black/5" />
             <div>
               <p className="text-[0.65rem] uppercase tracking-[0.35em] text-black/50">
-                Idea {idea.id}
+                Idea {idea._id}
               </p>
               <h3 className="mt-1 text-xl font-semibold">{idea.title}</h3>
               <p className="mt-2 text-sm text-black/70">{idea.summary}</p>
@@ -309,11 +313,17 @@ function PrepareSection({ poll }: { poll: PollData }) {
 }
 
 function VotingSection({ poll }: { poll: PollData }) {
+  const { getIdeaById } = useIdeas();
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  useEffect(() => {
+    Promise.all(poll.options.map(id => getIdeaById(id))).then(setIdeas);
+  }, [poll.options, getIdeaById]);
+  console.log("Resolved ideas for voting:", ideas);
   const highlightedIdeaId =
-    poll.ideas.length > 0
-      ? poll.ideas.reduce((top, idea) =>
+    ideas.length > 0
+      ? ideas.reduce((top, idea) =>
           idea.credits > top.credits ? idea : top
-        ).id
+        )._id
       : undefined;
 
   return (
@@ -342,13 +352,13 @@ function VotingSection({ poll }: { poll: PollData }) {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-        {poll.ideas.map((idea) => {
+        {ideas.map((idea) => {
           const isHighlighted =
-            highlightedIdeaId != null && idea.id === highlightedIdeaId;
+            highlightedIdeaId != null && idea._id === highlightedIdeaId;
 
           return (
             <article
-              key={idea.id}
+              key={idea._id}
               className={`relative flex h-full flex-col gap-4 rounded-[32px] border bg-white p-6 ${isHighlighted ? "border-[#2563eb] shadow-[0_0_0_2px_#2563eb33]" : "border-black"}`}
             >
               <div className="h-24 rounded-2xl border border-black bg-black/5" />
@@ -362,12 +372,12 @@ function VotingSection({ poll }: { poll: PollData }) {
               <span className="absolute right-6 top-6 rounded-full border border-black bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]">
                 {idea.credits} cr
               </span>
-              <Button
-                variant="ghost"
+              <Link
+                href={`/votes/${idea._id}`}
                 className="mt-auto rounded-full border border-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-black hover:bg-black/5"
               >
                 Read detail
-              </Button>
+              </Link>
             </article>
           );
         })}

@@ -1,17 +1,14 @@
 import PollClient from "./PollClient";
+import { PollProvider } from "./PollContext";
+type PollPageProps = {
+  params: { pollId?: string; id?: string };
+  searchParams?: { phase?: string };
+};
 
-export default async function PollPage({ params, searchParams }: {
-  params: Promise<{ id: string }> | { id: string };
-  searchParams?: Promise<{ phase?: string }> | { phase?: string };
-}) {
-
-  const resolvedParams = await params;
-  const resolvedSearch = searchParams ? await searchParams : undefined;
-
+export default function PollPage({ searchParams }: PollPageProps) {
   return (
-    <PollClient
-      pollId={resolvedParams.id}
-      searchParams={resolvedSearch}
-    />
+    <PollProvider>
+      <PollClient searchParams={searchParams} />
+    </PollProvider>
   );
 }

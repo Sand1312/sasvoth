@@ -8,6 +8,7 @@ import { cn } from "@sasvoth/ui/lib/utils";
 import { useAccount } from "wagmi";
 import { useIdeas } from "../hooks/useIdeas";
 import {usePolls} from "../hooks/usePolls";
+import { usePollContext } from "../app/polls/[id]/PollContext";
 type LayoutItemBase = {
   id: string;
   title: string;
@@ -47,6 +48,7 @@ export function IdeaUploadForm({
 }): React.ReactElement {
   const { address } = useAccount();
   const { createIdea } = useIdeas();
+  const { pollId } = usePollContext();
   const {  addIdeaToPoll, selectedPollId } = usePolls();
   const [step, setStep] = React.useState(1);
   const [logoFile, setLogoFile] = React.useState<File | null>(null);
@@ -271,8 +273,8 @@ export function IdeaUploadForm({
     const idea = await createIdea(payload);
     
     console.table(payload);
-    await addIdeaToPoll(selectedPollId, idea._id);
-    handlePreviewClose();
+    await addIdeaToPoll(pollId, idea._id);
+  
 
   }
 

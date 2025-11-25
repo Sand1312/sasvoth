@@ -72,7 +72,7 @@ function normalizeIdeaId(idea: IdeaRecord | string | undefined) {
 
 export default function AdminPollsPage(): React.ReactElement {
   const {deployPoll,getPollContracts} = useMaci();
-  const {updatePollStatus,saveOnChainId} = usePolls();
+  const {updatePollStatus,saveOnChainId,approveIdeaInPoll} = usePolls();
   const [polls, setPolls] = useState<PollWithIdeas[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -173,7 +173,7 @@ export default function AdminPollsPage(): React.ReactElement {
     setBusyIdea(ideaId);
     setError(null);
     try {
-      await pollsApi.approveIdeaInPoll(pollId, ideaId);
+      // await pollsApi.approveIdeaInPoll(pollId, ideaId);
       const metadata = {
         pollId,
         ideaId,
@@ -194,7 +194,7 @@ export default function AdminPollsPage(): React.ReactElement {
         },
       }));
       try {
-        await ideasApi.updateIdeaCID(ideaId, cidUri || cid);
+        await approveIdeaInPoll(pollId, ideaId, cidUri || cid);
       } catch (err) {
         console.warn("Unable to persist idea CID", err);
       }

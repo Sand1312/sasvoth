@@ -57,7 +57,7 @@ export const pollsApi = {
   },
   getPollById: async (pollId: string) => {
     try {
-      const response = await api.get(`/polls/`, { params: { pollId } });
+      const response = await api.get(`/polls/${pollId}`);
       return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
@@ -73,15 +73,15 @@ export const pollsApi = {
   },
   addIdeaToPoll: async (pollId: string, ideaId: string) => {
     try {
-      const response = await api.patch(`/polls/${pollId}/ideas`, { ideaId });
+      const response = await api.patch(`/polls/addIdea`, {pollId, ideaId });
       return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
     }
   },
-  approveIdeaInPoll: async (pollId: string, ideaId: string) => {
+  approveIdeaInPoll: async (pollId: string, ideaId: string, ideaCid: string) => {
     try {
-      const response = await api.patch(`/polls/${pollId}/approve`, { ideaId });
+      const response = await api.patch(`/polls/approveIdea`, {pollId,ideaId, ideaCid });
       return response.data?.poll ?? response.data;
     } catch (error) {
       throw error;
