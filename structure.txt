@@ -1,0 +1,1055 @@
+.
+├── README.md
+├── apps
+│   ├── api
+│   │   ├── README.md
+│   │   ├── dist
+│   │   │   ├── app.controller.d.ts
+│   │   │   ├── app.controller.js
+│   │   │   ├── app.controller.js.map
+│   │   │   ├── app.module.d.ts
+│   │   │   ├── app.module.js
+│   │   │   ├── app.module.js.map
+│   │   │   ├── app.service.d.ts
+│   │   │   ├── app.service.js
+│   │   │   ├── app.service.js.map
+│   │   │   ├── common
+│   │   │   ├── config
+│   │   │   ├── dto
+│   │   │   ├── main.d.ts
+│   │   │   ├── main.js
+│   │   │   ├── main.js.map
+│   │   │   ├── modules
+│   │   │   ├── tsconfig.build.tsbuildinfo
+│   │   │   └── utils
+│   │   ├── eslint.config.mjs
+│   │   ├── nest-cli.json
+│   │   ├── node_modules
+│   │   │   ├── @eslint
+│   │   │   ├── @maci-protocol
+│   │   │   ├── @nestjs
+│   │   │   ├── @nestjs-modules
+│   │   │   ├── @sasvoth
+│   │   │   ├── @sendgrid
+│   │   │   ├── @swc
+│   │   │   ├── @types
+│   │   │   ├── axios -> ../../../node_modules/.pnpm/axios@1.13.2/node_modules/axios
+│   │   │   ├── bcrypt -> ../../../node_modules/.pnpm/bcrypt@6.0.0/node_modules/bcrypt
+│   │   │   ├── circomlib -> ../../../node_modules/.pnpm/circomlib@2.0.5/node_modules/circomlib
+│   │   │   ├── circomlibjs -> ../../../node_modules/.pnpm/circomlibjs@0.1.7_bufferutil@4.0.9_utf-8-validate@5.0.10/node_modules/circomlibjs
+│   │   │   ├── config -> ../../../node_modules/.pnpm/config@3.2.3/node_modules/config
+│   │   │   ├── cookie-parser -> ../../../node_modules/.pnpm/cookie-parser@1.4.7/node_modules/cookie-parser
+│   │   │   ├── dotenv -> ../../../node_modules/.pnpm/dotenv@17.2.3/node_modules/dotenv
+│   │   │   ├── eslint -> ../../../node_modules/.pnpm/eslint@9.39.1_jiti@2.6.1/node_modules/eslint
+│   │   │   ├── eslint-config-prettier -> ../../../node_modules/.pnpm/eslint-config-prettier@10.1.8_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-config-prettier
+│   │   │   ├── eslint-plugin-prettier -> ../../../node_modules/.pnpm/eslint-plugin-prettier@5.5.4_@types+eslint@9.6.1_eslint-config-prettier@10.1.8_eslint@9.39.1__fickd46oetfizpxyrvzl2onoe4/node_modules/eslint-plugin-prettier
+│   │   │   ├── ethers -> ../../../node_modules/.pnpm/ethers@5.8.0_bufferutil@4.0.9_utf-8-validate@5.0.10/node_modules/ethers
+│   │   │   ├── form-data -> ../../../node_modules/.pnpm/form-data@4.0.5/node_modules/form-data
+│   │   │   ├── globals -> ../../../node_modules/.pnpm/globals@16.5.0/node_modules/globals
+│   │   │   ├── ioredis -> ../../../node_modules/.pnpm/ioredis@5.8.2/node_modules/ioredis
+│   │   │   ├── ipfs-http-client -> ../../../node_modules/.pnpm/ipfs-http-client@60.0.1_encoding@0.1.13/node_modules/ipfs-http-client
+│   │   │   ├── jest -> ../../../node_modules/.pnpm/jest@30.2.0_@types+node@22.19.1_babel-plugin-macros@3.1.0_ts-node@10.9.2_@swc+core@1.15.2_@sw_l7rekbmz7ro5ufxuug4fpiagsy/node_modules/jest
+│   │   │   ├── jsonwebtoken -> ../../../node_modules/.pnpm/jsonwebtoken@9.0.2/node_modules/jsonwebtoken
+│   │   │   ├── maci -> ../../../node_modules/.pnpm/maci@0.0.1/node_modules/maci
+│   │   │   ├── maci-crypto -> ../../../node_modules/.pnpm/maci-crypto@2.5.0_bufferutil@4.0.9_utf-8-validate@5.0.10/node_modules/maci-crypto
+│   │   │   ├── maci-domainobjs -> ../../../node_modules/.pnpm/maci-domainobjs@2.5.0_bufferutil@4.0.9_utf-8-validate@5.0.10/node_modules/maci-domainobjs
+│   │   │   ├── passport -> ../../../node_modules/.pnpm/passport@0.7.0/node_modules/passport
+│   │   │   ├── passport-github2 -> ../../../node_modules/.pnpm/passport-github2@0.1.12/node_modules/passport-github2
+│   │   │   ├── passport-google-oauth20 -> ../../../node_modules/.pnpm/passport-google-oauth20@2.0.0/node_modules/passport-google-oauth20
+│   │   │   ├── passport-jwt -> ../../../node_modules/.pnpm/passport-jwt@4.0.1/node_modules/passport-jwt
+│   │   │   ├── pino -> ../../../node_modules/.pnpm/pino@9.14.0/node_modules/pino
+│   │   │   ├── pino-pretty -> ../../../node_modules/.pnpm/pino-pretty@11.3.0/node_modules/pino-pretty
+│   │   │   ├── prettier -> ../../../node_modules/.pnpm/prettier@3.6.2/node_modules/prettier
+│   │   │   ├── reflect-metadata -> ../../../node_modules/.pnpm/reflect-metadata@0.2.2/node_modules/reflect-metadata
+│   │   │   ├── rxjs -> ../../../node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs
+│   │   │   ├── snarkjs -> ../../../node_modules/.pnpm/snarkjs@0.7.5/node_modules/snarkjs
+│   │   │   ├── source-map-support -> ../../../node_modules/.pnpm/source-map-support@0.5.21/node_modules/source-map-support
+│   │   │   ├── supertest -> ../../../node_modules/.pnpm/supertest@7.1.4/node_modules/supertest
+│   │   │   ├── swagger-ui-express -> ../../../node_modules/.pnpm/swagger-ui-express@5.0.1_express@5.1.0/node_modules/swagger-ui-express
+│   │   │   ├── ts-jest -> ../../../node_modules/.pnpm/ts-jest@29.4.5_@babel+core@7.28.5_@jest+transform@30.2.0_@jest+types@30.2.0_babel-jest@30.2.0_m4n7yp4xakvrt6okpm2mieojpe/node_modules/ts-jest
+│   │   │   ├── ts-loader -> ../../../node_modules/.pnpm/ts-loader@9.5.4_typescript@5.8.3_webpack@5.100.2_@swc+core@1.15.2_@swc+helpers@0.5.17__/node_modules/ts-loader
+│   │   │   ├── ts-node -> ../../../node_modules/.pnpm/ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+node@22.19.1_typescript@5.8.3/node_modules/ts-node
+│   │   │   ├── tsconfig-paths -> ../../../node_modules/.pnpm/tsconfig-paths@4.2.0/node_modules/tsconfig-paths
+│   │   │   ├── turbo -> ../../../node_modules/.pnpm/turbo@2.6.1/node_modules/turbo
+│   │   │   ├── typeorm -> ../../../node_modules/.pnpm/typeorm@0.3.27_babel-plugin-macros@3.1.0_ioredis@5.8.2_mongodb@6.20.0_reflect-metadata@0.2.2__rt22326dmsvr4nip62b5ljy2qi/node_modules/typeorm
+│   │   │   ├── typescript -> ../../../node_modules/.pnpm/typescript@5.8.3/node_modules/typescript
+│   │   │   ├── typescript-eslint -> ../../../node_modules/.pnpm/typescript-eslint@8.46.4_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/typescript-eslint
+│   │   │   ├── viem -> ../../../node_modules/.pnpm/viem@2.39.0_bufferutil@4.0.9_typescript@5.8.3_utf-8-validate@5.0.10_zod@4.1.12/node_modules/viem
+│   │   │   └── zod -> ../../../node_modules/.pnpm/zod@4.1.12/node_modules/zod
+│   │   ├── package.json
+│   │   ├── scripts
+│   │   │   └── deploy-poll.sh
+│   │   ├── src
+│   │   │   ├── app.controller.spec.ts
+│   │   │   ├── app.controller.ts
+│   │   │   ├── app.module.ts
+│   │   │   ├── app.service.ts
+│   │   │   ├── common
+│   │   │   ├── config
+│   │   │   ├── dto
+│   │   │   ├── main.ts
+│   │   │   ├── modules
+│   │   │   ├── sol
+│   │   │   ├── types
+│   │   │   └── utils
+│   │   ├── test
+│   │   │   ├── app.e2e-spec.ts
+│   │   │   └── jest-e2e.json
+│   │   ├── tsconfig.build.json
+│   │   └── tsconfig.json
+│   └── web
+│       ├── README.md
+│       ├── api
+│       │   ├── auth.api.ts
+│       │   ├── base.ts
+│       │   ├── ideas.api.ts
+│       │   ├── index.ts
+│       │   ├── ipfs.api.ts
+│       │   └── polls.api.ts
+│       ├── app
+│       │   ├── RootNav.tsx
+│       │   ├── admin
+│       │   ├── api
+│       │   ├── dashboard
+│       │   ├── fonts
+│       │   ├── globals.css
+│       │   ├── ideas
+│       │   ├── layout.tsx
+│       │   ├── mock-provider.tsx
+│       │   ├── page.tsx
+│       │   ├── polls
+│       │   ├── settings
+│       │   ├── signin
+│       │   ├── signup
+│       │   ├── test
+│       │   ├── transactions
+│       │   └── votes
+│       ├── components
+│       │   ├── idea-submit-form-trigger.tsx
+│       │   ├── idea-upload-form.tsx
+│       │   └── root-nav-client.tsx
+│       ├── eslint.config.js
+│       ├── hooks
+│       │   ├── index.ts
+│       │   ├── useAuth.ts
+│       │   ├── useClaimContract.ts
+│       │   ├── useMACI.ts
+│       │   ├── usePollCreation.ts
+│       │   ├── usePollMaci.ts
+│       │   ├── usePolls.ts
+│       │   ├── useRedirect.ts
+│       │   ├── useToken.ts
+│       │   └── useVote.ts
+│       ├── instrumentation.ts
+│       ├── lib
+│       │   ├── contracts.ts
+│       │   ├── date.ts
+│       │   ├── logger.ts
+│       │   └── wagmi-config.ts
+│       ├── middleware.ts
+│       ├── mock_ipfs_storage
+│       │   ├── bafkreiciq3sclsshfewgtfc6o2pa256aztbfhujjlqv3l5iyncvojqsvda-metadata.json
+│       │   ├── bafkreiedexohtsnitqf3hmmpezq2udlhzaithsquyn5qgkaxd5xo26rcyy-metadata.json
+│       │   ├── bafkreifby2e5yt24fz6ft6egu26nzqj5o72tw73lrteyy5hlzlvm44qrha-metadata.json
+│       │   ├── bafkreifqi57b73qhcbgj3cutm7un5wjz5pr64ognshce2rf7wsabknduzi-metadata.json
+│       │   └── bafkreige7rohlya546alvizrqzg6qa4qnuli62466cewktz3t5nuzu5qzq-metadata.json
+│       ├── mocks
+│       │   ├── accounts.ts
+│       │   ├── browser.ts
+│       │   ├── data.json
+│       │   ├── db.ts
+│       │   ├── handlers
+│       │   └── server.ts
+│       ├── next-env.d.ts
+│       ├── next.config.js
+│       ├── node_modules
+│       │   ├── @maci-protocol
+│       │   ├── @sasvoth
+│       │   ├── @tanstack
+│       │   ├── @types
+│       │   ├── autoprefixer -> ../../../node_modules/.pnpm/autoprefixer@10.4.22_postcss@8.5.6/node_modules/autoprefixer
+│       │   ├── axios -> ../../../node_modules/.pnpm/axios@1.13.2/node_modules/axios
+│       │   ├── cross-env -> ../../../node_modules/.pnpm/cross-env@7.0.3/node_modules/cross-env
+│       │   ├── eslint -> ../../../node_modules/.pnpm/eslint@9.39.1_jiti@2.6.1/node_modules/eslint
+│       │   ├── lucide-react -> ../../../node_modules/.pnpm/lucide-react@0.525.0_react@19.2.0/node_modules/lucide-react
+│       │   ├── msw -> ../../../node_modules/.pnpm/msw@2.12.2_@types+node@24.10.1_typescript@5.8.3/node_modules/msw
+│       │   ├── next -> ../../../node_modules/.pnpm/next@15.3.0_@babel+core@7.28.5_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next
+│       │   ├── next-auth -> ../../../node_modules/.pnpm/next-auth@4.24.13_next@15.3.0_@babel+core@7.28.5_react-dom@19.2.0_react@19.2.0__react@19.2.0__ixggzj6groshwnqs4fgq5eggee/node_modules/next-auth
+│       │   ├── nprogress -> ../../../node_modules/.pnpm/nprogress@0.2.0/node_modules/nprogress
+│       │   ├── postcss -> ../../../node_modules/.pnpm/postcss@8.5.6/node_modules/postcss
+│       │   ├── react -> ../../../node_modules/.pnpm/react@19.2.0/node_modules/react
+│       │   ├── react-dom -> ../../../node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom
+│       │   ├── react-toastify -> ../../../node_modules/.pnpm/react-toastify@11.0.5_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/react-toastify
+│       │   ├── snarkjs -> ../../../node_modules/.pnpm/snarkjs@0.7.5/node_modules/snarkjs
+│       │   ├── tailwindcss -> ../../../node_modules/.pnpm/tailwindcss@4.1.17/node_modules/tailwindcss
+│       │   ├── typescript -> ../../../node_modules/.pnpm/typescript@5.8.3/node_modules/typescript
+│       │   └── wagmi -> ../../../node_modules/.pnpm/wagmi@2.19.4_@tanstack+query-core@5.90.10_@tanstack+react-query@5.90.10_react@19.2.0__@types+_ddpdqxc3576rqdgdeucthnowqu/node_modules/wagmi
+│       ├── package.json
+│       ├── postcss.config.mjs
+│       ├── providers
+│       │   └── Web3Provider.tsx
+│       ├── public
+│       │   ├── file-text.svg
+│       │   ├── globe.svg
+│       │   ├── lg-logo.svg
+│       │   ├── logo.svg
+│       │   ├── mockServiceWorker.js
+│       │   ├── next.svg
+│       │   ├── silksong.jpg
+│       │   ├── sunflower.svg
+│       │   ├── turborepo-dark.svg
+│       │   ├── turborepo-light.svg
+│       │   ├── vercel.svg
+│       │   ├── window.svg
+│       │   └── zkeys
+│       ├── tsconfig.json
+│       └── types
+│           └── polls.ts
+├── build
+│   ├── packages
+│   │   ├── cli
+│   │   │   └── ts
+│   │   ├── contracts
+│   │   │   ├── tasks
+│   │   │   ├── ts
+│   │   │   └── typechain-types
+│   │   ├── core
+│   │   │   └── ts
+│   │   ├── crypto
+│   │   │   └── ts
+│   │   ├── domainobjs
+│   │   │   └── ts
+│   │   └── sdk
+│   │       └── ts
+│   └── tsconfig.tsbuildinfo
+├── cspell.json
+├── node_modules
+│   ├── @eslint
+│   │   ├── config-array -> ../.pnpm/@eslint+config-array@0.21.1/node_modules/@eslint/config-array
+│   │   ├── config-helpers -> ../.pnpm/@eslint+config-helpers@0.4.2/node_modules/@eslint/config-helpers
+│   │   ├── core -> ../.pnpm/@eslint+core@0.17.0/node_modules/@eslint/core
+│   │   ├── eslintrc -> ../.pnpm/@eslint+eslintrc@3.3.1/node_modules/@eslint/eslintrc
+│   │   ├── js -> ../.pnpm/@eslint+js@9.39.1/node_modules/@eslint/js
+│   │   ├── object-schema -> ../.pnpm/@eslint+object-schema@2.1.7/node_modules/@eslint/object-schema
+│   │   └── plugin-kit -> ../.pnpm/@eslint+plugin-kit@0.4.1/node_modules/@eslint/plugin-kit
+│   ├── @eslint-community
+│   │   ├── eslint-utils -> ../.pnpm/@eslint-community+eslint-utils@4.9.0_eslint@9.39.1_jiti@2.6.1_/node_modules/@eslint-community/eslint-utils
+│   │   └── regexpp -> ../.pnpm/@eslint-community+regexpp@4.12.2/node_modules/@eslint-community/regexpp
+│   ├── @nestjs
+│   │   └── mongoose -> ../.pnpm/@nestjs+mongoose@11.0.3_@nestjs+common@11.1.9_reflect-metadata@0.2.2_rxjs@7.8.2__@nestjs+core_tdwp462ejai7jx47s4zvcqleca/node_modules/@nestjs/mongoose
+│   ├── @next
+│   │   └── eslint-plugin-next -> ../.pnpm/@next+eslint-plugin-next@15.5.6/node_modules/@next/eslint-plugin-next
+│   ├── @nx
+│   │   ├── eslint -> ../.pnpm/@nx+eslint@21.6.8_@babel+traverse@7.28.5_@swc+core@1.15.2_@swc+helpers@0.5.17__@zkochan+js-ya_45apqfhxjsrn3wuc4dka6h5r5q/node_modules/@nx/eslint
+│   │   └── nest -> ../.pnpm/@nx+nest@21.6.8_@babel+traverse@7.28.5_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+node@24.1_w5n36in5lwodvqpznri2lzqyre/node_modules/@nx/nest
+│   ├── @rushstack
+│   │   └── eslint-patch -> ../.pnpm/@rushstack+eslint-patch@1.15.0/node_modules/@rushstack/eslint-patch
+│   ├── @sasvoth
+│   │   └── eslint-config -> ../../packages/eslint-config
+│   ├── @types
+│   │   ├── eslint -> ../.pnpm/@types+eslint@9.6.1/node_modules/@types/eslint
+│   │   ├── eslint-scope -> ../.pnpm/@types+eslint-scope@3.7.7/node_modules/@types/eslint-scope
+│   │   ├── mongoose -> ../.pnpm/@types+mongoose@5.11.97/node_modules/@types/mongoose
+│   │   ├── node -> ../.pnpm/@types+node@24.10.1/node_modules/@types/node
+│   │   └── prettier -> ../.pnpm/@types+prettier@2.7.3/node_modules/@types/prettier
+│   ├── @typescript-eslint
+│   │   ├── eslint-plugin -> ../.pnpm/@typescript-eslint+eslint-plugin@8.46.4_@typescript-eslint+parser@8.46.4_eslint@9.39.1_jiti@2_3l5fyydwppsxkce2jjjct4dhg4/node_modules/@typescript-eslint/eslint-plugin
+│   │   ├── parser -> ../.pnpm/@typescript-eslint+parser@8.46.4_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/@typescript-eslint/parser
+│   │   ├── project-service -> ../.pnpm/@typescript-eslint+project-service@8.46.4_typescript@5.8.3/node_modules/@typescript-eslint/project-service
+│   │   ├── scope-manager -> ../.pnpm/@typescript-eslint+scope-manager@8.46.4/node_modules/@typescript-eslint/scope-manager
+│   │   ├── tsconfig-utils -> ../.pnpm/@typescript-eslint+tsconfig-utils@8.46.4_typescript@5.8.3/node_modules/@typescript-eslint/tsconfig-utils
+│   │   ├── type-utils -> ../.pnpm/@typescript-eslint+type-utils@8.46.4_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/@typescript-eslint/type-utils
+│   │   ├── types -> ../.pnpm/@typescript-eslint+types@8.46.4/node_modules/@typescript-eslint/types
+│   │   ├── typescript-estree -> ../.pnpm/@typescript-eslint+typescript-estree@8.46.4_typescript@5.8.3/node_modules/@typescript-eslint/typescript-estree
+│   │   ├── utils -> ../.pnpm/@typescript-eslint+utils@8.46.4_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/@typescript-eslint/utils
+│   │   └── visitor-keys -> ../.pnpm/@typescript-eslint+visitor-keys@8.46.4/node_modules/@typescript-eslint/visitor-keys
+│   ├── @wagmi
+│   │   └── core -> ../.pnpm/@wagmi+core@2.22.1_@tanstack+query-core@5.90.10_@types+react@19.1.0_immer@10.0.2_react@19.2.0_2etnm4aqfxx7vgj63vkzfnzax4/node_modules/@wagmi/core
+│   ├── eslint -> .pnpm/eslint@9.39.1_jiti@2.6.1/node_modules/eslint
+│   ├── eslint-config-next -> .pnpm/eslint-config-next@15.3.5_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/eslint-config-next
+│   ├── eslint-config-prettier -> .pnpm/eslint-config-prettier@10.1.8_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-config-prettier
+│   ├── eslint-import-resolver-node -> .pnpm/eslint-import-resolver-node@0.3.9/node_modules/eslint-import-resolver-node
+│   ├── eslint-import-resolver-typescript -> .pnpm/eslint-import-resolver-typescript@3.10.1_eslint-plugin-import@2.32.0_@typescript-eslint+parse_ulk6dxdmuvdya5btq74j3a7riu/node_modules/eslint-import-resolver-typescript
+│   ├── eslint-module-utils -> .pnpm/eslint-module-utils@2.12.1_@typescript-eslint+parser@8.46.4_eslint@9.39.1_jiti@2.6.1__typescr_4hcfjpy7xbseoe76dconrpcwo4/node_modules/eslint-module-utils
+│   ├── eslint-plugin-import -> .pnpm/eslint-plugin-import@2.32.0_@typescript-eslint+parser@8.46.4_eslint@9.39.1_jiti@2.6.1__typesc_hxeyg4hpre7qe3iwdpkuxlpamy/node_modules/eslint-plugin-import
+│   ├── eslint-plugin-jsx-a11y -> .pnpm/eslint-plugin-jsx-a11y@6.10.2_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-plugin-jsx-a11y
+│   ├── eslint-plugin-only-warn -> .pnpm/eslint-plugin-only-warn@1.1.0/node_modules/eslint-plugin-only-warn
+│   ├── eslint-plugin-prettier -> .pnpm/eslint-plugin-prettier@5.5.4_@types+eslint@9.6.1_eslint-config-prettier@10.1.8_eslint@9.39.1__fickd46oetfizpxyrvzl2onoe4/node_modules/eslint-plugin-prettier
+│   ├── eslint-plugin-react -> .pnpm/eslint-plugin-react@7.37.5_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-plugin-react
+│   ├── eslint-plugin-react-hooks -> .pnpm/eslint-plugin-react-hooks@5.2.0_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-plugin-react-hooks
+│   ├── eslint-plugin-turbo -> .pnpm/eslint-plugin-turbo@2.6.1_eslint@9.39.1_jiti@2.6.1__turbo@2.6.1/node_modules/eslint-plugin-turbo
+│   ├── eslint-scope -> .pnpm/eslint-scope@8.4.0/node_modules/eslint-scope
+│   ├── eslint-visitor-keys -> .pnpm/eslint-visitor-keys@4.2.1/node_modules/eslint-visitor-keys
+│   ├── ethers -> .pnpm/ethers@5.8.0_bufferutil@4.0.9_utf-8-validate@5.0.10/node_modules/ethers
+│   ├── mongoose -> .pnpm/mongoose@8.19.4/node_modules/mongoose
+│   ├── nx -> .pnpm/nx@21.6.8_@swc+core@1.15.2_@swc+helpers@0.5.17_/node_modules/nx
+│   ├── prettier -> .pnpm/prettier@3.6.2/node_modules/prettier
+│   ├── prettier-linter-helpers -> .pnpm/prettier-linter-helpers@1.0.0/node_modules/prettier-linter-helpers
+│   ├── turbo -> .pnpm/turbo@2.6.1/node_modules/turbo
+│   ├── typescript -> .pnpm/typescript@5.8.3/node_modules/typescript
+│   ├── typescript-eslint -> .pnpm/typescript-eslint@8.46.4_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/typescript-eslint
+│   ├── viem -> .pnpm/viem@2.39.0_bufferutil@4.0.9_typescript@5.8.3_utf-8-validate@5.0.10_zod@3.25.76/node_modules/viem
+│   └── wagmi -> .pnpm/wagmi@2.19.4_@tanstack+query-core@5.90.10_@tanstack+react-query@5.90.10_react@19.2.0__@types+_hbxktwcfayumh6wnahw3zsiiwu/node_modules/wagmi
+├── package.json
+├── packages
+│   ├── circuits
+│   │   ├── calculateCommitment.js
+│   │   ├── input.json
+│   │   ├── node_modules
+│   │   │   ├── circomlib -> ../../../node_modules/.pnpm/circomlib@2.0.5/node_modules/circomlib
+│   │   │   ├── circomlibjs -> ../../../node_modules/.pnpm/circomlibjs@0.1.7_bufferutil@4.0.9_utf-8-validate@5.0.10/node_modules/circomlibjs
+│   │   │   ├── cpx -> ../../../node_modules/.pnpm/cpx@1.5.0/node_modules/cpx
+│   │   │   └── snarkjs -> ../../../node_modules/.pnpm/snarkjs@0.7.5/node_modules/snarkjs
+│   │   ├── package.json
+│   │   ├── powersOfTau28_hez_final_16.ptau
+│   │   ├── scripts
+│   │   │   └── runProofTest.js
+│   │   ├── src
+│   │   │   ├── index.ts
+│   │   │   ├── proofGenerator.ts
+│   │   │   └── types.ts
+│   │   ├── tsconfig.json
+│   │   ├── verification_key.json
+│   │   ├── voteProof.circom
+│   │   ├── voteProof.r1cs
+│   │   ├── voteProof.sym
+│   │   ├── voteProof_0000.zkey
+│   │   ├── voteProof_0001.zkey
+│   │   └── voteProof_js
+│   │       ├── generate_witness.js
+│   │       ├── voteProof.wasm
+│   │       └── witness_calculator.js
+│   ├── contracts
+│   │   ├── abi
+│   │   │   ├── contracts
+│   │   │   ├── policy
+│   │   │   ├── poseidon
+│   │   │   └── proxy
+│   │   ├── index.ts
+│   │   ├── node_modules
+│   │   │   ├── @excubiae
+│   │   │   ├── @maci-protocol
+│   │   │   ├── @matterlabs
+│   │   │   ├── @nomicfoundation
+│   │   │   ├── @openzeppelin
+│   │   │   ├── @pcd
+│   │   │   ├── @types
+│   │   │   ├── @zk-kit
+│   │   │   ├── chai -> ../../../node_modules/.pnpm/chai@4.5.0/node_modules/chai
+│   │   │   ├── chai-as-promised -> ../../../node_modules/.pnpm/chai-as-promised@7.1.2_chai@4.5.0/node_modules/chai-as-promised
+│   │   │   ├── circomlibjs -> ../../../node_modules/.pnpm/circomlibjs@0.1.7/node_modules/circomlibjs
+│   │   │   ├── cross-env -> ../../../node_modules/.pnpm/cross-env@7.0.3/node_modules/cross-env
+│   │   │   ├── dotenv -> ../../../node_modules/.pnpm/dotenv@17.2.0/node_modules/dotenv
+│   │   │   ├── ethers -> ../../../node_modules/.pnpm/ethers@6.15.0_bufferutil@4.0.9_utf-8-validate@5.0.10/node_modules/ethers
+│   │   │   ├── hardhat -> ../../../node_modules/.pnpm/hardhat@2.25.0_ts-node@10.9.2_@swc+core@1.12.11_@types+node@24.0.12_typescript@5.8.3__typescript@5.8.3/node_modules/hardhat
+│   │   │   ├── hardhat-artifactor -> ../../../node_modules/.pnpm/hardhat-artifactor@0.2.0_hardhat@2.25.0_ts-node@10.9.2_@swc+core@1.12.11_@types+node@24.0.12__rh7emlhtbqegyjiwvmcuatorpu/node_modules/hardhat-artifactor
+│   │   │   ├── hardhat-contract-sizer -> ../../../node_modules/.pnpm/hardhat-contract-sizer@2.10.0_hardhat@2.25.0_ts-node@10.9.2_@swc+core@1.12.11_@types+node@24._xbsalsjgytzls5522nij6g3zf4/node_modules/hardhat-contract-sizer
+│   │   │   ├── lowdb -> ../../../node_modules/.pnpm/lowdb@1.0.0/node_modules/lowdb
+│   │   │   ├── sinon -> ../../../node_modules/.pnpm/sinon@21.0.0/node_modules/sinon
+│   │   │   ├── snarkjs -> ../../../node_modules/.pnpm/snarkjs@0.7.5/node_modules/snarkjs
+│   │   │   ├── solady -> ../../../node_modules/.pnpm/solady@0.1.23/node_modules/solady
+│   │   │   ├── solidity-docgen -> ../../../node_modules/.pnpm/solidity-docgen@0.6.0-beta.36_hardhat@2.25.0_ts-node@10.9.2_@swc+core@1.12.11_@types+node@24._z5i4tx26b5ivsvvjhro5irsm2m/node_modules/solidity-docgen
+│   │   │   ├── ts-node -> ../../../node_modules/.pnpm/ts-node@10.9.2_@swc+core@1.12.11_@types+node@24.0.12_typescript@5.8.3/node_modules/ts-node
+│   │   │   ├── typescript -> ../../../node_modules/.pnpm/typescript@5.8.3/node_modules/typescript
+│   │   │   └── uuid -> ../../../node_modules/.pnpm/uuid@11.1.0/node_modules/uuid
+│   │   └── package.json
+│   ├── eslint-config
+│   │   ├── README.md
+│   │   ├── base.js
+│   │   ├── next.js
+│   │   ├── node_modules
+│   │   │   ├── @eslint
+│   │   │   ├── @next
+│   │   │   ├── eslint -> ../../../node_modules/.pnpm/eslint@9.39.1_jiti@2.6.1/node_modules/eslint
+│   │   │   ├── eslint-config-prettier -> ../../../node_modules/.pnpm/eslint-config-prettier@10.1.8_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-config-prettier
+│   │   │   ├── eslint-plugin-only-warn -> ../../../node_modules/.pnpm/eslint-plugin-only-warn@1.1.0/node_modules/eslint-plugin-only-warn
+│   │   │   ├── eslint-plugin-react -> ../../../node_modules/.pnpm/eslint-plugin-react@7.37.5_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-plugin-react
+│   │   │   ├── eslint-plugin-react-hooks -> ../../../node_modules/.pnpm/eslint-plugin-react-hooks@5.2.0_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-plugin-react-hooks
+│   │   │   ├── eslint-plugin-turbo -> ../../../node_modules/.pnpm/eslint-plugin-turbo@2.6.1_eslint@9.39.1_jiti@2.6.1__turbo@2.6.1/node_modules/eslint-plugin-turbo
+│   │   │   ├── globals -> ../../../node_modules/.pnpm/globals@16.5.0/node_modules/globals
+│   │   │   ├── typescript -> ../../../node_modules/.pnpm/typescript@5.8.3/node_modules/typescript
+│   │   │   └── typescript-eslint -> ../../../node_modules/.pnpm/typescript-eslint@8.46.4_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/typescript-eslint
+│   │   ├── package.json
+│   │   └── react-internal.js
+│   ├── ipfs-service
+│   │   ├── README.md
+│   │   ├── dist
+│   │   │   ├── app.controller.d.ts
+│   │   │   ├── app.controller.js
+│   │   │   ├── app.controller.js.map
+│   │   │   ├── app.module.d.ts
+│   │   │   ├── app.module.js
+│   │   │   ├── app.module.js.map
+│   │   │   ├── app.service.d.ts
+│   │   │   ├── app.service.js
+│   │   │   ├── app.service.js.map
+│   │   │   ├── ipfs
+│   │   │   ├── main.d.ts
+│   │   │   ├── main.js
+│   │   │   ├── main.js.map
+│   │   │   └── tsconfig.build.tsbuildinfo
+│   │   ├── eslint.config.mjs
+│   │   ├── mock-tally-results.json
+│   │   ├── mock-vote-batches.json
+│   │   ├── mock-vote-options.json
+│   │   ├── mock_ipfs_storage
+│   │   │   ├── Qm391e98a1fbade5e9c508835dde0a49fa76ae3b01e322-mock-tally-results.json
+│   │   │   ├── Qmb510eaf84d420f5df1ba6128446ba273c819f3e69c86-mock-vote-options.json
+│   │   │   ├── Qmca912401fbfd0362faeeca9027dada5cb0930613d79b-mock-vote-batches.json
+│   │   │   ├── bafkreibzd2mkd65n4xu4kcedlxpausp2o2xdwapdejoycq4bg6qbyrmfie-mock-tally-results.json
+│   │   │   ├── bafkreifvcdvpqtkcb5o7dotbfbcgxittzam7hzu4q2uwzb7peg4qadldmq-mock-vote-options.json
+│   │   │   └── bafkreigksesad675anrpv3wksat5vws4wcjqme6xtnnoo5pxeukxj2mwoy-mock-vote-batches.json
+│   │   ├── nest-cli.json
+│   │   ├── node_modules
+│   │   │   ├── @angular-devkit
+│   │   │   ├── @babel
+│   │   │   ├── @bcoe
+│   │   │   ├── @borewit
+│   │   │   ├── @chainsafe
+│   │   │   ├── @colors
+│   │   │   ├── @cspotcode
+│   │   │   ├── @eslint
+│   │   │   ├── @eslint-community
+│   │   │   ├── @fastify
+│   │   │   ├── @humanfs
+│   │   │   ├── @humanwhocodes
+│   │   │   ├── @inquirer
+│   │   │   ├── @ipld
+│   │   │   ├── @isaacs
+│   │   │   ├── @istanbuljs
+│   │   │   ├── @jest
+│   │   │   ├── @jridgewell
+│   │   │   ├── @leichtgewicht
+│   │   │   ├── @libp2p
+│   │   │   ├── @lukeed
+│   │   │   ├── @multiformats
+│   │   │   ├── @napi-rs
+│   │   │   ├── @nestjs
+│   │   │   ├── @noble
+│   │   │   ├── @nodelib
+│   │   │   ├── @nuxt
+│   │   │   ├── @paralleldrive
+│   │   │   ├── @pkgr
+│   │   │   ├── @protobufjs
+│   │   │   ├── @sinclair
+│   │   │   ├── @sindresorhus
+│   │   │   ├── @sinonjs
+│   │   │   ├── @swc
+│   │   │   ├── @szmarczak
+│   │   │   ├── @tokenizer
+│   │   │   ├── @tsconfig
+│   │   │   ├── @types
+│   │   │   ├── @typescript-eslint
+│   │   │   ├── @webassemblyjs
+│   │   │   ├── @xhmikosr
+│   │   │   ├── @xtuc
+│   │   │   ├── accepts
+│   │   │   ├── acorn
+│   │   │   ├── acorn-import-phases
+│   │   │   ├── acorn-jsx
+│   │   │   ├── acorn-walk
+│   │   │   ├── ajv
+│   │   │   ├── ajv-formats
+│   │   │   ├── ajv-keywords
+│   │   │   ├── ansi-colors
+│   │   │   ├── ansi-escapes
+│   │   │   ├── ansi-regex
+│   │   │   ├── ansi-styles
+│   │   │   ├── ansis
+│   │   │   ├── any-signal
+│   │   │   ├── anymatch
+│   │   │   ├── append-field
+│   │   │   ├── arch
+│   │   │   ├── arg
+│   │   │   ├── argparse
+│   │   │   ├── array-timsort
+│   │   │   ├── asap
+│   │   │   ├── asynckit
+│   │   │   ├── b4a
+│   │   │   ├── babel-jest
+│   │   │   ├── babel-plugin-istanbul
+│   │   │   ├── babel-plugin-jest-hoist
+│   │   │   ├── babel-preset-current-node-syntax
+│   │   │   ├── babel-preset-jest
+│   │   │   ├── balanced-match
+│   │   │   ├── bare-events
+│   │   │   ├── base64-js
+│   │   │   ├── baseline-browser-mapping
+│   │   │   ├── bin-version
+│   │   │   ├── bin-version-check
+│   │   │   ├── bl
+│   │   │   ├── blob-to-it
+│   │   │   ├── body-parser
+│   │   │   ├── brace-expansion
+│   │   │   ├── braces
+│   │   │   ├── browser-readablestream-to-it
+│   │   │   ├── browserslist
+│   │   │   ├── bs-logger
+│   │   │   ├── bser
+│   │   │   ├── buffer
+│   │   │   ├── buffer-crc32
+│   │   │   ├── buffer-from
+│   │   │   ├── busboy
+│   │   │   ├── bytes
+│   │   │   ├── cacheable-lookup
+│   │   │   ├── cacheable-request
+│   │   │   ├── call-bind-apply-helpers
+│   │   │   ├── call-bound
+│   │   │   ├── callsites
+│   │   │   ├── camelcase
+│   │   │   ├── caniuse-lite
+│   │   │   ├── cborg
+│   │   │   ├── chalk
+│   │   │   ├── char-regex
+│   │   │   ├── chardet
+│   │   │   ├── chokidar
+│   │   │   ├── chrome-trace-event
+│   │   │   ├── ci-info
+│   │   │   ├── cjs-module-lexer
+│   │   │   ├── cli-cursor
+│   │   │   ├── cli-spinners
+│   │   │   ├── cli-table3
+│   │   │   ├── cli-width
+│   │   │   ├── cliui
+│   │   │   ├── clone
+│   │   │   ├── co
+│   │   │   ├── collect-v8-coverage
+│   │   │   ├── color-convert
+│   │   │   ├── color-name
+│   │   │   ├── combined-stream
+│   │   │   ├── commander
+│   │   │   ├── comment-json
+│   │   │   ├── component-emitter
+│   │   │   ├── concat-map
+│   │   │   ├── concat-stream
+│   │   │   ├── consola
+│   │   │   ├── content-disposition
+│   │   │   ├── content-type
+│   │   │   ├── convert-source-map
+│   │   │   ├── cookie
+│   │   │   ├── cookie-signature
+│   │   │   ├── cookiejar
+│   │   │   ├── core-util-is
+│   │   │   ├── cors
+│   │   │   ├── cosmiconfig
+│   │   │   ├── create-jest
+│   │   │   ├── create-require
+│   │   │   ├── cross-spawn
+│   │   │   ├── dag-jose
+│   │   │   ├── debug
+│   │   │   ├── decompress-response
+│   │   │   ├── dedent
+│   │   │   ├── deep-is
+│   │   │   ├── deepmerge
+│   │   │   ├── defaults
+│   │   │   ├── defer-to-connect
+│   │   │   ├── delayed-stream
+│   │   │   ├── depd
+│   │   │   ├── destroy
+│   │   │   ├── detect-newline
+│   │   │   ├── dezalgo
+│   │   │   ├── diff
+│   │   │   ├── diff-sequences
+│   │   │   ├── dns-over-http-resolver
+│   │   │   ├── dunder-proto
+│   │   │   ├── eastasianwidth
+│   │   │   ├── ee-first
+│   │   │   ├── electron-fetch
+│   │   │   ├── electron-to-chromium
+│   │   │   ├── emittery
+│   │   │   ├── emoji-regex
+│   │   │   ├── encodeurl
+│   │   │   ├── encoding
+│   │   │   ├── enhanced-resolve
+│   │   │   ├── err-code
+│   │   │   ├── error-ex
+│   │   │   ├── es-define-property
+│   │   │   ├── es-errors
+│   │   │   ├── es-module-lexer
+│   │   │   ├── es-object-atoms
+│   │   │   ├── es-set-tostringtag
+│   │   │   ├── escalade
+│   │   │   ├── escape-html
+│   │   │   ├── escape-string-regexp
+│   │   │   ├── eslint -> ../../../node_modules/.pnpm/eslint@9.39.1_jiti@2.6.1/node_modules/eslint
+│   │   │   ├── eslint-config-prettier -> ../../../node_modules/.pnpm/eslint-config-prettier@10.1.8_eslint@9.39.1_jiti@2.6.1_/node_modules/eslint-config-prettier
+│   │   │   ├── eslint-plugin-prettier -> ../../../node_modules/.pnpm/eslint-plugin-prettier@5.5.4_@types+eslint@9.6.1_eslint-config-prettier@10.1.8_eslint@9.39.1__fickd46oetfizpxyrvzl2onoe4/node_modules/eslint-plugin-prettier
+│   │   │   ├── eslint-scope
+│   │   │   ├── eslint-visitor-keys
+│   │   │   ├── espree
+│   │   │   ├── esprima
+│   │   │   ├── esquery
+│   │   │   ├── esrecurse
+│   │   │   ├── estraverse
+│   │   │   ├── esutils
+│   │   │   ├── etag
+│   │   │   ├── events
+│   │   │   ├── events-universal
+│   │   │   ├── execa
+│   │   │   ├── exit
+│   │   │   ├── expect
+│   │   │   ├── express
+│   │   │   ├── ext-list
+│   │   │   ├── ext-name
+│   │   │   ├── fast-deep-equal
+│   │   │   ├── fast-diff
+│   │   │   ├── fast-fifo
+│   │   │   ├── fast-glob
+│   │   │   ├── fast-json-stable-stringify
+│   │   │   ├── fast-levenshtein
+│   │   │   ├── fast-safe-stringify
+│   │   │   ├── fast-uri
+│   │   │   ├── fastq
+│   │   │   ├── fb-watchman
+│   │   │   ├── fflate
+│   │   │   ├── file-entry-cache
+│   │   │   ├── file-type
+│   │   │   ├── filename-reserved-regex
+│   │   │   ├── filenamify
+│   │   │   ├── fill-range
+│   │   │   ├── finalhandler
+│   │   │   ├── find-up
+│   │   │   ├── find-versions
+│   │   │   ├── flat-cache
+│   │   │   ├── flatted
+│   │   │   ├── foreground-child
+│   │   │   ├── fork-ts-checker-webpack-plugin
+│   │   │   ├── form-data
+│   │   │   ├── form-data-encoder
+│   │   │   ├── formidable
+│   │   │   ├── forwarded
+│   │   │   ├── fresh
+│   │   │   ├── fs-extra
+│   │   │   ├── fs-monkey
+│   │   │   ├── fs.realpath
+│   │   │   ├── fsevents
+│   │   │   ├── function-bind
+│   │   │   ├── gensync
+│   │   │   ├── get-caller-file
+│   │   │   ├── get-intrinsic
+│   │   │   ├── get-iterator
+│   │   │   ├── get-package-type
+│   │   │   ├── get-proto
+│   │   │   ├── get-stream
+│   │   │   ├── glob
+│   │   │   ├── glob-parent
+│   │   │   ├── glob-to-regexp
+│   │   │   ├── globals -> ../../../node_modules/.pnpm/globals@16.5.0/node_modules/globals
+│   │   │   ├── gopd
+│   │   │   ├── got
+│   │   │   ├── graceful-fs
+│   │   │   ├── graphemer
+│   │   │   ├── handlebars
+│   │   │   ├── has-flag
+│   │   │   ├── has-symbols
+│   │   │   ├── has-tostringtag
+│   │   │   ├── hasown
+│   │   │   ├── html-escaper
+│   │   │   ├── http-cache-semantics
+│   │   │   ├── http-errors
+│   │   │   ├── http2-wrapper
+│   │   │   ├── human-signals
+│   │   │   ├── iconv-lite
+│   │   │   ├── ieee754
+│   │   │   ├── ignore
+│   │   │   ├── import-fresh
+│   │   │   ├── import-local
+│   │   │   ├── imurmurhash
+│   │   │   ├── inflight
+│   │   │   ├── inherits
+│   │   │   ├── inspect-with-kind
+│   │   │   ├── interface-datastore
+│   │   │   ├── interface-store
+│   │   │   ├── ip-regex
+│   │   │   ├── ipaddr.js
+│   │   │   ├── ipfs-core-types
+│   │   │   ├── ipfs-core-utils
+│   │   │   ├── ipfs-http-client -> ../../../node_modules/.pnpm/ipfs-http-client@56.0.3_encoding@0.1.13_node-fetch@2.7.0_encoding@0.1.13_/node_modules/ipfs-http-client
+│   │   │   ├── ipfs-unixfs
+│   │   │   ├── ipfs-utils
+│   │   │   ├── is-arrayish
+│   │   │   ├── is-core-module
+│   │   │   ├── is-electron
+│   │   │   ├── is-extglob
+│   │   │   ├── is-fullwidth-code-point
+│   │   │   ├── is-generator-fn
+│   │   │   ├── is-glob
+│   │   │   ├── is-interactive
+│   │   │   ├── is-ip
+│   │   │   ├── is-number
+│   │   │   ├── is-plain-obj
+│   │   │   ├── is-promise
+│   │   │   ├── is-stream
+│   │   │   ├── is-unicode-supported
+│   │   │   ├── isexe
+│   │   │   ├── iso-url
+│   │   │   ├── istanbul-lib-coverage
+│   │   │   ├── istanbul-lib-instrument
+│   │   │   ├── istanbul-lib-report
+│   │   │   ├── istanbul-lib-source-maps
+│   │   │   ├── istanbul-reports
+│   │   │   ├── it-all
+│   │   │   ├── it-first
+│   │   │   ├── it-glob
+│   │   │   ├── it-last
+│   │   │   ├── it-map
+│   │   │   ├── it-peekable
+│   │   │   ├── it-to-stream
+│   │   │   ├── iterare
+│   │   │   ├── jackspeak
+│   │   │   ├── jest -> ../../../node_modules/.pnpm/jest@29.7.0_@types+node@22.19.1_babel-plugin-macros@3.1.0_ts-node@10.9.2_@swc+core@1.15.2_@sw_vr7qlhtdzqwwzofylgfvnxbbr4/node_modules/jest
+│   │   │   ├── jest-changed-files
+│   │   │   ├── jest-circus
+│   │   │   ├── jest-cli
+│   │   │   ├── jest-config
+│   │   │   ├── jest-diff
+│   │   │   ├── jest-docblock
+│   │   │   ├── jest-each
+│   │   │   ├── jest-environment-node
+│   │   │   ├── jest-get-type
+│   │   │   ├── jest-haste-map
+│   │   │   ├── jest-leak-detector
+│   │   │   ├── jest-matcher-utils
+│   │   │   ├── jest-message-util
+│   │   │   ├── jest-mock
+│   │   │   ├── jest-pnp-resolver
+│   │   │   ├── jest-regex-util
+│   │   │   ├── jest-resolve
+│   │   │   ├── jest-resolve-dependencies
+│   │   │   ├── jest-runner
+│   │   │   ├── jest-runtime
+│   │   │   ├── jest-snapshot
+│   │   │   ├── jest-util
+│   │   │   ├── jest-validate
+│   │   │   ├── jest-watcher
+│   │   │   ├── jest-worker
+│   │   │   ├── js-tokens
+│   │   │   ├── js-yaml
+│   │   │   ├── jsesc
+│   │   │   ├── json-buffer
+│   │   │   ├── json-parse-even-better-errors
+│   │   │   ├── json-schema-traverse
+│   │   │   ├── json-stable-stringify-without-jsonify
+│   │   │   ├── json5
+│   │   │   ├── jsonc-parser
+│   │   │   ├── jsonfile
+│   │   │   ├── keyv
+│   │   │   ├── kind-of
+│   │   │   ├── kleur
+│   │   │   ├── leven
+│   │   │   ├── levn
+│   │   │   ├── lines-and-columns
+│   │   │   ├── load-esm
+│   │   │   ├── loader-runner
+│   │   │   ├── locate-path
+│   │   │   ├── lodash
+│   │   │   ├── lodash.memoize
+│   │   │   ├── lodash.merge
+│   │   │   ├── log-symbols
+│   │   │   ├── long
+│   │   │   ├── lowercase-keys
+│   │   │   ├── lru-cache
+│   │   │   ├── magic-string
+│   │   │   ├── make-dir
+│   │   │   ├── make-error
+│   │   │   ├── makeerror
+│   │   │   ├── math-intrinsics
+│   │   │   ├── media-typer
+│   │   │   ├── memfs
+│   │   │   ├── merge-descriptors
+│   │   │   ├── merge-options
+│   │   │   ├── merge-stream
+│   │   │   ├── merge2
+│   │   │   ├── methods
+│   │   │   ├── micromatch
+│   │   │   ├── mime
+│   │   │   ├── mime-db
+│   │   │   ├── mime-types
+│   │   │   ├── mimic-fn
+│   │   │   ├── mimic-response
+│   │   │   ├── minimatch
+│   │   │   ├── minimist
+│   │   │   ├── minipass
+│   │   │   ├── mkdirp
+│   │   │   ├── ms
+│   │   │   ├── multer
+│   │   │   ├── multiaddr
+│   │   │   ├── multiaddr-to-uri
+│   │   │   ├── multiformats -> ../../../node_modules/.pnpm/multiformats@12.1.3/node_modules/multiformats
+│   │   │   ├── mute-stream
+│   │   │   ├── nanoid
+│   │   │   ├── native-fetch
+│   │   │   ├── natural-compare
+│   │   │   ├── negotiator
+│   │   │   ├── neo-async
+│   │   │   ├── node-abort-controller
+│   │   │   ├── node-emoji
+│   │   │   ├── node-fetch
+│   │   │   ├── node-int64
+│   │   │   ├── node-releases
+│   │   │   ├── normalize-path
+│   │   │   ├── normalize-url
+│   │   │   ├── npm-run-path
+│   │   │   ├── object-assign
+│   │   │   ├── object-inspect
+│   │   │   ├── on-finished
+│   │   │   ├── once
+│   │   │   ├── onetime
+│   │   │   ├── optionator
+│   │   │   ├── ora
+│   │   │   ├── p-cancelable
+│   │   │   ├── p-defer
+│   │   │   ├── p-fifo
+│   │   │   ├── p-limit
+│   │   │   ├── p-locate
+│   │   │   ├── p-try
+│   │   │   ├── package-json-from-dist
+│   │   │   ├── parent-module
+│   │   │   ├── parse-duration
+│   │   │   ├── parse-json
+│   │   │   ├── parseurl
+│   │   │   ├── path-exists
+│   │   │   ├── path-is-absolute
+│   │   │   ├── path-key
+│   │   │   ├── path-parse
+│   │   │   ├── path-scurry
+│   │   │   ├── path-to-regexp
+│   │   │   ├── path-type
+│   │   │   ├── pend
+│   │   │   ├── picocolors
+│   │   │   ├── picomatch
+│   │   │   ├── pirates
+│   │   │   ├── piscina
+│   │   │   ├── pkg-dir
+│   │   │   ├── pluralize
+│   │   │   ├── prelude-ls
+│   │   │   ├── prettier -> ../../../node_modules/.pnpm/prettier@3.6.2/node_modules/prettier
+│   │   │   ├── prettier-linter-helpers
+│   │   │   ├── pretty-format
+│   │   │   ├── prompts
+│   │   │   ├── protobufjs
+│   │   │   ├── proxy-addr
+│   │   │   ├── punycode
+│   │   │   ├── pure-rand
+│   │   │   ├── qs
+│   │   │   ├── queue-microtask
+│   │   │   ├── quick-lru
+│   │   │   ├── randombytes
+│   │   │   ├── range-parser
+│   │   │   ├── raw-body
+│   │   │   ├── react-is
+│   │   │   ├── react-native-fetch-api
+│   │   │   ├── readable-stream
+│   │   │   ├── readdirp
+│   │   │   ├── receptacle
+│   │   │   ├── reflect-metadata -> ../../../node_modules/.pnpm/reflect-metadata@0.2.2/node_modules/reflect-metadata
+│   │   │   ├── require-directory
+│   │   │   ├── require-from-string
+│   │   │   ├── resolve
+│   │   │   ├── resolve-alpn
+│   │   │   ├── resolve-cwd
+│   │   │   ├── resolve-from
+│   │   │   ├── resolve.exports
+│   │   │   ├── responselike
+│   │   │   ├── restore-cursor
+│   │   │   ├── retimer
+│   │   │   ├── reusify
+│   │   │   ├── router
+│   │   │   ├── run-parallel
+│   │   │   ├── rxjs -> ../../../node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs
+│   │   │   ├── safe-buffer
+│   │   │   ├── safer-buffer
+│   │   │   ├── schema-utils
+│   │   │   ├── seek-bzip
+│   │   │   ├── semver
+│   │   │   ├── semver-regex
+│   │   │   ├── semver-truncate
+│   │   │   ├── send
+│   │   │   ├── serialize-javascript
+│   │   │   ├── serve-static -> ../../../node_modules/.pnpm/serve-static@1.16.2/node_modules/serve-static
+│   │   │   ├── setprototypeof
+│   │   │   ├── shebang-command
+│   │   │   ├── shebang-regex
+│   │   │   ├── side-channel
+│   │   │   ├── side-channel-list
+│   │   │   ├── side-channel-map
+│   │   │   ├── side-channel-weakmap
+│   │   │   ├── signal-exit
+│   │   │   ├── sisteransi
+│   │   │   ├── slash
+│   │   │   ├── sort-keys
+│   │   │   ├── sort-keys-length
+│   │   │   ├── source-map
+│   │   │   ├── source-map-support -> ../../../node_modules/.pnpm/source-map-support@0.5.21/node_modules/source-map-support
+│   │   │   ├── sprintf-js
+│   │   │   ├── stack-utils
+│   │   │   ├── statuses
+│   │   │   ├── stream-to-it
+│   │   │   ├── streamsearch
+│   │   │   ├── streamx
+│   │   │   ├── string-length
+│   │   │   ├── string-width
+│   │   │   ├── string-width-cjs
+│   │   │   ├── string_decoder
+│   │   │   ├── strip-ansi
+│   │   │   ├── strip-ansi-cjs
+│   │   │   ├── strip-bom
+│   │   │   ├── strip-dirs
+│   │   │   ├── strip-final-newline
+│   │   │   ├── strip-json-comments
+│   │   │   ├── strtok3
+│   │   │   ├── superagent
+│   │   │   ├── supertest -> ../../../node_modules/.pnpm/supertest@7.1.4/node_modules/supertest
+│   │   │   ├── supports-color
+│   │   │   ├── supports-preserve-symlinks-flag
+│   │   │   ├── symbol-observable
+│   │   │   ├── synckit
+│   │   │   ├── tapable
+│   │   │   ├── tar-stream
+│   │   │   ├── terser
+│   │   │   ├── terser-webpack-plugin
+│   │   │   ├── test-exclude
+│   │   │   ├── text-decoder
+│   │   │   ├── through
+│   │   │   ├── timeout-abort-controller
+│   │   │   ├── tmpl
+│   │   │   ├── to-regex-range
+│   │   │   ├── toidentifier
+│   │   │   ├── token-types
+│   │   │   ├── tr46
+│   │   │   ├── tree-kill
+│   │   │   ├── ts-api-utils
+│   │   │   ├── ts-jest -> ../../../node_modules/.pnpm/ts-jest@29.4.5_@babel+core@7.28.5_@jest+transform@30.2.0_@jest+types@30.2.0_babel-jest@30.2.0_cyy26cgxg5f7tkytxjdzrrgfte/node_modules/ts-jest
+│   │   │   ├── ts-loader -> ../../../node_modules/.pnpm/ts-loader@9.5.4_typescript@5.8.3_webpack@5.100.2_@swc+core@1.15.2_@swc+helpers@0.5.17__/node_modules/ts-loader
+│   │   │   ├── ts-node -> ../../../node_modules/.pnpm/ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+node@22.19.1_typescript@5.8.3/node_modules/ts-node
+│   │   │   ├── tsconfig-paths -> ../../../node_modules/.pnpm/tsconfig-paths@4.2.0/node_modules/tsconfig-paths
+│   │   │   ├── tsconfig-paths-webpack-plugin
+│   │   │   ├── tslib
+│   │   │   ├── type-check
+│   │   │   ├── type-detect
+│   │   │   ├── type-fest
+│   │   │   ├── type-is
+│   │   │   ├── typedarray
+│   │   │   ├── typescript -> ../../../node_modules/.pnpm/typescript@5.8.3/node_modules/typescript
+│   │   │   ├── typescript-eslint -> ../../../node_modules/.pnpm/typescript-eslint@8.46.4_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/typescript-eslint
+│   │   │   ├── uglify-js
+│   │   │   ├── uid
+│   │   │   ├── uint8array-extras
+│   │   │   ├── uint8arrays
+│   │   │   ├── unbzip2-stream
+│   │   │   ├── undici-types
+│   │   │   ├── universalify
+│   │   │   ├── unpipe
+│   │   │   ├── update-browserslist-db
+│   │   │   ├── uri-js
+│   │   │   ├── util-deprecate
+│   │   │   ├── v8-compile-cache-lib
+│   │   │   ├── v8-to-istanbul
+│   │   │   ├── varint
+│   │   │   ├── vary
+│   │   │   ├── walker
+│   │   │   ├── watchpack
+│   │   │   ├── wcwidth
+│   │   │   ├── webidl-conversions
+│   │   │   ├── webpack-node-externals
+│   │   │   ├── webpack-sources
+│   │   │   ├── whatwg-url
+│   │   │   ├── which
+│   │   │   ├── word-wrap
+│   │   │   ├── wordwrap
+│   │   │   ├── wrap-ansi
+│   │   │   ├── wrap-ansi-cjs
+│   │   │   ├── wrappy
+│   │   │   ├── write-file-atomic
+│   │   │   ├── xtend
+│   │   │   ├── y18n
+│   │   │   ├── yallist
+│   │   │   ├── yargs
+│   │   │   ├── yargs-parser
+│   │   │   ├── yauzl
+│   │   │   ├── yn
+│   │   │   ├── yocto-queue
+│   │   │   └── yoctocolors-cjs
+│   │   ├── package-lock.json
+│   │   ├── package.json
+│   │   ├── public
+│   │   │   └── ipfs-viewer.html
+│   │   ├── scripts
+│   │   │   ├── pin-mock-files-real.js
+│   │   │   ├── pin-mock-files-real.mjs
+│   │   │   └── pin-mock-files.js
+│   │   ├── src
+│   │   │   ├── app.controller.spec.ts
+│   │   │   ├── app.controller.ts
+│   │   │   ├── app.module.ts
+│   │   │   ├── app.service.ts
+│   │   │   ├── ipfs
+│   │   │   └── main.ts
+│   │   ├── test
+│   │   │   ├── app.e2e-spec.ts
+│   │   │   └── jest-e2e.json
+│   │   ├── tsconfig.build.json
+│   │   └── tsconfig.json
+│   ├── maci-assets
+│   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── scripts
+│   │   │   ├── encrypt-helper.js
+│   │   │   └── generate-auth.js
+│   │   └── zkeys
+│   │       └── PollJoining_10_test
+│   ├── typescript-config
+│   │   ├── base.json
+│   │   ├── nextjs.json
+│   │   ├── package.json
+│   │   └── react-library.json
+│   └── ui
+│       ├── README.md
+│       ├── app
+│       │   ├── globals.css
+│       │   ├── layout.tsx
+│       │   └── page.tsx
+│       ├── button.tsx
+│       ├── components.json
+│       ├── eslint.config.mjs
+│       ├── input.tsx
+│       ├── lib
+│       │   └── utils.ts
+│       ├── next-env.d.ts
+│       ├── next.config.ts
+│       ├── node_modules
+│       │   ├── @eslint
+│       │   ├── @radix-ui
+│       │   ├── @sasvoth
+│       │   ├── @tailwindcss
+│       │   ├── @types
+│       │   ├── class-variance-authority -> ../../../node_modules/.pnpm/class-variance-authority@0.7.1/node_modules/class-variance-authority
+│       │   ├── clsx -> ../../../node_modules/.pnpm/clsx@2.1.1/node_modules/clsx
+│       │   ├── eslint -> ../../../node_modules/.pnpm/eslint@9.39.1_jiti@2.6.1/node_modules/eslint
+│       │   ├── eslint-config-next -> ../../../node_modules/.pnpm/eslint-config-next@15.3.5_eslint@9.39.1_jiti@2.6.1__typescript@5.8.3/node_modules/eslint-config-next
+│       │   ├── lucide-react -> ../../../node_modules/.pnpm/lucide-react@0.525.0_react@19.2.0/node_modules/lucide-react
+│       │   ├── next -> ../../../node_modules/.pnpm/next@15.3.0_@babel+core@7.28.5_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next
+│       │   ├── react -> ../../../node_modules/.pnpm/react@19.2.0/node_modules/react
+│       │   ├── react-dom -> ../../../node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom
+│       │   ├── tailwind-merge -> ../../../node_modules/.pnpm/tailwind-merge@3.4.0/node_modules/tailwind-merge
+│       │   ├── tailwindcss -> ../../../node_modules/.pnpm/tailwindcss@4.1.17/node_modules/tailwindcss
+│       │   ├── tw-animate-css -> ../../../node_modules/.pnpm/tw-animate-css@1.4.0/node_modules/tw-animate-css
+│       │   └── typescript -> ../../../node_modules/.pnpm/typescript@5.8.3/node_modules/typescript
+│       ├── package.json
+│       ├── postcss.config.mjs
+│       ├── public
+│       │   ├── favicon.ico
+│       │   ├── file.svg
+│       │   ├── globe.svg
+│       │   ├── next.svg
+│       │   ├── vercel.svg
+│       │   └── window.svg
+│       └── tsconfig.json
+├── parsec.deb
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── structure.txt
+├── tsconfig.json
+└── turbo.json
+
+853 directories, 200 files
