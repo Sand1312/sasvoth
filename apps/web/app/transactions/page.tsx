@@ -24,17 +24,28 @@ export default function TransactionsPage() {
   const claim = useClaimContract();
 
   const [isClient, setIsClient] = useState(false);
+
+  // Deposit / withdraw
   const [showDeposit, setShowDeposit] = useState(true);
   const [depositAmount, setDepositAmount] = useState<number | "">("");
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState<number | "">("");
 
+  // Voice credits
   const [showBuyCredits, setShowBuyCredits] = useState(true);
   const [creditsAmount, setCreditsAmount] = useState<number | "">("");
   const [purchasedCredits, setPurchasedCredits] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showApproveOnly, setShowApproveOnly] = useState(false);
   const [approveAmount, setApproveAmount] = useState<number | "">("");
+
+  // Vote form
+  const [showVoteForm, setShowVoteForm] = useState(true);
+  const [privateKey, setPrivateKey] = useState("");
+  const [voteOptionId, setVoteOptionId] = useState<number | "">("");
+  const [voiceCredit, setVoiceCredit] = useState<number | "">("");
+  const [pollId, setPollId] = useState<number | "">("");
+  const [isVoting, setIsVoting] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -74,6 +85,15 @@ export default function TransactionsPage() {
 
   const isApproveDisabled = Boolean(
     token.isApproving || !approveAmount || Number(approveAmount) <= 0
+  );
+
+  const isVoteDisabled = Boolean(
+    !isConnected ||
+      !privateKey ||
+      !voteOptionId ||
+      !voiceCredit ||
+      !pollId ||
+      isVoting
   );
 
   const handleBuyToken = () => {
@@ -159,6 +179,29 @@ export default function TransactionsPage() {
     }, 3000);
   };
 
+  const handleSubmitVote = () => {
+    if (isVoteDisabled) return;
+
+    setIsVoting(true);
+
+    // TODO: chỗ này bạn có thể call smart contract / API thật
+    // ví dụ: claim.vote({ privateKey, voteOptionId, voiceCredit, pollId })
+    console.log("Submitting vote with data:", {
+      privateKey,
+      voteOptionId,
+      voiceCredit,
+      pollId,
+    });
+
+    // fake delay cho đẹp UI
+    setTimeout(() => {
+      alert(
+        `Đã submit vote:\n- Poll #${pollId}\n- Option: ${voteOptionId}\n- Voice credits: ${voiceCredit}`
+      );
+      setIsVoting(false);
+    }, 1200);
+  };
+
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gray-50 px-6 py-10">
@@ -189,7 +232,9 @@ export default function TransactionsPage() {
         </header>
 
         <div className="grid gap-6 lg:grid-cols-2">
+          {/* LEFT COLUMN */}
           <section className="space-y-6">
+            {/* HD Deposit */}
             <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-gray-900">HD Deposit</h2>
@@ -260,6 +305,7 @@ export default function TransactionsPage() {
               )}
             </div>
 
+            {/* Withdraw */}
             <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-gray-900">Withdraw</h2>
@@ -344,6 +390,7 @@ export default function TransactionsPage() {
               )}
             </div>
 
+            {/* Wallet info */}
             {isConnected && (
               <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-800">
                 <div className="mb-2 text-base font-semibold text-blue-900">
@@ -361,7 +408,8 @@ export default function TransactionsPage() {
                 </p>
                 {token.name && <p>Token: {token.name}</p>}
                 <p className="text-xs text-blue-700">
-                  Allowance: {token.allowance ? token.allowance.toString() : "0"}{" "}
+                  Allowance:{" "}
+                  {token.allowance ? token.allowance.toString() : "0"}{" "}
                   {token.symbol}
                 </p>
 
@@ -406,7 +454,9 @@ export default function TransactionsPage() {
             )}
           </section>
 
+          {/* RIGHT COLUMN */}
           <section className="space-y-6">
+            {/* Voice Credits */}
             <div className="rounded-2xl border border-purple-200 bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-gray-900">
@@ -537,6 +587,133 @@ export default function TransactionsPage() {
               )}
             </div>
 
+            {/* VOTE FORM */}
+            <div className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">Vote Form</h2>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Demo form để submit vote bằng voice credits.
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  className="text-xs"
+                  onClick={() => setShowVoteForm((prev) => !prev)}
+                >
+                  {showVoteForm ? "Hide" : "Show"}
+                </Button>
+              </div>
+
+              {showVoteForm && (
+                <div className="space-y-4">
+                  <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-[11px] text-red-700">
+                    ⚠️ <strong>Cảnh báo bảo mật:</strong> Đây chỉ là form demo.
+                    Trong thực tế, không nên nhập private key trực tiếp vào
+                    website.
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Private Key
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Nhập private key..."
+                      value={privateKey}
+                      onChange={(e) => setPrivateKey(e.target.value)}
+                      className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+
+                  <div className="grid gap-3 md:grid-cols-3">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">
+                        Vote Option ID
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="1"
+                        value={voteOptionId}
+                        onChange={(e) =>
+                          setVoteOptionId(
+                            e.target.value ? Number(e.target.value) : ""
+                          )
+                        }
+                        className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">
+                        Voice Credit
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="10"
+                        value={voiceCredit}
+                        onChange={(e) =>
+                          setVoiceCredit(
+                            e.target.value ? Number(e.target.value) : ""
+                          )
+                        }
+                        className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">
+                        Poll ID
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="7"
+                        value={pollId}
+                        onChange={(e) =>
+                          setPollId(
+                            e.target.value ? Number(e.target.value) : ""
+                          )
+                        }
+                        className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+
+                  {voteOptionId && voiceCredit && pollId && (
+                    <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-800">
+                      <p className="font-semibold">Tóm tắt vote:</p>
+                      <p className="mt-1">
+                        • Poll: <strong>#{pollId}</strong>
+                      </p>
+                      <p>
+                        • Option: <strong>{voteOptionId}</strong>
+                      </p>
+                      <p>
+                        • Voice credits: <strong>{voiceCredit}</strong>
+                      </p>
+                    </div>
+                  )}
+
+                  {!isConnected && (
+                    <p className="text-xs text-red-500">
+                      Vui lòng kết nối ví trước khi vote.
+                    </p>
+                  )}
+
+                  <Button
+                    onClick={handleSubmitVote}
+                    disabled={isVoteDisabled}
+                    className="w-full bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isVoting
+                      ? "Đang submit vote..."
+                      : "Submit Vote với Voice Credits"}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Notifications */}
             <div className="space-y-3">
               {mockNotifications.map((notif) => (
                 <div

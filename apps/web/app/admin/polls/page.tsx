@@ -3,12 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@sasvoth/ui/button";
+import { Input } from "@sasvoth/ui/input";
 import { ideasApi, IdeaPayload, ipfsApi, pollsApi } from "@/api";
-import {useMaci} from "@/hooks";
-import {usePolls} from "@/hooks";
+import { useMaci } from "@/hooks";
+import { usePolls } from "@/hooks";
 import { PollStatus } from "@/types/polls";
-
-
 
 // Types coming from backend models
 type PollRecord = {
@@ -43,7 +42,6 @@ type PollWithIdeas = PollRecord & { ideaMap: Record<string, IdeaRecord> };
 type IdeaIpfsLink = {
   cid: string;
   url: string;
-  metadata?: unknown;
 };
 
 type IdeaFormState = {
@@ -64,13 +62,6 @@ const defaultForm: IdeaFormState = {
   extraNotes: "",
 };
 
-const ipfsGatewayBase = (() => {
-  const gateway = process.env.NEXT_PUBLIC_IPFS_GATEWAY;
-  if (!gateway) return "/api/v1/ipfs/";
-  if (gateway.endsWith("/")) return gateway;
-  return `${gateway}/`;
-})();
-
 function normalizeIdeaId(idea: IdeaRecord | string | undefined) {
   if (!idea) return undefined;
   if (typeof idea === "string") return idea;
@@ -78,8 +69,8 @@ function normalizeIdeaId(idea: IdeaRecord | string | undefined) {
 }
 
 export default function AdminPollsPage(): React.ReactElement {
-  const {deployPoll,getPollContracts} = useMaci();
-  const {updatePollStatus,saveOnChainId,approveIdeaInPoll} = usePolls();
+  const { deployPoll, getPollContracts } = useMaci();
+  const { updatePollStatus, saveOnChainId, approveIdeaInPoll } = usePolls();
   const [polls, setPolls] = useState<PollWithIdeas[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +90,7 @@ export default function AdminPollsPage(): React.ReactElement {
     const normalized = cid.startsWith("ipfs://")
       ? cid.replace("ipfs://", "")
       : cid;
-    return `${ipfsGatewayBase}${normalized}`;
+    return `/api/ipfs/${normalized}`;
   }
   async function handleDeployPoll(poll: PollRecord) {
     const pollId = poll._id || poll.id;
@@ -107,22 +98,28 @@ export default function AdminPollsPage(): React.ReactElement {
     setBusyPoll(pollId);
     setError(null);
     try {
-      const startDate = Math.floor(
-        typeof poll.startTime === 'string'
-          ? new Date(poll.startTime).getTime()
-          : (poll.startTime?.getTime() ?? 0)
-      ) / 1000;
-      const endDate = Math.floor(
-        typeof poll.endTime === 'string'
-          ? new Date(poll.endTime).getTime()
-          : (poll.endTime?.getTime() ?? 0)
-      ) / 1000;
+      const startDate =
+        Math.floor(
+          typeof poll.startTime === "string"
+            ? new Date(poll.startTime).getTime()
+            : (poll.startTime?.getTime() ?? 0)
+        ) / 1000;
+      const endDate =
+        Math.floor(
+          typeof poll.endTime === "string"
+            ? new Date(poll.endTime).getTime()
+            : (poll.endTime?.getTime() ?? 0)
+        ) / 1000;
 
       // const startDate = Math.floor(Date.now() / 1000) + 60
 
       // const endDate = Math.floor(Date.now() / 1000) + 300
       // Deploy poll onchain
-      const deployed = await deployPoll({ startDate, endDate, voteOptions: poll.numberOptions });
+      const deployed = await deployPoll({
+        startDate,
+        endDate,
+        voteOptions: poll.numberOptions,
+      });
       // Nếu deploy thành công, tiếp tục update status và lưu onchainId
       if (deployed && deployed.pollId) {
         const status = PollStatus.InProgress;
@@ -190,19 +187,16 @@ export default function AdminPollsPage(): React.ReactElement {
         approvedAt: new Date().toISOString(),
       };
       const { cid, url } = await ipfsApi.uploadMetadata(metadata);
-      const storedCid = `ipfs://${cid}`;
-      const ipfsData = await ipfsApi.fetchMetadata(cid);
-      const gatewayUrl = toGatewayUrl(cid) || url || "";
+      const storedCid = cid.startsWith("ipfs://") ? cid : `ipfs://${cid}`;
       setIpfsLinks((prev) => ({
         ...prev,
         [ideaId]: {
           cid: storedCid,
-          url: gatewayUrl,
-          metadata: ipfsData,
+          url,
         },
       }));
       try {
-        await approveIdeaInPoll(pollId, ideaId, storedCid);
+        await approveIdeaInPoll(pollId, ideaId, cid);
       } catch (err) {
         console.warn("Unable to persist idea CID", err);
       }
@@ -239,19 +233,15 @@ export default function AdminPollsPage(): React.ReactElement {
             approvedAt: new Date().toISOString(),
           };
           const { cid, url } = await ipfsApi.uploadMetadata(metadata);
-          const storedCid = `ipfs://${cid}`;
-          const ipfsData = await ipfsApi.fetchMetadata(cid);
-          const gatewayUrl = toGatewayUrl(cid) || url || "";
           setIpfsLinks((prev) => ({
             ...prev,
             [ideaId]: {
-              cid: storedCid,
-              url: gatewayUrl,
-              metadata: ipfsData,
+              cid: cid,
+              url,
             },
           }));
           try {
-            await ideasApi.updateIdeaCID(ideaId, storedCid);
+            await ideasApi.updateIdeaCID(ideaId, cid);
           } catch (err) {
             console.warn("Unable to persist idea CID", err);
           }
@@ -317,10 +307,16 @@ export default function AdminPollsPage(): React.ReactElement {
                   </p>
                   <div className="flex flex-wrap gap-4 mt-2">
                     <span className="text-xs text-slate-500">
-                      <b>Start:</b> {poll.startTime ? new Date(poll.startTime).toLocaleString() : "-"}
+                      <b>Start:</b>{" "}
+                      {poll.startTime
+                        ? new Date(poll.startTime).toLocaleString()
+                        : "-"}
                     </span>
                     <span className="text-xs text-slate-500">
-                      <b>End:</b> {poll.endTime ? new Date(poll.endTime).toLocaleString() : "-"}
+                      <b>End:</b>{" "}
+                      {poll.endTime
+                        ? new Date(poll.endTime).toLocaleString()
+                        : "-"}
                     </span>
                   </div>
                   <p className="mt-1 text-xs font-medium uppercase tracking-[0.15em] text-amber-600">
@@ -410,7 +406,9 @@ export default function AdminPollsPage(): React.ReactElement {
                       onClick={() => handleDeployPoll(poll)}
                       disabled={busyPoll === (poll._id || poll.id)}
                     >
-                      {busyPoll === (poll._id || poll.id) ? "Deploying…" : "Deploy poll"}
+                      {busyPoll === (poll._id || poll.id)
+                        ? "Deploying…"
+                        : "Deploy poll"}
                     </Button>
                   </div>
                   {approved.length === 0 && (
@@ -422,7 +420,6 @@ export default function AdminPollsPage(): React.ReactElement {
                     const idea = poll.ideaMap[ideaId];
                     const cid = idea?.idea_cid || ipfsLinks[ideaId]?.cid;
                     const href = toGatewayUrl(cid) || ipfsLinks[ideaId]?.url;
-                    const metadata = ipfsLinks[ideaId]?.metadata;
                     return (
                       <div
                         key={`${ideaId}-approved`}
@@ -443,11 +440,6 @@ export default function AdminPollsPage(): React.ReactElement {
                           >
                             {cid || href}
                           </a>
-                        )}
-                        {metadata && (
-                          <pre className="mt-2 overflow-auto rounded bg-white/70 p-2 text-[11px] text-emerald-800">
-                            {JSON.stringify(metadata, null, 2)}
-                          </pre>
                         )}
                       </div>
                     );
