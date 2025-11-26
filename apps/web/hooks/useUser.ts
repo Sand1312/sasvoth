@@ -9,7 +9,16 @@ export function useUser() {
   const saveStateIndex = async (walletAddress: string, stateIndex: number) => {
     return await userApi.saveStateIndex(walletAddress, stateIndex);
   }
+  const deposit = async (userId: string, amountToken: number, txHash: string) => {
+    return await userApi.deposit(userId, amountToken, txHash);
+  }
+  const getHistoryDeposit = async (userId: string) => {
+    return await userApi.getHistoryDeposit(userId);
+  }
+
   return {
     saveStateIndex,
+    deposit,
+    getHistoryDeposit,
   }
 }

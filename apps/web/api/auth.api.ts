@@ -18,7 +18,6 @@ export const authApi = {
           withCredentials: true,
         });
         toast.success("Signed in!");
-        console.log("Signin response:", res.data);
         return res.data;
       } catch (err: any) {
         console.error("Signin failed:", err.response?.data || err);

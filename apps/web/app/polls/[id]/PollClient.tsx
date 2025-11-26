@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/date";
 import Link from "next/dist/client/link";
 import { usePollContext } from "./PollContext";
 import { useIPFS } from "@/hooks/useIPFS";
+import { useResults } from "@/hooks";
 
 type Timeline = { start: string; end: string };
 
@@ -318,6 +319,7 @@ function PrepareSection({ poll }: { poll: PollData }) {
 function VotingSection({ poll }: { poll: PollData }) {
   const { fetchMetadata } = useIPFS();
   const [ideas, setIdeas] = useState<Idea[]>([]);
+    const { updatePollStatus } = usePolls();
   useEffect(() => {
     Promise.all(poll.options.map((id) => fetchMetadata(id))).then(setIdeas);
   }, [poll.options, fetchMetadata]);
@@ -325,8 +327,20 @@ function VotingSection({ poll }: { poll: PollData }) {
   const highlightedIdeaId =
     ideas.length > 0
       ? ideas.reduce((top, idea) => (idea.credits > top.credits ? idea : top))
-          ._id
+        ._id
       : undefined;
+
+
+      const {tallyVotes} = useResults();
+  const handleTally = async () => {
+    // Tally logic heredadad
+    console.log("Tallying votes for poll...");
+    const pollId = "6926cc063d59305182bfdb58"; // Thay thế bằng pollId thực tế
+   await tallyVotes("6926cc063d59305182bfdb58");
+
+   await updatePollStatus(pollId,PollStatus.Ended);
+
+  };
 
   return (
     <section className="space-y-8">
@@ -347,7 +361,7 @@ function VotingSection({ poll }: { poll: PollData }) {
           >
             View ledger
           </Button>
-          <Button className="rounded-full border border-black bg-black px-6 py-3 text-white hover:bg-black">
+          <Button  className="rounded-full border border-black bg-black px-6 py-3 text-white hover:bg-black">
             Buy credit
           </Button>
         </div>
@@ -384,7 +398,15 @@ function VotingSection({ poll }: { poll: PollData }) {
           );
         })}
       </div>
-    </section>
+      <div className="flex justify-center pt-8">
+        <Button
+          onClick={() => handleTally()}
+          className="rounded-full border border-black bg-black px-8 py-6 text-lg font-bold text-white hover:bg-black/90"
+        >
+          Submit Votes
+        </Button>
+      </div>
+    </section >
   );
 }
 

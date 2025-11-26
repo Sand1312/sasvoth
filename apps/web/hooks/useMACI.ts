@@ -61,7 +61,7 @@ const getWalletClient = async () => {
         if (!account) throw new Error('No account connected');
         const pubKeyX = BigInt(publicKeyX || 0);
         const pubKeyY = BigInt(publicKeyY || 0);
-        console.log('📍 Signing up with pubKeyX:', pubKeyX, 'pubKeyY:', pubKeyY);
+        console.log(' Signing up with pubKeyX:', pubKeyX, 'pubKeyY:', pubKeyY);
 
         
         const hash = await walletClient.writeContract({
@@ -121,18 +121,10 @@ const getWalletClient = async () => {
     };
   
     // Vote function - publish message to poll
-    const submitVote = async (pollId: string, voteOptionIndex: number, voteWeight: number) => {
+    const submitVote = async (pollId: string, voteOptionIndex: number, voteWeight: number,stateIndex:number,pubKeyX:string,pubKeyY:string) => {
       setLoading(true);
       setStatus('Loading keypair...');
       try {
-        // Load keypair
-        const saved = localStorage.getItem(`maci_keypair_poll_${pollId}`);
-        if (!saved) throw new Error('No keypair found. Please sign up first.');
-  
-        const data = JSON.parse(saved);
-        const privKey = PrivKey.deserialize(data.privateKey);
-        const kp = new Keypair(privKey);
-  
         // Get wallet
         const walletClient = await getWalletClient();
         const [account] = await walletClient.getAddresses();
@@ -156,7 +148,7 @@ const getWalletClient = async () => {
         setStatus('Creating vote message...');
         const message = {
           data: [
-            BigInt(voteOptionIndex), // msgType or stateIndex
+            BigInt(stateIndex), // msgType or stateIndex
             BigInt(voteOptionIndex), // voteOptionIndex
             BigInt(voteWeight), // newVoteWeight
             BigInt(1), // nonce
@@ -180,8 +172,8 @@ const getWalletClient = async () => {
           args: [
             message,
             {
-              x: kp.pubKey.rawPubKey[0],
-              y: kp.pubKey.rawPubKey[1],
+              x: BigInt(pubKeyX),
+              y: BigInt(pubKeyY),
             },
           ],
           account,

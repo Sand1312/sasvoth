@@ -1,31 +1,24 @@
 import { useCallback } from "react";
-import { voteApi } from "@/api/vote.api";
+import { votesApi } from "@/api/votes.api";
 
 export function useVote() {
   // Lấy danh sách votes
-  const getVotes = async (params: { pollId?: string; voterId?: string }) => {
-    return await voteApi.getVotes(params);
+  const getVotes = async (params: { pollId?: string }) => {
+    return await votesApi.getVotes(params);
   };
 
   // Gửi vote mới
   const castVote =  async (voteData: {
-    voterId: string;
-    pollId: string;
-    selectedOption: string;
+   pollId: string;
+    selectedOption: number;
     voiceCredits: number;
-    privateKey: string;
-    voteCommitment: string;
   }) => {
-    return await voteApi.castVote(voteData);
-  };
-
-  const createVoteCommitment = async (vote: string, voiceCredits: string, pollIdOnchain: string, privateKey: string) => {
-    return await voteApi.createVoteCommitment(vote, voiceCredits, pollIdOnchain, privateKey);
+    return await votesApi.castVote(voteData);
   };
 
   return {
     getVotes,
     castVote,
-    createVoteCommitment,
+
   };
 }

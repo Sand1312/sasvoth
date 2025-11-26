@@ -1,13 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Votes, VotesDocument } from "./schemas/votes.schema";
-import { VoteDtoReq } from "@/dto/vote.dto";
+import { JoinPoll, JoinPollDocument } from "./schemas/join-poll.schema";
 import { VoiceCreditsService } from "../voice-credits/voice-credits.service";
 
 @Injectable()
-export class VotesService {
-    constructor(@InjectModel(Votes.name) private votesModel: Model<VotesDocument>,
+export class JoinPollService {
+    constructor(@InjectModel(JoinPoll.name) private joinPollModel: Model<JoinPollDocument>,
     private readonly voiceCreditsService: VoiceCreditsService
 ) {}
     
@@ -21,15 +20,20 @@ export class VotesService {
     //         timestamp: voteDto.timestamp,
     //     };
     // }
-    async get(pollId: string): Promise<VotesDocument[] | null> {
-        return this.votesModel.find({ pollId }).exec();
+    async get(voterId: string, pollId: string): Promise<JoinPollDocument | null> {
+        return this.joinPollModel.findOne({ voterId, pollId }).exec();
     };
-
 
     async create(voteData: any): Promise<void> {
         try {
+        const existingVote = await this.joinPollModel.findOne({ voterId: voteData.voterId, pollId: voteData.pollId }).exec();
+
+        if (existingVote) {
+            throw new Error("User has already voted in this poll");
+        }
         const timestamp = new Date();
-        const newVote = new this.votesModel({
+        // const voteCommitment = 
+        const newVote = new this.joinPollModel({
             ...voteData,
             timestamp: timestamp
         });

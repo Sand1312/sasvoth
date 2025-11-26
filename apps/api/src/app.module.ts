@@ -10,6 +10,7 @@ import { ResultsMetaModule } from './modules/results-meta/results-meta.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
 import { UsersModule } from './modules/users/users.module';
 import { VoiceCreditsModule } from './modules/voice-credits/voice-credits.module';
+import { JoinPollModule } from './modules/join-poll/join-poll.module';
 import { VotesModule } from './modules/votes/votes.module';
 import { PollsModule } from './modules/polls/polls.module';
 import { MaciModule } from './modules/maci/maci.module';
@@ -42,7 +43,8 @@ import { IpfsModule } from './modules/ipfs/ipfs.module';
     IdeasModule,
     MaciModule,
     // IdeasModule,
-    IpfsModule
+    IpfsModule,
+    JoinPollModule
   ],
   controllers: [AppController],
   providers: [AppService],

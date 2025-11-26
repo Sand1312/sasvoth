@@ -68,7 +68,7 @@ export async function middleware(req: NextRequest) {
       console.log("Middleware will validate against:", validateUrl.toString());
 
       const validationRes = await fetch(validateUrl.toString(), {
-        method: "GET",
+        method: "POST",
         headers: {
           cookie: cookieHeader,
         },

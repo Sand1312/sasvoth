@@ -15,5 +15,15 @@ export const userApi = {
     connectWallet: async (userId: string, walletAddress: string) => {
       const response = await api.post("/users/connectWallet", { userId, walletAddress });
       return response.data;
-    }
+    },
+
+  deposit: async (userId: string, amountToken: number, txHash: string) => {
+    const response = await api.post("/users/deposit", { userId, amountToken, txHash });
+    return response.data.user;
+  },
+  getHistoryDeposit: async (userId: string) => {
+    const response = await api.get("/users/historyDeposit", { params: { userId } });
+    return response.data.history;
+  }
+
 }

@@ -98,22 +98,23 @@ export default function AdminPollsPage(): React.ReactElement {
     setBusyPoll(pollId);
     setError(null);
     try {
-      const startDate =
-        Math.floor(
-          typeof poll.startTime === "string"
-            ? new Date(poll.startTime).getTime()
-            : (poll.startTime?.getTime() ?? 0)
-        ) / 1000;
-      const endDate =
-        Math.floor(
-          typeof poll.endTime === "string"
-            ? new Date(poll.endTime).getTime()
-            : (poll.endTime?.getTime() ?? 0)
-        ) / 1000;
+      // const startDate =
+      //   Math.floor(
+      //     typeof poll.startTime === "string"
+      //       ? new Date(poll.startTime).getTime()
+      //       : (poll.startTime?.getTime() ?? 0)
+      //   ) / 1000;
+      // const endDate =
+      //   Math.floor(
+      //     typeof poll.endTime === "string"
+      //       ? new Date(poll.endTime).getTime()
+      //       : (poll.endTime?.getTime() ?? 0)
+      //   ) / 1000;
 
-      // const startDate = Math.floor(Date.now() / 1000) + 60
+      const startDate = Math.floor(Date.now() / 1000) + 60;
 
-      // const endDate = Math.floor(Date.now() / 1000) + 300
+      const endDate = Math.floor(Date.now() / 1000) + 18000;
+
       // Deploy poll onchain
       const deployed = await deployPoll({
         startDate,

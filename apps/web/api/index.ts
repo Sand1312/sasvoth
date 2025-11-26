@@ -2,7 +2,10 @@ export * from "./auth.api";
 export * from "./polls.api";
 export * from "./ideas.api";
 export * from "./ipfs.api";
-export * from "./vote.api";
+export * from "./join-poll.api";
 export * from "./user.api";
 export * from "./base";
 export * from "./maci.api";
+export * from "./votes.api";
+export * from "./results.api"
+export * from "./rewards.api";

@@ -83,7 +83,6 @@ export function useAuth() {
   ) => {
     try {
       const res = await authApi.signinWithProvider(provider, data);
-      // console.log("signinWithProvider response:", res.user);
 
       // if sign in returned user info, set it locally
       const returnedUser =  res.user;
@@ -96,26 +95,26 @@ export function useAuth() {
         setUser({ authenticated: true } as any);
       }
 
-      if(returnedUser.privateKey){
-        setUser(returnedUser);
-        const maciResult = await signupToMaci(returnedUser.publicKeyX, returnedUser.publicKeyY);
-        if(maciResult.stateIndex) {
-        await saveStateIndex(returnedUser.walletAddress, maciResult.stateIndex);
-        }
-        console.log("User private key:", returnedUser.privateKey);
-      }
-      // navigate based on provider and user role
-      if (provider === "email" || provider === "wallet") {
-        const role = returnedUser?.role;
-        const targetPath = role === "admin" ? "/admin/dashboard" : "/dashboard";
-        console.log("About to navigate to:", targetPath);
-        try {
-          goTo(targetPath);
-          console.log("Navigation called successfully");
-        } catch (navError) {
-          console.error("Navigation failed:", navError);
-        }
-      }
+      // if(returnedUser.privateKey){
+      //   setUser(returnedUser);
+      //   const maciResult = await signupToMaci(returnedUser.publicKeyX, returnedUser.publicKeyY);
+      //   if(maciResult.stateIndex) {
+      //   await saveStateIndex(returnedUser.walletAddress, maciResult.stateIndex);
+      //   }
+      //   console.log("User private key:", returnedUser.privateKey);
+      // }
+      // // navigate based on provider and user role
+      // if (provider === "email" || provider === "wallet") {
+      //   const role = returnedUser?.role;
+      //   const targetPath = role === "admin" ? "/admin/dashboard" : "/dashboard";
+      //   console.log("About to navigate to:", targetPath);
+      //   try {
+      //     goTo(targetPath);
+      //     console.log("Navigation called successfully");
+      //   } catch (navError) {
+      //     console.error("Navigation failed:", navError);
+      //   }
+      // }
 
       return res;
     } catch (error) {
@@ -160,5 +159,6 @@ export function useAuth() {
     signinWithProvider,
     signupWithEmail,
     signout,
+    setUser,
   };
 }
