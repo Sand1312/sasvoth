@@ -41,12 +41,11 @@ function ScreenshotGallery({
           <button
             key={src}
             onClick={() => onChange(idx)}
-            className={`overflow-hidden rounded-lg border-2 transition-all duration-150 ${
+            className={`overflow-hidden rounded-lg border-2 transition-all duration-150 w-[72px] h-[48px] ${
               activeIndex === idx
                 ? "border-black"
                 : "border-transparent hover:border-black"
             }`}
-            style={{ width: 72, height: 48 }}
             aria-label={`Show screenshot ${idx + 1}`}
           >
             <img

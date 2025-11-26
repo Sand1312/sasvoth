@@ -114,15 +114,11 @@ export default function SignupPage() {
                 onClick={() => handleStepNav(s.key)}
                 disabled={s.key === step}
                 className={`
-                                    px-4 py-2 bg-transparent border-none outline-none
+                                    px-4 py-2 bg-transparent border-none outline-none shadow-none rounded-none
                                     ${s.key === step ? "text-black underline" : "text-gray-400"}
                                     font-medium transition
                                     ${s.key < step ? "cursor-pointer" : ""}
                                 `}
-                style={{
-                  boxShadow: "none",
-                  borderRadius: 0,
-                }}
               >
                 {s.label}
               </button>

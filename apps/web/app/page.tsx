@@ -1,5 +1,4 @@
-import Image, { type ImageProps } from "next/image";
-import { Button } from "@sasvoth/ui/button";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -14,61 +13,20 @@ export default function Home() {
         />
       </div>
       <div className="w-full flex justify-center">
-        <div className="relative" style={{ width: 250, height: 250 }}>
+        <div className="relative w-[250px] h-[250px]">
           {/* Ballot box */}
-          <div
-            className="absolute left-1/2 top-1/2"
-            style={{
-              width: 120,
-              height: 80,
-              background: "#fff",
-              border: "3px solid #e5e7eb",
-              borderRadius: "0 0 16px 16px",
-              boxShadow: "0 8px 32px 0 rgba(0,0,0,0.10)",
-              transform: "translate(-50%, -20%)",
-              zIndex: 2,
-            }}
-          >
+          <div className="absolute left-1/2 top-1/2 w-[120px] h-[80px] bg-white border-[3px] border-gray-200 rounded-b-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.10)] -translate-x-1/2 -translate-y-[20%] z-20">
             {/* Slot */}
-            <div
-              style={{
-                width: 48,
-                height: 8,
-                background: "#d1d5db",
-                borderRadius: 4,
-                position: "absolute",
-                left: "50%",
-                top: -10,
-                transform: "translateX(-50%)",
-              }}
-            />
+            <div className="absolute w-12 h-2 bg-gray-300 rounded-full left-1/2 -top-2.5 -translate-x-1/2" />
           </div>
           {/* Ballot paper animation */}
-          <div
-            className="absolute left-1/2"
-            style={{
-              width: 64,
-              height: 90,
-              background: "#f9fafb",
-              border: "2px solid #cbd5e1",
-              borderRadius: 8,
-              boxShadow: "0 2px 12px 0 rgba(0,0,0,0.08)",
-              transform: "translate(-50%, 0)",
-              zIndex: 3,
-              animation: "vote-drop 2.2s cubic-bezier(.6,1.5,.6,1) infinite",
-            }}
-          >
+          <div className="absolute left-1/2 w-16 h-[90px] bg-gray-50 border-2 border-slate-300 rounded-lg shadow-[0_2px_12px_0_rgba(0,0,0,0.08)] -translate-x-1/2 z-30 animate-vote-drop">
             {/* Checkmark */}
             <svg
               width="32"
               height="32"
               viewBox="0 0 32 32"
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             >
               <polyline
                 points="8,18 14,24 24,10"
@@ -81,109 +39,48 @@ export default function Home() {
             </svg>
           </div>
           {/* Ballot box shadow */}
-          <div
-            className="absolute left-1/2"
-            style={{
-              width: 100,
-              height: 20,
-              background: "rgba(0,0,0,0.08)",
-              borderRadius: "50%",
-              bottom: 32,
-              transform: "translateX(-50%)",
-              filter: "blur(2px)",
-              zIndex: 1,
-            }}
-          />
-          <style>{`
-            @keyframes vote-drop {
-              0% {
-                top: 0px;
-                opacity: 0;
-              }
-              10% {
-                opacity: 1;
-              }
-              60% {
-                top: 60px;
-                opacity: 1;
-              }
-              80% {
-                top: 80px;
-                opacity: 1;
-              }
-              100% {
-                top: 80px;
-                opacity: 0;
-              }
-            }
-          `}</style>
+          <div className="absolute left-1/2 w-[100px] h-5 bg-black/8 rounded-full bottom-8 -translate-x-1/2 blur-[2px] z-10" />
         </div>
       </div>
       <div className="w-full flex justify-center py-4">
-        <div
-          className="relative overflow-hidden"
-          style={{ width: 640, height: 100 }}
-        >
-          <div
-            className="flex animate-scroll-small gap-4 absolute left-0 top-0"
-            style={{
-              width: 1280, // 2x 6*100px + 2x 5*gap(16px)
-              height: 100,
-            }}
-          >
+        <div className="relative overflow-hidden w-[640px] h-[100px]">
+          <div className="flex gap-4 absolute left-0 top-0 w-[1280px] h-[100px] animate-scroll-small">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-md"
-                style={{
-                  width: 100,
-                  height: 100,
-                  display: "inline-block",
-                  backgroundColor: [
-                    "#f87171",
-                    "#fbbf24",
-                    "#34d399",
-                    "#60a5fa",
-                    "#a78bfa",
-                    "#f472b6",
-                  ][i % 6],
-                }}
+                className={`rounded-md w-[100px] h-[100px] inline-block ${
+                  [
+                    "bg-red-400",
+                    "bg-amber-400",
+                    "bg-emerald-400",
+                    "bg-blue-400",
+                    "bg-violet-400",
+                    "bg-pink-400",
+                  ][i % 6]
+                }`}
               />
             ))}
             {/* Duplicate for seamless looping */}
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={`dup-${i}`}
-                className="rounded-md"
-                style={{
-                  width: 100,
-                  height: 100,
-                  display: "inline-block",
-                  backgroundColor: [
-                    "#f87171",
-                    "#fbbf24",
-                    "#34d399",
-                    "#60a5fa",
-                    "#a78bfa",
-                    "#f472b6",
-                  ][i % 6],
-                }}
+                className={`rounded-md w-[100px] h-[100px] inline-block ${
+                  [
+                    "bg-red-400",
+                    "bg-amber-400",
+                    "bg-emerald-400",
+                    "bg-blue-400",
+                    "bg-violet-400",
+                    "bg-pink-400",
+                  ][i % 6]
+                }`}
               />
             ))}
           </div>
         </div>
-        <style>{`
-          .animate-scroll-small {
-        animation: scroll-small 10s linear infinite;
-          }
-          @keyframes scroll-small {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
-          }
-        `}</style>
       </div>
       <div className="w-full flex justify-center py-12">
-        <div className="relative" style={{ width: 600, height: 340 }}>
+        <div className="relative w-[600px] h-[340px]">
           {[
             { label: "Accessibility", top: 10, left: 220, rotate: -6 },
             { label: "Equity", top: 50, left: 60, rotate: -12 },
@@ -203,33 +100,20 @@ export default function Home() {
           ].map(({ label, top, left, rotate }, idx) => (
             <div
               key={label}
-              className="absolute shadow-lg rounded-xl px-4 py-3 flex items-center justify-center text-center font-semibold text-sm border border-gray-200 backdrop-blur-md animate-float"
-              style={{
-                minWidth: 120,
-                minHeight: 60,
-                borderRadius: "1.25rem",
-                boxShadow: "0 4px 24px 0 rgba(0,0,0,0.08)",
-                background: "transparent",
-                top,
-                left,
-                transform: `rotate(${rotate}deg)`,
-                animationDelay: `${idx * 0.2}s`,
-              }}
+              className="absolute shadow-lg rounded-xl px-4 py-3 flex items-center justify-center text-center font-semibold text-sm border border-gray-200 backdrop-blur-md animate-float min-w-[120px] min-h-[60px] rounded-[1.25rem] shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] bg-transparent"
+              style={
+                {
+                  top,
+                  left,
+                  "--rotate": `${rotate}deg`,
+                  animationDelay: `${idx * 0.2}s`,
+                } as React.CSSProperties
+              }
             >
               {label}
             </div>
           ))}
         </div>
-        <style>{`
-          @keyframes float {
-        0% { transform: translateY(0) scale(1) rotate(var(--rotate, 0deg)); }
-        50% { transform: translateY(-16px) scale(1.03) rotate(var(--rotate, 0deg)); }
-        100% { transform: translateY(0) scale(1) rotate(var(--rotate, 0deg)); }
-          }
-          .animate-float {
-        animation: float 3.2s ease-in-out infinite;
-          }
-        `}</style>
       </div>
       <div className="w-full flex flex-col items-center gap-8 py-8">
         {[
