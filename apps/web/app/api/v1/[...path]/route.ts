@@ -25,14 +25,14 @@ async function proxyRequest(
 
     const cookie = req.headers.get("cookie") || "";
     const contentType = req.headers.get("content-type") || "application/json";
-    console.log(' API Call:', {
-      method: method,
-      clientUrl: req.url,
-      proxyUrl: backendUrl.toString(),
-      path: targetPath,
-      query: incomingUrl.search,
-      timestamp: new Date().toISOString()
-    });
+    // console.log(' API Call:', {
+    //   method: method,
+    //   clientUrl: req.url,
+    //   proxyUrl: backendUrl.toString(),
+    //   path: targetPath,
+    //   query: incomingUrl.search,
+    //   timestamp: new Date().toISOString()
+    // });
     const init: RequestInit = {
       method,
       headers: {
@@ -54,7 +54,7 @@ async function proxyRequest(
     try {
       res = await fetch(backendUrl.toString(), init);
     } catch (err) {
-      console.error(`/api/v1 proxy ${method} backend fetch failed:`, err);
+      // console.error(`/api/v1 proxy ${method} backend fetch failed:`, err);
       return new NextResponse("backend unreachable", { status: 502 });
     }
 

@@ -34,6 +34,7 @@ export const pollsApi = {
         response = await api.get(`/polls/status/${status}`);
       } else {
         response = await api.get("/polls");
+        console.log("All Polls response:", response.data);
       }
       const polls = Array.isArray(response.data?.polls)
         ? response.data.polls

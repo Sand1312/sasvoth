@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { MaciService } from './maci.service';
 import { MaciController } from './maci.controller';
 import { PollsModule } from '../polls/polls.module';
-import { VotesModule } from '../votes/votes.module';
+import { JoinPollModule } from '../join-poll/join-poll.module';
 
 @Module({
   imports: [
     PollsModule,
-    VotesModule,
+    JoinPollModule,
   ],
   controllers: [MaciController],
   providers: [MaciService],

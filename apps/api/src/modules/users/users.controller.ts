@@ -6,6 +6,7 @@ import {
   Post,
   Res,
   NotFoundException,
+  Patch,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -89,4 +90,15 @@ export class UsersController {
         return res.status(500).json({message:'Error deposit',error})
       }
     }
+
+    @Patch("stateIndex")
+    async updateStateIndex(@Req() req:Request,@Res() res: Response){
+      const {walletAddress,stateIndex} = req.body;
+      try{
+         const user = await this.usersService.updateStateIndex(walletAddress,stateIndex);
+         return res.status(200).json({user})
+      } catch(error){
+        return res.status(500).json({message:'Error update stateIndex',error})
+      }
+}
 }

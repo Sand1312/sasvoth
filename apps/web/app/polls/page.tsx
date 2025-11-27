@@ -196,6 +196,7 @@ export default function PollsPage() {
         const response = await getPolls();
         if (Array.isArray(response) && response.length > 0) {
           setPolls(annotatePolls(response));
+          console.log("Loaded Polls:", annotatePolls(response));
           setError(null);
         } else {
           setPolls(annotatePolls(fallbackPolls));
@@ -211,7 +212,7 @@ export default function PollsPage() {
     };
 
     loadPolls();
-   return () => {
+    return () => {
       isMounted = false;
     };
   }, []);
@@ -339,8 +340,8 @@ export default function PollsPage() {
                   className={cn(
                     "size-4 transition-transform",
                     sortConfig.key === option.key &&
-                      sortConfig.direction === "asc" &&
-                      "-scale-y-100"
+                    sortConfig.direction === "asc" &&
+                    "-scale-y-100"
                   )}
                 />
               </button>
@@ -447,7 +448,7 @@ function ListView({ polls }: { polls: PollWithMeta[] }) {
               className={cn(
                 "absolute right-0 top-0 h-10 w-10 rounded-bl-3xl",
                 statusThemes[poll.status ?? PollStatus.Draft]?.accent ??
-                  "bg-black/10"
+                "bg-black/10"
               )}
               aria-hidden
             />
@@ -508,7 +509,7 @@ function GridView({ polls }: { polls: PollWithMeta[] }) {
             className={cn(
               "absolute right-0 top-0 h-12 w-12 rounded-bl-[30px]",
               statusThemes[poll.status ?? PollStatus.Draft]?.accent ??
-                "bg-black/10"
+              "bg-black/10"
             )}
             aria-hidden
           />

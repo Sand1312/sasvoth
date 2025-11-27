@@ -6,7 +6,7 @@ import { promisify } from 'util';
 import * as path from 'path';
 import { ethers } from 'ethers';
 import { PollsService } from '../polls/polls.service';
-import { VotesService } from '../votes/votes.service';
+import { JoinPollService } from '../join-poll/join-poll.service';
 
 const MACI_ABI = require('../../../../../packages/contracts/abi/contracts/Maci.json');
 const POLL_ABI = require('../../../../../packages/contracts/abi/contracts/Poll.json');
@@ -23,7 +23,7 @@ export class MaciService {
   private readonly provider: ethers.providers.JsonRpcProvider;
 
   private readonly pollsService: PollsService;
-  private readonly votesService: VotesService;
+  private readonly joinPollService: JoinPollService;
 
   constructor(
     private configService: ConfigService,

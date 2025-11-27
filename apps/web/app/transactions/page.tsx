@@ -3,25 +3,24 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { useAccount } from "wagmi";
-import { useClaimContract, useToken } from "../../hooks";
+import { useClaimContract, useToken, useUser } from "../../hooks";
+import { useGenProofVerify } from "../../hooks/genProofVerify";
+import { useResults } from "../../hooks";
+import { useJoinPoll } from "../../hooks";
+import { useVerifyVote } from "../../hooks";
+import { useRewards } from "../../hooks";
 
-type Notification = {
-  id: number;
-  message: string;
-  date: string;
+type DepositHistory = {
+  amount: number;
+  timestamp: string;
+ 
 };
-
-const mockNotifications: Notification[] = [
-  { id: 1, message: "Balance updated: +$120", date: "2024-06-10" },
-  { id: 2, message: "Balance updated: -$75", date: "2024-06-09" },
-  { id: 3, message: "Balance updated: +$200", date: "2024-06-08" },
-  { id: 4, message: "Balance updated: -$50", date: "2024-06-07" },
-];
 
 export default function TransactionsPage() {
   const { address, isConnected } = useAccount();
   const token = useToken();
   const claim = useClaimContract();
+  const { deposit, getHistoryDeposit } = useUser();
 
   const [isClient, setIsClient] = useState(false);
 
@@ -31,14 +30,6 @@ export default function TransactionsPage() {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState<number | "">("");
 
-  // Voice credits
-  const [showBuyCredits, setShowBuyCredits] = useState(true);
-  const [creditsAmount, setCreditsAmount] = useState<number | "">("");
-  const [purchasedCredits, setPurchasedCredits] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showApproveOnly, setShowApproveOnly] = useState(false);
-  const [approveAmount, setApproveAmount] = useState<number | "">("");
-
   // Vote form
   const [showVoteForm, setShowVoteForm] = useState(true);
   const [privateKey, setPrivateKey] = useState("");
@@ -46,22 +37,25 @@ export default function TransactionsPage() {
   const [voiceCredit, setVoiceCredit] = useState<number | "">("");
   const [pollId, setPollId] = useState<number | "">("");
   const [isVoting, setIsVoting] = useState(false);
+  const [history, setHistory] = useState<DepositHistory[]>([]);
+  const [reloadHistory, setReloadHistory] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
-
-  const needsApproval = useMemo(() => {
-    if (!creditsAmount || !claim.creditRate || !token.allowance) return true;
-
-    const requiredAmount = Number(creditsAmount) * Number(claim.creditRate);
-    return Number(token.allowance) < requiredAmount;
-  }, [creditsAmount, claim.creditRate, token.allowance]);
-
-  const requiredAmount = useMemo(() => {
-    if (!creditsAmount || !claim.creditRate) return 0;
-    return Number(creditsAmount) * Number(claim.creditRate);
-  }, [creditsAmount, claim.creditRate]);
+    const fetchHistory = async () => {
+      try {
+        const userId = "69268cf4f62b0d28cb5f614f";
+        const data = await getHistoryDeposit(userId);
+        if (Array.isArray(data)) {
+          
+          setHistory(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch deposit history:", error);
+      }
+    };
+    fetchHistory();
+  }, [reloadHistory]);
 
   const isDepositDisabled = Boolean(
     claim.isBuying || !depositAmount || Number(depositAmount) < 0.001
@@ -69,129 +63,112 @@ export default function TransactionsPage() {
 
   const isWithdrawDisabled = Boolean(
     claim.isSelling ||
-      !withdrawAmount ||
-      Number(withdrawAmount) > Number(token.balance) ||
-      Number(withdrawAmount) <= 0
+    !withdrawAmount ||
+    Number(withdrawAmount) > Number(token.balance) ||
+    Number(withdrawAmount) <= 0
   );
 
-  const isBuyCreditsDisabled = Boolean(
-    isProcessing ||
-      claim.isBuyingCredits ||
-      token.isApproving ||
-      !creditsAmount ||
-      requiredAmount <= 0 ||
-      requiredAmount > Number(token.balance)
-  );
-
-  const isApproveDisabled = Boolean(
-    token.isApproving || !approveAmount || Number(approveAmount) <= 0
-  );
 
   const isVoteDisabled = Boolean(
     !isConnected ||
-      !privateKey ||
-      !voteOptionId ||
-      !voiceCredit ||
-      !pollId ||
-      isVoting
+    !privateKey ||
+    !voteOptionId ||
+    !voiceCredit ||
+    !pollId ||
+    isVoting
   );
 
-  const handleBuyToken = () => {
+  const handleBuyToken = async () => {
     if (typeof depositAmount === "number" && depositAmount > 0) {
       const ethAmountString = depositAmount.toString();
-      claim.buyHD(ethAmountString);
+      const result = await claim.buyHD(ethAmountString);
+      console.log("Buy HD result:", result);
+      const userId = "69268cf4f62b0d28cb5f614f";
+
+      const amountToken = Number(depositAmount) * Number(claim.rate);
+      const txHash = "0xMockTxHash1234567890abcdef";
+      await deposit(userId, amountToken, txHash);
       setDepositAmount("");
       alert(`Đang mua token với ${depositAmount} ETH...`);
+      setReloadHistory(prev => prev + 1);
     } else {
       alert("Vui lòng nhập số ETH hợp lệ");
     }
   };
 
-  const handleWithdraw = () => {
+  const handleWithdraw = async() => {
     if (typeof withdrawAmount === "number" && withdrawAmount > 0) {
       const tokenAmountString = withdrawAmount.toString();
-      claim.sellHD(tokenAmountString);
-      setWithdrawAmount("");
+      await token.approve(claim.contractAddress, tokenAmountString);
 
-      if (claim.rate) {
-        const ethReceived = Number(withdrawAmount) / Number(claim.rate);
-        alert(
-          `Đang bán ${withdrawAmount} token để rút ${ethReceived.toFixed(6)} ETH...`
-        );
-      } else {
-        alert(`Đang bán ${withdrawAmount} token để rút ETH...`);
-      }
+      setTimeout(async () => {
+      await claim.sellHD(tokenAmountString);
+      setWithdrawAmount("");
+      const userId = "69268cf4f62b0d28cb5f614f";
+      const txHash = "0xMockWithdrawTxHashabcdef1234567890";
+      const amountToken = Number(withdrawAmount) - Number(withdrawAmount) *2;
+        await deposit(userId, amountToken, txHash);
+
+      
+        setReloadHistory(prev => prev + 1);
+
+      }, 8000);
+       
+        // alert(
+        //   `Đang bán ${withdrawAmount} token để rút ${ethReceived.toFixed(6)} ETH...`
+        // );
+     
     } else {
       alert("Vui lòng nhập số token hợp lệ");
     }
   };
 
-  const handleApproveOnly = () => {
-    if (!approveAmount || approveAmount <= 0) {
-      alert("Vui lòng nhập số lượng token cần approve");
-      return;
-    }
 
-    token.approve(claim.contractAddress, approveAmount.toString());
-    alert(`Đang approve ${approveAmount} token...`);
-  };
+  const { generateVoteProof, verifyProof, loading: proofLoading, status: proofStatus } = useGenProofVerify();
+  const { getResults } = useResults();
+  const { get } = useJoinPoll();
+  const { verifyVote } = useVerifyVote();
+  const { getReward, saveReward } = useRewards();
 
-  const handleBuyVoiceCredits = () => {
-    if (!creditsAmount || !claim.creditRate) return;
 
-    setIsProcessing(true);
-    setPurchasedCredits(Number(creditsAmount));
-
-    if (needsApproval) {
-      token.approve(claim.contractAddress, requiredAmount.toString());
-
-      setTimeout(() => {
-        token.refetchAllowance?.();
-        claim.buyVoiceCredits(creditsAmount.toString());
-        setTimeout(() => {
-          setCreditsAmount("");
-          setShowBuyCredits(false);
-          setIsProcessing(false);
-          claim.refetchVoiceCredits?.();
-        }, 3000);
-      }, 8000);
-    } else {
-      claim.buyVoiceCredits(creditsAmount.toString());
-      setTimeout(() => {
-        setCreditsAmount("");
-        setShowBuyCredits(false);
-        setIsProcessing(false);
-        claim.refetchVoiceCredits?.();
-      }, 3000);
-    }
-  };
-
-  const handleBuyDirect = () => {
-    if (!creditsAmount) return;
-
-    claim.buyVoiceCredits(creditsAmount.toString());
-
-    setTimeout(() => {
-      setCreditsAmount("");
-      setShowBuyCredits(false);
-      setIsProcessing(false);
-      claim.refetchVoiceCredits?.();
-    }, 3000);
-  };
-
-  const handleSubmitVote = () => {
+  const handleSubmitVote = async () => {
+    const poll = "6926cc063d59305182bfdb58"; //id poll từ backend
+    const voterId = "6926b204727a41b3c53aafa1";//user._id
+    const result = await getResults(poll);
+    const votes = await get({ pollId: poll, voterId });
+    const voterIndex = 1; //user.voterIndex
+    console.log("Fetched results:", result.outCome);
+    console.log("Fetched votes:", votes.voteCommitment);
     if (isVoteDisabled) return;
 
     setIsVoting(true);
+    const input = {
+      privateKey: BigInt(privateKey),
+      vote: BigInt(voteOptionId),
+      voiceCredits: BigInt(voiceCredit),
+      nonce: BigInt(1),
+      pollId: BigInt(pollId),
+      pubkeyX: BigInt("0x6926cc063d59305182bfdb58"),// user.pubkeyX,
+      pubkeyY: BigInt("0x6926cc063d59305182bfdb58"),// user.pubkeyY,
+      voiceCreditBalance: BigInt(voiceCredit),
 
-    // TODO: chỗ này bạn có thể call smart contract / API thật
-    // ví dụ: claim.vote({ privateKey, voteOptionId, voiceCredit, pollId })
-    console.log("Submitting vote with data:", {
-      privateKey,
-      voteOptionId,
-      voiceCredit,
-      pollId,
-    });
+      // Public inputs (will be in publicSignals)
+      voterIndex: BigInt(voterIndex),// user.voterIndex,
+      voteCommitment: BigInt(votes.voteCommitment),
+      outcome: BigInt(result.outCome),
+
+    }
+
+    const proofData = await generateVoteProof(input);
+
+    const isValid = await verifyProof(proofData.proof, proofData.publicSignals);
+    console.log("Proof validity:", proofData);
+    if (isValid) {
+      const proof = convertProofToSolidityFormat(proofData.proof);
+      await verifyVote(BigInt(pollId), BigInt(voterIndex), proof, proofData.publicSignals);
+
+      await saveReward(voterId, poll, (Number(voiceCredit) * 1000));
+    }
 
     // fake delay cho đẹp UI
     setTimeout(() => {
@@ -201,6 +178,28 @@ export default function TransactionsPage() {
       setIsVoting(false);
     }, 1200);
   };
+
+  function convertProofToSolidityFormat(proof: {
+    pi_a: string[];
+    pi_b: string[][];
+    pi_c: string[];
+  }): [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint] {
+    const proofArray: [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint] = [
+
+      BigInt(proof.pi_a[0]!),
+      BigInt(proof.pi_a[1]!),
+
+      BigInt(proof.pi_b[0]![0]!),
+      BigInt(proof.pi_b[0]![1]!),
+      BigInt(proof.pi_b[1]![0]!),
+      BigInt(proof.pi_b[1]![1]!),
+
+      BigInt(proof.pi_c[0]!),
+      BigInt(proof.pi_c[1]!)
+    ];
+
+    return proofArray;
+  }
 
   if (!isClient) {
     return (
@@ -402,332 +401,167 @@ export default function TransactionsPage() {
                 <p>
                   Số dư {token.symbol}: {token.balance}
                 </p>
-                <p className="font-bold text-purple-700">
-                  Voice Credits:{" "}
-                  {claim.voiceCredits ? claim.voiceCredits.toString() : "0"}
-                </p>
+
                 {token.name && <p>Token: {token.name}</p>}
                 <p className="text-xs text-blue-700">
                   Allowance:{" "}
                   {token.allowance ? token.allowance.toString() : "0"}{" "}
                   {token.symbol}
                 </p>
-
-                <div className="mt-4 border-t border-blue-200 pt-3">
-                  <Button
-                    className="mb-2 w-full bg-orange-500 text-xs hover:bg-orange-600"
-                    onClick={() => setShowApproveOnly((prev) => !prev)}
-                  >
-                    {showApproveOnly ? "Ẩn Approve" : "Approve Token"}
-                  </Button>
-                  {showApproveOnly && (
-                    <div className="rounded border border-orange-200 bg-orange-50 p-3">
-                      <label className="mb-1 block text-xs font-medium text-orange-800">
-                        Số token muốn approve:
-                      </label>
-                      <input
-                        type="number"
-                        step="1"
-                        min="1"
-                        placeholder="1000"
-                        value={approveAmount}
-                        onChange={(e) =>
-                          setApproveAmount(
-                            e.target.value ? Number(e.target.value) : ""
-                          )
-                        }
-                        className="mb-2 w-full rounded border border-orange-200 px-2 py-1 text-xs focus:outline-none"
-                      />
-                      <Button
-                        onClick={handleApproveOnly}
-                        disabled={isApproveDisabled}
-                        className="w-full bg-orange-600 text-xs hover:bg-orange-700"
-                      >
-                        {token.isApproving
-                          ? "Đang approve..."
-                          : `Approve ${approveAmount || 0} ${token.symbol}`}
-                      </Button>
-                    </div>
-                  )}
-                </div>
               </div>
             )}
           </section>
-
-          {/* RIGHT COLUMN */}
-          <section className="space-y-6">
-            {/* Voice Credits */}
-            <div className="rounded-2xl border border-purple-200 bg-white p-5 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-gray-900">
-                  Voice Credits
-                </h2>
-                <Button
-                  variant="ghost"
-                  className="text-xs"
-                  onClick={() => setShowBuyCredits((prev) => !prev)}
-                >
-                  {showBuyCredits ? "Hide" : "Show"}
-                </Button>
+          {/* VOTE FORM */}
+          <div className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">Vote Form</h2>
+                <p className="mt-1 text-xs text-gray-500">
+                  Demo form để submit vote bằng voice credits.
+                </p>
               </div>
+              <Button
+                variant="ghost"
+                className="text-xs"
+                onClick={() => setShowVoteForm((prev) => !prev)}
+              >
+                {showVoteForm ? "Hide" : "Show"}
+              </Button>
+            </div>
 
-              {showBuyCredits && (
-                <div className="space-y-4">
+            {showVoteForm && (
+              <div className="space-y-4">
+                <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-[11px] text-red-700">
+                  ⚠️ <strong>Cảnh báo bảo mật:</strong> Đây chỉ là form demo.
+                  Trong thực tế, không nên nhập private key trực tiếp vào
+                  website.
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Private Key
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Nhập private key..."
+                    value={privateKey}
+                    onChange={(e) => setPrivateKey(e.target.value)}
+                    className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-3">
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                      Số Voice Credits muốn mua:
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Vote Option ID
                     </label>
                     <input
                       type="number"
-                      step="1"
-                      min="1"
-                      placeholder="10"
-                      value={creditsAmount}
+                      placeholder="1"
+                      value={voteOptionId}
                       onChange={(e) =>
-                        setCreditsAmount(
+                        setVoteOptionId(
                           e.target.value ? Number(e.target.value) : ""
                         )
                       }
-                      className="w-full rounded-lg border border-purple-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-
-                  {claim.creditRate && creditsAmount && (
-                    <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 text-sm text-purple-800">
-                      <p>
-                        <strong>Tỷ giá hiện tại:</strong>
-                      </p>
-                      <p>
-                        1 Voice Credit ={" "}
-                        {Number(claim.creditRate).toLocaleString()}{" "}
-                        {token.symbol}
-                      </p>
-                      <p className="mt-2 font-bold text-lg">
-                        Tổng cần thanh toán: {requiredAmount.toLocaleString()}{" "}
-                        {token.symbol}
-                      </p>
-                      {token.balance && (
-                        <p
-                          className={`mt-2 text-sm ${
-                            requiredAmount > Number(token.balance)
-                              ? "text-red-600 font-bold"
-                              : "text-green-600"
-                          }`}
-                        >
-                          Số dư khả dụng: {token.balance} {token.symbol}
-                        </p>
-                      )}
-                      <p
-                        className={`text-sm ${
-                          needsApproval ? "text-orange-600" : "text-green-600"
-                        }`}
-                      >
-                        Allowance:{" "}
-                        {token.allowance ? token.allowance.toString() : "0"} /{" "}
-                        {requiredAmount} {token.symbol}
-                        {needsApproval && " (Cần approve thêm)"}
-                      </p>
-                    </div>
-                  )}
-
-                  {!isConnected ? (
-                    <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-center text-sm text-yellow-800">
-                      Vui lòng kết nối ví để mua Voice Credits
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {needsApproval ? (
-                        <Button
-                          onClick={handleBuyVoiceCredits}
-                          disabled={isBuyCreditsDisabled}
-                          className="w-full bg-purple-600 py-3 text-white hover:bg-purple-700"
-                        >
-                          {isProcessing ||
-                          claim.isBuyingCredits ||
-                          token.isApproving
-                            ? "Đang xử lý..."
-                            : `Approve & Mua ${creditsAmount} Credits`}
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={handleBuyDirect}
-                          disabled={isBuyCreditsDisabled}
-                          className="w-full bg-green-600 py-3 text-white hover:bg-green-700"
-                        >
-                          {claim.isBuyingCredits
-                            ? "Đang xử lý..."
-                            : `Mua ${creditsAmount} Credits`}
-                        </Button>
-                      )}
-
-                      {isProcessing && (
-                        <div className="text-center text-sm text-green-600">
-                          {token.isApproving
-                            ? "Đang approve token..."
-                            : claim.isBuyingCredits
-                              ? "Đang mua Voice Credits..."
-                              : "Đã mua thành công!"}
-                          {purchasedCredits > 0 && (
-                            <p className="mt-2 text-lg font-bold text-purple-600">
-                              Đã mua: {purchasedCredits} Voice Credits
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                      {creditsAmount &&
-                        requiredAmount > Number(token.balance) && (
-                          <p className="text-center text-sm font-medium text-red-500">
-                            Số dư không đủ để mua {creditsAmount} Voice Credits
-                          </p>
-                        )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* VOTE FORM */}
-            <div className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm">
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900">Vote Form</h2>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Demo form để submit vote bằng voice credits.
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  className="text-xs"
-                  onClick={() => setShowVoteForm((prev) => !prev)}
-                >
-                  {showVoteForm ? "Hide" : "Show"}
-                </Button>
-              </div>
-
-              {showVoteForm && (
-                <div className="space-y-4">
-                  <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-[11px] text-red-700">
-                    ⚠️ <strong>Cảnh báo bảo mật:</strong> Đây chỉ là form demo.
-                    Trong thực tế, không nên nhập private key trực tiếp vào
-                    website.
-                  </div>
-
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Private Key
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="Nhập private key..."
-                      value={privateKey}
-                      onChange={(e) => setPrivateKey(e.target.value)}
                       className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
 
-                  <div className="grid gap-3 md:grid-cols-3">
-                    <div>
-                      <label className="mb-1 block text-sm font-medium text-gray-700">
-                        Vote Option ID
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="1"
-                        value={voteOptionId}
-                        onChange={(e) =>
-                          setVoteOptionId(
-                            e.target.value ? Number(e.target.value) : ""
-                          )
-                        }
-                        className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-1 block text-sm font-medium text-gray-700">
-                        Voice Credit
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="10"
-                        value={voiceCredit}
-                        onChange={(e) =>
-                          setVoiceCredit(
-                            e.target.value ? Number(e.target.value) : ""
-                          )
-                        }
-                        className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-1 block text-sm font-medium text-gray-700">
-                        Poll ID
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="7"
-                        value={pollId}
-                        onChange={(e) =>
-                          setPollId(
-                            e.target.value ? Number(e.target.value) : ""
-                          )
-                        }
-                        className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                    </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Voice Credit
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="10"
+                      value={voiceCredit}
+                      onChange={(e) =>
+                        setVoiceCredit(
+                          e.target.value ? Number(e.target.value) : ""
+                        )
+                      }
+                      className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
                   </div>
 
-                  {voteOptionId && voiceCredit && pollId && (
-                    <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-800">
-                      <p className="font-semibold">Tóm tắt vote:</p>
-                      <p className="mt-1">
-                        • Poll: <strong>#{pollId}</strong>
-                      </p>
-                      <p>
-                        • Option: <strong>{voteOptionId}</strong>
-                      </p>
-                      <p>
-                        • Voice credits: <strong>{voiceCredit}</strong>
-                      </p>
-                    </div>
-                  )}
-
-                  {!isConnected && (
-                    <p className="text-xs text-red-500">
-                      Vui lòng kết nối ví trước khi vote.
-                    </p>
-                  )}
-
-                  <Button
-                    onClick={handleSubmitVote}
-                    disabled={isVoteDisabled}
-                    className="w-full bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {isVoting
-                      ? "Đang submit vote..."
-                      : "Submit Vote với Voice Credits"}
-                  </Button>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Poll ID
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="7"
+                      value={pollId}
+                      onChange={(e) =>
+                        setPollId(
+                          e.target.value ? Number(e.target.value) : ""
+                        )
+                      }
+                      className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
                 </div>
-              )}
-            </div>
 
-            {/* Notifications */}
-            <div className="space-y-3">
-              {mockNotifications.map((notif) => (
+                {voteOptionId && voiceCredit && pollId && (
+                  <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-800">
+                    <p className="font-semibold">Tóm tắt vote:</p>
+                    <p className="mt-1">
+                      • Poll: <strong>#{pollId}</strong>
+                    </p>
+                    <p>
+                      • Option: <strong>{voteOptionId}</strong>
+                    </p>
+                    <p>
+                      • Voice credits: <strong>{voiceCredit}</strong>
+                    </p>
+                  </div>
+                )}
+
+                {!isConnected && (
+                  <p className="text-xs text-red-500">
+                    Vui lòng kết nối ví trước khi vote.
+                  </p>
+                )}
+
+                <Button
+                  onClick={handleSubmitVote}
+                  disabled={isVoteDisabled}
+                  className="w-full bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isVoting
+                    ? "Đang submit vote..."
+                    : "Submit Vote với Voice Credits"}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* History */}
+          <div className="space-y-3">
+            <h2 className="text-lg font-bold text-gray-900">Transaction History</h2>
+            {history.length === 0 ? (
+              <p className="text-sm text-gray-500">No transactions found.</p>
+            ) : (
+              [...history].reverse().map((item, index) => (
                 <div
-                  key={notif.id}
+                  key={index}
                   className="rounded-2xl border border-black/5 bg-white px-5 py-4 shadow-sm"
                 >
-                  <div className="text-sm font-semibold text-gray-900">
-                    {notif.message.replace(/^Balance updated: /, "")}
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm font-semibold text-gray-900">
+                     {item.amount} HD
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {new Date(item.timestamp).toLocaleDateString()}
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500">{notif.date}</div>
+                 
                 </div>
-              ))}
-            </div>
-          </section>
+              ))
+            )}
+          </div>
+
         </div>
       </div>
     </div>

@@ -61,7 +61,7 @@ const getWalletClient = async () => {
         if (!account) throw new Error('No account connected');
         const pubKeyX = BigInt(publicKeyX || 0);
         const pubKeyY = BigInt(publicKeyY || 0);
-        console.log('📍 Signing up with pubKeyX:', pubKeyX, 'pubKeyY:', pubKeyY);
+        console.log(' Signing up with pubKeyX:', pubKeyX, 'pubKeyY:', pubKeyY);
 
         
         const hash = await walletClient.writeContract({
@@ -77,9 +77,29 @@ const getWalletClient = async () => {
           ],
           account,
         });
+
+         let stateIndex: number | null = null;
+              try {
+                const publicKeyHash = await publicClient.readContract({
+                  address: MACI_ADDRESS as `0x${string}`,
+                  abi: MACI_ABI,
+                  functionName: 'hash2',
+                  args: [[pubKeyX, pubKeyY]],
+                }) as bigint;
+                // Gọi getStateIndex(publicKeyHash)
+                stateIndex = Number(await publicClient.readContract({
+                  address: MACI_ADDRESS as `0x${string}`,
+                  abi: MACI_ABI,
+                  functionName: 'getStateIndex',
+                  args: [publicKeyHash],
+                }));
+              } catch (e) {
+                console.warn('Không lấy được stateIndex từ contract:', e);
+              }
   
         return {
           txHash: hash,
+          stateIndex,
          
         };
       } catch (error: any) {
@@ -101,18 +121,10 @@ const getWalletClient = async () => {
     };
   
     // Vote function - publish message to poll
-    const submitVote = async (pollId: string, voteOptionIndex: number, voteWeight: number) => {
+    const submitVote = async (pollId: string, voteOptionIndex: number, voteWeight: number,stateIndex:number,pubKeyX:string,pubKeyY:string) => {
       setLoading(true);
       setStatus('Loading keypair...');
       try {
-        // Load keypair
-        const saved = localStorage.getItem(`maci_keypair_poll_${pollId}`);
-        if (!saved) throw new Error('No keypair found. Please sign up first.');
-  
-        const data = JSON.parse(saved);
-        const privKey = PrivKey.deserialize(data.privateKey);
-        const kp = new Keypair(privKey);
-  
         // Get wallet
         const walletClient = await getWalletClient();
         const [account] = await walletClient.getAddresses();
@@ -129,18 +141,18 @@ const getWalletClient = async () => {
         }) as any;
   
         const pollAddress = pollData.poll;
-        console.log('📍 Poll address:', pollAddress);
+        console.log('Poll address:', pollAddress);
   
         // For publishMessage, we need a proper MACI message (10 uint256 array)
         // This is simplified - in production you'd encrypt the message properly
         setStatus('Creating vote message...');
         const message = {
           data: [
-            BigInt(voteOptionIndex), // msgType or stateIndex
-            BigInt(voteWeight), // voteOptionIndex
-            BigInt(0), // newVoteWeight
-            BigInt(0), // nonce
-            BigInt(0), // pollId
+            BigInt(stateIndex), // msgType or stateIndex
+            BigInt(voteOptionIndex), // voteOptionIndex
+            BigInt(voteWeight), // newVoteWeight
+            BigInt(1), // nonce
+            BigInt(pollId), // pollId
             BigInt(0), // salt
             BigInt(0), // padding
             BigInt(0), // padding
@@ -160,8 +172,8 @@ const getWalletClient = async () => {
           args: [
             message,
             {
-              x: kp.pubKey.rawPubKey[0],
-              y: kp.pubKey.rawPubKey[1],
+              x: BigInt(pubKeyX),
+              y: BigInt(pubKeyY),
             },
           ],
           account,

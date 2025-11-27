@@ -4,6 +4,7 @@ import { useRedirect } from "./useRedirect";
 import { authApi } from "../api";
 import { api } from "../api/base";
 import {useMaci} from "./useMACI"
+import { useUser } from "./useUser";
 
 //TODOs: define user type
 type User = any;
@@ -13,6 +14,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { signupToMaci } = useMaci();
+  const { saveStateIndex } = useUser();
 
   // refresh session and load current user on mount
   useEffect(() => {
@@ -81,7 +83,6 @@ export function useAuth() {
   ) => {
     try {
       const res = await authApi.signinWithProvider(provider, data);
-      // console.log("signinWithProvider response:", res.user);
 
       // if sign in returned user info, set it locally
       const returnedUser =  res.user;
@@ -94,23 +95,26 @@ export function useAuth() {
         setUser({ authenticated: true } as any);
       }
 
-      if(returnedUser.privateKey){
-        setUser(returnedUser);
-        await signupToMaci(returnedUser.publicKeyX, returnedUser.publicKeyY);
-        console.log("User private key:", returnedUser.privateKey.slice(0,10)+"...");
-      }
-      // navigate based on provider and user role
-      if (provider === "email" || provider === "wallet") {
-        const role = returnedUser?.role;
-        const targetPath = role === "admin" ? "/admin/dashboard" : "/dashboard";
-        console.log("About to navigate to:", targetPath);
-        try {
-          goTo(targetPath);
-          console.log("Navigation called successfully");
-        } catch (navError) {
-          console.error("Navigation failed:", navError);
-        }
-      }
+      // if(returnedUser.privateKey){
+      //   setUser(returnedUser);
+      //   const maciResult = await signupToMaci(returnedUser.publicKeyX, returnedUser.publicKeyY);
+      //   if(maciResult.stateIndex) {
+      //   await saveStateIndex(returnedUser.walletAddress, maciResult.stateIndex);
+      //   }
+      //   console.log("User private key:", returnedUser.privateKey);
+      // }
+      // // navigate based on provider and user role
+      // if (provider === "email" || provider === "wallet") {
+      //   const role = returnedUser?.role;
+      //   const targetPath = role === "admin" ? "/admin/dashboard" : "/dashboard";
+      //   console.log("About to navigate to:", targetPath);
+      //   try {
+      //     goTo(targetPath);
+      //     console.log("Navigation called successfully");
+      //   } catch (navError) {
+      //     console.error("Navigation failed:", navError);
+      //   }
+      // }
 
       return res;
     } catch (error) {
@@ -155,5 +159,6 @@ export function useAuth() {
     signinWithProvider,
     signupWithEmail,
     signout,
+    setUser,
   };
 }

@@ -3,8 +3,10 @@ import React from "react";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { useState } from "react";
-import { useAuth } from "../../hooks";
+import { useAuth, useRedirect } from "../../hooks";
 import { sign } from "crypto";
+import { useMaci } from "../../hooks/useMACI";
+import { useUser } from "../../hooks/useUser";
 function IconButton({
   children,
   label,
@@ -38,6 +40,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signupToMaci } = useMaci();
+  const { saveStateIndex } = useUser();
+  const { goTo } = useRedirect();
   const { signinWithProvider } = useAuth();
   const handleWalletLogin = async () => {
     setWalletError(null);
@@ -55,13 +60,37 @@ export default function LoginPage() {
         method: "personal_sign",
         params: [message, account],
       });
-      console.log("Address:", account);
-      console.log("Signature:", signature);
-      await signinWithProvider("wallet", {
+      // console.log("Address:", account);
+      // console.log("Signature:", signature);
+      const res = await signinWithProvider("wallet", {
         address: account,
         signature,
         message,
       });
+      
+      if(res.user.privateKey){
+        const maciResult = await signupToMaci(res.user.publicKeyX, res.user.publicKeyY);
+        if(maciResult.stateIndex) {
+          localStorage.setItem(`maci_stateIndex`, maciResult.stateIndex.toString());
+          localStorage.setItem(`maci_pubKeyX`, res.user.publicKeyX.toString());
+          localStorage.setItem(`maci_pubKeyY`, res.user.publicKeyY.toString());
+        await saveStateIndex(res.user.walletAddress, maciResult.stateIndex);
+        }
+        console.log("User private key:", res.user.privateKey);
+      } else{
+        // console.log("publicKeyX signin response:", res.user.publicKeyX );
+        // console.log("publicKeyY signin response:", res.user.publicKeyY );
+
+        // console.log("stateIndex:",res.user.stateIndex );
+
+        localStorage.setItem(`maci_stateIndex`, res.user.stateIndex.toString());
+        localStorage.setItem(`maci_pubKeyX`, res.user.publicKeyX.toString());
+        localStorage.setItem(`maci_pubKeyY`, res.user.publicKeyY.toString());
+
+        // console.log("pubKeyX:", localStorage.getItem(`maci_pubKeyX`));
+      }
+
+      
     } catch (err: any) {
       console.error(err);
       setWalletError("Failed to connect wallet.");

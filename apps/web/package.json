@@ -20,6 +20,7 @@
     "@sasvoth/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.5",
     "axios": "^1.12.2",
+    "circomlibjs": "^0.1.7",
     "lucide-react": "^0.525.0",
     "next": "catalog:",
     "next-auth": "^4.24.11",

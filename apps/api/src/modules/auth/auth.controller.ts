@@ -19,7 +19,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   // ---- VALIDATE COOKIE ----
-  @Get('validate')
+  @Post('validate')
   async validate(@Req() req: Request, @Res() res: Response) {
     try {
       const token = req.cookies.access_token;
