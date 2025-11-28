@@ -9,21 +9,83 @@ export type IdeaPayload = {
   creatorIdea: string;
 };
 
+/**
+ * Ideas API - RESTful Resource-Oriented
+ *
+ * Resource: /ideas
+ *
+ * GET    /ideas          - List all ideas
+ * POST   /ideas          - Create a new idea
+ * GET    /ideas/:id      - Get a specific idea
+ * PUT    /ideas/:id      - Replace an idea
+ * PATCH  /ideas/:id      - Update an idea partially
+ * DELETE /ideas/:id      - Delete an idea
+ * PATCH  /ideas/:id/cid  - Update idea's CID (sub-resource)
+ */
 export const ideasApi = {
-  createIdea: async (payload: IdeaPayload) => {
-    const response = await api.post("/ideas/create", { idea: payload });
+  /**
+   * Get all ideas
+   * GET /ideas
+   */
+  getAll: async () => {
+    const response = await api.get("/ideas");
+    return response.data?.ideas ?? response.data;
+  },
+
+  /**
+   * Create a new idea
+   * POST /ideas
+   */
+  create: async (payload: IdeaPayload) => {
+    const response = await api.post("/ideas", payload);
     return response.data?.idea ?? response.data;
   },
-  getIdeaById: async (ideaId: string) => {
-    const response = await api.get(`/ideas/${ideaId}`);
+
+  /**
+   * Get a specific idea by ID
+   * GET /ideas/:id
+   */
+  getById: async (id: string) => {
+    const response = await api.get(`/ideas/${id}`);
     return response.data?.idea ?? response.data;
   },
-  updateIdeaCID: async (ideaId: string, idea_cid: string) => {
-    const response = await api.patch(`/ideas/updateCID`, {ideaId, idea_cid });
+
+  /**
+   * Update an idea partially
+   * PATCH /ideas/:id
+   */
+  update: async (id: string, data: Partial<IdeaPayload>) => {
+    const response = await api.patch(`/ideas/${id}`, data);
     return response.data?.idea ?? response.data;
   },
-  updateIdea: async (ideaId: string, updateData: Partial<IdeaPayload>) => {
-    const response = await api.patch(`/ideas/${ideaId}`, { updateData });
+
+  /**
+   * Delete an idea
+   * DELETE /ideas/:id
+   */
+  delete: async (id: string) => {
+    const response = await api.delete(`/ideas/${id}`);
+    return response.data;
+  },
+
+  /**
+   * Update idea's CID (sub-resource)
+   * PATCH /ideas/:id/cid
+   */
+  updateCid: async (id: string, cid: string) => {
+    const response = await api.patch(`/ideas/${id}/cid`, { cid });
     return response.data?.idea ?? response.data;
   },
+
+  // Backward compatibility aliases
+  /** @deprecated Use create instead */
+  createIdea: async (payload: IdeaPayload) => ideasApi.create(payload),
+  /** @deprecated Use getById instead */
+  getIdeaById: async (ideaId: string) => ideasApi.getById(ideaId),
+  /** @deprecated Use updateCid instead */
+  updateIdeaCID: async (ideaId: string, idea_cid: string) =>
+    ideasApi.updateCid(ideaId, idea_cid),
+  /** @deprecated Use update instead */
+  updateIdea: async (ideaId: string, updateData: Partial<IdeaPayload>) =>
+    ideasApi.update(ideaId, updateData),
 };
