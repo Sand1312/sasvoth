@@ -189,9 +189,19 @@ export function useAuth() {
     }
   };
 
-  const signupWithEmail = async (email: string, password: string) => {
+  const signupWithEmail = async (
+    email: string,
+    password: string,
+    name: string,
+    walletAddress?: string
+  ) => {
     try {
-      const res = await authApi.signupWithEmail(email, password);
+      const res = await authApi.signupWithEmail(
+        email,
+        password,
+        name,
+        walletAddress
+      );
       const createdUser = res?.data?.user ?? res?.data ?? null;
       if (createdUser) setUser(createdUser);
       goTo("/dashboard");

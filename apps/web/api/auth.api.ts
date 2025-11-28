@@ -29,11 +29,16 @@ export const authApi = {
     return undefined;
   },
 
-  signupWithEmail: async (email: string, password: string) => {
+  signupWithEmail: async (
+    email: string,
+    password: string,
+    name: string,
+    walletAddress?: string
+  ) => {
     try {
       const res = await api.post(
         "/auth/signup?type=email",
-        { email, password },
+        { email, password, name, walletAddress },
         { withCredentials: true }
       );
       toast.success("Signed up! You can login now.");
