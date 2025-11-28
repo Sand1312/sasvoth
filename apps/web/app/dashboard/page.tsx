@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@sasvoth/ui/button";
 import React, { useState, useEffect, useMemo } from "react";
-import { usePolls } from "../../hooks";
+import { usePollsQuery } from "../../hooks/usePolls";
 import { PollStatus } from "@/types/polls";
 // Types cho Poll
 type Poll = {
@@ -106,32 +106,12 @@ export default function DashboardPage() {
   }>({ key: "date", direction: "desc" });
   const [phaseFilter, setPhaseFilter] = useState<"all" | VotePhase>("all");
 
-  // --- Polls state ---
-  const [polls, setPolls] = useState<Poll[]>([]);
-  const [activePolls, setActivePolls] = useState<Poll[]>([]);
-  const [loadingPolls, setLoadingPolls] = useState(true);
-  const [pollError, setPollError] = useState<string>("");
-  const { getPolls } = usePolls();
+  // Use the new hook for data fetching
+  const { data: activePolls = [], isLoading: loadingPolls, error: pollError, refetch } = usePollsQuery(PollStatus.InProgress);
 
   useEffect(() => {
     setIsClient(true);
-    loadPolls();
   }, []);
-
-  // Load polls từ API
-  const loadPolls = async () => {
-    try {
-      setLoadingPolls(true);
-      const data = await getPolls(PollStatus.InProgress);
-      setActivePolls(data);
-      setPolls(data); // Hiển thị active polls mặc định
-    } catch (error) {
-      setPollError("Failed to load polls");
-      console.error("Error loading polls:", error);
-    } finally {
-      setLoadingPolls(false);
-    }
-  };
 
   const handleSortClick = (key: "name" | "date" | "token") => {
     setSortConfig((prev) => {
@@ -394,7 +374,7 @@ export default function DashboardPage() {
               </Button>
               <Button
                 className="text-sm bg-blue-600 hover:bg-blue-700"
-                onClick={loadPolls}
+                onClick={() => refetch()}
                 disabled={loadingPolls}
               >
                 {loadingPolls ? "Loading..." : "Refresh Polls"}
@@ -407,7 +387,7 @@ export default function DashboardPage() {
             <div className="w-full flex justify-center py-8">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Đang tải polls...</p>
+                <p className="text-gray-600">Loading polls...</p>
               </div>
             </div>
           )}
@@ -416,13 +396,13 @@ export default function DashboardPage() {
           {pollError && !loadingPolls && (
             <div className="w-full bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
               <div className="text-red-800 text-center">
-                <p className="font-semibold">Lỗi khi tải polls</p>
-                <p className="text-sm mt-2">{pollError}</p>
+                <p className="font-semibold">Error loading polls</p>
+                <p className="text-sm mt-2">{(pollError as Error).message || "Unknown error"}</p>
                 <Button
-                  onClick={loadPolls}
+                  onClick={() => refetch()}
                   className="mt-4 bg-red-600 hover:bg-red-700"
                 >
-                  Thử lại
+                  Try Again
                 </Button>
               </div>
             </div>
@@ -434,57 +414,51 @@ export default function DashboardPage() {
               {activePolls.length === 0 ? (
                 <div className="w-full text-center py-12">
                   <p className="text-gray-500 text-lg">
-                    Không có poll nào đang active
+                    No active polls found
                   </p>
                   <p className="text-gray-400 text-sm mt-2">
-                    Hãy tạo poll mới hoặc thử lại sau
+                    Check back later for new voting opportunities
                   </p>
                 </div>
               ) : (
-                activePolls.map((poll, idx) => (
-                  <div
+                activePolls.map((poll: Poll) => (
+                  <Link
                     key={poll._id}
-                    className="w-64 bg-white rounded-xl shadow-md transition-transform duration-200 hover:-translate-y-2 hover:shadow-xl border border-black flex flex-col cursor-pointer"
-                    onClick={() => {
-                      window.location.href = `/votes/${poll.onChainPollId}`;
-                    }}
-                    tabIndex={0}
-                    role="button"
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        window.location.href = `/votes/${poll.onChainPollId}`;
-                      }
-                    }}
+                    href={`/votes/${poll.onChainPollId}`}
+                    className="group w-64 bg-white rounded-xl shadow-md transition-all duration-200 hover:-translate-y-2 hover:shadow-xl border border-black flex flex-col overflow-hidden"
                   >
-                    <div className="px-4 py-3 border-b border-black">
-                      <h3 className="text-center font-semibold text-lg text-black">
+                    <div className="px-4 py-3 border-b border-black bg-gray-50 group-hover:bg-gray-100 transition-colors">
+                      <h3 className="text-center font-semibold text-lg text-black truncate">
                         {poll.title}
                       </h3>
                     </div>
                     <div className="px-5 py-4 flex flex-col gap-2 flex-grow">
-                      <p className="text-black text-sm line-clamp-2">
-                        {poll.description || "No description"}
+                      <p className="text-black text-sm line-clamp-2 min-h-[2.5rem]">
+                        {poll.description || "No description available"}
                       </p>
-                      <div className="text-xs text-gray-500 mt-auto">
-                        <p>Options: {poll.options.length}</p>
-                        <p>Status: {poll.status}</p>
-                        <p>
-                          Ends: {new Date(poll.endTime).toLocaleDateString()}
-                        </p>
+                      <div className="text-xs text-gray-500 mt-auto space-y-1 pt-2 border-t border-gray-100">
+                        <div className="flex justify-between">
+                          <span>Options:</span>
+                          <span className="font-medium">{poll.options.length}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Status:</span>
+                          <span className="font-medium capitalize">{poll.status}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Ends:</span>
+                          <span className="font-medium">{new Date(poll.endTime).toLocaleDateString()}</span>
+                        </div>
                       </div>
                       <Button
-                        className="mt-2 w-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `/votes/${poll.onChainPollId}`;
-                        }}
+                        className="mt-4 w-full bg-black text-white group-hover:bg-gray-800"
                       >
                         {poll.status === PollStatus.InProgress
                           ? "Vote Now"
                           : "View Poll"}
                       </Button>
                     </div>
-                  </div>
+                  </Link>
                 ))
               )}
             </div>

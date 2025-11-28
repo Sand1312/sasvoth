@@ -1,17 +1,11 @@
 "use client";
-import { useRedirect } from "./useRedirect";
 import { ipfsApi } from "../api";
+import { createApiHook } from "./factory";
 
-export function useIPFS() {
-  const { goTo, replaceTo } = useRedirect();
-
-  const uploadMetadata = ipfsApi.uploadMetadata;
-  const fetchMetadata = ipfsApi.fetchMetadata;
-
-  return {
-    uploadMetadata,
-    fetchMetadata,
-    goTo,
-    replaceTo,
-  };
-}
+export const useIPFS = createApiHook(
+  {
+    uploadMetadata: ipfsApi.uploadMetadata,
+    fetchMetadata: ipfsApi.fetchMetadata,
+  },
+  { includeRedirect: true }
+);

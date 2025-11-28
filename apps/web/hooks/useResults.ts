@@ -1,16 +1,14 @@
 import { resultsApi } from "@/api";
+import { createAsyncHook } from "./factory";
 
-export function useResults() {
-  // Lấy kết quả poll
-  const getResults = async ( pollId: string ) => {
-    return await resultsApi.getResults({pollId});
-  };
-  const tallyVotes = async (pollId: string) => {
-    return await resultsApi.tally(pollId);
-  };
-
-  return {
-    getResults,
-    tallyVotes,
-  };
-}
+export const useResults = createAsyncHook(
+  {
+    getResults: async (pollId: string) => {
+      return await resultsApi.getResults({ pollId });
+    },
+    tallyVotes: async (pollId: string) => {
+      return await resultsApi.tally(pollId);
+    },
+  },
+  "Results"
+);
