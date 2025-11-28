@@ -77,48 +77,114 @@ export function useAuth() {
     };
   }, []);
 
-  const signinWithProvider = async (
-    provider: "google" | "github" | "email" | "wallet",
-    data?: any
-  ) => {
+  const handleMaciSetup = async (user: any) => {
     try {
-      const res = await authApi.signinWithProvider(provider, data);
+      if (user.privateKey) {
+        // New user - create MACI identity
+        const maciResult = await signupToMaci(user.publicKeyX, user.publicKeyY);
 
-      // if sign in returned user info, set it locally
-      const returnedUser =  res.user;
-      // console.log("Extracted user:", returnedUser.publicKeyX);
+        if (maciResult.stateIndex) {
+          // Store in localStorage
+          localStorage.setItem(
+            "maci_stateIndex",
+            maciResult.stateIndex.toString()
+          );
+          localStorage.setItem("maci_pubKeyX", user.publicKeyX.toString());
+          localStorage.setItem("maci_pubKeyY", user.publicKeyY.toString());
 
+          // Save to user profile
+          await saveStateIndex(user.walletAddress!, maciResult.stateIndex);
+        }
+      } else {
+        // Existing user - restore from data
+        if (user.stateIndex) {
+          localStorage.setItem("maci_stateIndex", user.stateIndex.toString());
+          localStorage.setItem("maci_pubKeyX", user.publicKeyX.toString());
+          localStorage.setItem("maci_pubKeyY", user.publicKeyY.toString());
+        }
+      }
+    } catch (error) {
+      console.error("MACI setup error:", error);
+      throw new Error("Failed to setup MACI system.");
+    }
+  };
+
+  const loginWithEmail = async (identifier: string, password: string) => {
+    try {
+      const res = await authApi.signinWithProvider("email", {
+        username: identifier,
+        email: identifier,
+        password,
+      });
+
+      const returnedUser = res.user;
       if (returnedUser) {
         setUser(returnedUser);
-      } else if (res && (provider === "email" || provider === "wallet")) {
-        // even if no explicit user data, if signin succeeded, treat as authenticated
+      } else {
+        setUser({ authenticated: true } as any);
+      }
+      
+      goTo("/dashboard");
+      return res;
+    } catch (error) {
+      console.error("Email login error:", error);
+      throw error;
+    }
+  };
+
+  const loginWithWallet = async () => {
+    try {
+      // Check if MetaMask is installed
+      if (!(window as any).ethereum) {
+        throw new Error("MetaMask is not installed.");
+      }
+
+      // Request account access
+      const accounts = await (window as any).ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const account = accounts[0];
+      const message = "Sign to login with MetaMask";
+
+      // Request signature
+      const signature = await (window as any).ethereum.request({
+        method: "personal_sign",
+        params: [message, account],
+      });
+
+      // Authenticate with backend
+      const res = await authApi.signinWithProvider("wallet", {
+        address: account,
+        signature,
+        message,
+      });
+
+      const returnedUser = res.user;
+      if (returnedUser) {
+        setUser(returnedUser);
+        // Initialize MACI
+        await handleMaciSetup(returnedUser);
+      } else {
         setUser({ authenticated: true } as any);
       }
 
-      // if(returnedUser.privateKey){
-      //   setUser(returnedUser);
-      //   const maciResult = await signupToMaci(returnedUser.publicKeyX, returnedUser.publicKeyY);
-      //   if(maciResult.stateIndex) {
-      //   await saveStateIndex(returnedUser.walletAddress, maciResult.stateIndex);
-      //   }
-      //   console.log("User private key:", returnedUser.privateKey);
-      // }
-      // // navigate based on provider and user role
-      // if (provider === "email" || provider === "wallet") {
-      //   const role = returnedUser?.role;
-      //   const targetPath = role === "admin" ? "/admin/dashboard" : "/dashboard";
-      //   console.log("About to navigate to:", targetPath);
-      //   try {
-      //     goTo(targetPath);
-      //     console.log("Navigation called successfully");
-      //   } catch (navError) {
-      //     console.error("Navigation failed:", navError);
-      //   }
-      // }
-
+      // Navigate to dashboard
+      const targetPath =
+        returnedUser?.role === "admin" ? "/admin/dashboard" : "/dashboard";
+      goTo(targetPath);
+      
       return res;
     } catch (error) {
-      console.error("Signin error:", error);
+      console.error("Wallet login error:", error);
+      throw error;
+    }
+  };
+
+  const loginWithSocial = (provider: "google" | "github") => {
+    try {
+      authApi.signinWithProvider(provider);
+    } catch (error) {
+      console.error("Social login error:", error);
       throw error;
     }
   };
@@ -156,7 +222,9 @@ export function useAuth() {
   return {
     user,
     isLoading,
-    signinWithProvider,
+    loginWithEmail,
+    loginWithWallet,
+    loginWithSocial,
     signupWithEmail,
     signout,
     setUser,
