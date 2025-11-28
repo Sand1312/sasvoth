@@ -8,7 +8,7 @@ import { cn } from "@sasvoth/ui/lib/utils";
 import { useAccount } from "wagmi";
 import { useIdeas } from "../hooks/useIdeas";
 import {usePolls} from "../hooks/usePolls";
-import { usePollContext } from "../app/polls/[id]/PollContext";
+import { useSafePollContext } from "../app/polls/[id]/PollContext";
 type LayoutItemBase = {
   id: string;
   title: string;
@@ -43,12 +43,15 @@ const createId = () =>
 
 export function IdeaUploadForm({
   className,
+  pollId: propPollId,
 }: {
   className?: string;
+  pollId?: string;
 }): React.ReactElement {
   const { address } = useAccount();
   const { createIdea } = useIdeas();
-  const { pollId } = usePollContext();
+  const pollContext = useSafePollContext();
+  const pollId = propPollId ?? pollContext?.pollId;
   const {  addIdeaToPoll, selectedPollId } = usePolls();
   const [step, setStep] = React.useState(1);
   const [logoFile, setLogoFile] = React.useState<File | null>(null);
@@ -245,6 +248,11 @@ export function IdeaUploadForm({
 
   async function handleFinalSubmit() {
     if (!canSaveDraft) return;
+    if (!pollId) {
+      console.error("No poll ID available for submission");
+      return;
+    }
+
     const load = {
       logo: logoFile?.name ?? "",
       ageLimit,

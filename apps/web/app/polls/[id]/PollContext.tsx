@@ -34,3 +34,7 @@ export function usePollContext() {
   return context;
 }
 
+export function useSafePollContext() {
+  return useContext(PollContext);
+}
+
