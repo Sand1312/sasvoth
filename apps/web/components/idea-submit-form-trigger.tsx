@@ -65,6 +65,7 @@ export function IdeaSubmitFormTrigger({
                 "max-h-[85vh] overflow-y-auto border border-black/20 bg-white",
                 "shadow-[0_35px_120px_-60px_rgba(0,0,0,0.7)]"
               )}
+              onSuccess={() => setIsOpen(false)}
             />
           </div>
         </div>

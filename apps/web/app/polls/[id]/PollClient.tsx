@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePollContext } from "./PollContext";
 import { useIPFS } from "@/hooks/useIPFS";
 import { useResults, useJoinPoll, useMaci } from "@/hooks";
+import { useFeedback } from "@/contexts/FeedbackContext";
 
 type Timeline = { start: string; end: string };
 
@@ -21,6 +22,7 @@ type Idea = {
   credits: number;
   votes: number;
   creator: string;
+  logo?: string;
 };
 
 type VoteOption = {
@@ -46,6 +48,7 @@ type ApiIdea = {
   creatorIdea?: string;
   creatorAddress?: string;
   idea_cid?: string;
+  imgSrc?: string;
 };
 
 type ApiPoll = {
@@ -121,6 +124,7 @@ const normalizeIdea = (idea: ApiIdea, fallbackId: string): Idea => {
     credits: 0,
     votes: 0,
     creator: idea.creatorIdea ?? idea.creatorAddress ?? "",
+    logo: idea.imgSrc,
   };
 };
 
@@ -173,6 +177,7 @@ export default function PollClient({
 }) {
   const { pollId } = usePollContext();
   const { getPollById } = usePolls();
+  const { showSuccess, showError } = useFeedback();
 
   const requestedPhase = searchParams?.phase?.toLowerCase() as
     | PollStatus
@@ -379,11 +384,11 @@ export default function PollClient({
       await submitProofs(poll.onChainId, maciAddress);
 
       setDevTallyStatus("Done!");
-      alert("Tally completed! Refreshing...");
+      showSuccess("Tally Completed", "Refreshing..."); // Replaced alert
       window.location.reload();
     } catch (e: any) {
-      console.error("Tally failed:", e);
-      alert("Tally failed: " + e.message);
+      console.error("Failed to tally votes:", e); // Changed `error` to `e`
+      showError("Tally Failed", e instanceof Error ? e.message : "Failed to tally votes"); // Replaced alert
       setDevTallyStatus("Failed.");
     } finally {
       setDevTallying(false);
@@ -491,15 +496,12 @@ function PollHero({
             Poll #{pollId}
           </p>
           <h1 className="mt-2 text-4xl font-semibold">{poll.title}</h1>
-          <p className="mt-4 max-w-xl text-sm text-black/70">
-            {poll.description}
-          </p>
         </div>
         <span className="self-end text-xs uppercase tracking-[0.3em] text-black">
           {badge}
         </span>
       </div>
-      <div className="mt-8 h-20 w-full rounded-[28px] border border-black bg-black/5" />
+      <p className="mt-8 text-center italic text-lg opacity-70">"{poll.description}"</p>
       <p className="mt-6 text-center text-base font-semibold md:text-left">
         {poll.timeframe.start} — {poll.timeframe.end}
       </p>
@@ -550,9 +552,25 @@ function PrepareSection({ poll }: { poll: PollData }) {
             {poll.approvedIdeas.map((idea) => (
               <article
                 key={idea._id}
-                className="flex h-full flex-col gap-4 rounded-[32px] border border-emerald-500 bg-emerald-50/50 p-6"
+                className="flex aspect-square flex-col gap-4 rounded-[32px] border border-emerald-500 bg-emerald-50/50 p-6"
               >
-                <div className="h-24 rounded-2xl border border-emerald-200 bg-white" />
+                <div className="flex-1 w-full rounded-2xl border border-emerald-200 bg-white overflow-hidden flex items-center justify-center min-h-0">
+                  {idea.logo ? (
+                    <img
+                      src={
+                        idea.logo.startsWith("ipfs://")
+                          ? `/api/v1/ipfs/${idea.logo.replace("ipfs://", "")}`
+                          : idea.logo.startsWith("/") || idea.logo.startsWith("http")
+                          ? idea.logo
+                          : `/api/v1/ipfs/${idea.logo}`
+                      }
+                      alt={idea.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-emerald-500 text-xs uppercase tracking-widest">No Logo</span>
+                  )}
+                </div>
                 <div>
                   <h3 className="mt-1 text-xl font-semibold text-emerald-900">
                     {idea.title}
@@ -641,6 +659,7 @@ function VotingSection({ poll }: { poll: PollData }) {
   const [joinedPollStateIndex, setJoinedPollStateIndex] = useState<
     string | null
   >(null);
+  const { showSuccess, showError } = useFeedback();
 
   useEffect(() => {
     // User requested to NOT rely on local state for "Joined" status.
@@ -703,10 +722,10 @@ function VotingSection({ poll }: { poll: PollData }) {
       const result = await signupToMaci();
 
       console.log("MACI Signup successful:", result);
-      alert(`MACI Signup successful! State Index: ${result.stateIndex}`);
+      showSuccess("MACI Signup", `Signup successful! State Index: ${result.stateIndex}`);
     } catch (error: any) {
       console.error("MACI Signup failed:", error);
-      alert(`MACI Signup failed: ${error.message}`);
+      showError("Signup Failed", error.message);
     }
   };
 
@@ -821,6 +840,7 @@ function SignupModal({
   pollIdOnChain: number;
   maciAddress: string;
 }) {
+  const { showSuccess, showError } = useFeedback();
   const { signupToMaci, joinMaciPoll, loading } = useMaci();
   const [privKey, setPrivKey] = useState("");
   // Default: if no existing key, perform signup (random). If existing key, use it.
@@ -894,7 +914,10 @@ function SignupModal({
         await new Promise((resolve) => setTimeout(resolve, 3000));
       } else {
         // Manual Import
-        if (!privKey) return alert("Enter secret key or use random generation");
+        if (!privKey) {
+             showError("Missing Key", "Enter secret key or use random generation");
+             return;
+        }
 
         console.log("Importing existing key...");
         try {
@@ -927,7 +950,7 @@ function SignupModal({
 
       // Handle Already Joined Case
       if (joinResult.alreadyJoined) {
-          alert("Note: You have already joined this poll! treating as success.");
+          showSuccess("Already Joined", "Note: You have already joined this poll! treating as success.");
           // If we don't have the real index, we might default to localStorage or 0.
           // For now, we proceed.
       }
@@ -950,7 +973,7 @@ function SignupModal({
       onSuccess();
     } catch (e: any) {
       console.error("Signup/Join failed", e);
-      alert("Signup/Join failed: " + e.message);
+      showError("Signup/Join Failed", e.message);
     }
   };
 
@@ -1084,6 +1107,7 @@ function SignupModal({
 }
 
 function EndedSection({ poll }: { poll: PollData }) {
+  const { showSuccess, showError } = useFeedback();
   const { mergePoll, generateProofs, submitProofs } = useMaci();
   const [tallying, setTallying] = useState(false);
   const [tallyStatus, setTallyStatus] = useState("");
@@ -1098,7 +1122,7 @@ function EndedSection({ poll }: { poll: PollData }) {
 
     const pollId = poll.onChainId;
     if (pollId === undefined || pollId === null || pollId === "") {
-      alert("Invalid Poll ID (On-Chain ID missing). Cannot tally.");
+      showError("Invalid Poll ID", "On-Chain ID missing. Cannot tally.");
       return;
     }
 
@@ -1133,11 +1157,12 @@ function EndedSection({ poll }: { poll: PollData }) {
       setTallyStatus("Submitting Proofs...");
       await submitProofs(pollId, maciAddress);
 
-      setTallyStatus("Done! Refreshing...");
+      setTallyStatus("Done!");
+      showSuccess("Tally Completed", "Refreshing...");
       window.location.reload();
     } catch (e: any) {
       console.error("Tally failed:", e);
-      alert("Tally validation/execution failed: " + e.message);
+      showError("Tally Failed", e.message);
       setTallyStatus("Failed.");
     } finally {
       setTallying(false);
@@ -1190,38 +1215,39 @@ function EndedSection({ poll }: { poll: PollData }) {
           </div>
         )}
         {poll.results.map((result, index) => (
-          <article
-            key={result.id}
-            className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 md:flex-row md:items-center"
-          >
-            <div className="flex items-center gap-4 md:w-64">
-              <div
-                className={`flex h-12 w-12 items-center justify-center rounded-full border border-black text-base font-semibold ${index === 0 ? "bg-black text-white" : "bg-white text-black"}`}
-              >
-                {index + 1}
-              </div>
-              <div>
-                <p className="text-lg font-semibold uppercase">
-                  {result.label}
-                </p>
-                <p className="text-xs uppercase tracking-[0.3em] text-black/60">
-                  {result.author}
-                </p>
-              </div>
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between text-sm font-semibold text-black/70">
-                <span>{result.votes} votes</span>
-                <span>{result.percentage}%</span>
-              </div>
-              <div className="mt-2 h-4 w-full overflow-hidden rounded-full border border-black bg-white">
+          <Link key={result.id} href={`/votes/${result.id}`} className="block group">
+            <article
+              className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 md:flex-row md:items-center transition-colors hover:bg-gray-50 cursor-pointer"
+            >
+              <div className="flex items-center gap-4 md:w-64">
                 <div
-                  className="h-full bg-black"
-                  style={{ width: `${result.percentage}%` }}
-                />
+                  className={`flex h-12 w-12 items-center justify-center rounded-full border border-black text-base font-semibold ${index === 0 ? "bg-black text-white" : "bg-white text-black"}`}
+                >
+                  {index + 1}
+                </div>
+                <div>
+                  <p className="text-lg font-semibold uppercase">
+                    {result.label}
+                  </p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-black/60">
+                    {result.author}
+                  </p>
+                </div>
               </div>
-            </div>
-          </article>
+              <div className="flex-1">
+                <div className="flex items-center justify-between text-sm font-semibold text-black/70">
+                  <span>{result.votes} votes</span>
+                  <span>{result.percentage}%</span>
+                </div>
+                <div className="mt-2 h-4 w-full overflow-hidden rounded-full border border-black bg-white">
+                  <div
+                    className="h-full bg-black"
+                    style={{ width: `${result.percentage}%` }}
+                  />
+                </div>
+              </div>
+            </article>
+          </Link>
         ))}
       </div>
     </section>

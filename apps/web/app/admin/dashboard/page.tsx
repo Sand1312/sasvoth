@@ -1,5 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import { pollsApi } from "@/api/polls.api";
+import React, { useEffect, useState } from "react";
+import { PollStatus } from "@/types/polls";
 import { Button } from "@sasvoth/ui/button";
 import { IdeaUploadForm } from "@/components/idea-upload-form";
 
@@ -11,17 +13,21 @@ type Vote = {
   votes: number;
   description: string;
   whitelistApproved: string[];
+  status: string;
 };
 
-const MOCK_VOTES: Vote[] = Array.from({ length: 10 }).map((_, i) => ({
-  id: `v-${i + 1}`,
-  title: `Vote #${i + 1} - Proposal ${String.fromCharCode(65 + (i % 6))}`,
-  openAt: `${i + 1}h ago`,
-  endsIn: `${3 + (i % 5)}d`,
-  votes: 20 + i * 5,
-  description: "A short description of the vote, goals and scope.",
-  whitelistApproved: ["alice", "bob", ...(i % 3 ? ["carol"] : [])],
-}));
+// Helper to format duration
+const formatDuration = (date: string | Date) => {
+  const diff = new Date(date).getTime() - Date.now();
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  return days > 0 ? `${days}d` : "Ended";
+};
+
+const formatTimeAgo = (date: string | Date) => {
+  const diff = Date.now() - new Date(date).getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  return hours > 24 ? `${Math.floor(hours / 24)}d ago` : `${hours}h ago`;
+};
 
 export default function AdminDashboardPage(): React.ReactElement {
   const [groupIndex, setGroupIndex] = useState(0); // groups of 3
@@ -29,9 +35,40 @@ export default function AdminDashboardPage(): React.ReactElement {
   const [sortBy, setSortBy] = useState<"end" | "start" | "votes" | "title">(
     "end"
   );
+  /* Removed MOCK_VOTES and fixed state */
+  const [votes, setVotes] = useState<Vote[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real votes
+  useEffect(() => {
+    const fetchVotes = async () => {
+      try {
+        const polls = await pollsApi.getAll();
+        const mapped: Vote[] = polls.map((p: any) => ({
+          id: p._id || p.id,
+          title: p.title,
+          description: p.description,
+          openAt: formatTimeAgo(p.startTime),
+          endsIn: formatDuration(p.endTime),
+          votes: 0, // TODO: Fetch real vote count if available
+          whitelistApproved: [], // Mocking for now as API doesn't return this yet
+          status: p.status
+        }));
+        setVotes(mapped);
+      } catch (err) {
+        console.error("Failed to fetch votes:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVotes();
+  }, []);
+
   const groupSize = 3;
-  const groups = Math.ceil(MOCK_VOTES.length / groupSize);
-  const currentGroup = MOCK_VOTES.slice(
+  // Filter for display in "Open Votes" fan view - limiting to InProgress or similar
+  const openVotes = votes.filter(v => v.status === PollStatus.InProgress); // Use InProgress as open state
+  const groups = Math.ceil(openVotes.length / groupSize);
+  const currentGroup = openVotes.slice(
     groupIndex * groupSize,
     groupIndex * groupSize + groupSize
   );
@@ -41,7 +78,7 @@ export default function AdminDashboardPage(): React.ReactElement {
   const openingVoteETA = "2d 4h";
 
   return (
-    <main className="min-h-screen bg-white text-black p-8 font-sans">
+    <main className="min-h-screen bg-white text-black font-sans mx-auto w-full max-w-7xl px-[2%] py-8">
       <header className="flex items-start justify-between mb-8">
         <div>
           <div className="w-full flex justify-center">
@@ -163,7 +200,7 @@ export default function AdminDashboardPage(): React.ReactElement {
               return isNaN(n) ? 0 : n;
             };
 
-            const sorted = [...MOCK_VOTES].sort((a, b) => {
+            const sorted = [...votes].sort((a, b) => {
               if (sortBy === "end") {
                 return parseEndsIn(a.endsIn) - parseEndsIn(b.endsIn);
               } else if (sortBy === "start") {
@@ -175,7 +212,7 @@ export default function AdminDashboardPage(): React.ReactElement {
               }
             });
 
-            const maxVotes = Math.max(...MOCK_VOTES.map((v) => v.votes), 1);
+            const maxVotes = Math.max(...votes.map((v) => v.votes), 1);
             const displayed = sorted.slice(0, 3);
 
             return displayed.map((v) => {
@@ -304,7 +341,7 @@ export default function AdminDashboardPage(): React.ReactElement {
         <aside className="col-span-2">
           <div className="relative h-[30rem] w-80">
             {Array.from({ length: groups }).map((_, gi) => {
-              const vote = MOCK_VOTES[gi * groupSize];
+              const vote = openVotes[gi * groupSize];
               if (!vote) return null;
 
               const active = gi === groupIndex;
@@ -374,7 +411,7 @@ export default function AdminDashboardPage(): React.ReactElement {
           <div>
             <h5 className="text-sm font-medium mb-2">Vote open timeline</h5>
             <ul className="space-y-3">
-              {MOCK_VOTES.slice(0, 6).map((v) => (
+              {votes.slice(0, 6).map((v) => (
                 <li key={v.id} className="p-3 border rounded">
                   <div className="text-xs text-gray-700">{v.openAt}</div>
                   <div className="font-medium">{v.title}</div>
@@ -386,7 +423,7 @@ export default function AdminDashboardPage(): React.ReactElement {
           <div>
             <h5 className="text-sm font-medium mb-2">Whitelist approvals</h5>
             <ul className="space-y-3">
-              {MOCK_VOTES.slice(0, 6).map((v) => (
+              {votes.slice(0, 6).map((v) => (
                 <li key={v.id} className="p-3 border rounded">
                   <div className="text-xs text-gray-700">{v.title}</div>
                   <div className="mt-1 flex gap-2">

@@ -44,7 +44,8 @@ async function proxyRequest(
     };
 
     if (METHODS_WITH_BODY.has(method.toUpperCase())) {
-      init.body = await req.text();
+      const bodyBuffer = await req.arrayBuffer();
+      init.body = bodyBuffer;
       init.headers = {
         ...init.headers,
         "Content-Type": contentType,
@@ -59,13 +60,13 @@ async function proxyRequest(
       return new NextResponse("backend unreachable", { status: 502 });
     }
 
-    const text = await res.text();
+    const arrayBuffer = await res.arrayBuffer();
     const headers = new Headers();
     const resContentType = res.headers.get("content-type");
     if (resContentType) headers.set("content-type", resContentType);
     forwardSetCookies(res, headers);
 
-    return new NextResponse(text, { status: res.status, headers });
+    return new NextResponse(arrayBuffer, { status: res.status, headers });
   } catch (err) {
     console.error(`/api/v1 proxy ${method} error:`, err);
     return new NextResponse("internal proxy error", { status: 500 });

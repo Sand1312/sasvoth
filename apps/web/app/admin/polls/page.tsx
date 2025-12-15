@@ -434,7 +434,7 @@ export default function AdminPollsPage(): React.ReactElement {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-8 text-slate-900">
+    <main className="min-h-screen bg-slate-50 font-sans mx-auto w-full max-w-7xl px-[2%] py-8 text-slate-900">
       <header className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500">

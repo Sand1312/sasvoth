@@ -9,6 +9,7 @@ import { PollStatus } from "@/types/polls";
 import RainAnimation from "../../components/RainAnimation";
 import { useAccount } from "wagmi";
 import { useClaimContract, useToken, useUser, useAuth } from "../../hooks";
+import { useFeedback } from "@/contexts/FeedbackContext";
 
 // Types cho Poll
 type Poll = {
@@ -114,6 +115,7 @@ export default function DashboardPage() {
     direction: "asc" | "desc";
   }>({ key: "date", direction: "desc" });
   const [phaseFilter, setPhaseFilter] = useState<"all" | VotePhase>("all");
+  const { showSuccess, showError } = useFeedback();
 
   // Wallet hooks
   const { address, isConnected } = useAccount();
@@ -173,13 +175,13 @@ export default function DashboardPage() {
       if (!txHash) return;
       const userId = user?._id;
       if (!userId) {
-        alert("Vui lòng đăng nhập lại");
+        showError("Authentication Required", "Vui lòng đăng nhập lại");
         return;
       }
       const amountToken = Number(depositAmount) * Number(claim.rate);
       await deposit(userId, amountToken, txHash);
       setDepositAmount("");
-      alert(`Đã mua ${amountToken} HD với ${depositAmount} ETH`);
+      showSuccess("Deposit Successful", `Đã mua ${amountToken} HD với ${depositAmount} ETH`);
       setReloadHistory((prev) => prev + 1);
     }
   };

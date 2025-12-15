@@ -96,7 +96,19 @@ export class IpfsService {
     // MOCK fallback
     const data = this.mockStorage.get(cid);
     if (!data) {
-      throw new Error(`Mock IPFS: CID ${cid} not found`);
+      this.logger.warn(`Mock IPFS: CID ${cid} not found locally. Trying public gateway...`);
+      try {
+        const response = await fetch(`https://ipfs.io/ipfs/${cid}`);
+        if (!response.ok) throw new Error(`Gateway returned ${response.status}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        // Cache it for future local requests? Optional.
+        this.mockStorage.set(cid, buffer); 
+        return buffer;
+      } catch (e) {
+         this.logger.error(`Public gateway failed: ${e.message}`);
+         throw new Error(`Mock IPFS: CID ${cid} not found locally or on gateway`);
+      }
     }
 
     return data;

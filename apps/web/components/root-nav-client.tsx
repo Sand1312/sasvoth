@@ -2,8 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import Image, { type ImageProps } from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@sasvoth/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 type NavItem = {
   label: string;
@@ -19,20 +20,43 @@ type RootNavClientProps = {
 };
 
 export function RootNavClient({
-  user,
+  // user, // No longer needed from props, useAuth handles it
   navItems,
   hideOnRoutes,
   wrapperClasses,
   logoProps,
 }: RootNavClientProps) {
+  const { user, signout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const isLoggedIn = !!user;
+
+  // Admin Path Detection
+  const isAdminPath = pathname?.startsWith("/admin");
+  const homeLink = isAdminPath ? "/admin/dashboard" : "/";
+  
+  // Login Callback URL
+  const loginHref = `/signin?callbackUrl=${encodeURIComponent(pathname || "/")}`;
   const shouldHideNav = hideOnRoutes.some((route) =>
     pathname?.startsWith(route)
   );
+
+  // Dynamic Navigation Items
+  const computedNavItems = navItems
+    .filter((item) => item.label !== "Transactions") // User requested to remove Transactions
+    .map((item) => {
+      if (isAdminPath) {
+        if (item.href === "/dashboard") {
+          return { ...item, href: "/admin/dashboard" };
+        }
+        if (item.href === "/polls") {
+          return { ...item, href: "/admin/polls" };
+        }
+      }
+      return item;
+    });
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -54,18 +78,8 @@ export function RootNavClient({
   }, [pathname]);
 
   const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        cache: "no-store",
-      });
-    } catch (err) {
-      console.error("Logout failed:", err);
-    } finally {
+      await signout();
       closeMenu();
-      router.replace("/signin");
-      router.refresh();
-    }
   };
 
   const handleSettingsClick = () => {
@@ -80,7 +94,7 @@ export function RootNavClient({
   if (!isLoggedIn) {
     return (
       <nav className={wrapperClasses}>
-        <Link href="/" className="flex items-center">
+        <Link href={homeLink} className="flex items-center">
           <Image {...logoProps} priority />
           <span className="sr-only">SaSvoth</span>
         </Link>
@@ -92,7 +106,7 @@ export function RootNavClient({
             </Button>
           </Link>
           <Link
-            href="/signin"
+            href={loginHref}
             className="text-lg font-semibold text-gray-900 hover:text-gray-600"
           >
             Login
@@ -105,15 +119,15 @@ export function RootNavClient({
   return (
     <nav className={wrapperClasses}>
       <div className="flex items-center gap-10">
-        <Link href="/" className="flex items-center">
+        <Link href={homeLink} className="flex items-center">
           <Image {...logoProps} />
           <span className="sr-only">SaSvoth</span>
         </Link>
         <div className="flex items-center text-base font-medium text-gray-500">
-          {navItems.map((item, idx) => {
+          {computedNavItems.map((item, idx) => {
             const isActive =
               pathname === item.href || pathname?.startsWith(`${item.href}/`);
-            const showDivider = idx < navItems.length - 1;
+            const showDivider = idx < computedNavItems.length - 1;
             return (
               <div className="flex items-center" key={item.href}>
                 <Link

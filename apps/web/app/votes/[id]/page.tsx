@@ -8,6 +8,10 @@ import { pollsApi } from "@/api";
 import { useIdeas } from "@/hooks/useIdeas";
 import { useClaimContract } from "@/hooks/useClaimContract";
 import { useToken } from "@/hooks/useToken";
+import { VoteDetailLayout, VoteLeftPanel, VoteTextBlock } from "@/components/vote/VoteDetailLayout";
+import { VoteRightPanel } from "@/components/vote/VoteRightPanel";
+import { VoteGallery } from "@/components/vote/VoteGallery";
+import { useFeedback } from "@/contexts/FeedbackContext";
 type Props = {
   params: Promise<{ id: string }>; // id = CID
 };
@@ -22,6 +26,7 @@ type VoteData = {
   logo?: string;
   heroImage?: string;
   ageLimit?: string;
+  layoutItems?: any[];
 };
 
 function BuyTicketsModal({
@@ -37,6 +42,7 @@ function BuyTicketsModal({
   const claim = useClaimContract();
   const token = useToken();
   const publicClient = usePublicClient();
+  const { showSuccess, showError } = useFeedback();
 
   if (!open) return null;
 
@@ -48,7 +54,7 @@ function BuyTicketsModal({
     try {
       const cost = calculateVoteCost(Number(credits));
       if (Number(token.balance) < cost) {
-        alert(
+        showError("Insufficient Funds",
           `Bạn cần có ít nhất ${cost} ${token.symbol} để mua ${credits} voice credits.`
         );
         return;
@@ -67,12 +73,12 @@ function BuyTicketsModal({
 
       console.log("Buying credits...");
       await claim.buyVoiceCredits(cost.toString());
-      alert("Bought voice credits successfully!");
+      showSuccess("Success", "Bought voice credits successfully!");
       setCredits("");
       onNext(credits);
     } catch (e: any) {
       console.error(e);
-      alert("Failed to buy credits: " + (e.message || e));
+      showError("Failed to Buy Credits", e.message || e);
     }
   };
 
@@ -235,6 +241,8 @@ function DebugPanel({
     format: string;
   } | null>(null);
 
+  const { showSuccess, showError } = useFeedback();
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       // MACI Address
@@ -376,7 +384,7 @@ function DebugPanel({
           <button
             onClick={async () => {
               if (!detectedPollId) {
-                alert("Poll ID not found");
+                showError("Error", "Poll ID not found");
                 return;
               }
               if (
@@ -418,10 +426,10 @@ function DebugPanel({
                 await submitProofs(detectedPollId, storedMaciAddress);
 
                 setTallyStatus("Done!");
-                alert("Tally completed! Refresh to see results.");
+                showSuccess("Tally Completed", "Tally completed! Refresh to see results.");
               } catch (e: any) {
                 console.error("Tally failed:", e);
-                alert("Tally failed: " + e.message);
+                showError("Tally Failed", e.message);
                 setTallyStatus("Failed.");
               } finally {
                 setTallying(false);
@@ -438,67 +446,12 @@ function DebugPanel({
   );
 }
 
-function ScreenshotGallery() {
-  const [mainIndex, setMainIndex] = useState(0);
 
-  const topThumbs = screenshots.slice(0, 4);
-  const bottomGrid = screenshots.slice(4);
-
-  return (
-    <div className="w-full flex flex-col items-center bg-white text-black mt-8 py-6 rounded-xl border border-black">
-      {/* Top Thumbnails */}
-      <div className="flex gap-4 mb-4">
-        {topThumbs.map((src, idx) => (
-          <button
-            key={src}
-            onClick={() => setMainIndex(idx)}
-            className={`overflow-hidden rounded-lg border-2 transition-all duration-150 w-[72px] h-[48px] ${
-              mainIndex === idx
-                ? "border-black"
-                : "border-transparent hover:border-black"
-            }`}
-            aria-label={`Show screenshot ${idx + 1}`}
-          >
-            <img
-              src={src}
-              alt={`Screenshot ${idx + 1}`}
-              className="object-cover w-full h-full grayscale transition-transform duration-150 hover:scale-105"
-            />
-          </button>
-        ))}
-      </div>
-
-      {/* Main Preview */}
-      <div className="w-full max-w-2xl aspect-video mb-6 rounded-2xl border-4 border-black bg-white flex items-center justify-center overflow-hidden">
-        <img
-          src={screenshots[mainIndex]}
-          alt={`Main screenshot ${mainIndex + 1}`}
-          className="object-cover w-full h-full grayscale"
-        />
-      </div>
-
-      {/* Bottom Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
-        {bottomGrid.map((src, idx) => (
-          <div
-            key={src}
-            className="bg-white rounded-xl overflow-hidden border-2 border-black flex items-center justify-center aspect-video"
-          >
-            <img
-              src={src}
-              alt={`Extra screenshot ${idx + 5}`}
-              className="object-cover w-full h-full grayscale transition-transform duration-150 hover:scale-105"
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 
 export default function VotePage({ params }: Props) {
   const { id } = React.use(params); // Next.js 15: Unwrap params
+  const { showSuccess, showError } = useFeedback();
 
   const {
     submitVote,
@@ -579,6 +532,7 @@ export default function VotePage({ params }: Props) {
             logo: apiIdea.imgSrc,
             heroImage: apiIdea.imgsSrc?.[0],
             ageLimit: apiIdea.descriptionMore?.[0],
+            layoutItems: apiIdea.descriptionMore?.[1] ? JSON.parse(apiIdea.descriptionMore[1]) : [],
           });
         } else if (!cancelled) {
           throw new Error("Failed to load vote data from both IPFS and API");
@@ -633,17 +587,17 @@ export default function VotePage({ params }: Props) {
     const nextNonce = 0; // Dummy value, ignored by backend
 
     if (!password) {
-      alert("Bạn cần nhập password.");
+      showError("Password Required", "Bạn cần nhập password.");
       return;
     }
 
     if (!pollStateIndex) {
-      alert("Poll State Index not found. Please join the poll first.");
+      showError("MACI Error", "Poll State Index not found. Please join the poll first.");
       return;
     }
 
     if (!privKey) {
-      alert("MACI Private Key not found. Please Sign Up first.");
+      showError("MACI Error", "MACI Private Key not found. Please Sign Up first.");
       return;
     }
 
@@ -720,11 +674,14 @@ export default function VotePage({ params }: Props) {
 
   const getImageSrc = (path?: string) => {
     if (!path) return "";
+    if (path.startsWith("ipfs://")) {
+      return `/api/v1/ipfs/${path.replace("ipfs://", "")}`;
+    }
     if (path.startsWith("/") || path.startsWith("http")) return path;
     return `/api/v1/ipfs/${path}`;
   };
 
-  const approvedAt = new Date(data.approvedAt);
+
 
   return (
     <main className="p-4">
@@ -744,128 +701,48 @@ export default function VotePage({ params }: Props) {
         generateProofs={generateProofs}
         submitProofs={submitProofs}
       />
-      <div className="min-h-screen w-full flex flex-col md:flex-row gap-8 rounded-lg">
-        {/* Left side */}
-        <section className="md:w-2/3 w-full flex flex-col items-center justify-start p-6 overflow-y-auto max-h-[90vh]">
-          <div className="w-full aspect-video border border-black rounded-xl flex items-center justify-center mb-6 overflow-hidden">
-            {data.heroImage ? (
-              <img
-                src={getImageSrc(data.heroImage)}
-                alt="Trailer / Screenshot"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-black text-lg">Trailer / Screenshot</span>
-            )}
-          </div>
-          <div className="flex items-center gap-2 w-full justify-center">
-            <Button
-              variant="ghost"
-              className="rounded-full p-2 text-black hover:bg-gray-100"
-              aria-label="Previous"
-            >
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M15 19l-7-7 7-7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Button>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <div
-                  key={n}
-                  className="w-20 h-14 border border-black rounded-lg flex items-center justify-center text-black text-xs font-semibold"
-                >
-                  Img {n}
-                </div>
-              ))}
-            </div>
-            <Button
-              variant="ghost"
-              className="rounded-full p-2 text-black hover:bg-gray-100"
-              aria-label="Next"
-            >
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M9 5l7 7-7 7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Button>
-          </div>
-          <div className="h-4" />
-          <ScreenshotGallery />
-        </section>
-        {/* Right side */}
-        <section className="md:w-1/3 w-full flex flex-col gap-6 p-6 border border-black rounded-xl">
-          <div>
-            <h2 className="text-3xl font-bold text-black mb-2">{data.title}</h2>
-            <div className="flex gap-8 border-b border-black mb-4">
-              <button className="pb-2 text-black font-semibold border-b-2 border-black">
-                Overview
-              </button>
-              <button className="pb-2 text-black hover:underline transition-colors">
-                Achievements
-              </button>
-            </div>
-          </div>
-          <div className="w-32 h-32 border border-black rounded-lg flex items-center justify-center mb-4 overflow-hidden relative">
-            {data.logo ? (
-              <img
-                src={getImageSrc(data.logo)}
-                alt="Logo"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-black text-sm">Logo</span>
-            )}
-          </div>
-          <div className="text-black text-sm mb-2">
-            <p className="mb-2">{data.description}</p>
-            <p className="text-xs">
-              Creator: <span className="font-mono">{data.creator}</span>
-            </p>
-            <p className="text-xs">
-              Approved at:{""}
-              {approvedAt.toLocaleString(undefined, {
-                dateStyle: "medium",
-                timeStyle: "short",
-              })}
-            </p>
-            <p className="text-xs">Idea ID: {data.ideaId}</p>
-          </div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="border border-black rounded-md px-3 py-1 text-black font-bold text-lg">
-              {data.ageLimit ? `${data.ageLimit}+` : "18+"}
-            </div>
-            <span className="text-black text-sm">
-              Extreme Violence, Strong Language
-            </span>
-          </div>
-          <div className="text-black text-xs uppercase tracking-wider mb-1">
-            Base Game
-          </div>
-          <div className="text-2xl font-bold text-black mb-4">₫209,000</div>
-          <div className="flex flex-col gap-3">
-            <Button
-              onClick={() => setShowBuyModal(true)}
-              className="border border-black text-black font-bold text-lg py-3 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              Vote
-            </Button>
-            <Button className="border border-black text-black font-semibold py-3 rounded-lg hover:bg-gray-100 transition-colors">
-              Add To Pin
-            </Button>
-          </div>
-        </section>
-      </div>
+      <VoteDetailLayout>
+        <VoteLeftPanel>
+          {data.heroImage && (
+             <VoteGallery
+               heroImage={getImageSrc(data.heroImage)}
+               screenshots={[]} // Hide gallery part if mixed with dynamic layout, or handle below
+             />
+          )}
+
+          {data.layoutItems && data.layoutItems.length > 0 ? (
+             data.layoutItems.map((item: any) => {
+                if (item.type === "text") {
+                   return <VoteTextBlock key={item.id} title={item.title} content={item.content} />;
+                }
+                if (item.type === "stack") {
+                   // Mock stack for now using default gallery or specific images if available
+                   return (
+                      <div key={item.id} className="w-full">
+                         <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
+                         <VoteGallery urlResolver={getImageSrc} /> {/* Pass resolver if needed, or use defaults */}
+                      </div>
+                   );
+                }
+                return null;
+             })
+          ) : (
+             /* Fallback for old ideas without layoutItems: Show default gallery */
+            !data.heroImage && <VoteGallery /> 
+          )}
+        </VoteLeftPanel>
+
+        <VoteRightPanel
+          title={data.title}
+          description={data.description}
+          creator={data.creator}
+          approvedAt={data.approvedAt}
+          ideaId={data.ideaId}
+          logo={data.logo ? getImageSrc(data.logo) : undefined}
+          ageLimit={data.ageLimit}
+          onVote={() => setShowBuyModal(true)}
+        />
+      </VoteDetailLayout>
 
       <VoteModal
         open={showModal}

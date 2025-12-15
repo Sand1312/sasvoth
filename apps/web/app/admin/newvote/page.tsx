@@ -129,7 +129,8 @@ export default function CreatePollPage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl p-6 text-black bg-white">
+    <main className="min-h-screen bg-white text-black font-sans mx-auto w-full max-w-7xl px-[2%] py-8">
+      <div className="max-w-2xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold tracking-tight">New Vote</h1>
         <a
@@ -301,6 +302,7 @@ export default function CreatePollPage() {
           )}
         </div>
       </div> */}
+      </div>
     </main>
   );
 }

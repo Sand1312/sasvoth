@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { useAccount } from "wagmi";
 import { useClaimContract, useToken, useUser, useAuth } from "../../hooks";
+import { useFeedback } from "@/contexts/FeedbackContext";
 
 type DepositHistory = {
   amount: number;
@@ -19,6 +20,7 @@ export default function TransactionsPage() {
   const { deposit, getHistoryDeposit } = useUser();
 
   const [isClient, setIsClient] = useState(false);
+  const { showSuccess, showError } = useFeedback();
 
   // Deposit / withdraw
   const [showDeposit, setShowDeposit] = useState(true);
@@ -69,17 +71,17 @@ export default function TransactionsPage() {
       console.log("Buy HD result:", txHash);
       const userId = user?._id;
       if (!userId) {
-        alert("Vui lòng đăng nhập lại");
+        showError("Authentication Required", "Vui lòng đăng nhập lại");
         return;
       }
 
       const amountToken = Number(depositAmount) * Number(claim.rate);
       await deposit(userId, amountToken, txHash);
       setDepositAmount("");
-      alert(`Đang mua token với ${depositAmount} ETH...`);
+      showSuccess("Deposit Successful", `Đang mua token với ${depositAmount} ETH...`);
       setReloadHistory(prev => prev + 1);
     } else {
-      alert("Vui lòng nhập số ETH hợp lệ");
+      showError("Invalid Input", "Vui lòng nhập số ETH hợp lệ");
     }
   };
 
@@ -94,7 +96,7 @@ export default function TransactionsPage() {
       setWithdrawAmount("");
       const userId = user?._id;
       if (!userId) {
-        alert("Vui lòng đăng nhập lại");
+        showError("Authentication Required", "Vui lòng đăng nhập lại");
         return;
       }
       const amountToken = Number(withdrawAmount) - Number(withdrawAmount) *2;
@@ -110,7 +112,7 @@ export default function TransactionsPage() {
         // );
      
     } else {
-      alert("Vui lòng nhập số token hợp lệ");
+      showError("Invalid Input", "Vui lòng nhập số token hợp lệ");
     }
   };
 

@@ -35,11 +35,24 @@ The goal is to replace the `@maci-protocol/sdk` NPM dependency with a local sour
 - Run `turbo install` (or `npm install`) to link workspaces.
 - Build the local MACI packages (`turbo run build --filter=@maci-protocol/*`).
 
-## Verification Plan
+### User Feedback System (Completed)
+- [x] Create `FeedbackDialog` component (Shadcn-like)
+- [x] Create `FeedbackContext` and `useFeedback` hook
+- [x] Wrap application in `FeedbackProvider`
+- [x] Replace `alert()` usage in:
+    - `IdeaUploadForm.tsx`
+    - `PollClient.tsx` (MACI Join/Signup, Tally)
+    - `VotePage.tsx` (Vote validation, Buy Credits)
+    - `LoginForm.tsx` & `SocialLoginButtons.tsx`
+    - `dashboard/page.tsx` & `transactions/page.tsx`
 
+## Verification Plan
 ### Automated Tests
-- Run `turbo dev` to ensure the project builds with local packages.
-- Verify `joinPoll` flow works with the local SDK (logs should show local file paths if we add debug logs).
+- Build verification: `turbo build --filter=web`
 
 ### Manual Verification
-- Add a unique log in `packages/maci-sdk/src/index.ts` (or relevant file) to confirm the local code is executing.
+- **Idea Submission**: Verify success dialog appears and form closes.
+- **Poll Joining**: Verify MACI signup/join success/error dialogs.
+- **Voting**: Verify vote submission success dialog.
+- **Login**: Verify mock login success/error.
+- **Transactions**: Verify deposit/withdraw alerts are now dialogs.unique log in `packages/maci-sdk/src/index.ts` (or relevant file) to confirm the local code is executing.

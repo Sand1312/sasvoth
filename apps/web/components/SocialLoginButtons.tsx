@@ -2,33 +2,46 @@
 
 import * as React from "react";
 import { SocialLoginButton } from "./SocialLoginButton";
+import { useFeedback } from "@/contexts/FeedbackContext";
 
 export interface SocialLoginButtonsProps {
-  onGoogleLogin: () => void;
-  onGithubLogin: () => void;
-  onWalletLogin: () => void;
   error: string | null;
 }
 
 import { AUTH_PROVIDERS } from "../config/auth.config";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function SocialLoginButtons({
-  onGoogleLogin,
-  onGithubLogin,
-  onWalletLogin,
   error,
 }: SocialLoginButtonsProps): React.ReactElement {
-  const handleLogin = (providerId: string) => {
-    switch (providerId) {
-      case "google":
-        onGoogleLogin();
-        break;
-      case "github":
-        onGithubLogin();
-        break;
-      case "wallet":
-        onWalletLogin();
-        break;
+  /* Removed duplicate useFeedback call */
+  const { showSuccess, showError } = useFeedback();
+  const { loginWithSocial, loginWithWallet } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || searchParams.get("from") || "/dashboard";
+
+  const handleSocialLogin = async (providerId: string) => {
+    try {
+      console.log(`Login with ${providerId}`);
+      // Mapping providerId string to literal type
+      if (providerId === "google" || providerId === "github") {
+         console.log("Triggering social login for:", providerId);
+         loginWithSocial(providerId);
+         // showSuccess("Redirecting", `Connecting to ${providerId}...`); // Removed to avoid blocking redirect
+      } else if (providerId === "wallet") {
+          console.log("Triggering wallet login");
+          showSuccess("Connecting Wallet", "Please check your MetaMask...");
+          await loginWithWallet();
+          showSuccess("Connected", "Wallet login successful!");
+          router.push(callbackUrl);
+      } else {
+         console.warn(`Unsupported provider: ${providerId}`);
+      }
+    } catch (err: any) {
+      console.error("Login failed:", err);
+      showError("Connection Failed", err.message || "Could not connect to provider");
     }
   };
 
@@ -39,7 +52,7 @@ export function SocialLoginButtons({
           <SocialLoginButton
             key={provider.id}
             provider={provider.id}
-            onClick={() => handleLogin(provider.id)}
+            onClick={() => handleSocialLogin(provider.id)}
             label={provider.label}
             icon={provider.icon}
             testId={provider.testId}

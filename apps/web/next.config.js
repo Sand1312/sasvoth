@@ -53,7 +53,6 @@ const nextConfig = {
     "@maci-protocol/crypto",
     "@maci-protocol/domainobjs",
     "hardhat",
-    "ethers",
     "ts-node",
   ],
 };
