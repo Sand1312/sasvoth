@@ -1,6 +1,10 @@
-import { useAccount, useContractRead, useContractWrite } from 'wagmi';
-import { TOKEN_ABI, TOKEN_CONTRACT_ADDRESS, CLAIM_CONTRACT_ADDRESS } from '@maci-protocol/contracts';
-import { parseEther, formatEther } from 'viem';
+import { useAccount, useContractRead, useContractWrite } from "wagmi";
+import {
+  TOKEN_ABI,
+  TOKEN_CONTRACT_ADDRESS,
+  CLAIM_CONTRACT_ADDRESS,
+} from "@sasvoth/contracts";
+import { parseEther, formatEther } from "viem";
 
 interface UseTokenReturn {
   name: string | undefined;
@@ -8,7 +12,7 @@ interface UseTokenReturn {
   balance: string;
   rawBalance: bigint | undefined;
   allowance: string;
-  approve: (spender: string, amount: string) => void;
+  approve: (spender: string, amount: string) => Promise<`0x${string}`>;
   isApproving: boolean;
   refetchBalance: (() => void) | undefined;
   refetchAllowance: (() => void) | undefined;
@@ -22,19 +26,19 @@ export const useToken = (): UseTokenReturn => {
   const { data: name } = useContractRead({
     address: TOKEN_CONTRACT_ADDRESS,
     abi: TOKEN_ABI,
-    functionName: 'name',
+    functionName: "name",
   });
 
   const { data: symbol } = useContractRead({
     address: TOKEN_CONTRACT_ADDRESS,
     abi: TOKEN_ABI,
-    functionName: 'symbol',
+    functionName: "symbol",
   });
 
   const { data: balance, refetch: refetchBalance } = useContractRead({
     address: TOKEN_CONTRACT_ADDRESS,
     abi: TOKEN_ABI,
-    functionName: 'balanceOf',
+    functionName: "balanceOf",
     args: address ? [address] : undefined,
   });
 
@@ -42,18 +46,22 @@ export const useToken = (): UseTokenReturn => {
   const { data: allowance, refetch: refetchAllowance } = useContractRead({
     address: TOKEN_CONTRACT_ADDRESS,
     abi: TOKEN_ABI,
-    functionName: 'allowance',
-    args: address && CLAIM_CONTRACT_ADDRESS ? [address, CLAIM_CONTRACT_ADDRESS] : undefined,
+    functionName: "allowance",
+    args:
+      address && CLAIM_CONTRACT_ADDRESS
+        ? [address, CLAIM_CONTRACT_ADDRESS]
+        : undefined,
   });
 
   // Approve token
-  const { writeContract: approve, isPending: isApproving } = useContractWrite();
+  const { writeContractAsync: approveAsync, isPending: isApproving } =
+    useContractWrite();
 
-  const handleApprove = (spender: string, amount: string): void => {
-    approve({
+  const handleApprove = async (spender: string, amount: string) => {
+    return await approveAsync({
       address: TOKEN_CONTRACT_ADDRESS,
       abi: TOKEN_ABI,
-      functionName: 'approve',
+      functionName: "approve",
       args: [spender, parseEther(amount)],
     });
   };
@@ -72,6 +80,6 @@ export const useToken = (): UseTokenReturn => {
     isApproving,
     refetchBalance,
     refetchAllowance,
-    tokenAddress: TOKEN_CONTRACT_ADDRESS
+    tokenAddress: TOKEN_CONTRACT_ADDRESS,
   };
 };

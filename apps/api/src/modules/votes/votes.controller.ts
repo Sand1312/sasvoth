@@ -35,6 +35,12 @@ class CastVoteDto {
 
   @ApiProperty()
   voteCommitment: string;
+
+  @ApiProperty({ required: false })
+  message?: any;
+
+  @ApiProperty({ required: false })
+  encPubKey?: any;
 }
 
 @ApiTags('Votes')

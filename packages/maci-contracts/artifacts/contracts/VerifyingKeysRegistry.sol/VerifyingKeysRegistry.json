@@ -1,0 +1,2406 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "VerifyingKeysRegistry",
+  "sourceName": "contracts/VerifyingKeysRegistry.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_initialOwner",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidKeysParams",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "VerifyingKeyAlreadySet",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "VerifyingKeyNotSet",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "PollJoinedVerifyingKeySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "PollJoiningVerifyingKeySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "ProcessVerifyingKeySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "TallyVerifyingKeySet",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "MESSAGE_DATA_LENGTH",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "generatePollJoinedVerifyingKeySignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "signature",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "generatePollJoiningVerifyingKeySignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "signature",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        }
+      ],
+      "name": "generateProcessVerifyingKeySignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "signature",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "generateTallyVerifyingKeySignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "signature",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPollJoinedVerifyingKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPollJoinedVerifyingKeyBySignature",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPollJoiningVerifyingKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "getPollJoiningVerifyingKeyBySignature",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "getProcessVerifyingKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "getProcessVerifyingKeyBySignature",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "getTallyVerifyingKey",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "getTallyVerifyingKeyBySignature",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "verifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "hasProcessVerifyingKey",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "hasTallyVerifyingKey",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "isPollJoinedVerifyingKeySet",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        }
+      ],
+      "name": "isPollJoiningVerifyingKeySet",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "isProcessVerifyingKeySet",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_signature",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        }
+      ],
+      "name": "isTallyVerifyingKeySet",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isSet",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_pollJoinedVerifyingSignature",
+          "type": "tuple"
+        }
+      ],
+      "name": "setPollJoinedVerifyingKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_pollJoiningVerifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "setPollJoiningVerifyingKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_processVerifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "setProcessVerifyingKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_tallyVerifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "setTallyVerifyingKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_stateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_intStateTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_voteOptionTreeDepth",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_messageBatchSize",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum DomainObjs.Mode",
+          "name": "_mode",
+          "type": "uint8"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_processVerifyingKey",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point",
+              "name": "alpha1",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "beta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "gamma2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256[2]",
+                  "name": "x",
+                  "type": "uint256[2]"
+                },
+                {
+                  "internalType": "uint256[2]",
+                  "name": "y",
+                  "type": "uint256[2]"
+                }
+              ],
+              "internalType": "struct Pairing.G2Point",
+              "name": "delta2",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Pairing.G1Point[]",
+              "name": "ic",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct SnarkCommon.VerifyingKey",
+          "name": "_tallyVerifyingKey",
+          "type": "tuple"
+        }
+      ],
+      "name": "setVerifyingKeys",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "stateTreeDepth",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "pollStateTreeDepth",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "tallyProcessingStateTreeDepth",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "voteOptionTreeDepth",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "messageBatchSize",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum DomainObjs.Mode[]",
+              "name": "modes",
+              "type": "uint8[]"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point",
+                  "name": "alpha1",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "beta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "gamma2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "delta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point[]",
+                  "name": "ic",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SnarkCommon.VerifyingKey",
+              "name": "pollJoiningVerifyingKey",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point",
+                  "name": "alpha1",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "beta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "gamma2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "delta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point[]",
+                  "name": "ic",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SnarkCommon.VerifyingKey",
+              "name": "pollJoinedVerifyingKey",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point",
+                  "name": "alpha1",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "beta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "gamma2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "delta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point[]",
+                  "name": "ic",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SnarkCommon.VerifyingKey[]",
+              "name": "processVerifyingKeys",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point",
+                  "name": "alpha1",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "beta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "gamma2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "x",
+                      "type": "uint256[2]"
+                    },
+                    {
+                      "internalType": "uint256[2]",
+                      "name": "y",
+                      "type": "uint256[2]"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G2Point",
+                  "name": "delta2",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "x",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "y",
+                      "type": "uint256"
+                    }
+                  ],
+                  "internalType": "struct Pairing.G1Point[]",
+                  "name": "ic",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SnarkCommon.VerifyingKey[]",
+              "name": "tallyVerifyingKeys",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct IVerifyingKeysRegistry.SetVerifyingKeysBatchArgs",
+          "name": "_args",
+          "type": "tuple"
+        }
+      ],
+      "name": "setVerifyingKeysBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052604051611f33380380611f3383398101604081905260209160ab565b806001600160a01b038116604e57604051631e4fbdf760e01b81526000600482015260240160405180910390fd5b605581605b565b505060d9565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b60006020828403121560bc57600080fd5b81516001600160a01b038116811460d257600080fd5b9392505050565b611e4b806100e86000396000f3fe608060405234801561001057600080fd5b50600436106101c45760003560e01c8063683f3dc3116100f9578063d8042cf711610097578063f2fde38b11610071578063f2fde38b146103e9578063f3350299146103fc578063fc73e3d01461040f578063fe43fd581461042257600080fd5b8063d8042cf7146103b0578063e92f7132146103c3578063f1d5c7b7146103d657600080fd5b80638da5cb5b116100d35780638da5cb5b1461034c578063a69d292a14610367578063b746b4311461038a578063b7e3d4f71461039d57600080fd5b8063683f3dc314610317578063715018a61461033157806377ce724d1461033957600080fd5b80633e7112fe1161016657806348b121261161014057806348b12126146102cb5780635465b477146102de5780635bf2d33e146102f15780636069bc021461030457600080fd5b80633e7112fe14610292578063435fe1c9146102a557806345dcd51c146102b857600080fd5b806333b1ef83116101a257806333b1ef831461022857806339a4fbfd1461023b5780633ba1b0011461025b5780633c9f3c351461027e57600080fd5b806302ed71f3146101c9578063258f7e5f146101f157806327a2f46714610206575b600080fd5b6101dc6101d7366004611816565b610435565b60405190151581526020015b60405180910390f35b6102046101ff36600461185b565b610487565b005b61021a6102143660046118c6565b60401b90565b6040519081526020016101e8565b61021a6102363660046118df565b6106be565b61024e610249366004611816565b6106e5565b6040516101e89190611951565b6101dc6102693660046118c6565b60009081526006602052604090205460ff1690565b61021a61028c3660046118c6565b60801b90565b61024e6102a0366004611816565b61099b565b61024e6102b3366004611a15565b610a1e565b6102046102c6366004611a5b565b610a49565b6101dc6102d9366004611a97565b610bbe565b61024e6102ec3660046118c6565b610c20565b61021a6102ff366004611acb565b610e6c565b6101dc610312366004611816565b610e7d565b61031f600a81565b60405160ff90911681526020016101e8565b610204610e95565b610204610347366004611b00565b610ea9565b6000546040516001600160a01b0390911681526020016101e8565b6101dc6103753660046118c6565b60009081526008602052604090205460ff1690565b610204610398366004611b3d565b6110ce565b61024e6103ab3660046118c6565b611252565b6102046103be366004611b84565b611278565b6102046103d1366004611b3d565b6112a3565b6101dc6103e4366004611a15565b611418565b6102046103f7366004611c2b565b61143e565b61024e61040a366004611a97565b611481565b61024e61041d3660046118c6565b6114a2565b61024e6104303660046118c6565b6116d2565b60006004600083600281111561044d5761044d611c54565b600281111561045e5761045e611c54565b815260208082019290925260409081016000908120958152949091529092205460ff1692915050565b61048f6116f1565b600061049c8686866106be565b9050600460008460028111156104b4576104b4611c54565b60028111156104c5576104c5611c54565b81526020808201929092526040908101600090812084825290925290205460ff161561050457604051630799cd4560e51b815260040160405180910390fd5b60006003600085600281111561051c5761051c611c54565b600281111561052d5761052d611c54565b81526020808201929092526040908101600090812085825283522084358155908401356001820155905060408301600282016105698282611c6a565b505060c083016006820161057d8282611c6a565b50506101408301600a82016105928282611c6a565b50600090506105a56101c0850185611cb4565b9050905060005b8181101561061b57600e83016105c66101c0870187611cb4565b838181106105d6576105d6611d05565b835460018101855560009485526020909420604090910292909201926002029091019050610611828281358155602090910135600190910155565b50506001016105ac565b5060016004600087600281111561063457610634611c54565b600281111561064557610645611c54565b8152602001908152602001600020600085815260200190815260200160002060006101000a81548160ff0219169083151502179055507f04bf57f28e3b574246246a480331f14e11be0417629317a49fa2fdebff7d5df983866040516106ac929190611d1b565b60405180910390a15050505050505050565b6000816106d3604085901b608087901b611d4d565b6106dd9190611d4d565b949350505050565b6106ed61176e565b6004600083600281111561070357610703611c54565b600281111561071457610714611c54565b81526020808201929092526040908101600090812086825290925290205460ff1661075257604051637c48038560e01b815260040160405180910390fd5b6003600083600281111561076857610768611c54565b600281111561077957610779611c54565b8152602080820192909252604090810160009081208682528352819020815160e081018352815460a08201908152600183015460c0830152815282516080810180855291949293928501929091600280860192849290830191849182845b8154815260200190600101908083116107d757505050918352505060408051808201918290526020909201919060028481019182845b81548152602001906001019080831161080d575050509190925250505081526040805160808101808352602090930192909160068501918391820190839060029082845b81548152602001906001019080831161085157505050918352505060408051808201918290526020909201919060028481019182845b8154815260200190600101908083116108875750505091909252505050815260408051608081018083526020909301929091600a8501918391820190839060029082845b8154815260200190600101908083116108cb57505050918352505060408051808201918290526020909201919060028481019182845b815481526020019060010190808311610901575050505050815250508152602001600e8201805480602002602001604051908101604052809291908181526020016000905b8282101561098c57838290600052602060002090600202016040518060400160405290816000820154815260200160018201548152505081526020019060010190610946565b50505091525090949350505050565b6109a361176e565b600260008360028111156109b9576109b9611c54565b60028111156109ca576109ca611c54565b81526020808201929092526040908101600090812086825290925290205460ff16610a0857604051637c48038560e01b815260040160405180910390fd5b6001600083600281111561076857610768611c54565b610a2661176e565b6000610a33868686610e6c565b9050610a3f818461099b565b9695505050505050565b610a516116f1565b610a5f610100820182611d74565b9050610a6e60a0830183611d74565b9050141580610a9a5750610a86610120820182611d74565b9050610a9560a0830183611d74565b905014155b15610ab8576040516335c0365760e11b815260040160405180910390fd5b6000610ac760a0830183611d74565b9150610ae0905060208301356103d160c0850185611dbe565b610af5602083013561039860e0850185611dbe565b60005b81811015610bb957610bb1833560408501356060860135610b1f60a0880160808901611ddf565b610b2c60a0890189611d74565b87818110610b3c57610b3c611d05565b9050602002016020810190610b519190611dfa565b610b5f6101008a018a611d74565b88818110610b6f57610b6f611d05565b9050602002810190610b819190611dbe565b610b8f6101208b018b611d74565b89818110610b9f57610b9f611d05565b90506020028101906103be9190611dbe565b600101610af8565b505050565b600080610bcc8686866106be565b905060046000846002811115610be457610be4611c54565b6002811115610bf557610bf5611c54565b8152602080820192909252604090810160009081209381529290915290205460ff1695945050505050565b610c2861176e565b60008281526008602052604090205460ff16610c5757604051637c48038560e01b815260040160405180910390fd5b600082815260076020908152604091829020825160e081018452815460a08201908152600183015460c08301528152835160808101808652919492938501929091600280860192849290830191849182845b815481526020019060010190808311610ca957505050918352505060408051808201918290526020909201919060028481019182845b815481526020019060010190808311610cdf575050509190925250505081526040805160808101808352602090930192909160068501918391820190839060029082845b815481526020019060010190808311610d2357505050918352505060408051808201918290526020909201919060028481019182845b815481526020019060010190808311610d595750505091909252505050815260408051608081018083526020909301929091600a8501918391820190839060029082845b815481526020019060010190808311610d9d57505050918352505060408051808201918290526020909201919060028481019182845b815481526020019060010190808311610dd3575050505050815250508152602001600e8201805480602002602001604051908101604052809291908181526020016000905b82821015610e5e57838290600052602060002090600202016040518060400160405290816000820154815260200160018201548152505081526020019060010190610e18565b505050915250909392505050565b6000826106d3604086901b83611d4d565b60006002600083600281111561044d5761044d611c54565b610e9d6116f1565b610ea7600061171e565b565b610eb16116f1565b6000610ebe868686610e6c565b905060026000846002811115610ed657610ed6611c54565b6002811115610ee757610ee7611c54565b81526020808201929092526040908101600090812084825290925290205460ff1615610f2657604051630799cd4560e51b815260040160405180910390fd5b600060016000856002811115610f3e57610f3e611c54565b6002811115610f4f57610f4f611c54565b8152602080820192909252604090810160009081208582528352208435815590840135600182015590506040830160028201610f8b8282611c6a565b505060c0830160068201610f9f8282611c6a565b50506101408301600a8201610fb48282611c6a565b5060009050610fc76101c0850185611cb4565b9050905060005b8181101561103d57600e8301610fe86101c0870187611cb4565b83818110610ff857610ff8611d05565b835460018101855560009485526020909420604090910292909201926002029091019050611033828281358155602090910135600190910155565b5050600101610fce565b5060016002600087600281111561105657611056611c54565b600281111561106757611067611c54565b8152602001908152602001600020600085815260200190815260200160002060006101000a81548160ff0219169083151502179055507f2b93019f1f441e1d35223dd3f3462c7e03c68b95f548ea412b04989c98f4622a83866040516106ac929190611d1b565b6110d66116f1565b60006110e28360801b90565b60008181526008602052604090205490915060ff161561111557604051630799cd4560e51b815260040160405180910390fd5b60008181526007602090815260409091208335815590830135600182015560408301600282016111458282611c6a565b505060c08301600682016111598282611c6a565b50506101408301600a820161116e8282611c6a565b50600090506111816101c0850185611cb4565b9050905060005b818110156111f757600e83016111a26101c0870187611cb4565b838181106111b2576111b2611d05565b8354600181018555600094855260209094206040909102929092019260020290910190506111ed828281358155602090910135600190910155565b5050600101611188565b5060008381526008602052604090819020805460ff19166001179055517fb2a78535720c3ae385117c6c5bf22cb7eaabb72bf27f9a9bafa129f1209da317906112439085815260200190565b60405180910390a15050505050565b61125a61176e565b60006112668360801b90565b905061127181610c20565b9392505050565b6112806116f1565b61128d8786868686610ea9565b61129a8787878685610487565b50505050505050565b6112ab6116f1565b60006112b78360401b90565b60008181526006602052604090205490915060ff16156112ea57604051630799cd4560e51b815260040160405180910390fd5b600081815260056020908152604090912083358155908301356001820155604083016002820161131a8282611c6a565b505060c083016006820161132e8282611c6a565b50506101408301600a82016113438282611c6a565b50600090506113566101c0850185611cb4565b9050905060005b818110156113cc57600e83016113776101c0870187611cb4565b8381811061138757611387611d05565b8354600181018555600094855260209094206040909102929092019260020290910190506113c2828281358155602090910135600190910155565b505060010161135d565b5060008381526006602052604090819020805460ff19166001179055517f5a8674e4e64f43a95153cefa8317b6f1d677fd44d23928e1abca41c6e1b5131e906112439085815260200190565b600080611426868686610e6c565b905060026000846002811115610be457610be4611c54565b6114466116f1565b6001600160a01b03811661147557604051631e4fbdf760e01b8152600060048201526024015b60405180910390fd5b61147e8161171e565b50565b61148961176e565b60006114968686866106be565b9050610a3f81846106e5565b6114aa61176e565b60008281526006602052604090205460ff166114d957604051637c48038560e01b815260040160405180910390fd5b600082815260056020908152604091829020825160e081018452815460a08201908152600183015460c0830152815283516080810180865260028085018054978401978852939694958701949293928492909184916003890160608601808311610ca957505050918352505060408051808201918290526002848101805483526020948501949293909260038701908501808311610cdf5750505091909252505050815260408051608081018083526006850180549383019384526020909401939192839183906002906007890160608601808311610d2357505050918352505060408051808201918290526002848101805483526020948501949293909260038701908501808311610d59575050509190925250505081526040805160808101808352600a85018054938301938452602090940193919283918390600290600b890160608601808311610d9d57505050918352505060408051808201918290526002848101805483526020948501949293909260038701908501808311610dd3575050505050815250508152602001600e82018054806020026020016040519081016040528092919081815260200160009082821015610e5e57838290600052602060002090600202016040518060400160405290816000820154815260200160018201548152505081526020019060010190610e18565b6116da61176e565b60006116e68360401b90565b9050611271816114a2565b6000546001600160a01b03163314610ea75760405163118cdaa760e01b815233600482015260240161146c565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6040805160e08101909152600060a0820181815260c08301919091528152602081016117986117bf565b81526020016117a56117bf565b81526020016117b26117bf565b8152602001606081525090565b60405180604001604052806117d26117e4565b81526020016117df6117e4565b905290565b60405180604001604052806002906020820280368337509192915050565b80356003811061181157600080fd5b919050565b6000806040838503121561182957600080fd5b8235915061183960208401611802565b90509250929050565b60006101e0828403121561185557600080fd5b50919050565b600080600080600060a0868803121561187357600080fd5b85359450602086013593506040860135925061189160608701611802565b9150608086013567ffffffffffffffff8111156118ad57600080fd5b6118b988828901611842565b9150509295509295909350565b6000602082840312156118d857600080fd5b5035919050565b6000806000606084860312156118f457600080fd5b505081359360208301359350604090920135919050565b8060005b600281101561192e57815184526020938401939091019060010161190f565b50505050565b61193f82825161190b565b6020810151610bb9604084018261190b565b602080825282518051838301520151604082015260006102008201602084015161197e6060850182611934565b50604084015161199160e0850182611934565b5060608401516119a5610160850182611934565b5060808401516101e084810152805191829052602001906000906102208501905b808310156119fa576119e382855180518252602090810151910152565b6040820191506020840193506001830192506119c6565b5095945050505050565b803560ff8116811461181157600080fd5b60008060008060808587031215611a2b57600080fd5b8435935060208501359250611a4260408601611a04565b9150611a5060608601611802565b905092959194509250565b600060208284031215611a6d57600080fd5b813567ffffffffffffffff811115611a8457600080fd5b8201610140818503121561127157600080fd5b60008060008060808587031215611aad57600080fd5b843593506020850135925060408501359150611a5060608601611802565b600080600060608486031215611ae057600080fd5b8335925060208401359150611af760408501611a04565b90509250925092565b600080600080600060a08688031215611b1857600080fd5b8535945060208601359350611b2f60408701611a04565b925061189160608701611802565b60008060408385031215611b5057600080fd5b82359150602083013567ffffffffffffffff811115611b6e57600080fd5b611b7a85828601611842565b9150509250929050565b600080600080600080600060e0888a031215611b9f57600080fd5b873596506020880135955060408801359450611bbd60608901611a04565b9350611bcb60808901611802565b925060a088013567ffffffffffffffff811115611be757600080fd5b611bf38a828b01611842565b92505060c088013567ffffffffffffffff811115611c1057600080fd5b611c1c8a828b01611842565b91505092959891949750929550565b600060208284031215611c3d57600080fd5b81356001600160a01b038116811461127157600080fd5b634e487b7160e01b600052602160045260246000fd5b8160005b6002811015611c8b57813583820155602090910190600101611c6e565b50506040820160005b600281101561192e57813583820160020155602090910190600101611c94565b6000808335601e19843603018112611ccb57600080fd5b83018035915067ffffffffffffffff821115611ce657600080fd5b6020019150600681901b3603821315611cfe57600080fd5b9250929050565b634e487b7160e01b600052603260045260246000fd5b8281526040810160038310611d4057634e487b7160e01b600052602160045260246000fd5b8260208301529392505050565b80820180821115611d6e57634e487b7160e01b600052601160045260246000fd5b92915050565b6000808335601e19843603018112611d8b57600080fd5b83018035915067ffffffffffffffff821115611da657600080fd5b6020019150600581901b3603821315611cfe57600080fd5b600082356101de19833603018112611dd557600080fd5b9190910192915050565b600060208284031215611df157600080fd5b61127182611a04565b600060208284031215611e0c57600080fd5b6112718261180256fea26469706673582212206152d3ba3095a9630d2721b37cb190fa4032048a70e96eae1799bbc807d8b01064736f6c634300081c0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106101c45760003560e01c8063683f3dc3116100f9578063d8042cf711610097578063f2fde38b11610071578063f2fde38b146103e9578063f3350299146103fc578063fc73e3d01461040f578063fe43fd581461042257600080fd5b8063d8042cf7146103b0578063e92f7132146103c3578063f1d5c7b7146103d657600080fd5b80638da5cb5b116100d35780638da5cb5b1461034c578063a69d292a14610367578063b746b4311461038a578063b7e3d4f71461039d57600080fd5b8063683f3dc314610317578063715018a61461033157806377ce724d1461033957600080fd5b80633e7112fe1161016657806348b121261161014057806348b12126146102cb5780635465b477146102de5780635bf2d33e146102f15780636069bc021461030457600080fd5b80633e7112fe14610292578063435fe1c9146102a557806345dcd51c146102b857600080fd5b806333b1ef83116101a257806333b1ef831461022857806339a4fbfd1461023b5780633ba1b0011461025b5780633c9f3c351461027e57600080fd5b806302ed71f3146101c9578063258f7e5f146101f157806327a2f46714610206575b600080fd5b6101dc6101d7366004611816565b610435565b60405190151581526020015b60405180910390f35b6102046101ff36600461185b565b610487565b005b61021a6102143660046118c6565b60401b90565b6040519081526020016101e8565b61021a6102363660046118df565b6106be565b61024e610249366004611816565b6106e5565b6040516101e89190611951565b6101dc6102693660046118c6565b60009081526006602052604090205460ff1690565b61021a61028c3660046118c6565b60801b90565b61024e6102a0366004611816565b61099b565b61024e6102b3366004611a15565b610a1e565b6102046102c6366004611a5b565b610a49565b6101dc6102d9366004611a97565b610bbe565b61024e6102ec3660046118c6565b610c20565b61021a6102ff366004611acb565b610e6c565b6101dc610312366004611816565b610e7d565b61031f600a81565b60405160ff90911681526020016101e8565b610204610e95565b610204610347366004611b00565b610ea9565b6000546040516001600160a01b0390911681526020016101e8565b6101dc6103753660046118c6565b60009081526008602052604090205460ff1690565b610204610398366004611b3d565b6110ce565b61024e6103ab3660046118c6565b611252565b6102046103be366004611b84565b611278565b6102046103d1366004611b3d565b6112a3565b6101dc6103e4366004611a15565b611418565b6102046103f7366004611c2b565b61143e565b61024e61040a366004611a97565b611481565b61024e61041d3660046118c6565b6114a2565b61024e6104303660046118c6565b6116d2565b60006004600083600281111561044d5761044d611c54565b600281111561045e5761045e611c54565b815260208082019290925260409081016000908120958152949091529092205460ff1692915050565b61048f6116f1565b600061049c8686866106be565b9050600460008460028111156104b4576104b4611c54565b60028111156104c5576104c5611c54565b81526020808201929092526040908101600090812084825290925290205460ff161561050457604051630799cd4560e51b815260040160405180910390fd5b60006003600085600281111561051c5761051c611c54565b600281111561052d5761052d611c54565b81526020808201929092526040908101600090812085825283522084358155908401356001820155905060408301600282016105698282611c6a565b505060c083016006820161057d8282611c6a565b50506101408301600a82016105928282611c6a565b50600090506105a56101c0850185611cb4565b9050905060005b8181101561061b57600e83016105c66101c0870187611cb4565b838181106105d6576105d6611d05565b835460018101855560009485526020909420604090910292909201926002029091019050610611828281358155602090910135600190910155565b50506001016105ac565b5060016004600087600281111561063457610634611c54565b600281111561064557610645611c54565b8152602001908152602001600020600085815260200190815260200160002060006101000a81548160ff0219169083151502179055507f04bf57f28e3b574246246a480331f14e11be0417629317a49fa2fdebff7d5df983866040516106ac929190611d1b565b60405180910390a15050505050505050565b6000816106d3604085901b608087901b611d4d565b6106dd9190611d4d565b949350505050565b6106ed61176e565b6004600083600281111561070357610703611c54565b600281111561071457610714611c54565b81526020808201929092526040908101600090812086825290925290205460ff1661075257604051637c48038560e01b815260040160405180910390fd5b6003600083600281111561076857610768611c54565b600281111561077957610779611c54565b8152602080820192909252604090810160009081208682528352819020815160e081018352815460a08201908152600183015460c0830152815282516080810180855291949293928501929091600280860192849290830191849182845b8154815260200190600101908083116107d757505050918352505060408051808201918290526020909201919060028481019182845b81548152602001906001019080831161080d575050509190925250505081526040805160808101808352602090930192909160068501918391820190839060029082845b81548152602001906001019080831161085157505050918352505060408051808201918290526020909201919060028481019182845b8154815260200190600101908083116108875750505091909252505050815260408051608081018083526020909301929091600a8501918391820190839060029082845b8154815260200190600101908083116108cb57505050918352505060408051808201918290526020909201919060028481019182845b815481526020019060010190808311610901575050505050815250508152602001600e8201805480602002602001604051908101604052809291908181526020016000905b8282101561098c57838290600052602060002090600202016040518060400160405290816000820154815260200160018201548152505081526020019060010190610946565b50505091525090949350505050565b6109a361176e565b600260008360028111156109b9576109b9611c54565b60028111156109ca576109ca611c54565b81526020808201929092526040908101600090812086825290925290205460ff16610a0857604051637c48038560e01b815260040160405180910390fd5b6001600083600281111561076857610768611c54565b610a2661176e565b6000610a33868686610e6c565b9050610a3f818461099b565b9695505050505050565b610a516116f1565b610a5f610100820182611d74565b9050610a6e60a0830183611d74565b9050141580610a9a5750610a86610120820182611d74565b9050610a9560a0830183611d74565b905014155b15610ab8576040516335c0365760e11b815260040160405180910390fd5b6000610ac760a0830183611d74565b9150610ae0905060208301356103d160c0850185611dbe565b610af5602083013561039860e0850185611dbe565b60005b81811015610bb957610bb1833560408501356060860135610b1f60a0880160808901611ddf565b610b2c60a0890189611d74565b87818110610b3c57610b3c611d05565b9050602002016020810190610b519190611dfa565b610b5f6101008a018a611d74565b88818110610b6f57610b6f611d05565b9050602002810190610b819190611dbe565b610b8f6101208b018b611d74565b89818110610b9f57610b9f611d05565b90506020028101906103be9190611dbe565b600101610af8565b505050565b600080610bcc8686866106be565b905060046000846002811115610be457610be4611c54565b6002811115610bf557610bf5611c54565b8152602080820192909252604090810160009081209381529290915290205460ff1695945050505050565b610c2861176e565b60008281526008602052604090205460ff16610c5757604051637c48038560e01b815260040160405180910390fd5b600082815260076020908152604091829020825160e081018452815460a08201908152600183015460c08301528152835160808101808652919492938501929091600280860192849290830191849182845b815481526020019060010190808311610ca957505050918352505060408051808201918290526020909201919060028481019182845b815481526020019060010190808311610cdf575050509190925250505081526040805160808101808352602090930192909160068501918391820190839060029082845b815481526020019060010190808311610d2357505050918352505060408051808201918290526020909201919060028481019182845b815481526020019060010190808311610d595750505091909252505050815260408051608081018083526020909301929091600a8501918391820190839060029082845b815481526020019060010190808311610d9d57505050918352505060408051808201918290526020909201919060028481019182845b815481526020019060010190808311610dd3575050505050815250508152602001600e8201805480602002602001604051908101604052809291908181526020016000905b82821015610e5e57838290600052602060002090600202016040518060400160405290816000820154815260200160018201548152505081526020019060010190610e18565b505050915250909392505050565b6000826106d3604086901b83611d4d565b60006002600083600281111561044d5761044d611c54565b610e9d6116f1565b610ea7600061171e565b565b610eb16116f1565b6000610ebe868686610e6c565b905060026000846002811115610ed657610ed6611c54565b6002811115610ee757610ee7611c54565b81526020808201929092526040908101600090812084825290925290205460ff1615610f2657604051630799cd4560e51b815260040160405180910390fd5b600060016000856002811115610f3e57610f3e611c54565b6002811115610f4f57610f4f611c54565b8152602080820192909252604090810160009081208582528352208435815590840135600182015590506040830160028201610f8b8282611c6a565b505060c0830160068201610f9f8282611c6a565b50506101408301600a8201610fb48282611c6a565b5060009050610fc76101c0850185611cb4565b9050905060005b8181101561103d57600e8301610fe86101c0870187611cb4565b83818110610ff857610ff8611d05565b835460018101855560009485526020909420604090910292909201926002029091019050611033828281358155602090910135600190910155565b5050600101610fce565b5060016002600087600281111561105657611056611c54565b600281111561106757611067611c54565b8152602001908152602001600020600085815260200190815260200160002060006101000a81548160ff0219169083151502179055507f2b93019f1f441e1d35223dd3f3462c7e03c68b95f548ea412b04989c98f4622a83866040516106ac929190611d1b565b6110d66116f1565b60006110e28360801b90565b60008181526008602052604090205490915060ff161561111557604051630799cd4560e51b815260040160405180910390fd5b60008181526007602090815260409091208335815590830135600182015560408301600282016111458282611c6a565b505060c08301600682016111598282611c6a565b50506101408301600a820161116e8282611c6a565b50600090506111816101c0850185611cb4565b9050905060005b818110156111f757600e83016111a26101c0870187611cb4565b838181106111b2576111b2611d05565b8354600181018555600094855260209094206040909102929092019260020290910190506111ed828281358155602090910135600190910155565b5050600101611188565b5060008381526008602052604090819020805460ff19166001179055517fb2a78535720c3ae385117c6c5bf22cb7eaabb72bf27f9a9bafa129f1209da317906112439085815260200190565b60405180910390a15050505050565b61125a61176e565b60006112668360801b90565b905061127181610c20565b9392505050565b6112806116f1565b61128d8786868686610ea9565b61129a8787878685610487565b50505050505050565b6112ab6116f1565b60006112b78360401b90565b60008181526006602052604090205490915060ff16156112ea57604051630799cd4560e51b815260040160405180910390fd5b600081815260056020908152604090912083358155908301356001820155604083016002820161131a8282611c6a565b505060c083016006820161132e8282611c6a565b50506101408301600a82016113438282611c6a565b50600090506113566101c0850185611cb4565b9050905060005b818110156113cc57600e83016113776101c0870187611cb4565b8381811061138757611387611d05565b8354600181018555600094855260209094206040909102929092019260020290910190506113c2828281358155602090910135600190910155565b505060010161135d565b5060008381526006602052604090819020805460ff19166001179055517f5a8674e4e64f43a95153cefa8317b6f1d677fd44d23928e1abca41c6e1b5131e906112439085815260200190565b600080611426868686610e6c565b905060026000846002811115610be457610be4611c54565b6114466116f1565b6001600160a01b03811661147557604051631e4fbdf760e01b8152600060048201526024015b60405180910390fd5b61147e8161171e565b50565b61148961176e565b60006114968686866106be565b9050610a3f81846106e5565b6114aa61176e565b60008281526006602052604090205460ff166114d957604051637c48038560e01b815260040160405180910390fd5b600082815260056020908152604091829020825160e081018452815460a08201908152600183015460c0830152815283516080810180865260028085018054978401978852939694958701949293928492909184916003890160608601808311610ca957505050918352505060408051808201918290526002848101805483526020948501949293909260038701908501808311610cdf5750505091909252505050815260408051608081018083526006850180549383019384526020909401939192839183906002906007890160608601808311610d2357505050918352505060408051808201918290526002848101805483526020948501949293909260038701908501808311610d59575050509190925250505081526040805160808101808352600a85018054938301938452602090940193919283918390600290600b890160608601808311610d9d57505050918352505060408051808201918290526002848101805483526020948501949293909260038701908501808311610dd3575050505050815250508152602001600e82018054806020026020016040519081016040528092919081815260200160009082821015610e5e57838290600052602060002090600202016040518060400160405290816000820154815260200160018201548152505081526020019060010190610e18565b6116da61176e565b60006116e68360401b90565b9050611271816114a2565b6000546001600160a01b03163314610ea75760405163118cdaa760e01b815233600482015260240161146c565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6040805160e08101909152600060a0820181815260c08301919091528152602081016117986117bf565b81526020016117a56117bf565b81526020016117b26117bf565b8152602001606081525090565b60405180604001604052806117d26117e4565b81526020016117df6117e4565b905290565b60405180604001604052806002906020820280368337509192915050565b80356003811061181157600080fd5b919050565b6000806040838503121561182957600080fd5b8235915061183960208401611802565b90509250929050565b60006101e0828403121561185557600080fd5b50919050565b600080600080600060a0868803121561187357600080fd5b85359450602086013593506040860135925061189160608701611802565b9150608086013567ffffffffffffffff8111156118ad57600080fd5b6118b988828901611842565b9150509295509295909350565b6000602082840312156118d857600080fd5b5035919050565b6000806000606084860312156118f457600080fd5b505081359360208301359350604090920135919050565b8060005b600281101561192e57815184526020938401939091019060010161190f565b50505050565b61193f82825161190b565b6020810151610bb9604084018261190b565b602080825282518051838301520151604082015260006102008201602084015161197e6060850182611934565b50604084015161199160e0850182611934565b5060608401516119a5610160850182611934565b5060808401516101e084810152805191829052602001906000906102208501905b808310156119fa576119e382855180518252602090810151910152565b6040820191506020840193506001830192506119c6565b5095945050505050565b803560ff8116811461181157600080fd5b60008060008060808587031215611a2b57600080fd5b8435935060208501359250611a4260408601611a04565b9150611a5060608601611802565b905092959194509250565b600060208284031215611a6d57600080fd5b813567ffffffffffffffff811115611a8457600080fd5b8201610140818503121561127157600080fd5b60008060008060808587031215611aad57600080fd5b843593506020850135925060408501359150611a5060608601611802565b600080600060608486031215611ae057600080fd5b8335925060208401359150611af760408501611a04565b90509250925092565b600080600080600060a08688031215611b1857600080fd5b8535945060208601359350611b2f60408701611a04565b925061189160608701611802565b60008060408385031215611b5057600080fd5b82359150602083013567ffffffffffffffff811115611b6e57600080fd5b611b7a85828601611842565b9150509250929050565b600080600080600080600060e0888a031215611b9f57600080fd5b873596506020880135955060408801359450611bbd60608901611a04565b9350611bcb60808901611802565b925060a088013567ffffffffffffffff811115611be757600080fd5b611bf38a828b01611842565b92505060c088013567ffffffffffffffff811115611c1057600080fd5b611c1c8a828b01611842565b91505092959891949750929550565b600060208284031215611c3d57600080fd5b81356001600160a01b038116811461127157600080fd5b634e487b7160e01b600052602160045260246000fd5b8160005b6002811015611c8b57813583820155602090910190600101611c6e565b50506040820160005b600281101561192e57813583820160020155602090910190600101611c94565b6000808335601e19843603018112611ccb57600080fd5b83018035915067ffffffffffffffff821115611ce657600080fd5b6020019150600681901b3603821315611cfe57600080fd5b9250929050565b634e487b7160e01b600052603260045260246000fd5b8281526040810160038310611d4057634e487b7160e01b600052602160045260246000fd5b8260208301529392505050565b80820180821115611d6e57634e487b7160e01b600052601160045260246000fd5b92915050565b6000808335601e19843603018112611d8b57600080fd5b83018035915067ffffffffffffffff821115611da657600080fd5b6020019150600581901b3603821315611cfe57600080fd5b600082356101de19833603018112611dd557600080fd5b9190910192915050565b600060208284031215611df157600080fd5b61127182611a04565b600060208284031215611e0c57600080fd5b6112718261180256fea26469706673582212206152d3ba3095a9630d2721b37cb190fa4032048a70e96eae1799bbc807d8b01064736f6c634300081c0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

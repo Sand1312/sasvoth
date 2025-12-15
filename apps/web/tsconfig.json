@@ -9,8 +9,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-       "@maci-protocol/contracts": ["../../packages/contracts"],
-       "@ipfs-service/*": ["../../packages/ipfs-service/src/*"]
+      "@ipfs-service/*": ["../../packages/ipfs-service/src/*"]
     }
   },
   "include": [
@@ -18,8 +17,7 @@
     "**/*.tsx",
     "next-env.d.ts",
     "next.config.js",
-    ".next/types/**/*.ts",
-     "../../packages/contracts/**/*.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

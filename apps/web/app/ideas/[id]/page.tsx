@@ -46,9 +46,10 @@ async function fetchIdeaById(id: string): Promise<Idea | null> {
 export default async function IdeaPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const idea = await fetchIdeaById(params.id);
+  const { id } = await params;
+  const idea = await fetchIdeaById(id);
 
   if (!idea) {
     notFound();

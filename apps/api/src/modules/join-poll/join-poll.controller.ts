@@ -35,6 +35,12 @@ class CastVoteDto {
 
   @ApiProperty()
   voteCommitment: string;
+
+  @ApiProperty({ required: false })
+  pubKey?: { x: string; y: string };
+
+  @ApiProperty({ required: false })
+  maciContractAddress?: string;
 }
 
 @ApiTags('join-poll')

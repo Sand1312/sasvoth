@@ -9,6 +9,7 @@ import { useAccount } from "wagmi";
 import { useIdeas } from "../hooks/useIdeas";
 import {usePolls} from "../hooks/usePolls";
 import { useSafePollContext } from "../app/polls/[id]/PollContext";
+import { useIPFS } from "../hooks/useIPFS";
 type LayoutItemBase = {
   id: string;
   title: string;
@@ -49,7 +50,8 @@ export function IdeaUploadForm({
   pollId?: string;
 }): React.ReactElement {
   const { address } = useAccount();
-  const { createIdea } = useIdeas();
+  const { createIdea, updateIdeaCID } = useIdeas();
+  // const { uploadFile, uploadMetadata } = useIPFS(); // Not using IPFS here anymore
   const pollContext = useSafePollContext();
   const pollId = propPollId ?? pollContext?.pollId;
   const {  addIdeaToPoll, selectedPollId } = usePolls();
@@ -57,6 +59,7 @@ export function IdeaUploadForm({
   const [logoFile, setLogoFile] = React.useState<File | null>(null);
   const [logoPreview, setLogoPreview] = React.useState<string | null>(null);
   const [logoCrop, setLogoCrop] = React.useState(100);
+  const [title, setTitle] = React.useState("");
   const [ageLimit, setAgeLimit] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [mainHero, setMainHero] = React.useState<File | null>(null);
@@ -93,6 +96,7 @@ export function IdeaUploadForm({
 
   const canAdvanceFromStepOne =
     Boolean(logoPreview) &&
+    Boolean(title.trim()) &&
     Boolean(ageLimit.trim()) &&
     descriptionWords > 0 &&
     descriptionWords < 200;
@@ -246,6 +250,18 @@ export function IdeaUploadForm({
     setIsPreviewOpen(false);
   }
 
+  async function uploadToLocal(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || "Upload failed");
+    return data.url;
+  }
+
   async function handleFinalSubmit() {
     if (!canSaveDraft) return;
     if (!pollId) {
@@ -253,37 +269,52 @@ export function IdeaUploadForm({
       return;
     }
 
-    const load = {
-      logo: logoFile?.name ?? "",
-      ageLimit,
-      description: description.trim(),
-      hero: mainHero?.name ?? "",
-      layout: layoutItems.map((item) =>
-        item.type === "text"
-          ? {
-              type: "text",
-              title: item.title,
-              content: item.content,
-            }
-          : {
-              type: "stack",
-              title: item.title,
-              frames: item.frames.map((frame) => frame.label),
-            }
-      ),
-    };
-    const payload = {
-    title: "Uchiha Clan Emblem",
-    description: description,
-    imgSrc: logoFile?.name ?? "",
-    creatorIdea:address ?? "",
-    }
-    const idea = await createIdea(payload);
-    
-    console.table(payload);
-    await addIdeaToPoll(pollId, idea._id);
-  
+    try {
+      // 1. Upload assets to Local Storage
+      let logoUrl = "";
+      if (logoFile) {
+        console.log("Uploading logo to Local...");
+        logoUrl = await uploadToLocal(logoFile);
+      }
 
+      let heroUrl = "";
+      if (mainHero) {
+        console.log("Uploading hero to Local...");
+        heroUrl = await uploadToLocal(mainHero);
+      }
+
+      // 2. Create Idea in DB with mapped fields
+      // Mapping:
+      // imgSrc -> Local URL
+      // imgsSrc[0] -> Local URL
+      // descriptionMore[0] -> Age Limit
+      // descriptionMore[1] -> Layout Items JSON
+      
+      const layoutJson = JSON.stringify(layoutItems);
+
+      const payload = {
+        title: title.trim(),
+        description: description.trim(),
+        imgSrc: logoUrl, 
+        imgsSrc: heroUrl ? [heroUrl] : [],
+        descriptionMore: [ageLimit, layoutJson],
+        creatorIdea: address ?? "",
+      };
+
+      console.log("Creating idea in DB with payload:", payload);
+      const idea = await createIdea(payload);
+      
+      if (idea?._id) {
+         await addIdeaToPoll(pollId, idea._id);
+         alert("Idea submitted successfully! Waiting for admin approval.");
+         // Reset form or redirect? 
+      }
+
+    } catch (err) {
+      console.error("Failed to submit idea flow:", err);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      alert(`Submission failed: ${message}`);
+    }
   }
 
   return (
@@ -413,6 +444,19 @@ export function IdeaUploadForm({
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
+              <label className="space-y-2 md:col-span-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.25em] text-black">
+                  Idea Title
+                </span>
+                <Input
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="Enter the name of your idea"
+                  className="border-black/30 text-black placeholder:text-black/30 focus-visible:border-black focus-visible:ring-black/50"
+                  maxLength={100}
+                />
+              </label>
+
               <label className="space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.25em] text-black">
                   Age limit

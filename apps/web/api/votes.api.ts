@@ -1,9 +1,15 @@
 import { api } from "./base";
 
 export type CreateVotePayload = {
+  voterId: string;
   pollId: string;
   selectedOption: number;
   voiceCredits: number;
+  voteCommitment: string;
+  message?: any;
+  encPubKey?: any;
+  maciContractAddress?: string;
+  userId?: string; 
 };
 
 /**

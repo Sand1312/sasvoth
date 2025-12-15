@@ -11,8 +11,8 @@ export function PollPageWrapper({
   searchParams?: { phase?: string };
 }) {
   return (
-    <PollProvider pollId={pollId}>
-      <PollClient pollId={pollId} searchParams={searchParams} />
+    <PollProvider>
+      <PollClient searchParams={searchParams} />
     </PollProvider>
   );
 }

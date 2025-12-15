@@ -93,7 +93,7 @@ export function useAuth() {
           localStorage.setItem("maci_pubKeyY", user.publicKeyY.toString());
 
           // Save to user profile
-          await saveStateIndex(user.walletAddress!, maciResult.stateIndex);
+          await saveStateIndex(user.walletAddress!, Number(maciResult.stateIndex));
         }
       } else {
         // Existing user - restore from data

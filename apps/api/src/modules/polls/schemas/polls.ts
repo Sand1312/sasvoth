@@ -40,6 +40,9 @@ export class Polls {
 
     // @Prop({required:false,type:String})
     // pollAddressOnchain: string;
+
+    @Prop({ required: false })
+    subgraphUrl: string;
 }
 
 export const PollsSchema = SchemaFactory.createForClass(Polls);

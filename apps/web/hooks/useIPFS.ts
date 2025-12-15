@@ -6,6 +6,7 @@ export const useIPFS = createApiHook(
   {
     uploadMetadata: ipfsApi.uploadMetadata,
     fetchMetadata: ipfsApi.fetchMetadata,
+    uploadFile: ipfsApi.uploadFile,
   },
   { includeRedirect: true }
 );

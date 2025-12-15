@@ -51,6 +51,9 @@ class ApproveIdeaDto {
 class UpdateChainDto {
   @ApiProperty()
   pollIdOnChain: number;
+
+  @ApiProperty({ required: false })
+  subgraphUrl?: string;
 }
 
 /**
@@ -71,10 +74,15 @@ class UpdateChainDto {
  * PATCH  /polls/:id/ideas/:ideaId/approve - Approve idea
  * PATCH  /polls/:id/chain    - Update on-chain ID
  */
+import { ResultsMetaService } from '../results-meta/results-meta.service';
+
 @Controller('polls')
 @ApiTags('Polls')
 export class PollsController {
-  constructor(private pollsService: PollsService) {}
+  constructor(
+    private pollsService: PollsService,
+    private resultsMetaService: ResultsMetaService,
+  ) {}
 
   // ========================================
   // RESTful Endpoints (New)
@@ -126,6 +134,38 @@ export class PollsController {
   }
 
   /**
+   * Get poll by option CID (idea CID in options[])
+   * GET /polls/by-option/:optionCid
+   */
+  @Get('by-option/:optionCid')
+  @ApiOperation({ summary: 'Get poll by option CID' })
+  @ApiParam({
+    name: 'optionCid',
+    type: String,
+    description: 'Idea CID in poll options',
+  })
+  @ApiResponse({ status: 200, description: 'Poll retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Poll not found' })
+  async getByOptionCid(
+    @Param('optionCid') optionCid: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const poll = await this.pollsService.getPollByOptionCid(optionCid);
+      if (!poll) {
+        return res
+          .status(404)
+          .json({ message: 'Poll not found for this option' });
+      }
+      return res.status(200).json({ poll });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Error fetching poll by option', error });
+    }
+  }
+
+  /**
    * Get a specific poll by ID
    * GET /polls/:id
    */
@@ -136,7 +176,74 @@ export class PollsController {
   async getById(@Param('id') id: string, @Res() res: Response) {
     try {
       const poll = await this.pollsService.getPollById(id);
-      return res.status(200).json({ poll });
+      if (!poll) {
+        return res.status(404).json({ message: 'Poll not found' });
+      }
+
+      let results: any[] = [];
+      try {
+        // IMPORTANT: Results are saved with the On-Chain Poll ID (e.g., "0"), not the Mongo ID
+        const onChainId = (poll as any).pollIdOnChain;
+        if (onChainId !== undefined && onChainId !== null) {
+          const resultsMeta =
+            await this.resultsMetaService.getOutComeByVotingEventId(
+              onChainId.toString(),
+            );
+          if (resultsMeta && resultsMeta.detailResult) {
+            const counts = resultsMeta.detailResult;
+            const total = counts.reduce(
+              (a: number, b: number) => a + (b || 0),
+              0,
+            );
+            const p = poll as any;
+
+            // Determine options list for mapping labels
+            const optionsList =
+              p.options && p.options.length
+                ? p.options
+                : p.approvedIdeaIds && p.approvedIdeaIds.length
+                  ? p.approvedIdeaIds
+                  : p.ideas || [];
+
+            // Map counts to result objects
+            results = counts.map((votes: number, index: number) => {
+              const opt = optionsList[index];
+              // If opt is object (Populated Idea), use title. If string (CID/ID), use it.
+              const label =
+                opt && typeof opt === 'object' && opt.title
+                  ? opt.title
+                  : typeof opt === 'string'
+                    ? `Option ${index + 1} (${opt.substring(0, 6)}...)`
+                    : `Option ${index + 1}`;
+
+              const rId =
+                opt && typeof opt === 'object' && opt._id
+                  ? opt._id
+                  : typeof opt === 'string'
+                    ? opt
+                    : index.toString();
+
+              return {
+                id: rId,
+                label: label,
+                votes: votes || 0,
+                percentage: total === 0 ? 0 : Math.round((votes / total) * 100),
+                author: 'Community',
+              };
+            });
+
+            // Sort by votes desc
+            results.sort((a, b) => b.votes - a.votes);
+          }
+        }
+      } catch (e) {
+        // Results not found or error, just return empty results
+      }
+
+      const pollObj = (poll as any).toObject ? (poll as any).toObject() : poll;
+      pollObj.results = results;
+
+      return res.status(200).json({ poll: pollObj });
     } catch (error) {
       return res.status(500).json({ message: 'Error fetching poll', error });
     }
@@ -279,11 +386,12 @@ export class PollsController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const { pollIdOnChain } = req.body;
+    const { pollIdOnChain, subgraphUrl } = req.body;
     try {
       const updatedPoll = await this.pollsService.savePollOnChainId(
         id,
         pollIdOnChain,
+        subgraphUrl,
       );
       return res.status(200).json({ poll: updatedPoll });
     } catch (error) {

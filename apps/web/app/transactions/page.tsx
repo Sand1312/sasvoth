@@ -3,12 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { useAccount } from "wagmi";
-import { useClaimContract, useToken, useUser } from "../../hooks";
-import { useGenProofVerify } from "../../hooks/genProofVerify";
-import { useResults } from "../../hooks";
-import { useJoinPoll } from "../../hooks";
-import { useVerifyVote } from "../../hooks";
-import { useRewards } from "../../hooks";
+import { useClaimContract, useToken, useUser, useAuth } from "../../hooks";
 
 type DepositHistory = {
   amount: number;
@@ -18,6 +13,7 @@ type DepositHistory = {
 
 export default function TransactionsPage() {
   const { address, isConnected } = useAccount();
+  const { user } = useAuth();
   const token = useToken();
   const claim = useClaimContract();
   const { deposit, getHistoryDeposit } = useUser();
@@ -30,21 +26,15 @@ export default function TransactionsPage() {
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState<number | "">("");
 
-  // Vote form
-  const [showVoteForm, setShowVoteForm] = useState(true);
-  const [privateKey, setPrivateKey] = useState("");
-  const [voteOptionId, setVoteOptionId] = useState<number | "">("");
-  const [voiceCredit, setVoiceCredit] = useState<number | "">("");
-  const [pollId, setPollId] = useState<number | "">("");
-  const [isVoting, setIsVoting] = useState(false);
   const [history, setHistory] = useState<DepositHistory[]>([]);
   const [reloadHistory, setReloadHistory] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
     const fetchHistory = async () => {
+      if (!user?._id) return;
       try {
-        const userId = "69268cf4f62b0d28cb5f614f";
+        const userId = user._id;
         const data = await getHistoryDeposit(userId);
         if (Array.isArray(data)) {
           
@@ -55,7 +45,7 @@ export default function TransactionsPage() {
       }
     };
     fetchHistory();
-  }, [reloadHistory]);
+  }, [reloadHistory, user]);
 
   const isDepositDisabled = Boolean(
     claim.isBuying || !depositAmount || Number(depositAmount) < 0.001
@@ -69,24 +59,21 @@ export default function TransactionsPage() {
   );
 
 
-  const isVoteDisabled = Boolean(
-    !isConnected ||
-    !privateKey ||
-    !voteOptionId ||
-    !voiceCredit ||
-    !pollId ||
-    isVoting
-  );
+
 
   const handleBuyToken = async () => {
     if (typeof depositAmount === "number" && depositAmount > 0) {
       const ethAmountString = depositAmount.toString();
-      const result = await claim.buyHD(ethAmountString);
-      console.log("Buy HD result:", result);
-      const userId = "69268cf4f62b0d28cb5f614f";
+      const txHash = await claim.buyHD(ethAmountString);
+      if (!txHash) return;
+      console.log("Buy HD result:", txHash);
+      const userId = user?._id;
+      if (!userId) {
+        alert("Vui lòng đăng nhập lại");
+        return;
+      }
 
       const amountToken = Number(depositAmount) * Number(claim.rate);
-      const txHash = "0xMockTxHash1234567890abcdef";
       await deposit(userId, amountToken, txHash);
       setDepositAmount("");
       alert(`Đang mua token với ${depositAmount} ETH...`);
@@ -102,10 +89,14 @@ export default function TransactionsPage() {
       await token.approve(claim.contractAddress, tokenAmountString);
 
       setTimeout(async () => {
-      await claim.sellHD(tokenAmountString);
+      const txHash = await claim.sellHD(tokenAmountString);
+      if (!txHash) return;
       setWithdrawAmount("");
-      const userId = "69268cf4f62b0d28cb5f614f";
-      const txHash = "0xMockWithdrawTxHashabcdef1234567890";
+      const userId = user?._id;
+      if (!userId) {
+        alert("Vui lòng đăng nhập lại");
+        return;
+      }
       const amountToken = Number(withdrawAmount) - Number(withdrawAmount) *2;
         await deposit(userId, amountToken, txHash);
 
@@ -124,82 +115,7 @@ export default function TransactionsPage() {
   };
 
 
-  const { generateVoteProof, verifyProof, loading: proofLoading, status: proofStatus } = useGenProofVerify();
-  const { getResults } = useResults();
-  const { get } = useJoinPoll();
-  const { verifyVote } = useVerifyVote();
-  const { getReward, saveReward } = useRewards();
 
-
-  const handleSubmitVote = async () => {
-    const poll = "6926cc063d59305182bfdb58"; //id poll từ backend
-    const voterId = "6926b204727a41b3c53aafa1";//user._id
-    const result = await getResults(poll);
-    const votes = await get({ pollId: poll, voterId });
-    const voterIndex = 1; //user.voterIndex
-    console.log("Fetched results:", result.outCome);
-    console.log("Fetched votes:", votes.voteCommitment);
-    if (isVoteDisabled) return;
-
-    setIsVoting(true);
-    const input = {
-      privateKey: BigInt(privateKey),
-      vote: BigInt(voteOptionId),
-      voiceCredits: BigInt(voiceCredit),
-      nonce: BigInt(1),
-      pollId: BigInt(pollId),
-      pubkeyX: BigInt("0x6926cc063d59305182bfdb58"),// user.pubkeyX,
-      pubkeyY: BigInt("0x6926cc063d59305182bfdb58"),// user.pubkeyY,
-      voiceCreditBalance: BigInt(voiceCredit),
-
-      // Public inputs (will be in publicSignals)
-      voterIndex: BigInt(voterIndex),// user.voterIndex,
-      voteCommitment: BigInt(votes.voteCommitment),
-      outcome: BigInt(result.outCome),
-
-    }
-
-    const proofData = await generateVoteProof(input);
-
-    const isValid = await verifyProof(proofData.proof, proofData.publicSignals);
-    console.log("Proof validity:", proofData);
-    if (isValid) {
-      const proof = convertProofToSolidityFormat(proofData.proof);
-      await verifyVote(BigInt(pollId), BigInt(voterIndex), proof, proofData.publicSignals);
-
-      await saveReward(voterId, poll, (Number(voiceCredit) * 1000));
-    }
-
-    // fake delay cho đẹp UI
-    setTimeout(() => {
-      alert(
-        `Đã submit vote:\n- Poll #${pollId}\n- Option: ${voteOptionId}\n- Voice credits: ${voiceCredit}`
-      );
-      setIsVoting(false);
-    }, 1200);
-  };
-
-  function convertProofToSolidityFormat(proof: {
-    pi_a: string[];
-    pi_b: string[][];
-    pi_c: string[];
-  }): [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint] {
-    const proofArray: [bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint] = [
-
-      BigInt(proof.pi_a[0]!),
-      BigInt(proof.pi_a[1]!),
-
-      BigInt(proof.pi_b[0]![0]!),
-      BigInt(proof.pi_b[0]![1]!),
-      BigInt(proof.pi_b[1]![0]!),
-      BigInt(proof.pi_b[1]![1]!),
-
-      BigInt(proof.pi_c[0]!),
-      BigInt(proof.pi_c[1]!)
-    ];
-
-    return proofArray;
-  }
 
   if (!isClient) {
     return (
@@ -231,7 +147,7 @@ export default function TransactionsPage() {
         </header>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* LEFT COLUMN */}
+          {/* LEFT COLUMN: Deposit & Withdraw */}
           <section className="space-y-6">
             {/* HD Deposit */}
             <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
@@ -388,8 +304,11 @@ export default function TransactionsPage() {
                 </div>
               )}
             </div>
+          </section>
 
-            {/* Wallet info */}
+          {/* RIGHT COLUMN: Wallet Info & History */}
+          <section className="space-y-6">
+            {/* Wallet Info (Moved Here) */}
             {isConnected && (
               <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm text-blue-800">
                 <div className="mb-2 text-base font-semibold text-blue-900">
@@ -398,170 +317,39 @@ export default function TransactionsPage() {
                 <p>
                   Địa chỉ: {address?.slice(0, 8)}...{address?.slice(-6)}
                 </p>
-                <p>
-                  Số dư {token.symbol}: {token.balance}
-                </p>
-
-                {token.name && <p>Token: {token.name}</p>}
-                <p className="text-xs text-blue-700">
-                  Allowance:{" "}
-                  {token.allowance ? token.allowance.toString() : "0"}{" "}
-                  {token.symbol}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                   <p className="font-bold text-lg">
+                      Số dư: {token.balance} {token.symbol}
+                   </p>
+                </div>
+                {token.name && <p className="text-xs mt-1 text-blue-600">Token: {token.name}</p>}
               </div>
             )}
-          </section>
-          {/* VOTE FORM */}
-          <div className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">Vote Form</h2>
-                <p className="mt-1 text-xs text-gray-500">
-                  Demo form để submit vote bằng voice credits.
-                </p>
+
+            {/* History */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-gray-900">Transaction History</h2>
+              <div className="max-h-[500px] overflow-y-auto space-y-2 pr-1">
+                  {history.length === 0 ? (
+                    <p className="text-sm text-gray-500">No transactions found.</p>
+                  ) : (
+                    [...history].reverse().map((item, index) => (
+                      <div
+                        key={index}
+                        className="rounded-xl border border-black/5 bg-white px-4 py-3 shadow-sm flex justify-between items-center"
+                      >
+                          <div className="text-sm font-semibold text-gray-900">
+                           {item.amount > 0 ? "+" : ""}{item.amount} HD
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(item.timestamp).toLocaleDateString()} {new Date(item.timestamp).toLocaleTimeString()}
+                          </div>
+                      </div>
+                    ))
+                  )}
               </div>
-              <Button
-                variant="ghost"
-                className="text-xs"
-                onClick={() => setShowVoteForm((prev) => !prev)}
-              >
-                {showVoteForm ? "Hide" : "Show"}
-              </Button>
             </div>
-
-            {showVoteForm && (
-              <div className="space-y-4">
-                <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-[11px] text-red-700">
-                  ⚠️ <strong>Cảnh báo bảo mật:</strong> Đây chỉ là form demo.
-                  Trong thực tế, không nên nhập private key trực tiếp vào
-                  website.
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Private Key
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="Nhập private key..."
-                    value={privateKey}
-                    onChange={(e) => setPrivateKey(e.target.value)}
-                    className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-
-                <div className="grid gap-3 md:grid-cols-3">
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Vote Option ID
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="1"
-                      value={voteOptionId}
-                      onChange={(e) =>
-                        setVoteOptionId(
-                          e.target.value ? Number(e.target.value) : ""
-                        )
-                      }
-                      className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Voice Credit
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="10"
-                      value={voiceCredit}
-                      onChange={(e) =>
-                        setVoiceCredit(
-                          e.target.value ? Number(e.target.value) : ""
-                        )
-                      }
-                      className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Poll ID
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="7"
-                      value={pollId}
-                      onChange={(e) =>
-                        setPollId(
-                          e.target.value ? Number(e.target.value) : ""
-                        )
-                      }
-                      className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                </div>
-
-                {voteOptionId && voiceCredit && pollId && (
-                  <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-800">
-                    <p className="font-semibold">Tóm tắt vote:</p>
-                    <p className="mt-1">
-                      • Poll: <strong>#{pollId}</strong>
-                    </p>
-                    <p>
-                      • Option: <strong>{voteOptionId}</strong>
-                    </p>
-                    <p>
-                      • Voice credits: <strong>{voiceCredit}</strong>
-                    </p>
-                  </div>
-                )}
-
-                {!isConnected && (
-                  <p className="text-xs text-red-500">
-                    Vui lòng kết nối ví trước khi vote.
-                  </p>
-                )}
-
-                <Button
-                  onClick={handleSubmitVote}
-                  disabled={isVoteDisabled}
-                  className="w-full bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isVoting
-                    ? "Đang submit vote..."
-                    : "Submit Vote với Voice Credits"}
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* History */}
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-gray-900">Transaction History</h2>
-            {history.length === 0 ? (
-              <p className="text-sm text-gray-500">No transactions found.</p>
-            ) : (
-              [...history].reverse().map((item, index) => (
-                <div
-                  key={index}
-                  className="rounded-2xl border border-black/5 bg-white px-5 py-4 shadow-sm"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm font-semibold text-gray-900">
-                     {item.amount} HD
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(item.timestamp).toLocaleDateString()}
-                    </div>
-                  </div>
-                 
-                </div>
-              ))
-            )}
-          </div>
-
+          </section>
         </div>
       </div>
     </div>

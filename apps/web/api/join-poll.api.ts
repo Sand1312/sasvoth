@@ -5,6 +5,8 @@ export type JoinPollPayload = {
   pollId: string;
   voteCommitment: string;
   pollIdOnchain: number;
+  pubKey?: { x: string; y: string };
+  maciContractAddress?: string;
 };
 
 export type VoteCommitmentPayload = {
@@ -16,14 +18,6 @@ export type VoteCommitmentPayload = {
 
 /**
  * Poll Participants API - RESTful Resource-Oriented
- *
- * Resource: /polls/:pollId/participants (poll participants/joiners)
- * Sub-resource: /vote-commitments (vote commitment generation)
- *
- * GET    /polls/:pollId/participants           - List participants
- * POST   /polls/:pollId/participants           - Join a poll
- * GET    /polls/:pollId/participants/:voterId  - Check if user joined
- * POST   /vote-commitments                     - Generate vote commitment
  */
 export const pollParticipantsApi = {
   /**
@@ -38,13 +32,16 @@ export const pollParticipantsApi = {
 
   /**
    * Join a poll (create participant)
-   * POST /polls/:pollId/participants
+   * POST /join-poll/join
    */
   create: async (payload: JoinPollPayload) => {
-    const response = await api.post(`/polls/${payload.pollId}/participants`, {
+    const response = await api.post(`/join-poll/join`, {
       voterId: payload.voterId,
-      voteCommitment: payload.voteCommitment,
+      pollId: payload.pollId, 
+      maciContractAddress: payload.maciContractAddress,
+      pubKey: payload.pubKey,
       pollIdOnchain: payload.pollIdOnchain,
+      voteCommitment: payload.voteCommitment,
     });
     return response.data;
   },

@@ -1,11 +1,14 @@
 import PollClient from "./PollClient";
 import { PollProvider } from "./PollContext";
 type PollPageProps = {
-  params: { pollId?: string; id?: string };
-  searchParams?: { phase?: string };
+  params: Promise<{ pollId?: string; id?: string }>;
+  searchParams: Promise<{ phase?: string }>;
 };
 
-export default function PollPage({ searchParams }: PollPageProps) {
+export default async function PollPage(props: PollPageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
   return (
     <PollProvider>
       <PollClient searchParams={searchParams} />

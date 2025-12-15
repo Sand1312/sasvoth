@@ -5,10 +5,10 @@ import { parseEther } from 'viem';
 interface UseClaimContractReturn {
   allowToClaim: boolean | undefined;
   rate: bigint | undefined;
-  buyHD: (ethAmount: string) => void;
-  sellHD: (amount: string) => void;
-  buyVoiceCredits: (credits: string) => void;
-  claimReward: (_idClaim: string, rewardAmount: string, _v: number, _r: string, _s: string) => void;
+  buyHD: (ethAmount: string) => Promise<`0x${string}` | undefined>;
+  sellHD: (amount: string) => Promise<`0x${string}` | undefined>;
+  buyVoiceCredits: (credits: string) => Promise<`0x${string}` | undefined>;
+  claimReward: (_idClaim: string, rewardAmount: string, _v: number, _r: string, _s: string) => Promise<`0x${string}` | undefined>;
   isBuying: boolean;
   isSelling: boolean;
   isBuyingCredits: boolean;
@@ -35,14 +35,14 @@ export const useClaimContract = (): UseClaimContractReturn => {
   });
 
   // Buy HD token with ETH
-  const { writeContract: buyHD, isPending: isBuying } = useContractWrite();
+  const { writeContractAsync: buyHDAsync, isPending: isBuying } = useContractWrite();
 
-  const handleBuyHD = (ethAmount: string): void => {
+  const handleBuyHD = async (ethAmount: string): Promise<`0x${string}` | undefined> => {
     if (!ethAmount || Number(ethAmount) <= 0) {
       console.error("ETH amount must be greater than 0");
       return;
     }
-    buyHD({
+    return await buyHDAsync({
       address: CLAIM_CONTRACT_ADDRESS as `0x${string}`,
       abi: CLAIMING_ABI,
       functionName: 'buy_HD',
@@ -51,16 +51,16 @@ export const useClaimContract = (): UseClaimContractReturn => {
   };
 
   // Sell HD token for ETH
-  const { writeContract: sellHD, isPending: isSelling } = useContractWrite();
+  const { writeContractAsync: sellHDAsync, isPending: isSelling } = useContractWrite();
 
-  const handleSellHD = (amount: string): void => {
+  const handleSellHD = async (amount: string): Promise<`0x${string}` | undefined> => {
     if (!amount || Number(amount) <= 0) {
       console.error("Token amount must be greater than 0");
       return;
     }
 
     const tokenAmount = parseEther(amount);
-    sellHD({
+    return await sellHDAsync({
       address: CLAIM_CONTRACT_ADDRESS as `0x${string}`,
       abi: CLAIMING_ABI,
       functionName: 'sell_HD',
@@ -69,16 +69,16 @@ export const useClaimContract = (): UseClaimContractReturn => {
   };
 
   // Buy Voice Credits
-  const { writeContract: buyVoiceCredits, isPending: isBuyingCredits } = useContractWrite();
+  const { writeContractAsync: buyVoiceCreditsAsync, isPending: isBuyingCredits } = useContractWrite();
 
-  const handleBuyVoiceCredits = (credits: string): void => {
+  const handleBuyVoiceCredits = async (credits: string): Promise<`0x${string}` | undefined> => {
     if (!credits || Number(credits) <= 0) {
       console.error("Credits amount must be greater than 0");
       return;
     }
 
     const amount = parseEther(credits);
-    buyVoiceCredits({
+    return await buyVoiceCreditsAsync({
       address: CLAIM_CONTRACT_ADDRESS as `0x${string}`,
       abi: CLAIMING_ABI,
       functionName: 'buyVoiceCredits',
@@ -87,15 +87,15 @@ export const useClaimContract = (): UseClaimContractReturn => {
   };
 
   // Claim Reward
-  const { writeContract: claimReward, isPending: isClaiming } = useContractWrite();
+  const { writeContractAsync: claimRewardAsync, isPending: isClaiming } = useContractWrite();
 
-  const handleClaimReward = (_idClaim: string, rewardAmount: string, _v: number, _r: string, _s: string): void => {
+  const handleClaimReward = async (_idClaim: string, rewardAmount: string, _v: number, _r: string, _s: string): Promise<`0x${string}` | undefined> => {
     if (!rewardAmount || Number(rewardAmount) <= 0) {
       console.error("Reward amount must be greater than 0");
       return;
     }
 
-    claimReward({
+    return await claimRewardAsync({
       address: CLAIM_CONTRACT_ADDRESS as `0x${string}`,
       abi: CLAIMING_ABI,
       functionName: 'ClaimReward',

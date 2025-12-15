@@ -55,9 +55,27 @@ export class PollsService {
   async savePollOnChainId(
     pollId: string,
     pollIdOnChain: number,
+    subgraphUrl?: string,
+  ): Promise<PollsDocument | null> {
+    const update: any = { pollIdOnChain };
+    if (subgraphUrl) {
+      update.subgraphUrl = subgraphUrl;
+    }
+    return this.pollsModel
+      .findByIdAndUpdate(pollId, update, { new: true })
+      .exec();
+  }
+
+  async updateStatusByOnChainId(
+    pollIdOnChain: number,
+    status: string,
   ): Promise<PollsDocument | null> {
     return this.pollsModel
-      .findByIdAndUpdate(pollId, { pollIdOnChain }, { new: true })
+      .findOneAndUpdate(
+        { pollIdOnChain: pollIdOnChain },
+        { status },
+        { new: true },
+      )
       .exec();
   }
 
@@ -69,6 +87,13 @@ export class PollsService {
 
   async getAll(): Promise<PollsDocument[]> {
     return this.pollsModel.find().exec();
+  }
+
+  /**
+   * Find poll that contains the given CID in options[]
+   */
+  async getPollByOptionCid(optionCid: string): Promise<PollsDocument | null> {
+    return this.pollsModel.findOne({ options: optionCid }).exec();
   }
 
   /**

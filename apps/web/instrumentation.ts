@@ -11,7 +11,7 @@ export async function register() {
     return;
   }
 
-  const { server } = await import("./mocks/server");
-  server.listen({ onUnhandledRequest: "bypass" });
+  // const { server } = await import("./mocks/server");
+  // server.listen({ onUnhandledRequest: "bypass" });
   globalThis.__MSW_SERVER_STARTED__ = true;
 }

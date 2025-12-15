@@ -8,7 +8,7 @@ const apiBase =
 
 const METHODS_WITH_BODY = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
-type RouteContext = { params: { path?: string[] } };
+type RouteContext = { params: Promise<{ path?: string[] }> };
 
 async function proxyRequest(
   req: Request,
@@ -16,7 +16,8 @@ async function proxyRequest(
   context: RouteContext
 ) {
   try {
-    const segments = context.params.path ?? [];
+    const params = await context.params;
+    const segments = params.path ?? [];
     const targetPath = `/api/v1/${segments.join("/")}`;
 
     const incomingUrl = new URL(req.url);

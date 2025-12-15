@@ -76,6 +76,15 @@ export const pollsApi = {
   },
 
   /**
+   * Get poll by option CID (idea CID in options[])
+   * GET /polls/by-option/:optionCid
+   */
+  getByOptionCid: async (optionCid: string) => {
+    const response = await api.get(`/polls/by-option/${optionCid}`);
+    return response.data?.poll ?? response.data;
+  },
+
+  /**
    * Update a poll
    * PATCH /polls/:id
    */
@@ -129,9 +138,10 @@ export const pollsApi = {
    * Update on-chain ID
    * PATCH /polls/:id/chain
    */
-  updateChainId: async (id: string, chainId: string) => {
+  updateChainId: async (id: string, chainId: string, subgraphUrl?: string) => {
     const response = await api.patch(`/polls/${id}/chain`, {
       pollIdOnChain: chainId,
+      subgraphUrl,
     });
     return response.data?.poll ?? response.data;
   },
@@ -168,6 +178,9 @@ export const pollsApi = {
   approveIdeaInPoll: async (pollId: string, ideaId: string, ideaCid: string) =>
     pollsApi.approveIdea(pollId, ideaId, ideaCid),
   /** @deprecated Use updateChainId instead */
-  saveOnChainId: async (pollId: string, pollIdOnChain: string) =>
-    pollsApi.updateChainId(pollId, pollIdOnChain),
+  saveOnChainId: async (
+    pollId: string,
+    pollIdOnChain: string,
+    subgraphUrl?: string
+  ) => pollsApi.updateChainId(pollId, pollIdOnChain, subgraphUrl),
 };

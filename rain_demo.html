@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Performance Rain with PixiJS & GSAP</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #050505; /* Dark night background */
+            font-family: sans-serif;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; /* Behind the obstacle if we want, or in front? Usually rain is everywhere. Let's put it behind for depth or make z-index manageable. */
+            pointer-events: none;
+        }
+
+        .obstacle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 100px;
+            background: linear-gradient(135deg, #444, #222);
+            border: 1px solid #666;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            z-index: 2; /* Above canvas so rain falls "on" it */
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-weight: bold;
+            letter-spacing: 1px;
+            user-select: none;
+        }
+    </style>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- PixiJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+</head>
+<body>
+
+    <div class="obstacle">OBSTACLE</div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const CONFIG = {
+            dropCountPerFrame: 5, // Increase for heavier rain
+            gravity: 20, // Speed factor
+            wind: 0, // Optional: x-axis movement
+            color: 0xaaccff,
+            splashColor: 0xffffff
+        };
+
+        // --- SETUP PIXI APP ---
+        const app = new PIXI.Application({
+            width: window.innerWidth,
+            height: window.innerHeight,
+            backgroundAlpha: 0, // Transparent to see CSS background
+            antialias: true,
+            resolution: window.devicePixelRatio || 1,
+            autoDensity: true
+        });
+        document.body.appendChild(app.view);
+
+        // Container for drops
+        const rainContainer = new PIXI.Container();
+        app.stage.addChild(rainContainer);
+
+        // --- GENERATE TEXTURES (PERFORMANCE) ---
+        // 1. Raindrop Texture
+        const dropGraphics = new PIXI.Graphics();
+        dropGraphics.beginFill(CONFIG.color);
+        dropGraphics.drawRect(0, 0, 2, 15); // Thin, long drop
+        dropGraphics.endFill();
+        const dropTexture = app.renderer.generateTexture(dropGraphics);
+
+        // 2. Splash Texture (Simple circle for now, could be improved)
+        const splashGraphics = new PIXI.Graphics();
+        splashGraphics.beginFill(CONFIG.splashColor, 0.6);
+        splashGraphics.drawCircle(0, 0, 3);
+        splashGraphics.endFill();
+        const splashTexture = app.renderer.generateTexture(splashGraphics);
+
+        // --- OBSTACLE TRACKING ---
+        let obstacleBounds = { left: 0, right: 0, top: 0, width: 0 };
+        const obstacleEl = document.querySelector('.obstacle');
+
+        function updateObstacleBounds() {
+            const rect = obstacleEl.getBoundingClientRect();
+            // Store simple bounds for fast access
+            obstacleBounds = {
+                left: rect.left,
+                right: rect.right,
+                top: rect.top,
+                width: rect.width,
+                height: rect.height
+            };
+        }
+        updateObstacleBounds(); // Initial check
+
+        // --- SPAWN LOGIC ---
+
+        function spawnDrop() {
+            const drop = new PIXI.Sprite(dropTexture);
+            
+            // Randomize start position
+            const startX = Math.random() * app.screen.width;
+            const startY = -50 - (Math.random() * 100); // Start above screen
+            
+            drop.x = startX;
+            drop.y = startY;
+            drop.alpha = 0.3 + Math.random() * 0.5; // Variance in opacity
+            drop.scale.y = 0.8 + Math.random() * 0.5; // Variance in length
+
+            rainContainer.addChild(drop);
+
+            // --- PRE-CALCULATED COLLISION (CRUCIAL) ---
+            // Determine End Y based on X position
+            let endY = app.screen.height;
+            let hitsObstacle = false;
+
+            // Check if X is within obstacle horizontal bounds
+            if (startX >= obstacleBounds.left && startX <= obstacleBounds.right) {
+                // It will hit the obstacle
+                endY = obstacleBounds.top;
+                hitsObstacle = true;
+            }
+
+            // Calculate duration based on distance and random speed variance
+            const distance = endY - startY;
+            const speed = (1000 + Math.random() * 500); // pixels per second (approx)
+            const duration = distance / speed;
+
+            // --- GSAP ANIMATION ---
+            gsap.to(drop, {
+                y: endY,
+                duration: duration,
+                ease: "none", // Linear fall
+                onComplete: () => {
+                    // Spawn splash at impact point
+                    spawnSplash(drop.x, endY, hitsObstacle);
+                    
+                    // Cleanup
+                    drop.destroy(); 
+                }
+            });
+        }
+
+        function spawnSplash(x, y, isObstacle) {
+            // Create a few particles for the splash
+            const particleCount = isObstacle ? 5 : 2; // More splash on obstacle
+            
+            for (let i = 0; i < particleCount; i++) {
+                const splash = new PIXI.Sprite(splashTexture);
+                splash.x = x;
+                splash.y = y;
+                splash.alpha = 0.8;
+                
+                rainContainer.addChild(splash);
+
+                // Randomize splash direction (upwards mostly)
+                const angle = (Math.PI) + (Math.random() * Math.PI); // Arc upwards
+                const velocity = 10 + Math.random() * 20;
+                const destX = x + Math.cos(angle) * velocity;
+                const destY = y + Math.sin(angle) * velocity * 0.5; // Flattened y
+
+                gsap.to(splash, {
+                    x: destX,
+                    y: destY,
+                    alpha: 0,
+                    scale: 0.1,
+                    duration: 0.2 + Math.random() * 0.2,
+                    onComplete: () => splash.destroy()
+                });
+            }
+        }
+
+        // --- TICKER ---
+        // Spawn multiple drops per frame for density
+        app.ticker.add(() => {
+            for (let i = 0; i < CONFIG.dropCountPerFrame; i++) {
+                spawnDrop();
+            }
+        });
+
+        // --- RESIZE HANDLING ---
+        window.addEventListener('resize', () => {
+            app.renderer.resize(window.innerWidth, window.innerHeight);
+            updateObstacleBounds();
+        });
+
+    </script>
+</body>
+</html>

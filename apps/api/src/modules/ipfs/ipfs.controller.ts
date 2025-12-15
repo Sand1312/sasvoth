@@ -33,7 +33,6 @@ export class IpfsController {
   @Get(':cid')
   async fetch(@Param('cid') cid: string, @Res() res: Response) {
     const data = await this.ipfsService.getFile(cid);
-    res.setHeader('Content-Type', 'application/octet-stream');
     res.send(data);
   }
 }

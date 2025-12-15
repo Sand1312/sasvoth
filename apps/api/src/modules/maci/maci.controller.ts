@@ -1,5 +1,5 @@
 // src/maci/maci.controller.ts
-import { Controller, Post, Get, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Query } from '@nestjs/common';
 import { MaciService } from './maci.service';
 import {
   ApiBearerAuth,
@@ -22,6 +22,59 @@ class DeployPollDto {
   voteOptions?: number;
 }
 
+class SignupDto {
+  @ApiProperty()
+  pubKey: { x: string; y: string };
+
+  @ApiProperty({ required: false })
+  maciAddress?: string;
+}
+
+class MaciSignupDto {
+  @ApiProperty({ description: "MACI Public Key string (macipk...)" })
+  maciPubKey: string;
+
+  @ApiProperty({ required: false })
+  maciAddress?: string;
+
+  @ApiProperty({ required: false })
+  sgData?: string;
+}
+
+class JoinPollDto {
+  @ApiProperty({ description: "User MACI Private Key" })
+  maciPrivateKey: string;
+
+  @ApiProperty({ required: false })
+  maciAddress?: string;
+
+  @ApiProperty({ required: false })
+  startBlock?: number;
+}
+
+class VoteDto {
+  @ApiProperty()
+  voteOptionIndex: number;
+
+  @ApiProperty()
+  voteWeight: number;
+
+  @ApiProperty()
+  nonce: number;
+
+  @ApiProperty()
+  userStateIndex: string;
+
+  @ApiProperty()
+  userMaciPrivateKey: string;
+
+  @ApiProperty()
+  userMaciPublicKey: string;
+
+  @ApiProperty({ required: false })
+  maciAddress?: string;
+}
+
 /**
  * MACI Controller - RESTful Resource-Oriented
  *
@@ -30,6 +83,7 @@ class DeployPollDto {
  * Sub-resource: /maci/polls/:id/merge
  * Sub-resource: /maci/polls/:id/proofs
  *
+ * POST   /maci/signup                   - Signup to MACI
  * POST   /maci/polls                    - Deploy a new poll
  * GET    /maci/polls/:id/contracts      - Get poll contracts
  * POST   /maci/polls/:id/merge          - Merge poll state
@@ -47,6 +101,67 @@ export class MaciController {
   // RESTful Endpoints (New)
   // ========================================
 
+
+
+  /**
+   * Signup to MACI (Relayer)
+   * POST /maci/signup
+   */
+  @Post('signup')
+  @ApiOperation({ summary: 'Signup to MACI (Relayed)' })
+  @ApiBody({ type: MaciSignupDto })
+  @ApiResponse({ status: 201, description: 'Signed up successfully' })
+  async signup(@Body() body: MaciSignupDto) {
+    return this.maciService.signup(body.maciPubKey, body.maciAddress, body.sgData);
+  }
+
+  /**
+   * Join Poll (Relayed)
+   * POST /maci/polls/:id/join
+   */
+  @Post('polls/:id/join')
+  @ApiOperation({ summary: 'Join Poll (Relayed)' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiBody({ type: JoinPollDto })
+  @ApiResponse({ status: 201, description: 'Joined poll successfully' })
+  async joinPoll(@Param('id') id: string, @Body() body: JoinPollDto) {
+    return this.maciService.joinPoll(id, body.maciPrivateKey, body.maciAddress, body.startBlock);
+  }
+
+  /**
+   * Vote (Relayed)
+   * POST /maci/polls/:id/vote
+   */
+  @Post('polls/:id/vote')
+  @ApiOperation({ summary: 'Vote (Relayed)' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiBody({ type: VoteDto })
+  @ApiResponse({ status: 201, description: 'Vote submitted successfully' })
+  async vote(@Param('id') id: string, @Body() body: VoteDto) {
+    return this.maciService.vote(
+      id, 
+      body.voteOptionIndex, 
+      body.voteWeight, 
+      body.nonce, 
+      body.userStateIndex, 
+      body.userMaciPrivateKey, 
+      body.userMaciPublicKey, 
+      body.maciAddress
+    );
+  }
+
+
+  /**
+   * Deploy MACI Contract
+   * POST /maci/deploy
+   */
+  @Post('deploy')
+  @ApiOperation({ summary: 'Deploy new MACI Contract' })
+  @ApiResponse({ status: 201, description: 'MACI contract deployed' })
+  async deployMaci(@Body() body: any) {
+    return this.maciService.deployMaci(body);
+  }
+
   /**
    * Deploy a new MACI poll
    * POST /maci/polls
@@ -55,7 +170,7 @@ export class MaciController {
   @ApiOperation({ summary: 'Deploy a new MACI poll' })
   @ApiBody({ type: DeployPollDto })
   @ApiResponse({ status: 201, description: 'Poll deployed successfully' })
-  async createPoll(@Body() body: DeployPollDto) {
+  async createPoll(@Body() body: any) {
     return this.maciService.deployPoll(body);
   }
 
@@ -67,8 +182,8 @@ export class MaciController {
   @ApiOperation({ summary: 'Get poll contracts' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, description: 'Contracts retrieved successfully' })
-  async getContracts(@Param('id') id: string) {
-    return this.maciService.getPollContracts(id);
+  async getContracts(@Param('id') id: string, @Query('maciAddress') maciAddress?: string) {
+    return this.maciService.getPollContracts(id, maciAddress);
   }
 
   /**
@@ -79,8 +194,8 @@ export class MaciController {
   @ApiOperation({ summary: 'Merge poll state' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, description: 'Poll merged successfully' })
-  async merge(@Param('id') id: string) {
-    return this.maciService.mergePoll(id);
+  async merge(@Param('id') id: string, @Body() body: { maciAddress?: string }) {
+    return this.maciService.mergePoll(id, body?.maciAddress);
   }
 
   /**
@@ -103,8 +218,8 @@ export class MaciController {
   @ApiOperation({ summary: 'Generate proofs' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, description: 'Proofs generated successfully' })
-  async generateProofs(@Param('id') id: string) {
-    return this.maciService.generateProofs(id);
+  async generateProofs(@Param('id') id: string, @Body() body: { maciAddress?: string; startBlock?: number }) {
+    return this.maciService.generateProofs(id, body?.maciAddress, body?.startBlock);
   }
 
   /**
@@ -115,8 +230,8 @@ export class MaciController {
   @ApiOperation({ summary: 'Submit proofs' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, description: 'Proofs submitted successfully' })
-  async submitProofs(@Param('id') id: string) {
-    return this.maciService.submitProofs(id);
+  async submitProofs(@Param('id') id: string, @Body() body: { maciAddress?: string }) {
+    return this.maciService.submitProofs(id, body?.maciAddress);
   }
 
   // ========================================
@@ -134,7 +249,7 @@ export class MaciController {
   @Post('merge/:pollId')
   @ApiOperation({ summary: '[Deprecated] Merge poll' })
   async mergePoll(@Param('pollId') pollId: string) {
-    return this.merge(pollId);
+    return this.merge(pollId, {});
   }
 
   /** @deprecated Use POST /maci/polls/:id/merge/direct instead */
@@ -148,14 +263,14 @@ export class MaciController {
   @Post('generate-proofs/:pollId')
   @ApiOperation({ summary: '[Deprecated] Generate proofs' })
   async generateProofsLegacy(@Param('pollId') pollId: string) {
-    return this.generateProofs(pollId);
+    return this.generateProofs(pollId, {});
   }
 
   /** @deprecated Use POST /maci/polls/:id/proofs/submit instead */
   @Post('submit-proofs/:pollId')
   @ApiOperation({ summary: '[Deprecated] Submit proofs' })
   async submitProofsLegacy(@Param('pollId') pollId: string) {
-    return this.submitProofs(pollId);
+    return this.submitProofs(pollId, {});
   }
 
   /** @deprecated Use GET /maci/polls/:id/contracts instead */
