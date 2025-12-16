@@ -65,7 +65,7 @@ const rewardTargets = {
   list: buildTargets("/v1/rewards"),
 };
 
-const ok = <T>(data: T, status = 200) => HttpResponse.json(data, { status });
+const ok = <T>(data: T, status = 200) => HttpResponse.json(data as any, { status });
 
 const notFound = (message: string) =>
   HttpResponse.json({ message }, { status: 404 });
@@ -89,7 +89,7 @@ export const v1Handlers = [
         pollData?: Partial<(typeof db.ideas)[number]>;
         idea?: Partial<(typeof db.ideas)[number]>;
       }>(request);
-      const payload = body.pollData ?? body.idea;
+      const payload = (body.pollData ?? body.idea) as any;
       if (!payload?.title) {
         return invalid("title is required");
       }
@@ -155,7 +155,7 @@ export const v1Handlers = [
       const body = await ensureBody<{
         pollData?: Partial<(typeof db.polls)[number]>;
       }>(request);
-      const payload = body.pollData ?? body;
+      const payload = (body.pollData ?? body) as any;
       if (!payload.title || !payload.status) {
         return invalid("title and status are required");
       }
@@ -220,7 +220,7 @@ export const v1Handlers = [
       );
       const poll = db.polls.find(
         (item) => item.id === (params.pollId || body.pollId)
-      );
+      ) as any;
       if (!poll) return notFound("Poll not found");
       if (!body.ideaId) return invalid("ideaId is required");
       if (!poll.ideaIds.includes(body.ideaId)) {
@@ -236,7 +236,7 @@ export const v1Handlers = [
       );
       const poll = db.polls.find(
         (item) => item.id === (params.pollId || body.pollId)
-      );
+      ) as any;
       if (!poll) return notFound("Poll not found");
       if (!body.ideaId) return invalid("ideaId is required");
       if (!poll.approvedIdeaIds.includes(body.ideaId)) {
@@ -280,7 +280,7 @@ export const v1Handlers = [
       const body = await ensureBody<{
         voteData?: Partial<(typeof db.votes)[number]>;
       }>(request);
-      const payload = body.voteData ?? body;
+      const payload = (body.voteData ?? body) as any;
       if (!payload.pollId || !payload.userId || !payload.selectedOption) {
         return invalid("pollId, userId, and selectedOption are required");
       }

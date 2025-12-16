@@ -1,0 +1,116 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { create, IPFSHTTPClient } from 'ipfs-http-client';
+
+@Injectable()
+export class IpfsService {
+  private readonly logger = new Logger(IpfsService.name);
+  private readonly ipfs?: IPFSHTTPClient;
+  private readonly useMock: boolean;
+  private readonly mockStorage = new Map<string, Buffer>(); // Mock storage
+
+  constructor() {
+    console.log(process.env.USE_MOCK_IPFS);
+    this.useMock = process.env.USE_MOCK_IPFS === 'true';
+
+    if (!this.useMock) {
+      const hasCustomEndpoint =
+        Boolean(process.env.IPFS_API_URL) ||
+        Boolean(process.env.IPFS_API_HOST) ||
+        Boolean(process.env.IPFS_API_PORT) ||
+        Boolean(process.env.IPFS_API_PROTOCOL);
+
+      if (!hasCustomEndpoint) {
+        this.logger.warn(
+          'No IPFS endpoint configured; using mock client. Set IPFS_API_URL or IPFS_API_HOST/IPFS_API_PORT when your IPFS daemon is running.',
+        );
+        this.useMock = true;
+      }
+    }
+
+    if (!this.useMock) {
+      try {
+        const rawApiUrl =
+          process.env.IPFS_API_URL ||
+          `${process.env.IPFS_API_PROTOCOL || 'http'}://${
+            process.env.IPFS_API_HOST || 'localhost'
+          }:${process.env.IPFS_API_PORT || 5001}/api/v0`;
+
+        const apiUrl = rawApiUrl.endsWith('/api/v0')
+          ? rawApiUrl
+          : `${rawApiUrl.replace(/\/+$/, '')}/api/v0`;
+
+        this.ipfs = create({ url: apiUrl });
+
+        this.logger.log(`Connected to IPFS node at ${apiUrl}`);
+      } catch (err) {
+        this.logger.warn(
+          `Failed to connect to IPFS node, falling back to mock: ${(err as Error).message}`,
+        );
+      }
+    } else {
+      this.logger.log('USE_MOCK_IPFS=true, using mock IPFS client');
+    }
+  }
+
+  private usingMock(): boolean {
+    return this.useMock || !this.ipfs;
+  }
+
+  /** Upload file to IPFS */
+  async addFile(file: Buffer, filename?: string): Promise<string> {
+    if (!this.usingMock()) {
+      try {
+        const { cid } = await this.ipfs!.add(file);
+        return cid.toString();
+      } catch (err) {
+        this.logger.warn(
+          `Real IPFS add failed, switching to mock: ${(err as Error).message}`,
+        );
+      }
+    }
+
+    const fakeCid = `mock-${Date.now()}-${Math.random().toString(36).substring(2)}`;
+    this.mockStorage.set(fakeCid, file);
+    this.logger.log(`Stored file in mock IPFS with CID: ${fakeCid}`);
+    return fakeCid;
+  }
+
+  /** Fetch file from IPFS */
+  async getFile(cid: string): Promise<Buffer> {
+    if (!this.usingMock()) {
+      try {
+        const chunks: Uint8Array[] = [];
+
+        for await (const chunk of this.ipfs!.cat(cid)) {
+          chunks.push(chunk);
+        }
+
+        return Buffer.concat(chunks);
+      } catch (err) {
+        this.logger.warn(
+          `Real IPFS cat failed, switching to mock: ${(err as Error).message}`,
+        );
+      }
+    }
+
+    // MOCK fallback
+    const data = this.mockStorage.get(cid);
+    if (!data) {
+      this.logger.warn(`Mock IPFS: CID ${cid} not found locally. Trying public gateway...`);
+      try {
+        const response = await fetch(`https://ipfs.io/ipfs/${cid}`);
+        if (!response.ok) throw new Error(`Gateway returned ${response.status}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        // Cache it for future local requests? Optional.
+        this.mockStorage.set(cid, buffer); 
+        return buffer;
+      } catch (e) {
+         this.logger.error(`Public gateway failed: ${e.message}`);
+         throw new Error(`Mock IPFS: CID ${cid} not found locally or on gateway`);
+      }
+    }
+
+    return data;
+  }
+}

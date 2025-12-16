@@ -2,8 +2,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { useAccount } from "wagmi";
-import { useMACI, usePolls } from "../../../hooks";
-
+import { usePolls } from "../../../hooks/usePolls";
 type VoteOption = { id: string; label: string };
 
 function PlusIcon(props: { className?: string }) {
@@ -42,40 +41,26 @@ function XIcon(props: { className?: string }) {
 
 export default function CreatePollPage() {
   const { address } = useAccount();
-  const {
-    createPoll,
-    isDeployingPoll,
-    isDeploySuccess,
-    nextPollId,
-    deployError,
-  } = useMACI();
+  
   const { initPoll } = usePolls();
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
-  const [treeDepth, setTreeDepth] = useState<string>("");
-  const [batchSize, setBatchSize] = useState<string>("");
-  const [initVoiceCredit, setInitVoiceCredit] = useState<string>("");
-  const [options, setOptions] = useState<VoteOption[]>([
-    { id: cryptoRandomId(), label: "" },
-    { id: cryptoRandomId(), label: "" },
-  ]);
+  // const [treeDepth, setTreeDepth] = useState<string>("");
+  // const [batchSize, setBatchSize] = useState<string>("");
+  // const [initVoiceCredit, setInitVoiceCredit] = useState<string>("");
+  // Instead of collecting labels for each option, we accept a number
+  // representing how many anonymous options the poll should have.
+  const [numberOptions, setNumberOptions] = useState<number>(2);
   const [submitted, setSubmitted] = useState(false);
 
-  // Xử lý sau khi deploy thành công
-  useEffect(() => {
-    if (isDeploySuccess && nextPollId > 0) {
-      console.log(" Poll deployed successfully! Poll ID:", nextPollId);
-       initPoll(
-            options.map((o) => o.label),
-            new Date(startTime),
-            new Date(endTime),
-            nextPollId
-          );
-    }
-  }, [isDeploySuccess, nextPollId]);
 
   const errors = useMemo(() => {
     const e: Record<string, string> = {};
+    if (!title || title.trim().length === 0) e.title = "Title is required";
+    if (!description || description.trim().length === 0)
+      e.description = "Description is required";
     const start = startTime ? new Date(startTime) : null;
     const end = endTime ? new Date(endTime) : null;
 
@@ -83,47 +68,32 @@ export default function CreatePollPage() {
     if (!endTime) e.endTime = "End time is required";
     if (start && end && end <= start) e.endTime = "End must be after start";
 
-    const td = Number(treeDepth);
-    if (!treeDepth) e.treeDepth = "Tree depth is required";
-    else if (!Number.isInteger(td) || td < 1)
-      e.treeDepth = "Tree depth must be a positive integer";
+    // const td = Number(treeDepth);
+    // if (!treeDepth) e.treeDepth = "Tree depth is required";
+    // else if (!Number.isInteger(td) || td < 1)
+    //   e.treeDepth = "Tree depth must be a positive integer";
 
-    const bs = Number(batchSize);
-    if (!batchSize) e.batchSize = "Batch size is required";
-    else if (!Number.isInteger(bs) || bs < 1)
-      e.batchSize = "Batch size must be a positive integer";
+    // const bs = Number(batchSize);
+    // if (!batchSize) e.batchSize = "Batch size is required";
+    // else if (!Number.isInteger(bs) || bs < 1)
+    //   e.batchSize = "Batch size must be a positive integer";
 
-    const vc = Number(initVoiceCredit);
-    if (initVoiceCredit === "")
-      e.initVoiceCredit = "Initial voice credit is required";
-    else if (!isFinite(vc) || vc < 0)
-      e.initVoiceCredit = "Initial voice credit must be ≥ 0";
+    // const vc = Number(initVoiceCredit);
+    // if (initVoiceCredit === "")
+    //   e.initVoiceCredit = "Initial voice credit is required";
+    // else if (!isFinite(vc) || vc < 0)
+    //   e.initVoiceCredit = "Initial voice credit must be ≥ 0";
 
-    const trimmed = options.map((o) => o.label.trim());
-    if (trimmed.length < 2) e.options = "At least two options are required";
-    else if (trimmed.some((t) => t.length === 0))
-      e.options = "Options cannot be empty";
-    else if (
-      new Set(trimmed.map((t) => t.toLowerCase())).size !== trimmed.length
-    )
-      e.options = "Options must be unique";
+    if (!Number.isInteger(numberOptions) || numberOptions < 2)
+      e.options = "At least two options are required";
 
     return e;
-  }, [startTime, endTime, treeDepth, batchSize, initVoiceCredit, options]);
+  }, [title, description, startTime, endTime, numberOptions]);
+
 
   const isValid = Object.keys(errors).length === 0;
 
-  function addOption() {
-    setOptions((prev) => [...prev, { id: cryptoRandomId(), label: "" }]);
-  }
-
-  function removeOption(id: string) {
-    setOptions((prev) => prev.filter((o) => o.id !== id));
-  }
-
-  function updateOption(id: string, label: string) {
-    setOptions((prev) => prev.map((o) => (o.id === id ? { ...o, label } : o)));
-  }
+  // option add/remove/update removed — the form now takes only `numberOptions`.
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -141,27 +111,15 @@ export default function CreatePollPage() {
     try {
       console.log(" Starting poll creation...");
 
-      // Tính UNIX timestamp (giây)
-      const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
-      const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
+     
 
-      console.log(" Timestamps:", { startTimestamp, endTimestamp });
-
-      // Tạo poll parameters theo đúng ABI
-      const treeDepths = {
-        intStateTreeDepth: Number(treeDepth) || 2,
-        messageTreeDepth: 4, // stateTreeDepth
-        voteOptionTreeDepth: 3,
-      };
-
-      // GỌI createPoll VỚI ĐÚNG THAM SỐ MỚI
-      createPoll(
-        startTimestamp,
-        endTimestamp,
-        treeDepths,
-        address, // coordinator address
-        Number(batchSize),
-        options.length // số lượng options
+      await initPoll(
+        title,
+        description,
+        address,
+        numberOptions,
+        new Date(startTime),
+        new Date(endTime),
       );
   
     } catch (error) {
@@ -171,7 +129,8 @@ export default function CreatePollPage() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl p-6 text-black bg-white">
+    <main className="min-h-screen bg-white text-black font-sans mx-auto w-full max-w-7xl px-[2%] py-8">
+      <div className="max-w-2xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold tracking-tight">New Vote</h1>
         <a
@@ -182,26 +141,7 @@ export default function CreatePollPage() {
         </a>
       </div>
 
-      {/* Error Message */}
-      {deployError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800 font-medium">
-            Error: {deployError.message}
-          </p>
-        </div>
-      )}
 
-      {/* Success Message */}
-      {isDeploySuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800 font-medium">
-            Poll created successfully! Poll ID: {nextPollId}
-          </p>
-          <p className="text-green-700 text-sm mt-1">
-            The poll has been deployed to the blockchain.
-          </p>
-        </div>
-      )}
 
       {/* Wallet Not Connected */}
       {!address && (
@@ -214,13 +154,42 @@ export default function CreatePollPage() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <section className="space-y-4">
+          <Field label="Title" error={submitted ? errors.title : ""}>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={inputClass(submitted && !!errors.title)}
+            />
+          </Field>
+
+          <Field
+            label="Description"
+            error={submitted ? errors.description : ""}
+          >
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={inputClass(submitted && !!errors.description)}
+              rows={3}
+            />
+          </Field>
+
+          <Field label="Creator address">
+            <input
+              type="text"
+              value={address ?? "Not connected"}
+              readOnly
+              className={inputClass(!address)}
+            />
+          </Field>
+
           <Field label="Start time" error={submitted ? errors.startTime : ""}>
             <input
               type="datetime-local"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               className={inputClass(submitted && !!errors.startTime)}
-              disabled={isDeployingPoll}
             />
           </Field>
 
@@ -230,11 +199,11 @@ export default function CreatePollPage() {
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
               className={inputClass(submitted && !!errors.endTime)}
-              disabled={isDeployingPoll}
+              // disabled={isDeployingPoll}
             />
           </Field>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Field label="Tree depth" error={submitted ? errors.treeDepth : ""}>
               <input
                 inputMode="numeric"
@@ -245,7 +214,7 @@ export default function CreatePollPage() {
                 onChange={(e) => setTreeDepth(e.target.value)}
                 className={inputClass(submitted && !!errors.treeDepth)}
                 placeholder="2"
-                disabled={isDeployingPoll}
+                // disabled={isDeployingPoll}
               />
             </Field>
 
@@ -259,7 +228,7 @@ export default function CreatePollPage() {
                 onChange={(e) => setBatchSize(e.target.value)}
                 className={inputClass(submitted && !!errors.batchSize)}
                 placeholder="4"
-                disabled={isDeployingPoll}
+                // disabled={isDeployingPoll}
               />
             </Field>
 
@@ -276,179 +245,30 @@ export default function CreatePollPage() {
                 onChange={(e) => setInitVoiceCredit(e.target.value)}
                 className={inputClass(submitted && !!errors.initVoiceCredit)}
                 placeholder="100"
-                disabled={isDeployingPoll}
+                // disabled={isDeployingPoll}
               />
             </Field>
-          </div>
+          </div> */}
         </section>
 
-        {/* Dynamic additional fields (self-contained component) */}
-        {(() => {
-          function DynamicFields() {
-            const [fields, setFields] = useState<
-              {
-                id: string;
-                label: string;
-                type: "text" | "number" | "datetime";
-                value: string;
-              }[]
-            >([]);
-
-            function addField() {
-              setFields((s) => [
-                ...s,
-                {
-                  id: cryptoRandomId(),
-                  label: `Field ${s.length + 1}`,
-                  type: "text",
-                  value: "",
-                },
-              ]);
-            }
-
-            function removeField(id: string) {
-              setFields((s) => s.filter((f) => f.id !== id));
-            }
-
-            function updateField(
-              id: string,
-              patch: Partial<{ label: string; type: any; value: string }>
-            ) {
-              setFields((s) =>
-                s.map((f) => (f.id === id ? { ...f, ...patch } : f))
-              );
-            }
-
-            return (
-              <section className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">
-                    Additional fields
-                  </label>
-                  <Button
-                    type="button"
-                    onClick={addField}
-                    disabled={isDeployingPoll}
-                    className="inline-flex items-center gap-2 rounded-none border border-black bg-white px-3 py-1 text-sm text-black hover:bg-black hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <PlusIcon />
-                    Add field
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  {fields.length === 0 ? (
-                    <p className="text-sm text-black/70">
-                      No additional fields yet.
-                    </p>
-                  ) : null}
-
-                  {fields.map((f) => (
-                    <div
-                      key={f.id}
-                      className="grid grid-cols-1 gap-3 sm:grid-cols-4"
-                    >
-                      <input
-                        value={f.label}
-                        onChange={(e) =>
-                          updateField(f.id, { label: e.target.value })
-                        }
-                        placeholder="Label"
-                        className={inputClass()}
-                        disabled={isDeployingPoll}
-                      />
-
-                      <select
-                        value={f.type}
-                        onChange={(e) =>
-                          updateField(f.id, {
-                            type: e.target.value as
-                              | "text"
-                              | "number"
-                              | "datetime",
-                          })
-                        }
-                        className={inputClass()}
-                        disabled={isDeployingPoll}
-                      >
-                        <option value="text">Text</option>
-                        <option value="number">Number</option>
-                        <option value="datetime">Date / Time</option>
-                      </select>
-
-                      <input
-                        type={
-                          f.type === "datetime"
-                            ? "datetime-local"
-                            : f.type === "number"
-                              ? "number"
-                              : "text"
-                        }
-                        inputMode={f.type === "number" ? "numeric" : "text"}
-                        value={f.value}
-                        onChange={(e) =>
-                          updateField(f.id, { value: e.target.value })
-                        }
-                        placeholder="Value"
-                        className={inputClass()}
-                        disabled={isDeployingPoll}
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() => removeField(f.id)}
-                        className="inline-flex h-9 items-center justify-center border border-black text-black hover:bg-black hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Remove field"
-                        disabled={isDeployingPoll}
-                      >
-                        <XIcon />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            );
-          }
-
-          return <DynamicFields />;
-        })()}
+        {/* Additional fields removed — polls use anonymous option counts instead. */}
 
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Vote options</label>
-            <Button
-              type="button"
-              onClick={addOption}
-              disabled={isDeployingPoll}
-              className="inline-flex items-center gap-2 rounded-none border border-black bg-white px-3 py-1 text-sm text-black hover:bg-black hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <PlusIcon />
-              Add option
-            </Button>
+            <label className="text-sm font-medium">Number of options</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={2}
+                value={numberOptions}
+                onChange={(e) => setNumberOptions(Number(e.target.value))}
+                className={inputClass(submitted && !!errors.options)}
+                style={{ width: 120 }}
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            {options.map((opt, idx) => (
-              <div key={opt.id} className="flex items-center gap-2">
-                <input
-                  value={opt.label}
-                  onChange={(e) => updateOption(opt.id, e.target.value)}
-                  placeholder={`Option ${idx + 1}`}
-                  className={inputClass(submitted && !!errors.options)}
-                  disabled={isDeployingPoll}
-                />
-                <button
-                  type="button"
-                  onClick={() => removeOption(opt.id)}
-                  className="inline-flex h-9 w-9 items-center justify-center border border-black text-black hover:bg-black hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Remove option"
-                  disabled={options.length <= 1 || isDeployingPoll}
-                >
-                  <XIcon />
-                </button>
-              </div>
-            ))}
-          </div>
+
           {submitted && errors.options ? (
             <p className="text-xs text-red-500">{errors.options}</p>
           ) : null}
@@ -457,26 +277,17 @@ export default function CreatePollPage() {
         <div className="flex items-center gap-3">
           <Button
             type="submit"
-            disabled={(!isValid && submitted) || isDeployingPoll || !address}
+            disabled={(!isValid && submitted)  || !address}
             className="rounded-none border border-black bg-black px-4 py-2 text-white hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isDeployingPoll ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Creating Poll...
-              </div>
-            ) : (
-              "Create vote on Blockchain"
-            )}
+            Create Poll 
           </Button>
           {!isValid && submitted ? (
             <span className="text-sm text-red-500">Fix errors to continue</span>
           ) : null}
         </div>
       </form>
-
-      {/* Debug Info */}
-      <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+      {/* <div className="mt-8 p-4 bg-gray-100 rounded-lg">
         <h3 className="font-semibold mb-2">Debug Info:</h3>
         <div className="text-sm space-y-1">
           <p>Connected: {address ? "Yes" : " No"}</p>
@@ -490,6 +301,7 @@ export default function CreatePollPage() {
             </p>
           )}
         </div>
+      </div> */}
       </div>
     </main>
   );

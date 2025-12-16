@@ -1,53 +1,56 @@
 "use client";
 import React, { useState } from "react";
 import { Input } from "@sasvoth/ui/input";
-import { authApi } from "@/api";
+import { useAuth } from "@/hooks";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
 const steps = [
   { label: "Account", key: 1 },
   { label: "Wallet", key: 2 },
 ];
 
-function validateEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+const signUpSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  wallet: z.string().optional(),
+});
+
+type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export default function SignupPage() {
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    wallet: "",
-  });
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
   const [isConnecting, setIsConnecting] = useState(false);
   const [walletError, setWalletError] = useState<string | null>(null);
+  const { signupWithEmail } = useAuth();
 
-  const validate = () => {
-    const newErrors = { name: "", email: "", password: "" };
-    if (!form.name.trim()) newErrors.name = "Name is required.";
-    if (!form.email.trim()) newErrors.email = "Email is required.";
-    else if (!validateEmail(form.email))
-      newErrors.email = "Invalid email address.";
-    if (!form.password) newErrors.password = "Password is required.";
-    else if (form.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters.";
-    setErrors(newErrors);
-    return !newErrors.name && !newErrors.email && !newErrors.password;
-  };
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    trigger,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      wallet: "",
+    },
+    mode: "onChange",
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
-  };
+  const walletAddress = watch("wallet");
 
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) setStep(2);
+  const handleNext = async () => {
+    const isValid = await trigger(["name", "email", "password"]);
+    if (isValid) {
+      setStep(2);
+    }
   };
 
   const handleConnectWallet = async () => {
@@ -62,25 +65,30 @@ export default function SignupPage() {
       const accounts = await (window as any).ethereum.request({
         method: "eth_requestAccounts",
       });
-      setForm((prev) => ({ ...prev, wallet: accounts[0] }));
+      setValue("wallet", accounts[0]);
     } catch (err: any) {
       setWalletError("Failed to connect wallet.");
     }
     setIsConnecting(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle sign up logic here, form contains wallet address
-    authApi.signupWithEmail(form.email, form.password);
+  const onSubmit = async (data: SignUpFormData) => {
+    try {
+      await signupWithEmail(data.email, data.password, data.name, data.wallet);
+    } catch (error) {
+      // Error is handled by useAuth/authApi
+    }
   };
 
-  const handleStepNav = (targetStep: number) => {
+  const handleStepNav = async (targetStep: number) => {
     if (targetStep < step) {
       setStep(targetStep);
     } else if (targetStep > step) {
-      if (step === 1 && validate()) {
-        setStep(targetStep);
+      if (step === 1) {
+        const isValid = await trigger(["name", "email", "password"]);
+        if (isValid) {
+          setStep(targetStep);
+        }
       }
     }
   };
@@ -88,7 +96,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <form
-        onSubmit={step === 1 ? handleSubmit : handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className="bg-white p-6 rounded shadow-md w-full max-w-sm space-y-4"
       >
         <h2 className="text-2xl font-semibold text-center mb-4 text-black">
@@ -114,15 +122,11 @@ export default function SignupPage() {
                 onClick={() => handleStepNav(s.key)}
                 disabled={s.key === step}
                 className={`
-                                    px-4 py-2 bg-transparent border-none outline-none
+                                    px-4 py-2 bg-transparent border-none outline-none shadow-none rounded-none
                                     ${s.key === step ? "text-black underline" : "text-gray-400"}
                                     font-medium transition
                                     ${s.key < step ? "cursor-pointer" : ""}
                                 `}
-                style={{
-                  boxShadow: "none",
-                  borderRadius: 0,
-                }}
               >
                 {s.label}
               </button>
@@ -140,16 +144,15 @@ export default function SignupPage() {
               </label>
               <Input
                 id="name"
-                name="name"
                 type="text"
-                value={form.name}
-                onChange={handleChange}
                 placeholder="Your name"
-                required
                 className="bg-white border-black text-black"
+                {...register("name")}
               />
               {errors.name && (
-                <div className="text-red-600 text-xs mt-1">{errors.name}</div>
+                <div className="text-red-600 text-xs mt-1">
+                  {errors.name.message}
+                </div>
               )}
             </div>
             <div>
@@ -158,16 +161,15 @@ export default function SignupPage() {
               </label>
               <Input
                 id="email"
-                name="email"
                 type="email"
-                value={form.email}
-                onChange={handleChange}
                 placeholder="you@example.com"
-                required
                 className="bg-white border-black text-black"
+                {...register("email")}
               />
               {errors.email && (
-                <div className="text-red-600 text-xs mt-1">{errors.email}</div>
+                <div className="text-red-600 text-xs mt-1">
+                  {errors.email.message}
+                </div>
               )}
             </div>
             <div>
@@ -179,22 +181,20 @@ export default function SignupPage() {
               </label>
               <Input
                 id="password"
-                name="password"
                 type="password"
-                value={form.password}
-                onChange={handleChange}
                 placeholder="Password"
-                required
                 className="bg-white border-black text-black"
+                {...register("password")}
               />
               {errors.password && (
                 <div className="text-red-600 text-xs mt-1">
-                  {errors.password}
+                  {errors.password.message}
                 </div>
               )}
             </div>
             <button
-              type="submit"
+              type="button"
+              onClick={handleNext}
               className="w-full bg-black text-white py-2 rounded hover:bg-gray-900 transition"
             >
               Next
@@ -207,9 +207,9 @@ export default function SignupPage() {
               <label className="block text-sm mb-1 text-black">
                 MetaMask Wallet
               </label>
-              {form.wallet ? (
+              {walletAddress ? (
                 <div className="p-2 bg-gray-100 rounded text-black text-sm">
-                  Connected: {form.wallet}
+                  Connected: {walletAddress}
                 </div>
               ) : (
                 <button
@@ -228,9 +228,9 @@ export default function SignupPage() {
             <button
               type="submit"
               className="w-full bg-black text-white py-2 rounded hover:bg-gray-900 transition"
-              disabled={!form.wallet}
+              disabled={isSubmitting || !walletAddress}
             >
-              Sign Up
+              {isSubmitting ? "Signing Up..." : "Sign Up"}
             </button>
             <button
               type="button"

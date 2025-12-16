@@ -27,11 +27,14 @@ export function useMaci() {
 
   const getPublicClient = () => {
     // Fallback RPC URLs for Arbitrum Sepolia
-    const rpcUrls = [
-      'https://sepolia-rollup.arbitrum.io/rpc',
-      'https://arbitrum-sepolia.blockpi.network/v1/rpc/public',
-      'https://arbitrum-sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // Public Infura key
-    ];
+   const rpcUrls = [
+    "https://arb-sepolia.g.alchemy.com/v2/t9qH0NbAMVlsMRhxqOxm1FvDyuFvRLkQ",
+    'https://sepolia-rollup.arbitrum.io/rpc',
+      'https://arbitrum-sepolia-rpc.publicnode.com',
+  'https://arbitrum-sepolia.drpc.org',
+
+  
+];
     
     return createPublicClient({
       chain: arbitrumSepolia,
@@ -44,7 +47,7 @@ export function useMaci() {
   };
 
   // Signup to MACI
-  const signupToMaci = async (pollId: string) => {
+  const signupToMaci = async () => {
     setLoading(true);
     try {
       // 0. Check if contract exists
@@ -91,20 +94,35 @@ export function useMaci() {
       console.log('✅ Signup transaction sent:', hash);
       console.log('⏳ Waiting for confirmation...');
 
-      // 4. Save keypair
-      localStorage.setItem(`maci_keypair_poll_${pollId}`, JSON.stringify({
-        publicKey: kp.pubKey.serialize(),
-        privateKey: kp.privKey.serialize(),
-        pollId,
-        signupTx: hash,
-        signedUpAt: new Date().toISOString(),
-      }));
-
-      setKeypair(kp);
+      // 4. Lấy stateIndex bằng cách gọi hàm getStateIndex(publicKeyHash)
+      let stateIndex: number | null = null;
+      try {
+        // Tính publicKeyHash = hash2([x, y])
+        // MACI contract dùng hash2(uint256[2])
+        // Gọi hàm hash2 trên contract để lấy publicKeyHash
+        const pubKeyX = kp.pubKey.rawPubKey[0];
+        const pubKeyY = kp.pubKey.rawPubKey[1];
+        const publicKeyHash = await publicClient.readContract({
+          address: MACI_ADDRESS as `0x${string}`,
+          abi: MACI_ABI,
+          functionName: 'hash2',
+          args: [[pubKeyX, pubKeyY]],
+        }) as bigint;
+        // Gọi getStateIndex(publicKeyHash)
+        stateIndex = Number(await publicClient.readContract({
+          address: MACI_ADDRESS as `0x${string}`,
+          abi: MACI_ABI,
+          functionName: 'getStateIndex',
+          args: [publicKeyHash],
+        }));
+      } catch (e) {
+        console.warn('Không lấy được stateIndex từ contract:', e);
+      }
 
       return {
         txHash: hash,
         publicKey: kp.pubKey.serialize(),
+        stateIndex,
       };
     } catch (error: any) {
       console.error('❌ Signup error:', error);

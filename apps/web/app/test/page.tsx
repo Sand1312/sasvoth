@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useMaci } from './useHook';
 
-const POLL_ID = '22';
+const POLL_ID = '3'
 
 export default function TestPage() {
   const { keypair, loading, status: hookStatus, signupToMaci, submitVote, checkPollStatus } = useMaci();
@@ -91,7 +91,7 @@ export default function TestPage() {
       await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for UI update
       
       setStatus('Please confirm transaction in MetaMask...');
-      const result = await signupToMaci(POLL_ID);
+      const result = await signupToMaci();
       
       setSignedUp(true);
       setStatus(`✅ Successfully signed up! TX: ${result.txHash.slice(0, 10)}...`);

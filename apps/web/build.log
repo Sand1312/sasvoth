@@ -1,0 +1,103 @@
+
+> web@0.1.0 build /Users/thesand/sasvoth/apps/web
+> next build
+
+   ▲ Next.js 15.3.0
+   - Environments: .env
+
+   Creating an optimized production build ...
+Failed to compile.
+
+../../node_modules/.pnpm/@nomicfoundation+edr-darwin-arm64@0.12.0-next.16/node_modules/@nomicfoundation/edr-darwin-arm64/edr.darwin-arm64.node
+Error: Node.js binary module ./les/.pnpm/@nomicfoundation+edr-darwin-arm64@0.12.0-next.16/node_modules/@nomicfoundation/edr-darwin-arm64/edr.darwin-arm64.node is not supported in the browser. Please only use the module on server side
+    at Object.nextErrorBrowserBinaryLoader (/Users/thesand/sasvoth/node_modules/.pnpm/next@15.3.0_@babel+core@7.28.5_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/webpack/loaders/next-error-browser-binary-loader.js:14:33)
+
+Import trace for requested module:
+../../node_modules/.pnpm/@nomicfoundation+edr-darwin-arm64@0.12.0-next.16/node_modules/@nomicfoundation/edr-darwin-arm64/edr.darwin-arm64.node
+../../node_modules/.pnpm/@nomicfoundation+edr@0.12.0-next.16/node_modules/@nomicfoundation/edr/index.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/hardhat-network/provider/provider.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/providers/construction.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/runtime-environment.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/lib/hardhat-lib.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/deploy.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/index.js
+../../node_modules/.pnpm/@maci-protocol+sdk@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/sdk/build/ts/index.js
+./hooks/useMaciSignup.ts
+./hooks/useMACI.ts
+./app/votes/[id]/page.tsx
+
+../../node_modules/.pnpm/@nomicfoundation+edr-darwin-x64@0.12.0-next.16/node_modules/@nomicfoundation/edr-darwin-x64/edr.darwin-x64.node
+Error: Node.js binary module ./les/.pnpm/@nomicfoundation+edr-darwin-x64@0.12.0-next.16/node_modules/@nomicfoundation/edr-darwin-x64/edr.darwin-x64.node is not supported in the browser. Please only use the module on server side
+    at Object.nextErrorBrowserBinaryLoader (/Users/thesand/sasvoth/node_modules/.pnpm/next@15.3.0_@babel+core@7.28.5_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/webpack/loaders/next-error-browser-binary-loader.js:14:33)
+
+Import trace for requested module:
+../../node_modules/.pnpm/@nomicfoundation+edr-darwin-x64@0.12.0-next.16/node_modules/@nomicfoundation/edr-darwin-x64/edr.darwin-x64.node
+../../node_modules/.pnpm/@nomicfoundation+edr@0.12.0-next.16/node_modules/@nomicfoundation/edr/index.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/hardhat-network/provider/provider.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/providers/construction.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/runtime-environment.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/lib/hardhat-lib.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/deploy.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/index.js
+../../node_modules/.pnpm/@maci-protocol+sdk@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/sdk/build/ts/index.js
+./hooks/useMaciSignup.ts
+./hooks/useMACI.ts
+./app/votes/[id]/page.tsx
+
+../../node_modules/.pnpm/@nomicfoundation+edr-linux-arm64-gnu@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-arm64-gnu/edr.linux-arm64-gnu.node
+Error: Node.js binary module ./les/.pnpm/@nomicfoundation+edr-linux-arm64-gnu@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-arm64-gnu/edr.linux-arm64-gnu.node is not supported in the browser. Please only use the module on server side
+    at Object.nextErrorBrowserBinaryLoader (/Users/thesand/sasvoth/node_modules/.pnpm/next@15.3.0_@babel+core@7.28.5_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/webpack/loaders/next-error-browser-binary-loader.js:14:33)
+
+Import trace for requested module:
+../../node_modules/.pnpm/@nomicfoundation+edr-linux-arm64-gnu@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-arm64-gnu/edr.linux-arm64-gnu.node
+../../node_modules/.pnpm/@nomicfoundation+edr@0.12.0-next.16/node_modules/@nomicfoundation/edr/index.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/hardhat-network/provider/provider.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/providers/construction.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/runtime-environment.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/lib/hardhat-lib.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/deploy.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/index.js
+../../node_modules/.pnpm/@maci-protocol+sdk@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/sdk/build/ts/index.js
+./hooks/useMaciSignup.ts
+./hooks/useMACI.ts
+./app/votes/[id]/page.tsx
+
+../../node_modules/.pnpm/@nomicfoundation+edr-linux-arm64-musl@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-arm64-musl/edr.linux-arm64-musl.node
+Error: Node.js binary module ./les/.pnpm/@nomicfoundation+edr-linux-arm64-musl@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-arm64-musl/edr.linux-arm64-musl.node is not supported in the browser. Please only use the module on server side
+    at Object.nextErrorBrowserBinaryLoader (/Users/thesand/sasvoth/node_modules/.pnpm/next@15.3.0_@babel+core@7.28.5_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/webpack/loaders/next-error-browser-binary-loader.js:14:33)
+
+Import trace for requested module:
+../../node_modules/.pnpm/@nomicfoundation+edr-linux-arm64-musl@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-arm64-musl/edr.linux-arm64-musl.node
+../../node_modules/.pnpm/@nomicfoundation+edr@0.12.0-next.16/node_modules/@nomicfoundation/edr/index.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/hardhat-network/provider/provider.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/providers/construction.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/runtime-environment.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/lib/hardhat-lib.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/deploy.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/index.js
+../../node_modules/.pnpm/@maci-protocol+sdk@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/sdk/build/ts/index.js
+./hooks/useMaciSignup.ts
+./hooks/useMACI.ts
+./app/votes/[id]/page.tsx
+
+../../node_modules/.pnpm/@nomicfoundation+edr-linux-x64-gnu@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-x64-gnu/edr.linux-x64-gnu.node
+Error: Node.js binary module ./les/.pnpm/@nomicfoundation+edr-linux-x64-gnu@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-x64-gnu/edr.linux-x64-gnu.node is not supported in the browser. Please only use the module on server side
+    at Object.nextErrorBrowserBinaryLoader (/Users/thesand/sasvoth/node_modules/.pnpm/next@15.3.0_@babel+core@7.28.5_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/webpack/loaders/next-error-browser-binary-loader.js:14:33)
+
+Import trace for requested module:
+../../node_modules/.pnpm/@nomicfoundation+edr-linux-x64-gnu@0.12.0-next.16/node_modules/@nomicfoundation/edr-linux-x64-gnu/edr.linux-x64-gnu.node
+../../node_modules/.pnpm/@nomicfoundation+edr@0.12.0-next.16/node_modules/@nomicfoundation/edr/index.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/hardhat-network/provider/provider.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/providers/construction.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/core/runtime-environment.js
+../../node_modules/.pnpm/hardhat@2.27.0_bufferutil@4.0.9_ts-node@10.9.2_@swc+core@1.15.2_@swc+helpers@0.5.17__@types+n_d3cdvrps2usder5745y75ac26a/node_modules/hardhat/internal/lib/hardhat-lib.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/deploy.js
+../../node_modules/.pnpm/@maci-protocol+contracts@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/contracts/build/ts/index.js
+../../node_modules/.pnpm/@maci-protocol+sdk@0.0.0-ci.26f28d6_sqsdvzznn35f4tesal35tp3v5m/node_modules/@maci-protocol/sdk/build/ts/index.js
+./hooks/useMaciSignup.ts
+./hooks/useMACI.ts
+./app/votes/[id]/page.tsx
+
+
+> Build failed because of webpack errors
+ ELIFECYCLE  Command failed with exit code 1.

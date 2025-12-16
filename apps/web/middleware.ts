@@ -59,12 +59,18 @@ export async function middleware(req: NextRequest) {
     }
     // perform server-side validation by calling our internal API which proxies the request
     try {
-      const validateUrl = new URL("/api/auth/validate", req.url);
+      // Prefer an explicit backend origin provided via env. This must be
+      // publicly available to the Next middleware (prefix NEXT_PUBLIC_).
+      // Fallback to localhost:8000 which is the API default in this repo.
+      const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+      const validateUrl = new URL("/api/v1/auth/validate", apiBase);
+
+      console.log("Middleware will validate against:", validateUrl.toString());
+
       const validationRes = await fetch(validateUrl.toString(), {
         method: "POST",
         headers: {
           cookie: cookieHeader,
-          "Content-Type": "application/json",
         },
         cache: "no-store",
       });

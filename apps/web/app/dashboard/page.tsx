@@ -4,8 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@sasvoth/ui/button";
 import React, { useState, useEffect, useMemo } from "react";
-import { usePolls } from "../../hooks";
+import { usePollsQuery } from "../../hooks/usePolls";
 import { PollStatus } from "@/types/polls";
+import RainAnimation from "../../components/RainAnimation";
+import { useAccount } from "wagmi";
+import { useClaimContract, useToken, useUser, useAuth } from "../../hooks";
+import { useFeedback } from "@/contexts/FeedbackContext";
+
 // Types cho Poll
 type Poll = {
   _id: string;
@@ -97,6 +102,11 @@ const phaseStyles: Record<VotePhase, { label: string; accent: string }> = {
 
 // API functions
 
+type DepositHistory = {
+  amount: number;
+  timestamp: string;
+};
+
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -105,31 +115,90 @@ export default function DashboardPage() {
     direction: "asc" | "desc";
   }>({ key: "date", direction: "desc" });
   const [phaseFilter, setPhaseFilter] = useState<"all" | VotePhase>("all");
+  const { showSuccess, showError } = useFeedback();
 
-  // --- Polls state ---
-  const [polls, setPolls] = useState<Poll[]>([]);
-  const [activePolls, setActivePolls] = useState<Poll[]>([]);
-  const [loadingPolls, setLoadingPolls] = useState(true);
-  const [pollError, setPollError] = useState<string>("");
-  const { getPolls } = usePolls();
+  // Wallet hooks
+  const { address, isConnected } = useAccount();
+  const { user } = useAuth();
+  const token = useToken();
+  const claim = useClaimContract();
+  const { deposit, getHistoryDeposit } = useUser();
+
+  // Wallet state
+  const [depositAmount, setDepositAmount] = useState<number | "">("");
+  const [withdrawAmount, setWithdrawAmount] = useState<number | "">("");
+  const [history, setHistory] = useState<DepositHistory[]>([]);
+  const [reloadHistory, setReloadHistory] = useState(0);
+
+  // Use the new hook for data fetching
+  const {
+    data: activePolls = [],
+    isLoading: loadingPolls,
+    error: pollError,
+    refetch,
+  } = usePollsQuery(PollStatus.InProgress);
 
   useEffect(() => {
     setIsClient(true);
-    loadPolls();
   }, []);
 
-  // Load polls từ API
-  const loadPolls = async () => {
-    try {
-      setLoadingPolls(true);
-      const data = await getPolls(PollStatus.InProgress);
-      setActivePolls(data);
-      setPolls(data); // Hiển thị active polls mặc định
-    } catch (error) {
-      setPollError("Failed to load polls");
-      console.error("Error loading polls:", error);
-    } finally {
-      setLoadingPolls(false);
+  // Fetch transaction history
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!user?._id) return;
+      try {
+        const data = await getHistoryDeposit(user._id);
+        if (Array.isArray(data)) {
+          setHistory(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch deposit history:", error);
+      }
+    };
+    fetchHistory();
+  }, [reloadHistory, user, getHistoryDeposit]);
+
+  const isDepositDisabled = Boolean(
+    claim.isBuying || !depositAmount || Number(depositAmount) < 0.001
+  );
+
+  const isWithdrawDisabled = Boolean(
+    claim.isSelling ||
+      !withdrawAmount ||
+      Number(withdrawAmount) > Number(token.balance) ||
+      Number(withdrawAmount) <= 0
+  );
+
+  const handleBuyToken = async () => {
+    if (typeof depositAmount === "number" && depositAmount > 0) {
+      const txHash = await claim.buyHD(depositAmount.toString());
+      if (!txHash) return;
+      const userId = user?._id;
+      if (!userId) {
+        showError("Authentication Required", "Vui lòng đăng nhập lại");
+        return;
+      }
+      const amountToken = Number(depositAmount) * Number(claim.rate);
+      await deposit(userId, amountToken, txHash);
+      setDepositAmount("");
+      showSuccess("Deposit Successful", `Đã mua ${amountToken} HD với ${depositAmount} ETH`);
+      setReloadHistory((prev) => prev + 1);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    if (typeof withdrawAmount === "number" && withdrawAmount > 0) {
+      await token.approve(claim.contractAddress, withdrawAmount.toString());
+      setTimeout(async () => {
+        const txHash = await claim.sellHD(withdrawAmount.toString());
+        if (!txHash) return;
+        const userId = user?._id;
+        if (!userId) return;
+        const amountToken = Number(withdrawAmount) - Number(withdrawAmount) * 2;
+        await deposit(userId, amountToken, txHash);
+        setWithdrawAmount("");
+        setReloadHistory((prev) => prev + 1);
+      }, 8000);
     }
   };
 
@@ -225,179 +294,195 @@ export default function DashboardPage() {
 
   return (
     <>
+      <RainAnimation obstacleSelector="#rain-obstacle" />
       <div className="mx-auto mt-8 flex w-full max-w-6xl flex-col gap-10 px-6 py-6">
-        {/* LEFT: Your Vote */}
-        <div className="w-full">
-          <div className="mb-6 space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-4xl font-black tracking-tight text-gray-900 sm:text-5xl">
-                Your Vote
-              </h2>
-              <p className="text-sm text-gray-500">
-                Browse ideas you&apos;ve backed. Filter by status, search, or
-                sort them by name, date, or token.
-              </p>
-            </div>
+        {/* WALLET SECTION - Minimalist B&W */}
+        <div
+          id="rain-obstacle"
+          className="w-full rounded-[32px] border border-black bg-white p-8 relative z-10"
+        >
+          <h2 className="text-3xl font-bold text-black mb-8">Wallet</h2>
 
-            <div className="relative w-full max-w-lg">
-              <svg
-                viewBox="0 0 24 24"
-                className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m16.5 16.5 3 3" strokeLinecap="round" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-full border border-black/10 bg-white py-3 pl-12 pr-4 text-sm text-gray-900 placeholder:text-gray-400 shadow focus:border-black focus:outline-none"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {(["name", "date", "token"] as const).map((key) => {
-                const isActive = sortConfig.key === key;
-                const directionArrow =
-                  sortConfig.direction === "asc" ? "↑" : "↓";
-                const label =
-                  key === "name" ? "Name" : key === "date" ? "Date" : "Token";
-                return (
-                  <button
-                    key={key}
-                    className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
-                      isActive
-                        ? "border-black bg-black text-white"
-                        : "border-black/20 bg-white text-gray-700 hover:border-black/60"
-                    }`}
-                    onClick={() => handleSortClick(key)}
-                  >
-                    {label} {isActive ? directionArrow : "↕"}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {phaseFilters.map(({ key, label, accent }) => {
-                const isActive = phaseFilter === key;
-                return (
-                  <Button
-                    key={key}
-                    onClick={() => setPhaseFilter(key)}
-                    className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
-                      isActive
-                        ? "text-white"
-                        : "text-gray-600 hover:text-gray-900"
-                    }`}
-                    style={{
-                      borderColor: accent,
-                      backgroundColor: isActive ? accent : "transparent",
-                    }}
-                  >
-                    {label}
-                  </Button>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold uppercase tracking-wide text-gray-600">
-              {legendEntries.map(([key, value]) => (
-                <div key={key} className="flex items-center gap-2">
-                  <span
-                    className="inline-block h-3 w-3 rounded-full"
-                    style={{ backgroundColor: value.accent }}
-                  />
-                  {value.label}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {visibleVotes.map((vote) => {
-              const style = phaseStyles[vote.phase];
-              return (
-                <div
-                  key={vote.id}
-                  className="relative overflow-hidden rounded-[20px] border border-black/5 bg-[#E7E7E7] p-5 shadow-sm"
-                >
-                  <span
-                    className="absolute right-0 top-0 h-10 w-10"
-                    style={{
-                      backgroundColor: style.accent,
-                      clipPath: "polygon(0 0, 100% 0, 100% 100%)",
-                    }}
-                    aria-hidden
-                  />
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-md font-semibold text-gray-900 uppercase tracking-wide">
-                        {vote.title}
-                      </h3>
-                      <p className="text-base font-semibold text-red-600">
-                        {vote.highlight}
-                      </p>
-                      <p className="text-xs text-gray-600">{vote.date}</p>
-                    </div>
-                    <div className="flex flex-col items-end text-right">
-                      <p className="text-3xl font-black text-gray-900 leading-tight">
-                        {vote.amount}{" "}
-                        <span className="text-lg font-semibold">
-                          {vote.token}
-                        </span>
-                      </p>
-                      {vote.rewarded ? (
-                        <div className="mt-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-gray-600">
-                          <Image
-                            src="/sunflower.svg"
-                            alt="Reward earned"
-                            width={32}
-                            height={32}
-                            className="h-8 w-8"
-                          />
-                          Reward
-                        </div>
-                      ) : null}
-                    </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* LEFT: Deposit & Withdraw */}
+            <div className="space-y-6">
+              {/* Deposit */}
+              <div className="rounded-[24px] border border-black p-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-full border-2 border-black flex items-center justify-center">
+                    <span className="text-black text-lg font-bold">↓</span>
                   </div>
+                  <h3 className="text-lg font-bold text-black uppercase tracking-wide">
+                    Deposit
+                  </h3>
                 </div>
-              );
-            })}
-
-            {visibleVotes.length === 0 && (
-              <div className="col-span-1 rounded-2xl border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500 md:col-span-2">
-                No votes match your filters yet.
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs uppercase tracking-[0.2em] text-black/60 mb-2 block">
+                      ETH Amount
+                    </label>
+                    <input
+                      type="number"
+                      step="0.001"
+                      min="0.001"
+                      placeholder="0.001"
+                      value={depositAmount}
+                      onChange={(e) =>
+                        setDepositAmount(
+                          e.target.value ? Number(e.target.value) : ""
+                        )
+                      }
+                      className="w-full rounded-full border border-black bg-white px-5 py-3 text-lg font-semibold focus:outline-none"
+                    />
+                  </div>
+                  {claim.rate && depositAmount && (
+                    <p className="text-sm text-black/60">
+                      ≈{" "}
+                      {(
+                        Number(depositAmount) * Number(claim.rate)
+                      ).toLocaleString()}{" "}
+                      HD
+                    </p>
+                  )}
+                  <Button
+                    onClick={handleBuyToken}
+                    disabled={isDepositDisabled || !isConnected}
+                    className="w-full rounded-full border border-black bg-black text-white py-3 font-semibold uppercase tracking-wide hover:bg-black/90 disabled:opacity-50"
+                  >
+                    {claim.isBuying ? "Processing..." : "Buy HD"}
+                  </Button>
+                </div>
               </div>
-            )}
+
+              {/* Withdraw */}
+              <div className="rounded-[24px] border border-black p-6">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-full border-2 border-black flex items-center justify-center">
+                    <span className="text-black text-lg font-bold">↑</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-black uppercase tracking-wide">
+                    Withdraw
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs uppercase tracking-[0.2em] text-black/60 mb-2 block">
+                      HD Amount
+                    </label>
+                    <input
+                      type="number"
+                      step="1"
+                      min="1"
+                      placeholder="100"
+                      value={withdrawAmount}
+                      onChange={(e) =>
+                        setWithdrawAmount(
+                          e.target.value ? Number(e.target.value) : ""
+                        )
+                      }
+                      className="w-full rounded-full border border-black bg-white px-5 py-3 text-lg font-semibold focus:outline-none"
+                    />
+                  </div>
+                  {claim.rate && withdrawAmount && (
+                    <p className="text-sm text-black/60">
+                      ≈{" "}
+                      {(Number(withdrawAmount) / Number(claim.rate)).toFixed(6)}{" "}
+                      ETH
+                    </p>
+                  )}
+                  <Button
+                    onClick={handleWithdraw}
+                    disabled={isWithdrawDisabled || !isConnected}
+                    className="w-full rounded-full border border-black bg-white text-black py-3 font-semibold uppercase tracking-wide hover:bg-black/5 disabled:opacity-50"
+                  >
+                    {claim.isSelling ? "Processing..." : "Sell HD"}
+                  </Button>
+                </div>
+              </div>
+
+              {!isConnected && (
+                <div className="rounded-full border border-black/30 px-5 py-3 text-center text-sm text-black/60">
+                  Connect wallet to transact
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT: Balance & History */}
+            <div className="space-y-6">
+              {/* Balance Card - Simple white background */}
+              <div className="rounded-[24px] border border-black p-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-black/60 mb-2">
+                  Balance
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-black text-black">
+                    {token.balance || "0"}
+                  </span>
+                  <span className="text-xl font-semibold text-black/60">
+                    HD
+                  </span>
+                </div>
+              </div>
+
+              {/* Transaction History - No border wrapper */}
+              <div className="pt-2">
+                <h3 className="text-xs font-bold text-black uppercase tracking-[0.3em] mb-4">
+                  History
+                </h3>
+                <div className="max-h-[280px] overflow-y-auto space-y-3">
+                  {history.length === 0 ? (
+                    <p className="text-sm text-black/40 text-center py-6">
+                      No transactions yet
+                    </p>
+                  ) : (
+                    [...history].reverse().map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between px-2 py-3 border-b border-black/10 last:border-b-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full border border-black flex items-center justify-center">
+                            <span className="text-black text-sm font-bold">
+                              {item.amount > 0 ? "↓" : "↑"}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-bold text-black">
+                              {item.amount > 0 ? "+" : ""}
+                              {item.amount} HD
+                            </p>
+                            <p className="text-xs text-black/40">
+                              {new Date(item.timestamp).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-xs text-black/40">
+                          {new Date(item.timestamp).toLocaleTimeString()}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Votes Section với Polls từ API */}
       <div className="flex justify-center py-10 px-4">
-        <div className="w-full max-w-6xl bg-white rounded-2xl shadow-xl border border-black p-8 flex flex-col items-center">
+        <div className="w-full max-w-6xl bg-white rounded-[32px] border border-black p-8 flex flex-col items-center">
           <div className="flex justify-between items-center w-full mb-8">
             <h2 className="text-2xl font-bold text-black tracking-tight">
               Active Votes
             </h2>
             <div className="flex gap-2">
               <Button
-                asChild
-                className="text-sm bg-purple-600 hover:bg-purple-700"
-              >
-                <Link href="/transactions">Manage Transactions</Link>
-              </Button>
-              <Button
-                className="text-sm bg-blue-600 hover:bg-blue-700"
-                onClick={loadPolls}
+                className="text-sm rounded-full border border-black bg-black text-white hover:bg-black/90"
+                onClick={() => refetch()}
                 disabled={loadingPolls}
               >
-                {loadingPolls ? "Loading..." : "Refresh Polls"}
+                {loadingPolls ? "Loading..." : "Refresh"}
               </Button>
             </div>
           </div>
@@ -406,23 +491,25 @@ export default function DashboardPage() {
           {loadingPolls && (
             <div className="w-full flex justify-center py-8">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Đang tải polls...</p>
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-black border-t-transparent mx-auto mb-4"></div>
+                <p className="text-black/60 text-sm">Loading polls...</p>
               </div>
             </div>
           )}
 
           {/* Polls Error State */}
           {pollError && !loadingPolls && (
-            <div className="w-full bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
-              <div className="text-red-800 text-center">
-                <p className="font-semibold">Lỗi khi tải polls</p>
-                <p className="text-sm mt-2">{pollError}</p>
+            <div className="w-full border border-black rounded-[20px] p-6 mb-8">
+              <div className="text-black text-center">
+                <p className="font-semibold">Error loading polls</p>
+                <p className="text-sm mt-2 text-black/60">
+                  {(pollError as Error).message || "Unknown error"}
+                </p>
                 <Button
-                  onClick={loadPolls}
-                  className="mt-4 bg-red-600 hover:bg-red-700"
+                  onClick={() => refetch()}
+                  className="mt-4 rounded-full border border-black bg-black text-white hover:bg-black/90"
                 >
-                  Thử lại
+                  Try Again
                 </Button>
               </div>
             </div>
@@ -430,61 +517,57 @@ export default function DashboardPage() {
 
           {/* Polls Grid */}
           {!loadingPolls && !pollError && (
-            <div className="flex flex-wrap gap-8 w-full justify-center">
+            <div className="flex flex-wrap gap-6 w-full justify-center">
               {activePolls.length === 0 ? (
                 <div className="w-full text-center py-12">
-                  <p className="text-gray-500 text-lg">
-                    Không có poll nào đang active
-                  </p>
-                  <p className="text-gray-400 text-sm mt-2">
-                    Hãy tạo poll mới hoặc thử lại sau
+                  <p className="text-black/60 text-lg">No active polls found</p>
+                  <p className="text-black/40 text-sm mt-2">
+                    Check back later for new voting opportunities
                   </p>
                 </div>
               ) : (
-                activePolls.map((poll, idx) => (
-                  <div
+                activePolls.map((poll: Poll) => (
+                  <Link
                     key={poll._id}
-                    className="w-64 bg-white rounded-xl shadow-md transition-transform duration-200 hover:-translate-y-2 hover:shadow-xl border border-black flex flex-col cursor-pointer"
-                    onClick={() => {
-                      window.location.href = `/votes/${poll.onChainPollId}`;
-                    }}
-                    tabIndex={0}
-                    role="button"
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        window.location.href = `/votes/${poll.onChainPollId}`;
-                      }
-                    }}
+                    href={`/votes/${poll.onChainPollId}`}
+                    className="group w-64 bg-white rounded-[20px] transition-all duration-200 hover:-translate-y-1 border border-black flex flex-col overflow-hidden"
                   >
                     <div className="px-4 py-3 border-b border-black">
-                      <h3 className="text-center font-semibold text-lg text-black">
+                      <h3 className="text-center font-semibold text-base text-black truncate uppercase tracking-wide">
                         {poll.title}
                       </h3>
                     </div>
                     <div className="px-5 py-4 flex flex-col gap-2 flex-grow">
-                      <p className="text-black text-sm line-clamp-2">
-                        {poll.description || "No description"}
+                      <p className="text-black/70 text-sm line-clamp-2 min-h-[2.5rem]">
+                        {poll.description || "No description available"}
                       </p>
-                      <div className="text-xs text-gray-500 mt-auto">
-                        <p>Options: {poll.options.length}</p>
-                        <p>Status: {poll.status}</p>
-                        <p>
-                          Ends: {new Date(poll.endTime).toLocaleDateString()}
-                        </p>
+                      <div className="text-xs text-black/50 mt-auto space-y-1 pt-3 border-t border-black/10">
+                        <div className="flex justify-between">
+                          <span>Options</span>
+                          <span className="font-medium text-black">
+                            {poll.options.length}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Status</span>
+                          <span className="font-medium text-black capitalize">
+                            {poll.status}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Ends</span>
+                          <span className="font-medium text-black">
+                            {new Date(poll.endTime).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
-                      <Button
-                        className="mt-2 w-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `/votes/${poll.onChainPollId}`;
-                        }}
-                      >
+                      <Button className="mt-4 w-full rounded-full border border-black bg-black text-white text-xs uppercase tracking-wide hover:bg-black/90">
                         {poll.status === PollStatus.InProgress
                           ? "Vote Now"
                           : "View Poll"}
                       </Button>
                     </div>
-                  </div>
+                  </Link>
                 ))
               )}
             </div>

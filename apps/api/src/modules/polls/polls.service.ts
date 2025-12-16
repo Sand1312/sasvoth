@@ -5,47 +5,113 @@ import { Polls, PollsDocument } from './schemas/polls';
 
 @Injectable()
 export class PollsService {
-    constructor(@InjectModel(Polls.name) private pollsModel: Model<PollsDocument>) {}
+  constructor(
+    @InjectModel(Polls.name) private pollsModel: Model<PollsDocument>,
+  ) {}
 
-    async getPollById(pollId: string): Promise<PollsDocument | null> {
-        return this.pollsModel.findById(pollId).exec();
+  async getPollById(pollId: string): Promise<PollsDocument | null> {
+    return this.pollsModel.findById(pollId).exec();
+  }
+  async createPoll(pollData: Partial<Polls>): Promise<PollsDocument> {
+    const newPoll = new this.pollsModel(pollData);
+    return newPoll.save();
+  }
+  async getPollByStatus(status: string): Promise<PollsDocument[]> {
+    return this.pollsModel.find({ status }).exec();
+  }
+  async updatePollStatus(
+    pollId: string,
+    status: string,
+  ): Promise<PollsDocument | null> {
+    return this.pollsModel
+      .findByIdAndUpdate(pollId, { status }, { new: true })
+      .exec();
+  }
+  async addIdeaToPoll(
+    pollId: string,
+    ideaId: string,
+  ): Promise<PollsDocument | null> {
+    let poll = await this.pollsModel.findById(pollId).exec();
+    if (!poll) {
+      throw new BadRequestException('Poll not found');
     }
-    async createPoll(pollData: Partial<Polls>): Promise<PollsDocument> {
-        const newPoll = new this.pollsModel(pollData);
-        return newPoll.save();
-    }
-    async getPollByStatus(status: string): Promise<PollsDocument[]> {
-        return this.pollsModel.find({ status }).exec();
-    }
-    async updatePollStatus(pollId: string, status: string): Promise<PollsDocument | null> {
-        return this.pollsModel.findByIdAndUpdate(pollId, { status }, { new: true }).exec();
-    }   
-    async addIdeaToPoll(pollId: string, ideaId: string): Promise<PollsDocument | null> {
-        let poll = await this.pollsModel.findById(pollId).exec();
-        if (!poll) {
-            throw new BadRequestException('Poll not found');
-        }
-        poll.ideas.push(ideaId);
-        return poll.save();
-    }
+    poll.ideas.push(ideaId);
+    return poll.save();
+  }
 
-    async approveIdeaInPoll(pollId: string, ideaId: string): Promise<PollsDocument | null> {
-        let poll = await this.pollsModel.findById(pollId).exec();
-        if (!poll) {
-            throw new BadRequestException('Poll not found');
-        }
-        poll.ideas = poll.ideas.filter(id => id !== ideaId);
-        poll.options.push(ideaId);
-        return poll.save();
+  async approveIdeaInPoll(
+    pollId: string,
+    ideaId: string,
+    ideaCid: string,
+  ): Promise<PollsDocument | null> {
+    let poll = await this.pollsModel.findById(pollId).exec();
+    if (!poll) {
+      throw new BadRequestException('Poll not found');
     }
-    async savePollOnChainId(pollId: string, pollIdOnChain: number): Promise<PollsDocument | null> {
-        return this.pollsModel.findByIdAndUpdate(pollId, { pollIdOnChain  }, { new: true }).exec();
+    poll.ideas = poll.ideas.filter((id) => id !== ideaId);
+    poll.options.push(ideaCid);
+    return poll.save();
+  }
+  async savePollOnChainId(
+    pollId: string,
+    pollIdOnChain: number,
+    subgraphUrl?: string,
+  ): Promise<PollsDocument | null> {
+    const update: any = { pollIdOnChain };
+    if (subgraphUrl) {
+      update.subgraphUrl = subgraphUrl;
     }
+    return this.pollsModel
+      .findByIdAndUpdate(pollId, update, { new: true })
+      .exec();
+  }
 
-    // async getOptionsByPollId(pollId: string): Promise<any[]|any> {
-    //     const poll = await this.pollsModel.findById(pollId).exec();
-    //     if (!poll) {
-    //         throw new BadRequestException('Poll not found');
-    //     }
+  async updateStatusByOnChainId(
+    pollIdOnChain: number,
+    status: string,
+  ): Promise<PollsDocument | null> {
+    return this.pollsModel
+      .findOneAndUpdate(
+        { pollIdOnChain: pollIdOnChain },
+        { status },
+        { new: true },
+      )
+      .exec();
+  }
 
+  // async getOptionsByPollId(pollId: string): Promise<any[]|any> {
+  //     const poll = await this.pollsModel.findById(pollId).exec();
+  //     if (!poll) {
+  //         throw new BadRequestException('Poll not found');
+  //     }
+
+  async getAll(): Promise<PollsDocument[]> {
+    return this.pollsModel.find().exec();
+  }
+
+  /**
+   * Find poll that contains the given CID in options[]
+   */
+  async getPollByOptionCid(optionCid: string): Promise<PollsDocument | null> {
+    return this.pollsModel.findOne({ options: optionCid }).exec();
+  }
+
+  /**
+   * Update poll
+   */
+  async updatePoll(
+    pollId: string,
+    updateData: Partial<Polls>,
+  ): Promise<PollsDocument | null> {
+    return this.pollsModel
+      .findByIdAndUpdate(pollId, updateData, { new: true })
+      .exec();
+  }
+
+  /**
+   * Delete poll
+   */
+  async deletePoll(pollId: string): Promise<PollsDocument | null> {
+    return this.pollsModel.findByIdAndDelete(pollId).exec();
+  }
 }

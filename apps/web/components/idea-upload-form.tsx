@@ -5,7 +5,14 @@ import Image from "next/image";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { cn } from "@sasvoth/ui/lib/utils";
+import { useAccount } from "wagmi";
+import { useIdeas } from "../hooks/useIdeas";
+import {usePolls} from "../hooks/usePolls";
 
+import { useIPFS } from "../hooks/useIPFS";
+import { VoteDetailLayout, VoteLeftPanel, VoteTextBlock } from "./vote/VoteDetailLayout";
+import { VoteRightPanel } from "./vote/VoteRightPanel";
+import { VoteGallery } from "./vote/VoteGallery";
 type LayoutItemBase = {
   id: string;
   title: string;
@@ -38,15 +45,35 @@ const createId = () =>
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random()}`;
 
+import { useFeedback } from "../contexts/FeedbackContext";
+
 export function IdeaUploadForm({
   className,
+  pollId: propPollId,
+  onSuccess,
 }: {
-  className?: string;
+  className?: string; // made className optional explicitly
+  pollId: string; // make pollId required
+  onSuccess?: () => void;
 }): React.ReactElement {
+  const { address } = useAccount();
+  const { createIdea, updateIdeaCID } = useIdeas();
+  // const { uploadFile, uploadMetadata } = useIPFS(); // Not using IPFS here anymore
+  
+  const pollId = propPollId; 
+  if (!pollId) {
+    console.error("IdeaUploadForm rendered without pollId!");
+  }
+
+  const {  addIdeaToPoll, selectedPollId } = usePolls();
+  
+  const { showSuccess, showError } = useFeedback();
+
   const [step, setStep] = React.useState(1);
   const [logoFile, setLogoFile] = React.useState<File | null>(null);
   const [logoPreview, setLogoPreview] = React.useState<string | null>(null);
   const [logoCrop, setLogoCrop] = React.useState(100);
+  const [title, setTitle] = React.useState("");
   const [ageLimit, setAgeLimit] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [mainHero, setMainHero] = React.useState<File | null>(null);
@@ -83,6 +110,7 @@ export function IdeaUploadForm({
 
   const canAdvanceFromStepOne =
     Boolean(logoPreview) &&
+    Boolean(title.trim()) &&
     Boolean(ageLimit.trim()) &&
     descriptionWords > 0 &&
     descriptionWords < 200;
@@ -236,28 +264,88 @@ export function IdeaUploadForm({
     setIsPreviewOpen(false);
   }
 
-  function handleFinalSubmit() {
+  async function uploadToLocal(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || "Upload failed");
+    return data.url;
+  }
+
+  async function handleFinalSubmit() {
     if (!canSaveDraft) return;
-    const payload = {
-      logo: logoFile?.name ?? "",
-      ageLimit,
-      description: description.trim(),
-      hero: mainHero?.name ?? "",
-      layout: layoutItems.map((item) =>
-        item.type === "text"
-          ? {
-              type: "text",
-              title: item.title,
-              content: item.content,
+    if (!pollId) {
+      console.error("No poll ID available for submission");
+      return;
+    }
+
+    try {
+      // 1. Upload assets to Local Storage
+      let logoUrl = "";
+      if (logoFile) {
+        console.log("Uploading logo to Local...");
+        logoUrl = await uploadToLocal(logoFile);
+      }
+
+      let heroUrl = "";
+      if (mainHero) {
+        console.log("Uploading hero to Local...");
+        heroUrl = await uploadToLocal(mainHero);
+      }
+
+      // 2. Create Idea in DB with mapped fields
+      // Mapping:
+      // imgSrc -> Local URL
+      // imgsSrc[0] -> Local URL
+      // descriptionMore[0] -> Age Limit
+      // descriptionMore[1] -> Layout Items JSON
+      
+      const layoutJson = JSON.stringify(layoutItems);
+
+      const payload = {
+        title: title.trim(),
+        description: description.trim(),
+        imgSrc: logoUrl, 
+        imgsSrc: heroUrl ? [heroUrl] : [],
+        descriptionMore: [ageLimit, layoutJson],
+        creatorIdea: address ?? "",
+      };
+
+      console.log("Creating idea in DB with payload:", payload);
+      const idea = await createIdea(payload);
+      
+      if (idea?._id) {
+         await addIdeaToPoll(pollId, idea._id);
+         
+         showSuccess(
+            "Idea Submitted!",
+            "Your idea has been successfully submitted and is pending approval.",
+            () => {
+               onSuccess?.();
+               // Reset form
+               setTitle("");
+               setAgeLimit("");
+               setDescription("");
+               setLogoPreview(null);
+               setMainHeroPreview(null);
+               setLogoFile(null);
+               setMainHero(null);
+               setLayoutItems([]);
+               setStep(1);
             }
-          : {
-              type: "stack",
-              title: item.title,
-              frames: item.frames.map((frame) => frame.label),
-            }
-      ),
-    };
-    console.table(payload);
+         );
+      } else {
+         showError("Submission Failed", "Failed to create idea in the database.");
+      }
+
+    } catch (error: any) {
+      console.error("Submission error:", error);
+      showError("Submission Failed", error.message || "An unexpected error occurred.");
+    }
   }
 
   return (
@@ -387,6 +475,19 @@ export function IdeaUploadForm({
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
+              <label className="space-y-2 md:col-span-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.25em] text-black">
+                  Idea Title
+                </span>
+                <Input
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="Enter the name of your idea"
+                  className="border-black/30 text-black placeholder:text-black/30 focus-visible:border-black focus-visible:ring-black/50"
+                  maxLength={100}
+                />
+              </label>
+
               <label className="space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.25em] text-black">
                   Age limit
@@ -689,6 +790,10 @@ export function IdeaUploadForm({
           onRemoveItem={handleLayoutRemove}
           heroPreview={mainHeroPreview}
           items={layoutItems}
+          title={title}
+          ageLimit={ageLimit}
+          description={description}
+          logoPreview={logoPreview}
         />
       )}
     </section>
@@ -700,94 +805,73 @@ function PreviewModal({
   onRemoveItem,
   heroPreview,
   items,
+  title,
+  ageLimit,
+  description,
+  logoPreview,
 }: {
   onClose: () => void;
   onRemoveItem: (id: string) => void;
   heroPreview: string | null;
   items: LayoutItem[];
+  title: string;
+  ageLimit: string;
+  description: string;
+  logoPreview: string | null;
 }) {
+  /* New Preview Logic matching VotePage exactly */
+  const address = "0xYourAddress..."; // Mock or use useAccount() if available in parent but not passed cleanly here
+  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8">
-      <div className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl border border-black/20 bg-white p-6 shadow-2xl">
+      <div className="relative max-h-[90vh] w-full max-w-[90vw] overflow-y-auto rounded-xl bg-white shadow-2xl">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-6 top-6 text-sm font-semibold uppercase tracking-[0.25em] text-black hover:underline"
+          className="absolute right-4 top-4 z-50 rounded-full bg-white p-2 text-black shadow hover:bg-gray-100"
         >
-          Close
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
-        <div className="space-y-4 pr-8">
-          <header>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/50">
-              Live preview
-            </p>
-            <h3 className="text-2xl font-semibold">News page layout</h3>
-            <p className="text-sm text-black/60">
-              Hero image leads, followed by the ordered blocks. Remove items
-              inline with the × buttons to keep only what matters.
-            </p>
-          </header>
+        
+        <div className="p-4 md:p-8">
+           <VoteDetailLayout>
+              <VoteLeftPanel>
+                 {heroPreview && (
+                    <div className="w-full aspect-video border border-black rounded-xl overflow-hidden mb-8">
+                       <img src={heroPreview} alt="Hero" className="w-full h-full object-cover" />
+                    </div>
+                 )}
 
-          <div className="space-y-6 rounded-3xl border border-black/15 bg-black/[0.01] p-6">
-            {heroPreview ? (
-              <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border border-black/10 bg-white">
-                <Image
-                  src={heroPreview}
-                  alt="Hero preview"
-                  fill
-                  sizes="(max-width: 900px) 100vw, 900px"
-                  className="object-cover grayscale"
-                  unoptimized
-                />
-              </div>
-            ) : (
-              <div className="aspect-[3/2] w-full rounded-2xl border border-black/20 bg-white text-center text-sm text-black/40 flex items-center justify-center">
-                Hero placeholder
-              </div>
-            )}
+                 {items.map((item) => {
+                    if (item.type === "text") {
+                       return <VoteTextBlock key={item.id} title={item.title} content={item.content} />;
+                    }
+                    if (item.type === "stack") {
+                       // Visualize stack as a Gallery
+                       return (
+                          <div key={item.id} className="w-full">
+                             <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
+                             <VoteGallery isPreview />
+                          </div>
+                       );
+                    }
+                    return null;
+                 })}
+              </VoteLeftPanel>
 
-            {items.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-black/15 bg-white p-4 text-center text-sm text-black/40">
-                No layout blocks yet.
-              </div>
-            )}
-
-            {items.map((item, index) => (
-              <div
-                key={item.id}
-                className="relative space-y-3 rounded-2xl border border-black/15 bg-white p-5"
-              >
-                <button
-                  type="button"
-                  onClick={() => onRemoveItem(item.id)}
-                  className="absolute right-5 top-5 text-xs font-semibold uppercase tracking-[0.25em] text-black hover:text-black/60"
-                >
-                  ×
-                </button>
-                <div className="text-xs font-semibold uppercase tracking-[0.25em] text-black/60">
-                  {index + 1}.{" "}
-                  {item.type === "text" ? "Editorial column" : "Image stack"}
-                </div>
-                <h4 className="text-lg font-semibold">{item.title}</h4>
-                {item.type === "text" ? (
-                  <p className="text-sm leading-relaxed text-black/80">
-                    {item.content}
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-3">
-                    {item.frames.map((frame) => (
-                      <div
-                        key={frame.id}
-                        className="flex h-24 w-32 flex-col items-center justify-center rounded-xl border border-black/15 bg-black/5 text-xs font-semibold uppercase tracking-[0.25em] text-black/60"
-                      >
-                        {frame.label}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+              <VoteRightPanel
+                 title={title || "Untitled Idea"}
+                 description={description}
+                 creator={address} // Placeholder or current user
+                 approvedAt={new Date()}
+                 ideaId="Preview-Mode"
+                 logo={logoPreview || undefined}
+                 ageLimit={ageLimit}
+                 isPreview={true}
+              />
+           </VoteDetailLayout>
         </div>
       </div>
     </div>

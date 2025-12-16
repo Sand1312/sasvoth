@@ -8,11 +8,13 @@ import { cn } from "@sasvoth/ui/lib/utils";
 type IdeaSubmitFormTriggerProps = {
   className?: string;
   children: React.ReactNode;
+  pollId: string;
 };
 
 export function IdeaSubmitFormTrigger({
   className,
   children,
+  pollId,
 }: IdeaSubmitFormTriggerProps): React.ReactElement {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -65,6 +67,8 @@ export function IdeaSubmitFormTrigger({
                 "max-h-[85vh] overflow-y-auto border border-black/20 bg-white",
                 "shadow-[0_35px_120px_-60px_rgba(0,0,0,0.7)]"
               )}
+              onSuccess={() => setIsOpen(false)}
+              pollId={pollId}
             />
           </div>
         </div>

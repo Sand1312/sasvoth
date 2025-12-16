@@ -1,0 +1,86 @@
+# Implementation Plan
+
+- [x] 1. Update server action for proper joinPoll
+  - [x] 1.1 Update joinPollAction to include all required MACI SDK parameters
+    - Add pollJoiningZkey path pointing to public/zkeys/PollJoining_10_test/PollJoining_10_test.0.zkey
+    - Add pollJoiningWasm path pointing to public/zkeys/PollJoining_10_test/PollJoining_10_test_js/PollJoining_10_test.wasm
+    - Add sgDataArg and ivcpDataArg as zero bytes
+    - Add startBlock and blocksPerBatch parameters
+    - Use actual wallet signer from environment (WALLET_PRIVATE_KEY)
+    - _Requirements: 1.2, 3.1, 3.2_
+  - [x] 1.2 Update joinPollAction return value to include pollStateIndex and voiceCredits
+    - Extract pollStateIndex from SDK result
+    - Extract voiceCredits from SDK result
+    - Return structured response with success, pollStateIndex, voiceCredits, hash
+    - _Requirements: 3.3, 3.4_
+  - [x] 1.3 Write property test for joinPoll parameter completeness
+    - **Property 3: JoinPoll parameter completeness**
+    - **Validates: Requirements 1.2, 3.2**
+  - [x] 1.4 Write property test for joinPoll result structure
+    - **Property 4: JoinPoll result structure**
+    - **Validates: Requirements 3.3**
+
+- [x] 2. Update SignupModal to use serialized keypair format
+  - [x] 2.1 Update keypair generation to use random Keypair or derive from user input
+    - Use `new Keypair()` for random generation
+    - Or use `new Keypair(new PrivKey(BigInt(userSeed)))` for deterministic
+    - _Requirements: 5.1_
+  - [x] 2.2 Update key storage to use serialized format
+    - Store `keypair.privateKey.serialize()` as maci_privKey (macisk.xxx format)
+    - Store `keypair.publicKey.serialize()` as maci_pubKey (macipk.xxx format)
+    - _Requirements: 1.4, 1.5, 5.2, 5.3_
+  - [x] 2.3 Store pollStateIndex from joinPoll result
+    - Call joinPollAction after signup
+    - Extract pollStateIndex from result
+    - Store in localStorage as maci_pollStateIndex
+    - _Requirements: 1.3_
+  - [x] 2.4 Write property test for serialized private key format
+    - **Property 1: Serialized private key format**
+    - **Validates: Requirements 1.4, 5.2**
+  - [x] 2.5 Write property test for serialized public key format
+    - **Property 2: Serialized public key format**
+    - **Validates: Requirements 1.5, 5.3**
+
+- [x] 3. Checkpoint - Ensure signup and joinPoll flow works
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 4. Update vote submission to use pollStateIndex
+  - [x] 4.1 Update handleVote to read pollStateIndex from localStorage
+    - Read maci_pollStateIndex instead of maci_stateIndex
+    - Validate pollStateIndex exists before voting
+    - _Requirements: 2.1_
+  - [x] 4.2 Update submitVote to deserialize keys correctly
+    - Use PrivKey.deserialize() for macisk.xxx format
+    - Verify key format before deserialization
+    - _Requirements: 2.2, 5.4_
+  - [x] 4.3 Update submitVote to use correct parameters
+    - Use pollStateIndex as stateIndex parameter
+    - Ensure voteOptionIndex is dynamic (not hardcoded)
+    - _Requirements: 2.1, 2.3_
+  - [x] 4.4 Write property test for vote uses pollStateIndex
+    - **Property 5: Vote uses pollStateIndex**
+    - **Validates: Requirements 2.1**
+
+- [x] 5. Add duplicate join prevention
+  - [x] 5.1 Check localStorage before joining poll
+    - Check if maci_pollStateIndex exists for current poll
+    - If exists, show "Already Joined" status
+    - Prevent duplicate joinPoll calls
+    - _Requirements: 4.2_
+  - [x] 5.2 Write property test for duplicate join prevention
+    - **Property 6: Duplicate join prevention**
+    - **Validates: Requirements 4.2**
+
+- [x] 6. Update UI to show join status and debug info
+  - [x] 6.1 Update SignupModal to show success with pollStateIndex
+    - Display pollStateIndex after successful join
+    - Show "Joined" status in button
+    - _Requirements: 4.1_
+  - [x] 6.2 Update vote page debug panel
+    - Show pollStateIndex (not just stateIndex)
+    - Show key format validation status
+    - Show MACI address and poll ID
+    - _Requirements: 4.3_
+
+- [x] 7. Final Checkpoint - Ensure full voting flow works
+  - Ensure all tests pass, ask the user if questions arise.

@@ -152,4 +152,12 @@ async updateBalance(userId: string, amount: number,txHash:string): Promise<Users
     await user.save()
     return user;
   }
+async updateStateIndex(walletAddress: string, stateIndex: number): Promise<void> {
+  let user = await this.usersModel.findOne({walletAddress: walletAddress}).exec();
+  if (!user) {
+      throw new InternalServerErrorException('User not found');
+    }
+    user.stateIndex = stateIndex;
+    await user.save();  
+  }
 }

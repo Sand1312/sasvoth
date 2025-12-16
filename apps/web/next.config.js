@@ -19,12 +19,42 @@ const nextConfig = {
         assert: false,
         buffer: false,
         events: false,
+        os: false,
+        path: false,
+        child_process: false,
+        readline: false,
+        console: false,
+        "@react-native-async-storage/async-storage": false,
+      };
+
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        hardhat: false,
+        "hardhat/config": false,
+        "@nomicfoundation/solidity-analyzer": false,
+        "@nomicfoundation/ignition-core": false,
+        "@nomicfoundation/hardhat-ignition": false,
+        "@excubiae/contracts": false,
+        "ts-node": false,
+        swc: false,
+        "@swc/core": false,
+        canvas: false,
       };
     }
-    
     return config;
   },
-  serverExternalPackages: ['undici', '@maci-protocol/sdk'],
+  serverExternalPackages: [
+    "undici",
+    "snarkjs",
+    "circomlibjs",
+    "@maci-protocol/sdk",
+    "@maci-protocol/contracts",
+    "@maci-protocol/core",
+    "@maci-protocol/crypto",
+    "@maci-protocol/domainobjs",
+    "hardhat",
+    "ts-node",
+  ],
 };
 
 export default nextConfig;

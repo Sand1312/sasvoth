@@ -2,23 +2,41 @@
 import { useRedirect } from "./useRedirect";
 import { pollsApi } from "../api";
 import { PollStatus } from "@/types/polls";
-// import { init } from "next/dist/compiled/webpack/webpack";
+import { useState } from "react";
+import { createDataHook } from "./factory";
+
+// Factory-created hooks
+export const usePollsQuery = createDataHook(
+  (status?: PollStatus) => ["polls", status || "all"],
+  (status?: PollStatus) => pollsApi.getPolls(status),
+  { staleTime: 1000 * 60 * 5 } // 5 minutes
+);
+
+export const usePollQuery = createDataHook(
+  (pollId: string) => ["poll", pollId],
+  (pollId: string) => pollsApi.getPollById(pollId),
+  { staleTime: 1000 * 60 * 5 }
+);
 
 export function usePolls() {
   const { goTo, replaceTo } = useRedirect();
-
+  const [selectedPollId, setSelectedPollId] = useState<string>("");
   const initPoll = async (
-    options: string[],
+     title: string,
+    description: string,
+    creatorAddress: string,
+    numberOptions: number,
     startTime: Date,
     endTime: Date,
-    pollIdOnChain: number
   ) => {
     try {
       const res = await pollsApi.createPoll(
-        options,
+        title,
+        description,
+        creatorAddress,
+        numberOptions,
         startTime,
         endTime,
-        pollIdOnChain
       );
       goTo("/admin/dashboard");
       return res;
@@ -38,16 +56,29 @@ export function usePolls() {
   };
   const getPollById = async (pollId: string) => {
     try {
-      const res = await pollsApi.getPollById(pollId);
+      const res = await pollsApi.getPollById(pollId); 
       return res;
     } catch (error) {
       console.error("Get Poll By ID error:", error);
       throw error;
     }
   };
+
+  const updatePollStatus= pollsApi.updatePollStatus;
+   const addIdeaToPoll= pollsApi.addIdeaToPoll;
+   const approveIdeaInPoll= pollsApi.approveIdeaInPoll;
+   const saveOnChainId= pollsApi.saveOnChainId;
+
+
   return {
     initPoll,
     getPolls,
     getPollById,
+    updatePollStatus ,
+    addIdeaToPoll,
+    approveIdeaInPoll,
+    saveOnChainId,
+    selectedPollId,
+    setSelectedPollId,
   };
 }

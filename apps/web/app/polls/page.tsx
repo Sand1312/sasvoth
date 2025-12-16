@@ -189,12 +189,14 @@ export default function PollsPage() {
   }>({ key: "dateAdded", direction: "desc" });
 
   useEffect(() => {
+    let isMounted = true;
     const loadPolls = async () => {
       setLoading(true);
       try {
         const response = await getPolls();
         if (Array.isArray(response) && response.length > 0) {
           setPolls(annotatePolls(response));
+          console.log("Loaded Polls:", annotatePolls(response));
           setError(null);
         } else {
           setPolls(annotatePolls(fallbackPolls));
@@ -205,11 +207,14 @@ export default function PollsPage() {
         setError("Unable to reach the polls service. Showing offline data.");
         setPolls(annotatePolls(fallbackPolls));
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     loadPolls();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const visiblePolls = useMemo(() => {
@@ -335,8 +340,8 @@ export default function PollsPage() {
                   className={cn(
                     "size-4 transition-transform",
                     sortConfig.key === option.key &&
-                      sortConfig.direction === "asc" &&
-                      "-scale-y-100"
+                    sortConfig.direction === "asc" &&
+                    "-scale-y-100"
                   )}
                 />
               </button>
@@ -443,7 +448,7 @@ function ListView({ polls }: { polls: PollWithMeta[] }) {
               className={cn(
                 "absolute right-0 top-0 h-10 w-10 rounded-bl-3xl",
                 statusThemes[poll.status ?? PollStatus.Draft]?.accent ??
-                  "bg-black/10"
+                "bg-black/10"
               )}
               aria-hidden
             />
@@ -504,7 +509,7 @@ function GridView({ polls }: { polls: PollWithMeta[] }) {
             className={cn(
               "absolute right-0 top-0 h-12 w-12 rounded-bl-[30px]",
               statusThemes[poll.status ?? PollStatus.Draft]?.accent ??
-                "bg-black/10"
+              "bg-black/10"
             )}
             aria-hidden
           />

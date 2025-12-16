@@ -27,6 +27,35 @@ const LOGO_PROPS = {
 const NAV_WRAPPER_CLASSES =
   "mx-auto flex w-full max-w-7xl items-center justify-between px-[2%] py-5 md:py-6 bg-white";
 
+async function refreshToken(
+  cookieHeader: string,
+  apiBase: string
+): Promise<boolean> {
+  try {
+    const refreshEndpoint = new URL("/api/v1/auth/refresh", apiBase).toString();
+
+    const res = await fetch(refreshEndpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        ...(cookieHeader ? { cookie: cookieHeader } : {}),
+      },
+      cache: "no-store",
+    });
+
+    if (res.ok) {
+      return true;
+    }
+
+    console.error("Token refresh failed with status:", res.status);
+    return false;
+  } catch (err) {
+    console.error("Token refresh error:", err);
+    return false;
+  }
+}
+
 async function getCurrentUser(): Promise<User> {
   try {
     const cookieStore = await cookies();
@@ -41,9 +70,9 @@ async function getCurrentUser(): Promise<User> {
       process.env.NEXT_PUBLIC_API_URL ||
       process.env.API_URL ||
       "http://localhost:8000";
-    const backendUrl = new URL("/users/me", apiBase).toString();
+    const userEndpoint = new URL("/api/v1/users/me", apiBase).toString();
 
-    const res = await fetch(backendUrl, {
+    let res = await fetch(userEndpoint, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -52,7 +81,30 @@ async function getCurrentUser(): Promise<User> {
       cache: "no-store",
     });
 
+    // Handle 401 with token refresh
+    if (res.status === 401) {
+      console.log("Received 401, attempting token refresh...");
+      const refreshSuccess = await refreshToken(cookieHeader, apiBase);
+
+      if (refreshSuccess) {
+        console.log("Token refresh successful, retrying user request...");
+        // Retry the original request
+        res = await fetch(userEndpoint, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            ...(cookieHeader ? { cookie: cookieHeader } : {}),
+          },
+          cache: "no-store",
+        });
+      } else {
+        console.log("Token refresh failed, returning null");
+        return null;
+      }
+    }
+
     if (!res.ok) {
+      console.error("Failed to fetch user, status:", res.status);
       return null;
     }
 

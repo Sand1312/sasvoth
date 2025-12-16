@@ -18,11 +18,14 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:3002',
+    origin:  'http://localhost:3002',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
   });
+
+  // Add API version prefix so all controllers are served under /api/v1
+  app.setGlobalPrefix('api/v1');
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('SASVoth API')
@@ -32,7 +35,8 @@ async function bootstrap() {
     .build();
 
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, swaggerDocument);
+  // Serve Swagger UI under /api/v1/docs
+  SwaggerModule.setup('api/v1/docs', app, swaggerDocument);
 
   const port = Number(process.env.PORT) || 8000;
   await app.listen(port);

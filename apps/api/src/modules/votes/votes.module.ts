@@ -4,11 +4,13 @@ import { VotesService } from './votes.service';
 import { VotesController } from './votes.controller';
 import { Votes, VotesSchema } from './schemas/votes.schema';
 import { VoiceCreditsModule } from '../voice-credits/voice-credits.module';
+import { MaciModule } from '../maci/maci.module';
 
 @Module({
     imports:[
         MongooseModule.forFeature([{name: 'Votes', schema: VotesSchema}]),
-        VoiceCreditsModule
+        VoiceCreditsModule,
+        MaciModule
     ],
     controllers: [VotesController],
     providers: [VotesService],

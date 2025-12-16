@@ -1,0 +1,95 @@
+# Implementation Plan
+
+- [x] 1. Create useLogin custom hook
+  - Create `apps/web/hooks/useLogin.ts` file
+  - Implement state management for wallet errors, form errors, and submission state
+  - Implement handleWalletLogin function with MetaMask connection logic
+  - Implement handleEmailLogin function with form submission logic
+  - Implement handleSocialLogin function for OAuth redirects
+  - Implement handleMaciSetup helper function for MACI initialization
+  - Add error message constants and categorization
+  - Add clearErrors and reset utility functions
+  - Export UseLoginReturn interface and useLogin hook
+  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
+
+- [x] 2. Create SocialLoginButton component
+  - Create `apps/web/components/SocialLoginButton.tsx` file
+  - Implement button with icon and label props
+  - Add hover state management for tooltip
+  - Add loading state management
+  - Implement tooltip display on hover
+  - Add ARIA labels for accessibility
+  - Add disabled state during loading
+  - Wrap with React.memo for performance
+  - Export SocialLoginButtonProps interface and component
+  - _Requirements: 1.4, 4.3, 4.4, 5.3, 5.4, 6.7, 9.1, 9.4, 10.1_
+
+- [x] 3. Create SocialLoginButtons component
+  - Create `apps/web/components/SocialLoginButtons.tsx` file
+  - Define PROVIDERS configuration with icons and labels
+  - Implement component that maps over providers
+  - Render SocialLoginButton for each provider
+  - Add error display for wallet errors
+  - Add role="group" with aria-label for accessibility
+  - Export SocialLoginButtonsProps interface and component
+  - _Requirements: 1.3, 4.1, 4.2, 4.3, 4.4, 5.1, 5.2, 5.3, 5.4, 6.1, 6.6, 8.2, 8.3, 9.1, 9.2_
+
+- [x] 4. Create LoginForm component
+  - Create `apps/web/components/LoginForm.tsx` file
+  - Implement form with identifier and password inputs
+  - Add FORM_VALIDATION constants
+  - Implement validateForm function with client-side validation
+  - Add local error state for validation messages
+  - Implement handleSubmit that validates before calling onSubmit prop
+  - Add proper autocomplete attributes (username, current-password)
+  - Add ARIA labels and aria-invalid attributes
+  - Display both local validation errors and server errors
+  - Show loading state on submit button when isSubmitting is true
+  - Export LoginFormProps interface and component
+  - _Requirements: 1.2, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 8.4, 8.5, 9.1, 9.3, 9.4, 9.5_
+
+- [x] 5. Create LoginPage container component
+  - Create `apps/web/components/LoginPage.tsx` file
+  - Import and use useLogin hook
+  - Compose layout with header and title
+  - Render LoginForm with onSubmit, isSubmitting, and error props
+  - Add divider with "or" text between form and social buttons
+  - Render SocialLoginButtons with handler props and error
+  - Add "Don't have an account? Sign up" link
+  - Apply styling for centered layout with white card
+  - Export LoginPage component
+  - _Requirements: 1.1, 1.5, 9.4_
+
+- [x] 6. Update signin page to use new LoginPage component
+  - Update `apps/web/app/signin/page.tsx`
+  - Remove all existing code
+  - Import and render LoginPage component
+  - Keep "use client" directive
+  - _Requirements: All_
+
+- [x] 7. Add performance optimizations
+  - Add useMemo to useLogin hook for stable handler references
+  - Add useMemo to useLogin return value
+  - Verify React.memo is applied to SocialLoginButton
+  - Add custom comparison function to SocialLoginButton memo if needed
+  - _Requirements: 10.1, 10.2, 10.3, 10.4_
+
+- [x] 8. Manual testing and verification
+  - Test email/password login with valid credentials
+  - Test email/password login with invalid credentials
+  - Test email/password login with empty fields
+  - Test email/password login with short identifier (< 3 chars)
+  - Test email/password login with short password (< 6 chars)
+  - Test Google OAuth login flow
+  - Test GitHub OAuth login flow
+  - Test MetaMask wallet login with MetaMask installed
+  - Test MetaMask wallet login without MetaMask installed
+  - Test MACI initialization for new wallet users
+  - Test MACI state restoration for existing wallet users
+  - Verify all error messages display correctly
+  - Verify loading states work correctly
+  - Verify hover tooltips appear on social buttons
+  - Test keyboard navigation through all interactive elements
+  - Verify ARIA labels are present and correct
+  - Test with screen reader for accessibility compliance
+  - _Requirements: All_
