@@ -8,7 +8,7 @@ import { cn } from "@sasvoth/ui/lib/utils";
 import { useAccount } from "wagmi";
 import { useIdeas } from "../hooks/useIdeas";
 import {usePolls} from "../hooks/usePolls";
-import { useSafePollContext } from "../app/polls/[id]/PollContext";
+
 import { useIPFS } from "../hooks/useIPFS";
 import { VoteDetailLayout, VoteLeftPanel, VoteTextBlock } from "./vote/VoteDetailLayout";
 import { VoteRightPanel } from "./vote/VoteRightPanel";
@@ -52,15 +52,19 @@ export function IdeaUploadForm({
   pollId: propPollId,
   onSuccess,
 }: {
-  className?: string;
-  pollId?: string;
+  className?: string; // made className optional explicitly
+  pollId: string; // make pollId required
   onSuccess?: () => void;
 }): React.ReactElement {
   const { address } = useAccount();
   const { createIdea, updateIdeaCID } = useIdeas();
   // const { uploadFile, uploadMetadata } = useIPFS(); // Not using IPFS here anymore
-  const pollContext = useSafePollContext();
-  const pollId = propPollId ?? pollContext?.pollId;
+  
+  const pollId = propPollId; 
+  if (!pollId) {
+    console.error("IdeaUploadForm rendered without pollId!");
+  }
+
   const {  addIdeaToPoll, selectedPollId } = usePolls();
   
   const { showSuccess, showError } = useFeedback();
