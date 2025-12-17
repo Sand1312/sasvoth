@@ -13,6 +13,118 @@ import { useIPFS } from "../hooks/useIPFS";
 import { VoteDetailLayout, VoteLeftPanel, VoteTextBlock } from "./vote/VoteDetailLayout";
 import { VoteRightPanel } from "./vote/VoteRightPanel";
 import { VoteGallery } from "./vote/VoteGallery";
+
+// Icons
+const ChevronIcon = ({ direction }: { direction: "up" | "down" }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={cn("size-4 transition-transform", direction === "down" && "rotate-180")}
+  >
+    <polyline points="18 15 12 9 6 15" />
+  </svg>
+);
+
+const IconButton = ({
+  children,
+  onClick,
+  disabled,
+  label,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  label: string;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    aria-label={label}
+    className="flex size-7 items-center justify-center rounded-full border border-black/20 text-black hover:bg-black/5 disabled:opacity-30 disabled:hover:bg-transparent"
+  >
+    {children}
+  </button>
+);
+
+// Preview Modal
+function PreviewModal({
+  onClose,
+  heroPreview,
+  items,
+  title,
+  ageLimit,
+  description,
+  logoPreview,
+  onRemoveItem
+}: {
+  onClose: () => void;
+  heroPreview: string | null;
+  items: LayoutItem[];
+  title: string;
+  ageLimit: string;
+  description: string;
+  logoPreview: string | null;
+  onRemoveItem: (id: string) => void;
+}) {
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
+            <div className="relative w-full max-w-6xl h-[90vh] bg-white rounded-3xl overflow-hidden flex flex-col">
+                <div className="flex justify-between items-center p-4 border-b">
+                    <h3 className="font-bold uppercase tracking-widest">Preview</h3>
+                    <button onClick={onClose} className="text-sm uppercase font-bold text-red-500">Close</button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-8">
+                     {/* Simplified View for Preview using same Layout components if possible, or manual */}
+                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        {/* LEFT (8 cols) */}
+                        <div className="lg:col-span-8 space-y-12">
+                             {heroPreview && (
+                                 <div className="w-full aspect-video relative rounded-xl overflow-hidden">
+                                     <img src={heroPreview} className="object-cover w-full h-full grayscale" />
+                                 </div>
+                             )}
+                             {items.map(item => (
+                                 <div key={item.id} className="relative group p-4 border border-transparent hover:border-dashed hover:border-black/20 rounded-xl">
+                                     {item.type === 'text' && (
+                                         <VoteTextBlock title={item.title} content={item.content} />
+                                     )}
+                                     {item.type === 'stack' && (
+                                         <div className="space-y-4">
+                                            <h3 className="uppercase font-bold tracking-widest">{item.title}</h3>
+                                            <VoteGallery 
+                                              screenshots={item.frames.map(f => f.preview || "")} 
+                                              isPreview={true}
+                                            />
+                                         </div>
+                                     )}
+                                 </div>
+                             ))}
+                        </div>
+                        {/* RIGHT (4 cols) */}
+                        <div className="lg:col-span-4">
+                            <VoteRightPanel 
+                                title={title}
+                                description={description}
+                                creator="Preview User"
+                                approvedAt={new Date().toLocaleDateString()}
+                                ideaId="preview"
+                                ageLimit={ageLimit}
+                                logo={logoPreview || undefined}
+                                onVote={() => {}}
+                            />
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 type LayoutItemBase = {
   id: string;
   title: string;
@@ -26,6 +138,9 @@ type TextLayoutItem = LayoutItemBase & {
 type StackFrame = {
   id: string;
   label: string;
+  file?: File; // New: optional file for upload
+  preview?: string; // New: local preview URL
+  ipfsUrl?: string; // New: stored after upload
 };
 
 type StackLayoutItem = LayoutItemBase & {
@@ -58,7 +173,7 @@ export function IdeaUploadForm({
 }): React.ReactElement {
   const { address } = useAccount();
   const { createIdea, updateIdeaCID } = useIdeas();
-  // const { uploadFile, uploadMetadata } = useIPFS(); // Not using IPFS here anymore
+  const { uploadFile } = useIPFS(); 
   
   const pollId = propPollId; 
   if (!pollId) {
@@ -124,6 +239,7 @@ export function IdeaUploadForm({
     return (
       Boolean(item.title.trim()) &&
       item.frames.length > 0 &&
+      // Relaxed validation: Just requires a label, images are optional but encouraged
       item.frames.every((frame) => frame.label.trim().length > 0)
     );
   });
@@ -225,6 +341,28 @@ export function IdeaUploadForm({
       )
     );
   }
+  
+  function handleFrameFileChange(
+    itemId: string,
+    frameId: string,
+    file: File | null
+  ) {
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    
+    setLayoutItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId && item.type === "stack"
+          ? {
+              ...item,
+              frames: item.frames.map((frame) =>
+                frame.id === frameId ? { ...frame, file, preview } : frame
+              ),
+            }
+          : item
+      )
+    );
+  }
 
   function handleFrameRemove(itemId: string, frameId: string) {
     setLayoutItems((prev) =>
@@ -264,17 +402,7 @@ export function IdeaUploadForm({
     setIsPreviewOpen(false);
   }
 
-  async function uploadToLocal(file: File) {
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || "Upload failed");
-    return data.url;
-  }
+  // NOTE: Local upload removed. Using IPFS directly.
 
   async function handleFinalSubmit() {
     if (!canSaveDraft) return;
@@ -284,27 +412,45 @@ export function IdeaUploadForm({
     }
 
     try {
-      // 1. Upload assets to Local Storage
+      // 1. Upload assets to IPFS
       let logoUrl = "";
       if (logoFile) {
-        console.log("Uploading logo to Local...");
-        logoUrl = await uploadToLocal(logoFile);
+        console.log("Uploading logo to IPFS...");
+        const result = await uploadFile(logoFile);
+        logoUrl = result.url; // This is a relative proxy URL: /api/v1/ipfs/Qm...
       }
 
       let heroUrl = "";
       if (mainHero) {
-        console.log("Uploading hero to Local...");
-        heroUrl = await uploadToLocal(mainHero);
+        console.log("Uploading hero to IPFS...");
+        const result = await uploadFile(mainHero);
+        heroUrl = result.url;
+      }
+
+      // 1.5 Upload Stack Images to IPFS
+      console.log("Uploading stack images...");
+      
+      // Deep clone layoutItems to update with IPFS URLs
+      const finalLayoutItems = [...layoutItems];
+      
+      for (const item of finalLayoutItems) {
+          if (item.type === 'stack') {
+              for (const frame of item.frames) {
+                  if (frame.file) {
+                      console.log(`Uploading frame ${frame.label}...`);
+                      const res = await uploadFile(frame.file);
+                      // Update frame with URL
+                      frame.ipfsUrl = res.url; 
+                      // Remove file object before stringify to be clean (optional, JSON.stringify ignores functions/files mostly but safe to clean)
+                      delete frame.file; 
+                      delete frame.preview;
+                  }
+              }
+          }
       }
 
       // 2. Create Idea in DB with mapped fields
-      // Mapping:
-      // imgSrc -> Local URL
-      // imgsSrc[0] -> Local URL
-      // descriptionMore[0] -> Age Limit
-      // descriptionMore[1] -> Layout Items JSON
-      
-      const layoutJson = JSON.stringify(layoutItems);
+      const layoutJson = JSON.stringify(finalLayoutItems);
 
       const payload = {
         title: title.trim(),
@@ -704,9 +850,23 @@ export function IdeaUploadForm({
                                 key={frame.id}
                                 className="flex items-center gap-3 rounded-xl border border-black/15 bg-white px-3 py-2"
                               >
-                                <div className="h-12 w-16 rounded-lg border border-black/10 bg-black/5 text-center text-[11px] uppercase tracking-[0.2em] text-black/50 flex items-center justify-center">
-                                  Img
-                                </div>
+                                { /* Frame Image Preview / Upload */ }
+                                <label className="relative h-12 w-16 rounded-lg border border-black/10 bg-black/5 cursor-pointer hover:bg-black/10 flex items-center justify-center overflow-hidden">
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        className="hidden"
+                                        onChange={(e) => handleFrameFileChange(item.id, frame.id, e.target.files?.[0] || null)}
+                                    />
+                                    {frame.preview ? (
+                                        <img src={frame.preview} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="text-center text-[9px] uppercase tracking-[0.2em] text-black/50">
+                                          + Img
+                                        </div>
+                                    )}
+                                </label>
+
                                 <Input
                                   value={frame.label}
                                   onChange={(event) =>
@@ -800,126 +960,4 @@ export function IdeaUploadForm({
   );
 }
 
-function PreviewModal({
-  onClose,
-  onRemoveItem,
-  heroPreview,
-  items,
-  title,
-  ageLimit,
-  description,
-  logoPreview,
-}: {
-  onClose: () => void;
-  onRemoveItem: (id: string) => void;
-  heroPreview: string | null;
-  items: LayoutItem[];
-  title: string;
-  ageLimit: string;
-  description: string;
-  logoPreview: string | null;
-}) {
-  /* New Preview Logic matching VotePage exactly */
-  const address = "0xYourAddress..."; // Mock or use useAccount() if available in parent but not passed cleanly here
-  
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8">
-      <div className="relative max-h-[90vh] w-full max-w-[90vw] overflow-y-auto rounded-xl bg-white shadow-2xl">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-4 top-4 z-50 rounded-full bg-white p-2 text-black shadow hover:bg-gray-100"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-        
-        <div className="p-4 md:p-8">
-           <VoteDetailLayout>
-              <VoteLeftPanel>
-                 {heroPreview && (
-                    <div className="w-full aspect-video border border-black rounded-xl overflow-hidden mb-8">
-                       <img src={heroPreview} alt="Hero" className="w-full h-full object-cover" />
-                    </div>
-                 )}
 
-                 {items.map((item) => {
-                    if (item.type === "text") {
-                       return <VoteTextBlock key={item.id} title={item.title} content={item.content} />;
-                    }
-                    if (item.type === "stack") {
-                       // Visualize stack as a Gallery
-                       return (
-                          <div key={item.id} className="w-full">
-                             <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
-                             <VoteGallery isPreview />
-                          </div>
-                       );
-                    }
-                    return null;
-                 })}
-              </VoteLeftPanel>
-
-              <VoteRightPanel
-                 title={title || "Untitled Idea"}
-                 description={description}
-                 creator={address} // Placeholder or current user
-                 approvedAt={new Date()}
-                 ideaId="Preview-Mode"
-                 logo={logoPreview || undefined}
-                 ageLimit={ageLimit}
-                 isPreview={true}
-              />
-           </VoteDetailLayout>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function IconButton({
-  onClick,
-  disabled,
-  label,
-  children,
-}: {
-  onClick: () => void;
-  disabled?: boolean;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      disabled={disabled}
-      className="rounded-full border border-black/30 p-1 text-black/70 transition hover:bg-black/5 disabled:opacity-30"
-    >
-      {children}
-    </button>
-  );
-}
-
-function ChevronIcon({ direction }: { direction: "up" | "down" }) {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-black"
-    >
-      {direction === "up" ? (
-        <path d="M6 15l6-6 6 6" />
-      ) : (
-        <path d="M6 9l6 6 6-6" />
-      )}
-    </svg>
-  );
-}

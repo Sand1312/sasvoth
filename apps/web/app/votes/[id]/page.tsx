@@ -716,11 +716,18 @@ export default function VotePage({ params }: Props) {
                    return <VoteTextBlock key={item.id} title={item.title} content={item.content} />;
                 }
                 if (item.type === "stack") {
-                   // Mock stack for now using default gallery or specific images if available
+                   const stackImages = item.frames
+                      ?.map((f: any) => f.ipfsUrl || f.url || f.preview) // Handle various potential keys
+                      .filter((url: any) => typeof url === 'string')
+                      .map((url: string) => getImageSrc(url));
+
                    return (
                       <div key={item.id} className="w-full">
                          <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
-                         <VoteGallery urlResolver={getImageSrc} /> {/* Pass resolver if needed, or use defaults */}
+                         <VoteGallery 
+                            screenshots={stackImages}
+                            urlResolver={getImageSrc} 
+                         />
                       </div>
                    );
                 }
