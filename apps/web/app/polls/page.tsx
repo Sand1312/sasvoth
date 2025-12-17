@@ -183,6 +183,7 @@ export default function PollsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [participationFilter, setParticipationFilter] =
     useState<ParticipationFilter>("joined");
+  const [statusFilter, setStatusFilter] = useState<PollStatus | null>(null);
   const [sortConfig, setSortConfig] = useState<{
     key: SortKey;
     direction: "asc" | "desc";
@@ -222,6 +223,11 @@ export default function PollsPage() {
     return [...polls]
       .filter((poll) => poll.participation.includes(participationFilter))
       .filter((poll) => {
+        // Status Filter
+        if (statusFilter && poll.status !== statusFilter) {
+          return false;
+        }
+
         if (!normalizedSearch) return true;
         const haystack = [
           poll.title,
@@ -251,7 +257,7 @@ export default function PollsPage() {
         const diff = Number(firstMetric) - Number(secondMetric);
         return sortConfig.direction === "asc" ? diff : -diff;
       });
-  }, [polls, participationFilter, searchTerm, sortConfig]);
+  }, [polls, participationFilter, searchTerm, sortConfig, statusFilter]);
 
   const handleSortChange = (key: SortKey) => {
     setSortConfig((current) => {
@@ -266,6 +272,10 @@ export default function PollsPage() {
     });
   };
 
+  const toggleStatusFilter = (status: PollStatus) => {
+    setStatusFilter((current) => (current === status ? null : status));
+  };
+
   const renderEmptyState = () => (
     <div className="px-6 py-16 text-center">
       <p className="text-lg font-semibold">
@@ -273,8 +283,7 @@ export default function PollsPage() {
         {participationFilter === "joined" ? "Joined" : "Contributed"} polls yet.
       </p>
       <p className="mt-2 text-sm text-black/60">
-        Try switching the view toggle or clear your filters to explore other
-        poll collections.
+        Try switching the view toggle, clearing filters, or changing status selection.
       </p>
     </div>
   );
@@ -350,18 +359,38 @@ export default function PollsPage() {
 
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-black/60">
             {statusLegend.map(({ key, label }) => (
-              <div key={key} className="flex items-center gap-2">
+              <button
+                 key={key}
+                 onClick={() => toggleStatusFilter(key)}
+                 className={cn(
+                   "flex items-center gap-2 rounded-full px-3 py-1 transition-all border cursor-pointer",
+                   statusFilter === key 
+                    ? "bg-gray-100 border-black ring-1 ring-black" 
+                    : "bg-transparent border-transparent hover:bg-gray-100 hover:border-black/10"
+                 )}
+              >
                 <span
                   className={cn(
                     "inline-block h-3 w-3 rounded-full",
                     statusThemes[key]?.accent ?? "bg-black/30"
                   )}
                 />
-                <span className="text-xs uppercase tracking-[0.2em]">
+                <span className={cn(
+                  "text-xs uppercase tracking-[0.2em]",
+                  statusFilter === key && "font-bold text-black"
+                )}>
                   {label}
                 </span>
-              </div>
+              </button>
             ))}
+            {statusFilter && (
+                <button 
+                    onClick={() => setStatusFilter(null)}
+                    className="text-xs underline text-black/40 hover:text-black ml-2"
+                >
+                    Clear Filter
+                </button>
+            )}
           </div>
 
           {error && <p className="mt-4 text-sm text-orange-600">{error}</p>}

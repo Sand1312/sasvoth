@@ -120,7 +120,7 @@ export function SignupModal({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="rounded-[32px] border-2 border-black sm:max-w-md bg-white p-6">
+      <DialogContent className="rounded-[32px] border-2 border-black sm:max-w-md !bg-white p-6 z-[100]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center sm:text-left">Join Poll</DialogTitle>
         </DialogHeader>

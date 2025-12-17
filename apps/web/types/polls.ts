@@ -5,4 +5,5 @@ export enum PollStatus {
   Cancelled = "cancelled",
   InProgress = "in_progress",
   Counting = "counting",
+  Waiting = "waiting",
 }

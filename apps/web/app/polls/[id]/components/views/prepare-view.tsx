@@ -19,10 +19,13 @@ function getLogoSrc(logo?: string) {
 }
 
 export function PrepareView({ poll }: PrepareViewProps) {
-  // Logic from PrepareSection
-  const isDeployed = Boolean(poll.onChainId && poll.onChainId !== "0");
+  // Prepare = Not deployed, before start time (Idea submission open)
+  // Waiting = Deployed, before start time (Idea submission CLOSED)
+  // Cancelled = Not deployed, after start time (Auto cancelled) OR Manual cancel
+  
+  const isWaiting = poll.status === PollStatus.Waiting;
   const isCancelled = poll.status === PollStatus.Cancelled;
-  const canSubmit = !isDeployed && !isCancelled;
+  const canSubmit = !isWaiting && !isCancelled;
 
   return (
     <section className="space-y-8">
@@ -37,6 +40,8 @@ export function PrepareView({ poll }: PrepareViewProps) {
         <div className="rounded-[32px] border border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-500">
           {isCancelled
             ? "This poll has been cancelled. No new submissions."
+            : isWaiting
+            ? "Poll is ready and waiting to start. Submissions are closed."
             : "Poll has started. New submissions are closed."}
         </div>
       )}

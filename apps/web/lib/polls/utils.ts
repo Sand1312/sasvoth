@@ -12,9 +12,6 @@ export function derivePollStatus(poll: {
   status?: PollStatus;
   timeframe?: { start: string; end: string };
 }): PollStatus {
-  // If explicitly set in DB to something final, verify consistency
-  // But generally we rely on time checks for deployed polls.
-
   const timeframeStart =
     (typeof poll.startTime === "string"
       ? poll.startTime
@@ -32,32 +29,47 @@ export function derivePollStatus(poll: {
   const startDate = isValidDate(start) ? start : new Date();
   const endDate = isValidDate(end) ? end : new Date();
 
-  // Check if deployed on-chain
   const isDeployed =
     poll.pollIdOnChain !== undefined &&
     poll.pollIdOnChain !== null &&
-    poll.pollIdOnChain !== "" &&
-    poll.pollIdOnChain !== "0" && // Often initialized to "0" or 0
-    poll.pollIdOnChain !== 0;
+    String(poll.pollIdOnChain) !== "";
 
+  // If deployed, we prioritize the derived status over a stale "Cancelled" status
+  // Otherwise, if explicitly statuses are set (locked), we respect them.
+  
+  // Admin forced end
+  if (poll.status === PollStatus.Ended) {
+    return PollStatus.Ended;
+  }
+  
+  // Tallying in progress
+  if (poll.status === PollStatus.Counting) {
+    return PollStatus.Counting;
+  }
+
+  // Case 1: Deployed
   if (isDeployed) {
     if (now < startDate) {
-      return PollStatus.Prepare; // Waiting for start
+      return PollStatus.Waiting; 
     } else if (now >= startDate && now <= endDate) {
       return PollStatus.InProgress;
     } else {
-      return PollStatus.Ended;
+      // Past end date
+      return PollStatus.Ended; 
     }
-  } else {
-    // Not deployed
-    if (now > startDate) {
-      // Should have been deployed by now, or is just late?
-      // Logic from PollClient implies if not deployed but time passes, it might be Cancelled or still Prepare.
-      // Let's stick to Prepare or potentially Cancelled if way past?
-      // For now, mirroring old logic:
-      return PollStatus.Cancelled;
+  } 
+  
+  // Case 2: Not Deployed
+  else {
+    // Only respect manual/auto cancel if NOT deployed
+    if (poll.status === PollStatus.Cancelled) {
+        return PollStatus.Cancelled;
+    }
+
+    if (now < startDate) {
+      return PollStatus.Prepare; 
     } else {
-      return PollStatus.Prepare;
+      return PollStatus.Cancelled;
     }
   }
 }
