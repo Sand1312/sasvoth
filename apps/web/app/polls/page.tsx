@@ -131,6 +131,11 @@ const statusThemes: Record<
     text: "text-red-700",
     accent: "bg-red-100",
   },
+  [PollStatus.Waiting]: {
+    badge: "bg-blue-50 border-blue-200 text-blue-700",
+    text: "text-blue-700",
+    accent: "bg-blue-100",
+  },
 };
 
 const annotatePolls = (data: PollRecord[]): PollWithMeta[] =>

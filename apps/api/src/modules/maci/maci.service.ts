@@ -16,6 +16,9 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { PollsService } from '../polls/polls.service';
 import { ResultsMetaService } from '../results-meta/results-meta.service';
+import { SmartNonceService } from './smart-nonce.service';
+import { SubgraphService } from './subgraph.service';
+import { MaciDeploymentsService } from './maci-deployments.service';
 
 import {
   signup as sdkSignup,
@@ -45,6 +48,9 @@ export class MaciService {
     private resultsMetaService: ResultsMetaService,
     @Inject(forwardRef(() => PollsService)) private pollsService: PollsService,
     @InjectRedis() private readonly redis: Redis,
+    private readonly smartNonceService: SmartNonceService,
+    private readonly subgraphService: SubgraphService,
+    private readonly maciDeploymentsService: MaciDeploymentsService,
   ) {
     this.coordinatorUrl = this.configService.get(
       'MACI_COORDINATOR_URL',
@@ -370,7 +376,7 @@ export class MaciService {
     pollId: string,
     voteOptionIndex: number,
     voteWeight: number,
-    nonce: number,
+    nonce: number, // Ignored - SmartNonce manages this
     userStateIndex: string,
     userMaciPrivateKey: string,
     userMaciPublicKey: string,
@@ -384,27 +390,35 @@ export class MaciService {
       
       const address = maciAddress || this.maciAddress;
 
-      // Redis Nonce Management
-      // We ignore the passed 'nonce' and use Redis to ensure centralized, atomic increment
-      const redisKey = `maci:nonce:${pollId}:${userMaciPublicKey}`;
-      const nextNonce = await this.redis.incr(redisKey);
-      this.logger.log(`Generated Nonce from Redis for ${redisKey}: ${nextNonce}`);
+      // Use SmartNonce with distributed locking
+      // This ensures:
+      // 1. No race conditions between concurrent votes
+      // 2. Nonce is max(confirmed from Graph, pending in Redis) + 1
+      // 3. Optimistic update to Redis after successful submission
+      const result = await this.smartNonceService.withVoteLock(
+        pollId,
+        userStateIndex,
+        async (smartNonce) => {
+          this.logger.log(`SmartNonce calculated: ${smartNonce} for ${userMaciPublicKey.substring(0, 20)}...`);
 
-      const result = await sdkPublishBatch({
-        messages: [{
-          stateIndex: BigInt(userStateIndex),
-          voteOptionIndex: BigInt(voteOptionIndex),
-          newVoteWeight: BigInt(voteWeight),
-          nonce: BigInt(nextNonce)
-        }],
-        publicKey: userMaciPublicKey,
-        privateKey: userMaciPrivateKey,
-        pollId: BigInt(pollId),
-        maciAddress: address,
-        signer: signerV6
-      });
-      
-      this.logger.log(`Vote success. Hash: ${result.hash}`);
+          const publishResult = await sdkPublishBatch({
+            messages: [{
+              stateIndex: BigInt(userStateIndex),
+              voteOptionIndex: BigInt(voteOptionIndex),
+              newVoteWeight: BigInt(voteWeight),
+              nonce: BigInt(smartNonce)
+            }],
+            publicKey: userMaciPublicKey,
+            privateKey: userMaciPrivateKey,
+            pollId: BigInt(pollId),
+            maciAddress: address,
+            signer: signerV6
+          });
+
+          this.logger.log(`Vote success. Hash: ${publishResult.hash}`);
+          return publishResult;
+        }
+      );
 
       return {
         success: true,
@@ -457,10 +471,62 @@ export class MaciService {
         throw new HttpException('Failed to deploy MACI contract', 500);
       }
 
+      const maciAddress = result.maciContractAddress || result.address;
+      
+      // Get block number from Coordinator response or fetch from chain
+      let startBlock = result.blockNumber || result.startBlock || 0;
+      
+      if (!startBlock || startBlock === 0) {
+        try {
+          // Fetch current block number from chain as fallback
+          const currentBlock = await this.provider.getBlockNumber();
+          // Use slightly earlier block to ensure we capture the deploy tx
+          startBlock = Math.max(0, currentBlock - 10);
+          this.logger.log(`Fetched startBlock from chain: ${startBlock}`);
+        } catch (e) {
+          this.logger.warn('Failed to fetch block number from chain, using 0');
+          startBlock = 0;
+        }
+      }
+
+      // Deploy subgraph for the new MACI contract (optional, based on config)
+      let subgraphUrl: string | null = null;
+      const shouldDeploySubgraph = this.configService.get<boolean>('AUTO_DEPLOY_SUBGRAPH', false);
+      
+      if (shouldDeploySubgraph) {
+        try {
+          this.logger.log('Auto-deploying subgraph for new MACI contract...');
+          const subgraphResult = await this.subgraphService.deploy({
+            maciContractAddress: maciAddress,
+            maciContractStartBlock: startBlock,
+            network: payload.chain || 'arbitrum-sepolia',
+          });
+          subgraphUrl = subgraphResult.subgraphUrl;
+          this.logger.log(`Subgraph deployed: ${subgraphUrl}`);
+        } catch (subgraphError) {
+          this.logger.warn('Subgraph auto-deployment failed, continuing without it', subgraphError);
+        }
+      }
+
+      // Save MACI deployment info to database
+      try {
+        await this.maciDeploymentsService.upsert({
+          maciAddress,
+          subgraphUrl: subgraphUrl || undefined,
+          startBlock,
+          chain: payload.chain || 'arbitrum_sepolia',
+          config: payload.config,
+        });
+        this.logger.log(`MACI deployment saved to database: ${maciAddress}`);
+      } catch (dbError) {
+        this.logger.warn('Failed to save MACI deployment to database', dbError);
+      }
+
       return {
-        address: result.maciContractAddress || result.address,
-        blockNumber: result.blockNumber || 0, // Assuming coordinator returns block
+        address: maciAddress,
+        blockNumber: startBlock,
         network: payload.chain,
+        subgraphUrl,
       };
     } catch (error) {
       this.logger.error('Deploy MACI failed', error);

@@ -3,6 +3,27 @@ import { HydratedDocument } from "mongoose";
 
 export type PollsDocument = HydratedDocument<Polls>;
 
+// MACI Configuration for poll deployment
+export class MaciConfig {
+    @Prop({ default: 1 })
+    mode?: number; // 0 = Non-QV, 1 = QV
+
+    @Prop({ default: 20 })
+    messageBatchSize?: number;
+
+    @Prop({ default: 10 })
+    pollStateTreeDepth?: number;
+
+    @Prop({ default: 2 })
+    voteOptionTreeDepth?: number;
+
+    @Prop({ default: 1 })
+    tallyProcessingStateTreeDepth?: number;
+
+    @Prop({ default: 100 })
+    initialVoiceCredits?: number;
+}
+
 @Schema()
 export class Polls {
     @Prop({ required: false })
@@ -43,6 +64,9 @@ export class Polls {
 
     @Prop({ required: false })
     subgraphUrl: string;
+
+    @Prop({ type: MaciConfig, required: false })
+    maciConfig?: MaciConfig;
 }
 
 export const PollsSchema = SchemaFactory.createForClass(Polls);

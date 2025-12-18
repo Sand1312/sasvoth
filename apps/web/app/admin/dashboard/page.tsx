@@ -462,7 +462,7 @@ export default function AdminDashboardPage(): React.ReactElement {
             preview modal.
           </p>
         </div>
-        <IdeaUploadForm />
+        <IdeaUploadForm pollId="" />
       </section>
     </main>
   );

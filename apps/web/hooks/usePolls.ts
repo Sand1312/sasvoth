@@ -28,6 +28,14 @@ export function usePolls() {
     numberOptions: number,
     startTime: Date,
     endTime: Date,
+    maciConfig?: {
+      mode?: number;
+      messageBatchSize?: number;
+      pollStateTreeDepth?: number;
+      voteOptionTreeDepth?: number;
+      tallyProcessingStateTreeDepth?: number;
+      initialVoiceCredits?: number;
+    }
   ) => {
     try {
       const res = await pollsApi.createPoll(
@@ -37,6 +45,7 @@ export function usePolls() {
         numberOptions,
         startTime,
         endTime,
+        maciConfig
       );
       goTo("/admin/dashboard");
       return res;

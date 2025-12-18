@@ -10,6 +10,7 @@ import { usePolls } from "@/hooks";
 import { createPublicClient, http } from "viem";
 import { arbitrumSepolia } from "viem/chains";
 import { PollStatus } from "@/types/polls";
+import { CreatePollDialog } from "@/components/admin/CreatePollDialog";
 
 // Types coming from backend models
 type PollRecord = {
@@ -91,9 +92,6 @@ export default function AdminPollsPage(): React.ReactElement {
   // MACI State
   const [maciAddress, setMaciAddress] = useState<string | null>(null);
   const [maciStartBlock, setMaciStartBlock] = useState<number | null>(null);
-  const [pollDurations, setPollDurations] = useState<Record<string, number>>(
-    {}
-  );
 
   const preparePolls = useMemo(
     () => polls.filter((p) => (p.status || "").toLowerCase() === "prepare"),
@@ -189,26 +187,17 @@ export default function AdminPollsPage(): React.ReactElement {
     setBusyPoll(pollId);
     setError(null);
     try {
-      // Fetch current blockchain time to avoid local clock skew
-      let now = Math.floor(Date.now() / 1000);
-      try {
-        const publicClient = createPublicClient({
-          chain: arbitrumSepolia,
-          transport: http(process.env.NEXT_PUBLIC_RPC_URL),
-        });
-        const block = await publicClient.getBlock();
-        now = Number(block.timestamp);
-      } catch (err) {
-        console.warn(
-          "Failed to fetch blockchain timestamp, falling back to local time",
-          err
-        );
+      // Use startTime/endTime from database
+      const pollStartTime = poll.startTime ? new Date(poll.startTime) : null;
+      const pollEndTime = poll.endTime ? new Date(poll.endTime) : null;
+
+      if (!pollStartTime || !pollEndTime) {
+        setError("Poll missing start/end time. Please update poll times.");
+        return;
       }
 
-      const durationMinutes = pollDurations[pollId] || 60;
-      const durationSeconds = durationMinutes * 60;
-      const startDate = now + 60; // Start in 1 min
-      const endDate = now + 60 + durationSeconds;
+      const startDate = Math.floor(pollStartTime.getTime() / 1000);
+      const endDate = Math.floor(pollEndTime.getTime() / 1000);
 
       // Deploy poll onchain
       const deployed = await deployPoll({
@@ -446,9 +435,12 @@ export default function AdminPollsPage(): React.ReactElement {
             the resulting metadata to IPFS.
           </p>
         </div>
-        <Button variant="outline" onClick={refreshPolls} disabled={loading}>
-          Refresh list
-        </Button>
+        <div className="flex gap-2">
+          <CreatePollDialog onSuccess={refreshPolls} />
+          <Button variant="outline" onClick={refreshPolls} disabled={loading}>
+            Refresh list
+          </Button>
+        </div>
       </header>
 
       {/* MACI Deployment Logic */}
@@ -612,29 +604,6 @@ export default function AdminPollsPage(): React.ReactElement {
                   <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-700">
                     Approved options
                   </h3>
-                  <div className="mb-3">
-                    <label className="text-xs font-bold text-slate-500 block mb-1">
-                      POLL DURATION (MINUTES)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      className="border border-slate-300 rounded px-3 py-1 text-sm w-full max-w-[200px]"
-                      value={pollDurations[poll._id || poll.id || ""] || 60}
-                      onChange={(e) => {
-                        const pid = poll._id || poll.id;
-                        if (pid) {
-                          setPollDurations((prev) => ({
-                            ...prev,
-                            [pid]: Number(e.target.value),
-                          }));
-                        }
-                      }}
-                    />
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      Default: 60 minutes
-                    </p>
-                  </div>
                   <div className="flex gap-2 mb-2">
                     <Button
                       size="sm"
