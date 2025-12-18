@@ -22,8 +22,7 @@ import {
   joinPoll as sdkJoinPoll,
   publishBatch as sdkPublishBatch,
 } from '@maci-protocol/sdk';
-const MACI_ABI = require('../../../../../packages/contracts/abi/contracts/Maci.json');
-const POLL_ABI = require('../../../../../packages/contracts/abi/contracts/Poll.json');
+import { MACI_ABI, POLL_ABI } from '@sasvoth/contracts';
 
 const execAsync = promisify(exec);
 const fs = require("fs");
@@ -49,7 +48,7 @@ export class MaciService {
   ) {
     this.coordinatorUrl = this.configService.get(
       'MACI_COORDINATOR_URL',
-      'http://localhost:3000',
+      'https://slim-certainly-milan-amounts.trycloudflare.com',
     );
     this.privateKey =
       this.configService.get('WALLET_PRIVATE_KEY') ||
@@ -418,7 +417,7 @@ export class MaciService {
         mode: 1,
         intStateTreeDepth: 1,
         tallyProcessingStateTreeDepth: 1,
-        messageBatchSize: 20, // Increased from 2 to 20 to match logic
+        messageBatchSize: 4, // Increased from 2 to 20 to match logic
         pollStateTreeDepth: 10,
         voteOptionTreeDepth: 2,
         voteOptions: 4,
@@ -728,7 +727,7 @@ export class MaciService {
           }
 
           this.logger.log(
-            `✅ Proofs generated successfully for poll ${pollId}`,
+            ` Proofs generated successfully for poll ${pollId}`,
           );
 
           return {
