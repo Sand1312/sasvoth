@@ -429,6 +429,40 @@ export const deployFreeForAllSignUpPolicy = async (
 };
 
 /**
+ * Deploy an EIP712SignupPolicy contract
+ * @param args - the arguments to deploy policy (name, version for EIP-712 domain)
+ * @param signer - the signer to use to deploy the contract
+ * @param quiet - whether to suppress console output
+ * @returns the deployed EIP712SignupPolicy and EIP712SignupChecker contracts
+ */
+export const deployEIP712SignupPolicy = async (
+  args: { name: string; version: string },
+  signer?: Signer,
+  quiet = false,
+): Promise<[BaseContract, BaseContract]> => {
+  // Deploy checker first
+  const checker = await deployContract<BaseContract>(
+    "EIP712SignupChecker",
+    signer,
+    quiet,
+    args.name,
+    args.version
+  );
+
+  const checkerAddress = await checker.getAddress();
+
+  // Deploy policy with checker address
+  const policy = await deployContract<BaseContract>(
+    "EIP712SignupPolicy",
+    signer,
+    quiet,
+    checkerAddress
+  );
+
+  return [policy, checker];
+};
+
+/**
  * Deploy a EASPolicy contract
  * @param args - the arguments to deploy policy
  * @param factories - the optional proxy factories to reuse for deployment

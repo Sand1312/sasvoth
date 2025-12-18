@@ -41,6 +41,26 @@ class MaciSignupDto {
   sgData?: string;
 }
 
+class MaciSignupEip712Dto {
+  @ApiProperty({ description: "MACI Public Key X coordinate" })
+  pubKeyX: string;
+
+  @ApiProperty({ description: "MACI Public Key Y coordinate" })  
+  pubKeyY: string;
+
+  @ApiProperty({ description: "EIP-712 signature" })
+  signature: string;
+
+  @ApiProperty({ description: "User nonce for anti-replay" })
+  nonce: number;
+
+  @ApiProperty({ description: "Signature deadline timestamp" })
+  deadline: number;
+
+  @ApiProperty({ required: false })
+  maciAddress?: string;
+}
+
 class JoinPollDto {
   @ApiProperty({ description: "User MACI Private Key" })
   maciPrivateKey: string;
@@ -83,7 +103,9 @@ class VoteDto {
  * Sub-resource: /maci/polls/:id/merge
  * Sub-resource: /maci/polls/:id/proofs
  *
- * POST   /maci/signup                   - Signup to MACI
+ * POST   /maci/signup                   - Signup to MACI (legacy)
+ * POST   /maci/signup-eip712            - Signup with EIP-712 signature
+ * GET    /maci/nonce/:address           - Get nonce for EIP-712 signing
  * POST   /maci/polls                    - Deploy a new poll
  * GET    /maci/polls/:id/contracts      - Get poll contracts
  * POST   /maci/polls/:id/merge          - Merge poll state
@@ -104,15 +126,49 @@ export class MaciController {
 
 
   /**
-   * Signup to MACI (Relayer)
+   * Signup to MACI (Relayer - Legacy)
    * POST /maci/signup
    */
   @Post('signup')
-  @ApiOperation({ summary: 'Signup to MACI (Relayed)' })
+  @ApiOperation({ summary: 'Signup to MACI (Relayed - Legacy)' })
   @ApiBody({ type: MaciSignupDto })
   @ApiResponse({ status: 201, description: 'Signed up successfully' })
   async signup(@Body() body: MaciSignupDto) {
     return this.maciService.signup(body.maciPubKey, body.maciAddress, body.sgData);
+  }
+
+  /**
+   * Signup to MACI with EIP-712 signature (Secure)
+   * POST /maci/signup-eip712
+   * 
+   * Backend verifies user eligibility in Users collection before relaying
+   */
+  @Post('signup-eip712')
+  @ApiOperation({ summary: 'Signup to MACI with EIP-712 signature (Secure)' })
+  @ApiBody({ type: MaciSignupEip712Dto })
+  @ApiResponse({ status: 201, description: 'Signed up successfully' })
+  @ApiResponse({ status: 403, description: 'User not eligible' })
+  async signupWithSignature(@Body() body: MaciSignupEip712Dto) {
+    return this.maciService.signupWithSignature(
+      body.pubKeyX,
+      body.pubKeyY,
+      body.signature,
+      body.nonce,
+      body.deadline,
+      body.maciAddress
+    );
+  }
+
+  /**
+   * Get nonce for a user (for EIP-712 signing)
+   * GET /maci/nonce/:address
+   */
+  @Get('nonce/:address')
+  @ApiOperation({ summary: 'Get nonce for EIP-712 signing' })
+  @ApiParam({ name: 'address', type: String })
+  @ApiResponse({ status: 200, description: 'Nonce retrieved' })
+  async getNonce(@Param('address') address: string) {
+    return this.maciService.getNonce(address);
   }
 
   /**

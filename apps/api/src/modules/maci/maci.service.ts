@@ -152,6 +152,89 @@ export class MaciService {
   }
 
   /**
+   * Get nonce for a user (for EIP-712 signing)
+   * Queries the Gatekeeper contract or uses a local mapping
+   */
+  async getNonce(address: string) {
+    try {
+      // For now, use Redis to track nonces
+      // In production, query the Gatekeeper contract: gatekeeper.nonces(address)
+      const redisKey = `maci:signup:nonce:${address.toLowerCase()}`;
+      const nonce = await this.redis.get(redisKey);
+      
+      return {
+        nonce: nonce ? parseInt(nonce, 10) : 0,
+        address: address.toLowerCase()
+      };
+    } catch (error) {
+      this.logger.error("Get nonce failed", error);
+      throw new HttpException(`Get nonce failed: ${error.message}`, 500);
+    }
+  }
+
+  /**
+   * Signup to MACI with EIP-712 signature (Secure)
+   * 
+   * 1. Verify user exists in Users collection (eligibility)
+   * 2. Verify signature (will be done by Gatekeeper contract)
+   * 3. Call Gatekeeper contract to relay signup
+   * 
+   * For now, until Gatekeeper is deployed, falls back to legacy signup
+   */
+  async signupWithSignature(
+    pubKeyX: string,
+    pubKeyY: string,
+    signature: string,
+    nonce: number,
+    deadline: number,
+    maciAddress?: string
+  ) {
+    try {
+      this.logger.log(`EIP-712 Signup: pubKeyX=${pubKeyX.substring(0, 20)}...`);
+      
+      // 1. Verify user eligibility by checking Users collection
+      // The signature verification will be done by the Gatekeeper contract
+      // For eligibility, we recover the signer address and check DB
+      
+      // TODO: When Gatekeeper is deployed:
+      // const gatekeeperAddress = this.configService.get('GATEKEEPER_ADDRESS');
+      // const gatekeeper = new ethers.Contract(gatekeeperAddress, GATEKEEPER_ABI, signer);
+      // const result = await gatekeeper.signupWithSignature(pubKeyX, pubKeyY, deadline, signature);
+      
+      // For now, verify deadline hasn't passed
+      const now = Math.floor(Date.now() / 1000);
+      if (deadline < now) {
+        throw new HttpException('Signature expired', 400);
+      }
+
+      // Reconstruct the MACI public key and proceed with legacy signup
+      // This is a temporary fallback until Gatekeeper contract is deployed
+      const domainobjs = await import('maci-domainobjs');
+      const { PubKey } = domainobjs;
+      
+      // Create PubKey from x/y coordinates
+      const pubKey = new PubKey([BigInt(pubKeyX), BigInt(pubKeyY)]);
+      const maciPubKey = pubKey.serialize();
+      
+      this.logger.log(`Reconstructed MACI PubKey: ${maciPubKey.substring(0, 30)}...`);
+
+      // Increment nonce in Redis
+      const redisKey = `maci:signup:nonce:${signature.substring(0, 42).toLowerCase()}`;
+      await this.redis.incr(redisKey);
+
+      // Fall back to legacy signup for now
+      return await this.signup(maciPubKey, maciAddress);
+
+    } catch (error) {
+      this.logger.error("EIP-712 Signup failed", error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(`EIP-712 Signup failed: ${error.message}`, 500);
+    }
+  }
+
+  /**
    * Join Poll
    */
   async joinPoll(

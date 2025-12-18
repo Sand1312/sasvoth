@@ -33,6 +33,7 @@
     "@nestjs/swagger": "^11.2.3",
     "@nestjs/typeorm": "^11.0.0",
     "@sasvoth/contracts": "workspace:*",
+    "@sasvoth/shared": "workspace:*",
     "@sendgrid/mail": "^8.1.5",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",

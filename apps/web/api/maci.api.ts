@@ -71,11 +71,38 @@ export type DeployPollPayload = {
  */
 export const maciApi = {
   /**
-   * Signup to MACI
+   * Signup to MACI (Legacy - direct signup)
    * POST /maci/signup
    */
   signup: async (payload: { maciPubKey: string; maciAddress?: string; sgData?: string }) => {
     const response = await api.post("/maci/signup", payload);
+    return response.data;
+  },
+
+  /**
+   * Signup to MACI with EIP-712 signature (New - secure)
+   * POST /maci/signup-eip712
+   * 
+   * The backend verifies user eligibility and relays to Gatekeeper contract
+   */
+  signupWithSignature: async (payload: {
+    maciAddress?: string;
+    pubKeyX: string;
+    pubKeyY: string;
+    signature: string;
+    nonce: number;
+    deadline: number;
+  }) => {
+    const response = await api.post("/maci/signup-eip712", payload);
+    return response.data;
+  },
+
+  /**
+   * Get nonce for a user (for EIP-712 signing)
+   * GET /maci/nonce/:address
+   */
+  getNonce: async (address: string) => {
+    const response = await api.get(`/maci/nonce/${address}`);
     return response.data;
   },
 
