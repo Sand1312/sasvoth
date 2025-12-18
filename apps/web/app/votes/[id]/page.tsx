@@ -25,7 +25,7 @@ type VoteData = {
   approvedAt: string;
   logo?: string;
   heroImage?: string;
-  ageLimit?: string;
+  ageLimit?: number;
   layoutItems?: any[];
 };
 
@@ -474,9 +474,11 @@ export default function VotePage({ params }: Props) {
   const [detectedPollId, setDetectedPollId] = useState<string | null>(null);
   const [tallying, setTallying] = useState(false);
   const [tallyStatus, setTallyStatus] = useState("");
+  const [detectedOptionIndex, setDetectedOptionIndex] = useState<number | null>(null);
 
   const { fetchMetadata } = useIPFS();
   const { getIdeaById } = useIdeas();
+  const token = useToken(); // Ensure token hook is used for balance check
 
   // Find poll that contains this idea in options[] using API
   useEffect(() => {
@@ -489,6 +491,17 @@ export default function VotePage({ params }: Props) {
             `Found poll for idea ${id}: pollIdOnChain = ${pollIdOnChain}`
           );
           setDetectedPollId(pollIdOnChain);
+          
+          // Find option index
+          if (Array.isArray(poll.options)) {
+             const index = poll.options.findIndex((opt: string) => opt === id);
+             if (index !== -1) {
+                console.log(`Found option index for idea ${id}: ${index}`);
+                setDetectedOptionIndex(index);
+             } else {
+                console.warn(`Idea ${id} not found in poll options`, poll.options);
+             }
+          }
         } else {
           console.log(`No poll found containing idea ${id} in options`);
         }
@@ -531,8 +544,8 @@ export default function VotePage({ params }: Props) {
             approvedAt: apiIdea.createdAt ?? new Date().toISOString(),
             logo: apiIdea.imgSrc,
             heroImage: apiIdea.imgsSrc?.[0],
-            ageLimit: apiIdea.descriptionMore?.[0],
-            layoutItems: apiIdea.descriptionMore?.[1] ? JSON.parse(apiIdea.descriptionMore[1]) : [],
+            ageLimit: apiIdea.ageLimit ?? 0,
+            layoutItems: apiIdea.descriptionMore?.[0] ? JSON.parse(apiIdea.descriptionMore[0]) : [],
           });
         } else if (!cancelled) {
           throw new Error("Failed to load vote data from both IPFS and API");
@@ -640,7 +653,20 @@ export default function VotePage({ params }: Props) {
       console.log("Using pollStateIndex:", pollStateIndex);
 
       // Submit Vote
-      const voteOptionIndex = 0; // Hardcoded for now
+      if (detectedOptionIndex === null) {
+          showError("Vote Error", "Does not detect correct option index for this idea.");
+          return;
+      }
+      const voteOptionIndex = detectedOptionIndex; 
+      
+      const cost = (voteAmount || 1) * (voteAmount || 1);
+      const balance = Number(token.balance || 0);
+      
+      if (cost > balance) {
+          showError("Insufficient Voice Credits", `Cost (${cost}) exceeds your balance (${balance}). Please buy more credits or reduce vote amount.`);
+          return;
+      }
+
       console.log("🗳️ Vote params:", {
         pollIdOnChain,
         voteOptionIndex,

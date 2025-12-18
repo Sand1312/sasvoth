@@ -55,6 +55,12 @@ export class Users {
     timestamp: Date;
     txHash: string;
   }>;
+
+  @Prop({ required: false })
+  avatar?: string;
+
+  @Prop({ required: false, type: Date })
+  dateOfBirth?: Date;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

@@ -6,7 +6,8 @@ export type IdeaPayload = {
   descriptionMore?: string[];
   imgSrc: string;
   imgsSrc?: string[];
-  creatorIdea: string;
+  userAddress: string;
+  ageLimit?: number;
 };
 
 /**
@@ -15,6 +16,7 @@ export type IdeaPayload = {
  * Resource: /ideas
  *
  * GET    /ideas          - List all ideas
+ * GET    /ideas/user/:address - Get ideas by user address
  * POST   /ideas          - Create a new idea
  * GET    /ideas/:id      - Get a specific idea
  * PUT    /ideas/:id      - Replace an idea
@@ -39,6 +41,15 @@ export const ideasApi = {
   create: async (payload: IdeaPayload) => {
     const response = await api.post("/ideas", payload);
     return response.data?.idea ?? response.data;
+  },
+
+  /**
+   * Get ideas by user address
+   * GET /ideas/user/:address
+   */
+  getByUserAddress: async (address: string) => {
+    const response = await api.get(`/ideas/user/${address}`);
+    return response.data?.ideas ?? response.data;
   },
 
   /**

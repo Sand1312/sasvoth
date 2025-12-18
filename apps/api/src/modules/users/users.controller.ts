@@ -41,6 +41,14 @@ class CreateDepositDto {
   txHash: string;
 }
 
+class UpdateProfileDto {
+  @ApiProperty({ required: false })
+  avatar?: string;
+
+  @ApiProperty({ required: false })
+  dateOfBirth?: string;
+}
+
 /**
  * Users Controller - RESTful Resource-Oriented
  *
@@ -48,6 +56,7 @@ class CreateDepositDto {
  * Sub-resource: /users/:id/wallet
  * Sub-resource: /users/:id/state-index
  * Sub-resource: /users/:id/deposits
+ * Sub-resource: /users/:id/profile
  *
  * GET    /users/me              - Get current user
  * GET    /users/:id             - Get user by ID
@@ -56,6 +65,7 @@ class CreateDepositDto {
  * PATCH  /users/:id/state-index - Update MACI state index
  * GET    /users/:id/deposits    - Get deposit history
  * POST   /users/:id/deposits    - Create deposit
+ * PATCH  /users/:id/profile     - Update user profile (avatar, DOB)
  */
 @Controller('users')
 @ApiTags('Users')
@@ -93,6 +103,8 @@ export class UsersController {
         role: (user as any).role,
         walletAddress: (user as any).walletAddress,
         authType: (user as any).authType,
+        avatar: (user as any).avatar,
+        dateOfBirth: (user as any).dateOfBirth,
       },
     };
   }
@@ -140,6 +152,38 @@ export class UsersController {
   //     return res.status(500).json({ message: 'Error updating user', error });
   //   }
   // }
+
+  /**
+   * Update user profile (avatar, date of birth)
+   * PATCH /users/:id/profile
+   */
+  @Patch(':id/profile')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update user profile (avatar, date of birth)' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiBody({ type: UpdateProfileDto })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+  async updateProfile(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const { avatar, dateOfBirth } = req.body;
+    try {
+      const data: { avatar?: string; dateOfBirth?: Date } = {};
+      if (avatar !== undefined) {
+        data.avatar = avatar;
+      }
+      if (dateOfBirth !== undefined) {
+        data.dateOfBirth = new Date(dateOfBirth);
+      }
+      const user = await this.usersService.updateProfile(id, data);
+      return res.status(200).json({ user });
+    } catch (error) {
+      return res.status(500).json({ message: 'Error updating profile', error });
+    }
+  }
 
   /**
    * Connect wallet to user
