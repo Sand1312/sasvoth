@@ -22,7 +22,8 @@ export function LoginForm() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  // Support both 'from' (from middleware) and 'callbackUrl' for compatibility
+  const redirectTo = searchParams.get('from') || searchParams.get('callbackUrl') || '/dashboard';
 
   // React 19: useActionState handles pending state & form result
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
@@ -30,9 +31,9 @@ export function LoginForm() {
   // Redirect if already logged in (Client Side)
   useEffect(() => {
     if (user || state.success) {
-      router.push(callbackUrl);
+      router.push(redirectTo);
     }
-  }, [user, state.success, router, callbackUrl]);
+  }, [user, state.success, router, redirectTo]);
 
   const {
     register,

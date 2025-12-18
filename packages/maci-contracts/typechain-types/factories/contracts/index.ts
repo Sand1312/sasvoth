@@ -2,6 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as crypto from "./crypto";
+export * as extensions from "./extensions";
+export * as gatekeepers from "./gatekeepers";
 export * as initialVoiceCreditProxy from "./initialVoiceCreditProxy";
 export * as interfaces from "./interfaces";
 export * as mocks from "./mocks";

@@ -10,7 +10,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 export class UsersService {
   constructor(@InjectModel(Users.name) private usersModel: Model<UsersDocument>) {}
 
-   private mapToUserDto(user: any,privateKey:string): UserDto {
+  private mapToUserDto(user: any, privateKey: string): UserDto {
     return {
       id: user._id?.toString() || user.id,
       email: user.email,
@@ -22,7 +22,9 @@ export class UsersService {
       publicKeyX: user.publicKeyX,
       publicKeyY: user.publicKeyY,
       stateIndex: user.stateIndex,
-       privateKey: privateKey 
+      privateKey: privateKey,
+      avatar: user.avatar,
+      dateOfBirth: user.dateOfBirth,
     };
   }
 
@@ -153,11 +155,29 @@ async updateBalance(userId: string, amount: number,txHash:string): Promise<Users
     return user;
   }
 async updateStateIndex(walletAddress: string, stateIndex: number): Promise<void> {
-  let user = await this.usersModel.findOne({walletAddress: walletAddress}).exec();
-  if (!user) {
+    const user = await this.usersModel.findOne({ walletAddress: walletAddress }).exec();
+    if (!user) {
       throw new InternalServerErrorException('User not found');
     }
     user.stateIndex = stateIndex;
-    await user.save();  
+    await user.save();
+  }
+
+  async updateProfile(
+    userId: string,
+    data: { avatar?: string; dateOfBirth?: Date },
+  ): Promise<UsersDocument | null> {
+    const user = await this.usersModel.findById(userId).exec();
+    if (!user) {
+      throw new InternalServerErrorException('User not found');
+    }
+    if (data.avatar !== undefined) {
+      user.avatar = data.avatar;
+    }
+    if (data.dateOfBirth !== undefined) {
+      user.dateOfBirth = data.dateOfBirth;
+    }
+    await user.save();
+    return user;
   }
 }

@@ -8,6 +8,7 @@ export const useIdeas = createApiHook(
     getIdeaById: ideasApi.getIdeaById,
     updateIdeaCID: ideasApi.updateIdeaCID,
     updateIdea: ideasApi.updateIdea,
+    getByUserAddress: ideasApi.getByUserAddress,
   },
   { includeRedirect: true }
 );

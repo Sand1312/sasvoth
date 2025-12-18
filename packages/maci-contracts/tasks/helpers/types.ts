@@ -580,6 +580,7 @@ export enum EPolicies {
   AnonAadhaar = "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicy.sol:AnonAadhaarPolicy",
   ERC20Votes = "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicy.sol:ERC20VotesPolicy",
   ERC20 = "@excubiae/contracts/contracts/extensions/erc20/ERC20Policy.sol:ERC20Policy",
+  EIP712Signup = "contracts/extensions/eip712/EIP712SignupPolicy.sol:EIP712SignupPolicy",
 }
 
 /**
@@ -597,6 +598,7 @@ export enum EPolicyFactories {
   AnonAadhaar = "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicyFactory.sol:AnonAadhaarPolicyFactory",
   ERC20Votes = "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicyFactory.sol:ERC20VotesPolicyFactory",
   ERC20 = "@excubiae/contracts/contracts/extensions/erc20/ERC20PolicyFactory.sol:ERC20PolicyFactory",
+  EIP712Signup = "contracts/extensions/eip712/EIP712SignupPolicyFactory.sol:EIP712SignupPolicyFactory",
 }
 
 /**
@@ -614,6 +616,7 @@ export enum ECheckers {
   AnonAadhaar = "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarChecker.sol:AnonAadhaarChecker",
   ERC20Votes = "@excubiae/contracts/contracts/extensions/erc20Votes/ERC20VotesChecker.sol:ERC20VotesChecker",
   ERC20 = "@excubiae/contracts/contracts/extensions/erc20/ERC20Checker.sol:ERC20Checker",
+  EIP712Signup = "contracts/extensions/eip712/EIP712SignupChecker.sol:EIP712SignupChecker",
 }
 
 /**
@@ -631,6 +634,7 @@ export enum ECheckerFactories {
   AnonAadhaar = "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarCheckerFactory.sol:AnonAadhaarCheckerFactory",
   ERC20Votes = "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesCheckerFactory.sol:ERC20VotesCheckerFactory",
   ERC20 = "@excubiae/contracts/contracts/extensions/erc20/ERC20CheckerFactory.sol:ERC20CheckerFactory",
+  EIP712Signup = "contracts/extensions/eip712/EIP712SignupCheckerFactory.sol:EIP712SignupCheckerFactory",
 }
 
 /**

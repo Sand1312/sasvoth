@@ -23,6 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { IdeasService } from './ideas.service';
+import { DobGuard } from '@/common/guards/dob';
 
 class CreateIdeaDto {
   @ApiProperty()
@@ -32,10 +33,13 @@ class CreateIdeaDto {
   description: string;
 
   @ApiProperty()
-  creatorAddress: string;
+  userAddress: string;
 
   @ApiProperty()
   imgSrc: string;
+
+  @ApiPropertyOptional()
+  ageLimit?: number;
 }
 
 class UpdateIdeaCidDto {
@@ -57,7 +61,10 @@ class UpdateIdeaDto {
   imgSrc?: string;
 
   @ApiPropertyOptional()
-  creatorIdea?: string;
+  userAddress?: string;
+
+  @ApiPropertyOptional()
+  ageLimit?: number;
 }
 
 /**
@@ -66,6 +73,7 @@ class UpdateIdeaDto {
  * Resource: /ideas
  *
  * GET    /ideas          - List all ideas
+ * GET    /ideas/user/:address - Get ideas by user address
  * POST   /ideas          - Create a new idea
  * GET    /ideas/:id      - Get a specific idea
  * PATCH  /ideas/:id      - Update an idea
@@ -99,6 +107,23 @@ export class IdeasController {
   }
 
   /**
+   * Get ideas by user address
+   * GET /ideas/user/:address
+   */
+  @Get('user/:address')
+  @ApiOperation({ summary: 'Get ideas by user address' })
+  @ApiParam({ name: 'address', type: String })
+  @ApiResponse({ status: 200, description: 'Ideas retrieved successfully' })
+  async getByUserAddress(@Param('address') address: string, @Res() res: Response) {
+    try {
+      const ideas = await this.ideasService.getIdeasByUserAddress(address);
+      return res.status(200).json({ ideas });
+    } catch (error) {
+      return res.status(500).json({ message: 'Error fetching ideas by user', error });
+    }
+  }
+
+  /**
    * Create a new idea
    * POST /ideas
    */
@@ -121,11 +146,14 @@ export class IdeasController {
   /**
    * Get a specific idea by ID
    * GET /ideas/:id
+   * Protected by DobGuard to check age limits
    */
   @Get(':id')
+  @UseGuards(DobGuard)
   @ApiOperation({ summary: 'Get idea by ID' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, description: 'Idea retrieved successfully' })
+  @ApiResponse({ status: 403, description: 'User does not meet age requirement' })
   async getById(@Param('id') id: string, @Res() res: Response) {
     try {
       const idea = await this.ideasService.getIdeaById(id);

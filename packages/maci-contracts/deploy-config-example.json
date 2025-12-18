@@ -51,6 +51,11 @@
       "semaphoreContract": "0x697c80d1F2654e88d52B16154929EB976568DB04",
       "groupId": 0
     },
+    "EIP712SignupPolicy": {
+      "deploy": false,
+      "name": "SaSvoth",
+      "version": "1"
+    },
     "MACI": {
       "stateTreeDepth": 10,
       "policy": "FreeForAllPolicy"
@@ -1064,9 +1069,14 @@
       "semaphoreContract": "0x0A09FB3f63c13F1C54F2fA41AFB1e7a98cffc774",
       "groupId": 0
     },
+    "EIP712SignupPolicy": {
+      "deploy": true,
+      "name": "SaSvoth",
+      "version": "1"
+    },
     "MACI": {
       "stateTreeDepth": 10,
-      "policy": "FreeForAllPolicy"
+      "policy": "EIP712SignupPolicy"
     },
     "VerifyingKeysRegistry": {
       "stateTreeDepth": 10,

@@ -66,7 +66,7 @@ function PreviewModal({
   heroPreview: string | null;
   items: LayoutItem[];
   title: string;
-  ageLimit: string;
+  ageLimit: number;
   description: string;
   logoPreview: string | null;
   onRemoveItem: (id: string) => void;
@@ -189,7 +189,7 @@ export function IdeaUploadForm({
   const [logoPreview, setLogoPreview] = React.useState<string | null>(null);
   const [logoCrop, setLogoCrop] = React.useState(100);
   const [title, setTitle] = React.useState("");
-  const [ageLimit, setAgeLimit] = React.useState("");
+  const [ageLimit, setAgeLimit] = React.useState<number>(0);
   const [description, setDescription] = React.useState("");
   const [mainHero, setMainHero] = React.useState<File | null>(null);
   const [mainHeroPreview, setMainHeroPreview] = React.useState<string | null>(
@@ -226,7 +226,7 @@ export function IdeaUploadForm({
   const canAdvanceFromStepOne =
     Boolean(logoPreview) &&
     Boolean(title.trim()) &&
-    Boolean(ageLimit.trim()) &&
+    ageLimit >= 0 &&
     descriptionWords > 0 &&
     descriptionWords < 200;
 
@@ -457,8 +457,9 @@ export function IdeaUploadForm({
         description: description.trim(),
         imgSrc: logoUrl, 
         imgsSrc: heroUrl ? [heroUrl] : [],
-        descriptionMore: [ageLimit, layoutJson],
-        creatorIdea: address ?? "",
+        descriptionMore: [layoutJson],
+        userAddress: address ?? "",
+        ageLimit: ageLimit,
       };
 
       console.log("Creating idea in DB with payload:", payload);
@@ -474,7 +475,7 @@ export function IdeaUploadForm({
                onSuccess?.();
                // Reset form
                setTitle("");
-               setAgeLimit("");
+               setAgeLimit(0);
                setDescription("");
                setLogoPreview(null);
                setMainHeroPreview(null);
@@ -645,7 +646,7 @@ export function IdeaUploadForm({
                   inputMode="numeric"
                   placeholder="18"
                   value={ageLimit}
-                  onChange={(event) => setAgeLimit(event.target.value)}
+                  onChange={(event) => setAgeLimit(Number(event.target.value) || 0)}
                   className="border-black/30 text-black placeholder:text-black/30 focus-visible:border-black focus-visible:ring-black/50"
                 />
                 <span className="text-xs text-black/50">
