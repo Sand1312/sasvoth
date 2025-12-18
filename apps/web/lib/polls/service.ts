@@ -139,7 +139,7 @@ export async function hydrateIdeas(
     const ids = ideasOrIds as string[];
     const fetched = await Promise.all(ids.map(id => fetchContent(id)));
     return fetched
-      .map((data, idx) => (data ? normalizeIdea(data, ids[idx]) : null))
+      .map((data, idx) => (data ? normalizeIdea(data, ids[idx] ?? "") : null))
       .filter((i): i is Idea => i !== null);
   }
 

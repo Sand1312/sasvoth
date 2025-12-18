@@ -1,6 +1,15 @@
 import { api } from "./base";
 import { PollStatus } from "@/types/polls";
 
+export type MaciConfig = {
+  mode?: number;
+  messageBatchSize?: number;
+  pollStateTreeDepth?: number;
+  voteOptionTreeDepth?: number;
+  tallyProcessingStateTreeDepth?: number;
+  initialVoiceCredits?: number;
+};
+
 export type CreatePollPayload = {
   title: string;
   description: string;
@@ -8,6 +17,7 @@ export type CreatePollPayload = {
   numberOptions: number;
   startTime: Date;
   endTime: Date;
+  maciConfig?: MaciConfig;
 };
 
 /**
@@ -154,7 +164,8 @@ export const pollsApi = {
     creatorAddress: string,
     numberOptions: number,
     startTime: Date,
-    endTime: Date
+    endTime: Date,
+    maciConfig?: MaciConfig
   ) =>
     pollsApi.create({
       title,
@@ -163,6 +174,7 @@ export const pollsApi = {
       numberOptions,
       startTime,
       endTime,
+      maciConfig,
     }),
   /** @deprecated Use getAll instead */
   getPolls: async (status?: PollStatus) => pollsApi.getAll(status),
