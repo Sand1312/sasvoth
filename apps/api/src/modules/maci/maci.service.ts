@@ -25,7 +25,8 @@ import {
   joinPoll as sdkJoinPoll,
   publishBatch as sdkPublishBatch,
 } from '@maci-protocol/sdk';
-import { MACI_ABI, POLL_ABI } from '@sasvoth/contracts';
+
+const { MACI_ABI, POLL_ABI } = require('@sasvoth/contracts');
 
 const execAsync = promisify(exec);
 const fs = require("fs");

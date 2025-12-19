@@ -1,27 +1,27 @@
 
-import CLAIMING_ABI from './abi/contracts/Claiming.json';
-import TOKEN_ABI from './abi/contracts/Token.json';
-import MACI_ABI from './abi/contracts/Maci.json';
-import MESSAGE_PROCESSOR_FACTORY_ABI from './abi/contracts/MessageProcessorFactory.json';
-import POLL_FACTORY_ABI from './abi/contracts/PollFactory.json';
-import TALLY_FACTORY_ABI from './abi/contracts/TallyFactory.json';
-import VERIFIER_ABI from './abi/contracts/Verifier.json';
-import VERIFYING_KEYS_REGISTRY_ABI from './abi/contracts/VerifyingKeysRegistry.json';
-import VOTE_VERIFIER_ABI from './abi/contracts/VoteVerifier.json';
-import CONSTANT_INITIAL_VOICE_CREDIT_PROXY_FACTORY_ABI from './abi/proxy/ConstantInitialVoiceCreditProxyFactory.json';
-import POSEIDON_T3_ABI from './abi/poseidon/PoseidonT3.json';
-import POSEIDON_T4_ABI from './abi/poseidon/PoseidonT4.json';
-import POSEIDON_T5_ABI from './abi/poseidon/PoseidonT5.json';
-import POSEIDON_T6_ABI from './abi/poseidon/PoseidonT6.json';
-import POLL_ABI from './abi/contracts/Poll.json';
-import TALLY_ABI from './abi/contracts/Tally.json';
-import MESSAGE_PROCESSOR_ABI from "./abi/contracts/MessageProcessor.json";
-import VERIFY_VOTE_ABI from './abi/contracts/VerifyVote.json';
+const CLAIMING_ABI = require('./abi/contracts/Claiming.json');
+const TOKEN_ABI = require('./abi/contracts/Token.json');
+const MACI_ABI = require('./abi/contracts/Maci.json');
+const MESSAGE_PROCESSOR_FACTORY_ABI = require('./abi/contracts/MessageProcessorFactory.json');
+const POLL_FACTORY_ABI = require('./abi/contracts/PollFactory.json');
+const TALLY_FACTORY_ABI = require('./abi/contracts/TallyFactory.json');
+const VERIFIER_ABI = require('./abi/contracts/Verifier.json');
+const VERIFYING_KEYS_REGISTRY_ABI = require('./abi/contracts/VerifyingKeysRegistry.json');
+const VOTE_VERIFIER_ABI = require('./abi/contracts/VoteVerifier.json');
+const CONSTANT_INITIAL_VOICE_CREDIT_PROXY_FACTORY_ABI = require('./abi/proxy/ConstantInitialVoiceCreditProxyFactory.json');
+const POSEIDON_T3_ABI = require('./abi/poseidon/PoseidonT3.json');
+const POSEIDON_T4_ABI = require('./abi/poseidon/PoseidonT4.json');
+const POSEIDON_T5_ABI = require('./abi/poseidon/PoseidonT5.json');
+const POSEIDON_T6_ABI = require('./abi/poseidon/PoseidonT6.json');
+const POLL_ABI = require('./abi/contracts/Poll.json');
+const TALLY_ABI = require('./abi/contracts/Tally.json');
+const MESSAGE_PROCESSOR_ABI = require('./abi/contracts/MessageProcessor.json');
+const VERIFY_VOTE_ABI = require('./abi/contracts/VerifyVote.json');
 
 
-export const CLAIM_CONTRACT_ADDRESS = "0x1FDc22E49e39054f38479fccC17D17813EF73B11";
-export const TOKEN_CONTRACT_ADDRESS = "0xDa52d3Fb44fECd1eB69b7206d9c73b91CFAFA4a8";
-export const VERIFY_VOTE="0xB01489a6Cb3A66AC56bCE486777307516E20ED32";
+const CLAIM_CONTRACT_ADDRESS = "0x1FDc22E49e39054f38479fccC17D17813EF73B11";
+const TOKEN_CONTRACT_ADDRESS = "0xDa52d3Fb44fECd1eB69b7206d9c73b91CFAFA4a8";
+const VERIFY_VOTE = "0xB01489a6Cb3A66AC56bCE486777307516E20ED32";
 // export const FreeForAllPolicy= "0xD60c63e972271ad39Ab8b5B62dc74f59588487d0";
 // export const  FreeForAllChecker ="0xC169891E4Bb0e663a66931343b0BD0A44fDADc8d";
 //  export const FreeForAllPolicyFactory= "0x6199f7AB05F9ADB820461254AB77D286FD7aD443";
@@ -38,12 +38,35 @@ export const VERIFY_VOTE="0xB01489a6Cb3A66AC56bCE486777307516E20ED32";
 //  export const MACI= "0xF6dd97A2359Cb3F9ADff5bbBd7849Cf995c50A20";
 //  export const ConstantInitialVoiceCreditProxyFactory= "0xAe0B998B50c26239fB0902CC3878366B485F0B9b"
 
-export const FreeForAll ="0x884507D6461B8Af6569E676a2df7DDf935F73dA4";
-export const Verifier =  "0x6E7ED23F8E76DE166dBc7bAdCB8380fdd2553E05";
+const FreeForAll = "0x884507D6461B8Af6569E676a2df7DDf935F73dA4";
+const Verifier = "0x6E7ED23F8E76DE166dBc7bAdCB8380fdd2553E05";
+const VerifyingKeysRegistry = "0x0D8D601e90fD052466dd30da6E8a481aA5015D70";
+const MACI = "0x427f7F83c465eb7176c98Bf056233329b10c5E1b";
 
- export const VerifyingKeysRegistry = "0x0D8D601e90fD052466dd30da6E8a481aA5015D70";
-
-
- export const MACI = "0x427f7F83c465eb7176c98Bf056233329b10c5E1b";
-
-export {VERIFY_VOTE_ABI, CLAIMING_ABI, TOKEN_ABI, MACI_ABI, MESSAGE_PROCESSOR_FACTORY_ABI, POLL_FACTORY_ABI, TALLY_FACTORY_ABI, VERIFIER_ABI, VERIFYING_KEYS_REGISTRY_ABI, VOTE_VERIFIER_ABI, CONSTANT_INITIAL_VOICE_CREDIT_PROXY_FACTORY_ABI, POSEIDON_T3_ABI, POSEIDON_T4_ABI, POSEIDON_T5_ABI, POSEIDON_T6_ABI, POLL_ABI,TALLY_ABI,MESSAGE_PROCESSOR_ABI };
+module.exports = {
+  VERIFY_VOTE_ABI,
+  CLAIMING_ABI,
+  TOKEN_ABI,
+  MACI_ABI,
+  MESSAGE_PROCESSOR_FACTORY_ABI,
+  POLL_FACTORY_ABI,
+  TALLY_FACTORY_ABI,
+  VERIFIER_ABI,
+  VERIFYING_KEYS_REGISTRY_ABI,
+  VOTE_VERIFIER_ABI,
+  CONSTANT_INITIAL_VOICE_CREDIT_PROXY_FACTORY_ABI,
+  POSEIDON_T3_ABI,
+  POSEIDON_T4_ABI,
+  POSEIDON_T5_ABI,
+  POSEIDON_T6_ABI,
+  POLL_ABI,
+  TALLY_ABI,
+  MESSAGE_PROCESSOR_ABI,
+  CLAIM_CONTRACT_ADDRESS,
+  TOKEN_CONTRACT_ADDRESS,
+  VERIFY_VOTE,
+  FreeForAll,
+  Verifier,
+  VerifyingKeysRegistry,
+  MACI,
+};

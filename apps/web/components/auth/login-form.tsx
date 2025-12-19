@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginFormData } from '@/lib/schemas/auth';
@@ -17,7 +17,7 @@ const initialState = {
   message: '',
 };
 
-export function LoginForm() {
+function LoginFormContent() {
   const { showSuccess, showError } = useFeedback();
   const { user } = useAuth();
   const router = useRouter();
@@ -98,5 +98,19 @@ export function LoginForm() {
 
       <SocialLoginButtons error={null} />
     </form>
+  );
+}
+
+export function LoginForm() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-4">
+        <div className="h-10 bg-gray-200 animate-pulse rounded" />
+        <div className="h-10 bg-gray-200 animate-pulse rounded" />
+        <div className="h-10 bg-gray-200 animate-pulse rounded" />
+      </div>
+    }>
+      <LoginFormContent />
+    </Suspense>
   );
 }
