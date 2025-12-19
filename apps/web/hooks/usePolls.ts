@@ -78,11 +78,33 @@ export function usePolls() {
    const approveIdeaInPoll= pollsApi.approveIdeaInPoll;
    const saveOnChainId= pollsApi.saveOnChainId;
 
+  /**
+   * Get polls with pagination and filtering (server-side)
+   */
+  const getPollsPaginated = async (options: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    activeAt?: Date;
+    search?: string;
+    sortBy?: 'createdAt' | 'updatedAt' | 'startTime' | 'title';
+    sortOrder?: 'asc' | 'desc';
+  }) => {
+    try {
+      const res = await pollsApi.getPollsPaginated(options);
+      return res;
+    } catch (error) {
+      console.error("Get Polls Paginated error:", error);
+      throw error;
+    }
+  };
+
 
   return {
     initPoll,
     getPolls,
     getPollById,
+    getPollsPaginated,
     updatePollStatus ,
     addIdeaToPoll,
     approveIdeaInPoll,
