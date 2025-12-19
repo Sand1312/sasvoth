@@ -90,18 +90,44 @@ export class PollsController {
 
   /**
    * List all polls (with optional status filter)
-   * GET /polls or GET /polls?status=X
+   * GET /polls or GET /polls?status=X&page=1&limit=10
    */
   @Get()
   @ApiOperation({ summary: 'List all polls' })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    description: 'Filter by status',
-  })
+  @ApiQuery({ name: 'status', required: false, description: 'Filter by status' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page (default: 10)' })
+  @ApiQuery({ name: 'activeAt', required: false, description: 'Filter polls active at date (ISO string)' })
+  @ApiQuery({ name: 'search', required: false, description: 'Search in title/description' })
+  @ApiQuery({ name: 'sortBy', required: false, description: 'Sort field: createdAt, updatedAt, startTime, title' })
+  @ApiQuery({ name: 'sortOrder', required: false, description: 'Sort order: asc or desc' })
   @ApiResponse({ status: 200, description: 'Polls retrieved successfully' })
-  async getAll(@Query('status') status: string, @Res() res: Response) {
+  async getAll(
+    @Query('status') status: string,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('activeAt') activeAt: string,
+    @Query('search') search: string,
+    @Query('sortBy') sortBy: string,
+    @Query('sortOrder') sortOrder: string,
+    @Res() res: Response,
+  ) {
     try {
+      // If pagination params are provided, use paginated method
+      if (page || limit || activeAt || search || sortBy) {
+        const result = await this.pollsService.getAllPaginated({
+          page: page ? parseInt(page, 10) : 1,
+          limit: limit ? parseInt(limit, 10) : 10,
+          status: status || undefined,
+          activeAt: activeAt ? new Date(activeAt) : undefined,
+          search: search || undefined,
+          sortBy: (sortBy as 'createdAt' | 'updatedAt' | 'startTime' | 'title') || 'createdAt',
+          sortOrder: (sortOrder as 'asc' | 'desc') || 'desc',
+        });
+        return res.status(200).json(result);
+      }
+      
+      // Legacy: return all polls without pagination
       let polls;
       if (status) {
         polls = await this.pollsService.getPollByStatus(status);

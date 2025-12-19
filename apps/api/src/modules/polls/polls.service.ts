@@ -168,6 +168,69 @@ export class PollsService {
   }
 
   /**
+   * Get all polls with pagination and filtering
+   */
+  async getAllPaginated(options: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    activeAt?: Date; // Filter polls where startTime <= activeAt <= endTime
+    search?: string;
+    sortBy?: 'createdAt' | 'updatedAt' | 'startTime' | 'title';
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<{ polls: PollsDocument[]; total: number; page: number; limit: number }> {
+    const {
+      page = 1,
+      limit = 10,
+      status,
+      activeAt,
+      search,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = options;
+
+    const query: any = {};
+
+    // Status filter
+    if (status) {
+      query.status = status;
+    }
+
+    // Active at date filter (polls that would be in_progress at this date)
+    if (activeAt) {
+      query.startTime = { $lte: activeAt };
+      query.endTime = { $gte: activeAt };
+    }
+
+    // Search filter (title or description)
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+    const sort: any = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
+
+    const [polls, total] = await Promise.all([
+      this.pollsModel.find(query).sort(sort).skip(skip).limit(limit).exec(),
+      this.pollsModel.countDocuments(query).exec(),
+    ]);
+
+    // Sync status for all found polls
+    const synced = await Promise.all(polls.map(p => this.syncPollStatus(p)));
+    const filteredPolls = synced.filter((p): p is PollsDocument => p !== null);
+
+    return {
+      polls: filteredPolls,
+      total,
+      page,
+      limit,
+    };
+  }
+
+  /**
    * Find poll that contains the given CID in options[]
    */
   async getPollByOptionCid(optionCid: string): Promise<PollsDocument | null> {

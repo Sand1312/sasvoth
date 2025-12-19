@@ -65,6 +65,50 @@ export const pollsApi = {
   },
 
   /**
+   * Get all polls with pagination and filtering
+   * GET /polls?page=X&limit=Y&activeAt=Z&search=...
+   */
+  getPollsPaginated: async (options: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    activeAt?: Date;
+    search?: string;
+    sortBy?: 'createdAt' | 'updatedAt' | 'startTime' | 'title';
+    sortOrder?: 'asc' | 'desc';
+  }) => {
+    const params: Record<string, string | number> = {};
+    if (options.page) params.page = options.page;
+    if (options.limit) params.limit = options.limit;
+    if (options.status) params.status = options.status;
+    if (options.activeAt) params.activeAt = options.activeAt.toISOString();
+    if (options.search) params.search = options.search;
+    if (options.sortBy) params.sortBy = options.sortBy;
+    if (options.sortOrder) params.sortOrder = options.sortOrder;
+
+    const response = await api.get("/polls", { params });
+
+    // Handle paginated response
+    const polls = Array.isArray(response.data?.polls)
+      ? response.data.polls
+      : [];
+
+    return {
+      polls: polls.map((poll: Record<string, unknown>) => ({
+        ...poll,
+        _id:
+          (poll as { _id?: string })._id ||
+          (poll as { id?: string }).id ||
+          (poll as { pollId?: string | number }).pollId ||
+          (poll as { pollIdOnChain?: string | number }).pollIdOnChain?.toString(),
+      })),
+      total: response.data?.total ?? polls.length,
+      page: response.data?.page ?? 1,
+      limit: response.data?.limit ?? 10,
+    };
+  },
+
+  /**
    * Create a new poll
    * POST /polls
    */
