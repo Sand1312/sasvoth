@@ -5,10 +5,7 @@ import { Button } from "@sasvoth/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sasvoth/ui/dialog";
 import { useMaci } from "@/hooks";
 import { useFeedback } from "@/contexts/FeedbackContext";
-
-// Dynamic imports for crypto libraries to avoid SSR issues
-// Note: In Next.js 16/React 19 we might handle this differently but sticking to working pattern
-import dynamic from "next/dynamic";
+import { useCheckJoinStatus } from "@/hooks/useCheckJoinStatus";
 
 type SignupModalProps = {
   open: boolean;
@@ -27,33 +24,55 @@ export function SignupModal({
 }: SignupModalProps) {
   const { showSuccess, showError } = useFeedback();
   const { signupToMaci, joinMaciPoll, loading } = useMaci();
+  const { checkJoinStatus, getUserPubKeyCoords, loading: checkingStatus } = useCheckJoinStatus();
   const [privKey, setPrivKey] = useState("");
   const [useRandomKey, setUseRandomKey] = useState(true);
   const [useExistingKey, setUseExistingKey] = useState(false);
 
-  // ... (state logic remains same) ...
   const [alreadyJoined, setAlreadyJoined] = useState(false);
   const [existingPollStateIndex, setExistingPollStateIndex] = useState<string | null>(null);
   const [existingVoiceCredits, setExistingVoiceCredits] = useState<string | null>(null);
+  const [statusSource, setStatusSource] = useState<"subgraph" | "localStorage" | "none">("none");
 
   const [joinSuccess, setJoinSuccess] = useState(false);
   const [newPollStateIndex, setNewPollStateIndex] = useState<string | null>(null);
   const [newVoiceCredits, setNewVoiceCredits] = useState<string | null>(null);
 
+  // Check join status from subgraph when modal opens
   useEffect(() => {
-    if (open) {
-      const storedPollStateIndex = localStorage.getItem("maci_poll_state_index");
-      const storedVoiceCredits = localStorage.getItem("maci_voice_credits");
-      const storedPrivKey = localStorage.getItem("maci_priv_key");
+    const checkStatus = async () => {
+      if (!open) return;
+      
+      // Reset state
+      setJoinSuccess(false);
+      setNewPollStateIndex(null);
+      setNewVoiceCredits(null);
 
-      if (storedPollStateIndex) {
+      const storedPrivKey = localStorage.getItem("maci_priv_key");
+      
+      // Get user's public key coordinates for subgraph query
+      const coords = await getUserPubKeyCoords();
+      
+      // Check join status (subgraph first, then localStorage fallback)
+      const pollIdStr = String(pollIdOnChain);
+      const result = await checkJoinStatus(
+        pollIdStr,
+        coords?.x,
+        coords?.y
+      );
+
+      console.log(`[SignupModal] Join status for poll ${pollIdStr}:`, result);
+
+      if (result.isJoined) {
         setAlreadyJoined(true);
-        setExistingPollStateIndex(storedPollStateIndex);
-        setExistingVoiceCredits(storedVoiceCredits);
+        setExistingPollStateIndex(result.pollStateIndex);
+        setExistingVoiceCredits(result.voiceCredits);
+        setStatusSource(result.source);
       } else {
         setAlreadyJoined(false);
         setExistingPollStateIndex(null);
         setExistingVoiceCredits(null);
+        setStatusSource("none");
 
         if (storedPrivKey) {
           setUseExistingKey(true);
@@ -63,11 +82,10 @@ export function SignupModal({
           setUseRandomKey(true);
         }
       }
-      setJoinSuccess(false);
-      setNewPollStateIndex(null);
-      setNewVoiceCredits(null);
-    }
-  }, [open]);
+    };
+
+    checkStatus();
+  }, [open, pollIdOnChain, checkJoinStatus, getUserPubKeyCoords]);
 
   const handleSignup = async () => {
     // ... (logic remains same) ...
@@ -108,8 +126,16 @@ export function SignupModal({
       setNewPollStateIndex(joinResult.pollStateIndex || null);
       setNewVoiceCredits(joinResult.voiceCredits || null);
 
-      if (joinResult.pollStateIndex) localStorage.setItem("maci_poll_state_index", joinResult.pollStateIndex);
-      if (joinResult.voiceCredits) localStorage.setItem("maci_voice_credits", joinResult.voiceCredits);
+      if (joinResult.pollStateIndex) {
+        // Save with poll-specific key for accurate multi-poll tracking
+        localStorage.setItem(`maci_poll_state_index_${pollIdOnChain}`, joinResult.pollStateIndex);
+        // Also save generic key for backward compatibility
+        localStorage.setItem("maci_poll_state_index", joinResult.pollStateIndex);
+      }
+      if (joinResult.voiceCredits) {
+        localStorage.setItem(`maci_voice_credits_${pollIdOnChain}`, joinResult.voiceCredits);
+        localStorage.setItem("maci_voice_credits", joinResult.voiceCredits);
+      }
 
       onSuccess();
     } catch (e: any) {

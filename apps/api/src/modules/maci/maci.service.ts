@@ -343,28 +343,72 @@ export class MaciService {
     } catch (error: any) {
       this.logger.error("Join Poll failed", error);
        let errorMessage = error.message || "Unknown error joining poll";
+       const errorData = error.data || error.error?.data || '';
+       
+       // Decode Poll contract custom errors by selector
+       // Selectors computed from keccak256 of error signature
+       const ERROR_SELECTORS: Record<string, string> = {
+         '0xf45d43bf': 'UserAlreadyJoined',
+         '0x75fc7f6f': 'InvalidPollProof',
+         '0xa47dcd48': 'VotingPeriodOver',
+         '0x1262a27a': 'VotingPeriodNotOver', 
+         '0x256eadc8': 'VotingPeriodNotStarted',
+         '0xb984588b': 'TooManySignups',
+         '0xc64891a5': 'NotRelayer',
+         '0xdfd58098': 'StateLeafNotFound',
+         '0xb2d14184': 'UserNotSignedUp',
+         '0xa2d0fee8': 'InvalidPublicKey',
+       };
+
+       // Check for known error selectors in error data
+       let decodedError: string | null = null;
+       for (const [selector, errorName] of Object.entries(ERROR_SELECTORS)) {
+         if (errorMessage.includes(selector) || errorData.includes(selector)) {
+           decodedError = errorName;
+           break;
+         }
+       }
+
+       if (decodedError) {
+         this.logger.error(`Decoded custom error: ${decodedError}`);
+       }
        
        // Handle "UserAlreadyJoined" (selector 0xf45d43bf)
-       if (
-         errorMessage.includes("0xf45d43bf") || 
-         errorMessage.includes("UserAlreadyJoined") ||
-         (error.data && error.data.includes("0xf45d43bf"))
-        ) {
+       if (decodedError === 'UserAlreadyJoined') {
          this.logger.log("User already joined poll. Treating as success.");
          return {
            success: true,
            alreadyJoined: true,
-           // We might not get pollStateIndex back easily without re-querying, 
-           // but frontend might just need to know it's ok to proceed.
-           // For now, return dummy or handle in frontend.
-           pollStateIndex: "0", // Placeholder or fetch if crucial
+           pollStateIndex: "0",
            voiceCredits: "0", 
          };
+       }
+
+       // Handle InvalidPollProof - ZK proof verification failed
+       if (decodedError === 'InvalidPollProof') {
+         errorMessage = "ZK Proof verification failed. Possible causes: (1) ZKey mismatch with contract, (2) State tree depth mismatch, (3) startBlock is wrong causing incorrect Merkle tree, (4) User not found in MACI state tree.";
+         this.logger.error(`InvalidPollProof details: startBlock may be incorrect or user signup not indexed`);
+       }
+
+       // Handle UserNotSignedUp
+       if (decodedError === 'UserNotSignedUp') {
+         errorMessage = "User has not signed up to MACI. Please call signupToMaci first.";
+       }
+
+       // Handle VotingPeriodNotStarted
+       if (decodedError === 'VotingPeriodNotStarted') {
+         errorMessage = "Poll voting period has not started yet.";
+       }
+
+       // Handle VotingPeriodOver
+       if (decodedError === 'VotingPeriodOver') {
+         errorMessage = "Poll voting period has ended. Cannot join after deadline.";
        }
 
        if (errorMessage.includes("Signal indices not found")) {
          errorMessage = "User signup not found on-chain. Check startBlock or if user is signed up.";
        }
+       
        this.logger.error(`Join Poll full error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
       throw new HttpException(`Join Poll failed: ${errorMessage}`, 500);
     }

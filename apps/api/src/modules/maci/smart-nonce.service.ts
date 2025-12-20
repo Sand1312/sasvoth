@@ -23,8 +23,8 @@ export class SmartNonceService implements OnModuleInit {
   // TTL for pending nonces in Redis (10 minutes - time for Graph to catch up)
   private readonly PENDING_NONCE_TTL = 600;
   
-  // Lock TTL for vote transactions (5 seconds)
-  private readonly LOCK_TTL = 5000;
+  // Lock TTL for vote transactions (2 minutes - enough for slow blockchain tx)
+  private readonly LOCK_TTL = 120000;
 
   constructor(
     @InjectRedis() private readonly redis: Redis,
@@ -201,7 +201,21 @@ export class SmartNonceService implements OnModuleInit {
     const stateIndexStr = stateIndex.toString();
     const lockKey = `lock:vote:${pollId}:${stateIndexStr}`;
     
-    const lock = await this.redlock.acquire([lockKey], this.LOCK_TTL);
+    let lock;
+    try {
+      lock = await this.redlock.acquire([lockKey], this.LOCK_TTL);
+    } catch (lockError: any) {
+      // If lock cannot be acquired, log and proceed without lock (graceful degradation)
+      // This is better than blocking the user entirely
+      this.logger.warn(`Failed to acquire vote lock for ${lockKey}: ${lockError.message}`);
+      this.logger.warn('Proceeding without distributed lock - race conditions possible');
+      
+      // Calculate nonce without lock
+      const nonce = await this.calculateNextNonce(pollId, stateIndexStr);
+      const result = await fn(nonce);
+      await this.setPendingNonce(pollId, stateIndexStr, nonce);
+      return result;
+    }
     
     try {
       // Calculate nonce while holding the lock
@@ -216,7 +230,13 @@ export class SmartNonceService implements OnModuleInit {
       return result;
     } finally {
       // Always release the lock
-      await lock.release();
+      if (lock) {
+        try {
+          await lock.release();
+        } catch (releaseError) {
+          this.logger.warn(`Failed to release lock: ${releaseError}`);
+        }
+      }
     }
   }
 
