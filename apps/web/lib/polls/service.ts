@@ -33,6 +33,7 @@ export type PollData = {
   approvedIdeas: Idea[];
   options: string[];
   results: TallyResult[];
+  maciAddress?: string;  // MACI contract address this poll belongs to
 };
 
 // Raw types from API
@@ -62,6 +63,7 @@ type ApiPoll = {
   approvedIdeaIds?: string[];
   options?: string[];
   results?: TallyResult[];
+  maciAddress?: string;
 };
 
 const API_BASE_URL =
@@ -92,17 +94,17 @@ async function fetchContent(id: string): Promise<ApiIdea | null> {
 
     // If it's a standard ID, originally the code called ideasApi.getIdeaById
     // If we assume everything interesting is IPFS or normalized:
-    
+
     // Note: The original client code distinguishes between IPFS CIDs and DB IDs.
     // For IPFS, it calls `ipfsApi.getById` which calls `/api/v1/ipfs/:cid`.
     // For DB IDs, it calls `ideasApi.getIdeaById`.
-    
+
     // We strictly use the backend URL here.
     const res = await fetch(url, {
-        cache: 'force-cache', 
-        next: { tags: [`content-${id}`] }
+      cache: 'force-cache',
+      next: { tags: [`content-${id}`] }
     });
-    
+
     if (!res.ok) return null;
     return await res.json();
   } catch (error) {
@@ -116,8 +118,8 @@ function normalizeIdea(idea: ApiIdea, fallbackId: string): Idea {
     idea._id && idea._id.length > 0
       ? idea._id
       : idea.idea_cid && idea.idea_cid.length > 0
-      ? idea.idea_cid
-      : fallbackId;
+        ? idea.idea_cid
+        : fallbackId;
 
   return {
     _id: resolvedId,
@@ -156,9 +158,9 @@ export async function getPollById(id: string): Promise<PollData> {
     });
 
     if (!res.ok) {
-        // Fallback for 404 or error
-        console.error(`Fetch poll ${id} failed: ${res.status}`);
-        return fallbackPoll; 
+      // Fallback for 404 or error
+      console.error(`Fetch poll ${id} failed: ${res.status}`);
+      return fallbackPoll;
     }
 
     const data = await res.json();
@@ -187,11 +189,11 @@ export async function getPollById(id: string): Promise<PollData> {
 
     // Derive Status
     const derivedStatus = derivePollStatus({
-        startTime: source.startTime,
-        endTime: source.endTime,
-        timeframe: source.timeframe,
-        pollIdOnChain: source.pollIdOnChain,
-        status: source.status
+      startTime: source.startTime,
+      endTime: source.endTime,
+      timeframe: source.timeframe,
+      pollIdOnChain: source.pollIdOnChain,
+      status: source.status
     });
 
     return {
@@ -202,21 +204,21 @@ export async function getPollById(id: string): Promise<PollData> {
       timeframe: {
         start: timeframeStart
           ? new Date(timeframeStart).toLocaleString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
           : fallbackPoll.timeframe.start,
         end: timeframeEnd
           ? new Date(timeframeEnd).toLocaleString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
           : fallbackPoll.timeframe.end,
       },
       credits: source.credits ?? fallbackPoll.credits,
@@ -225,6 +227,7 @@ export async function getPollById(id: string): Promise<PollData> {
       approvedIdeas,
       options: source.options ?? [],
       results: source.results ?? [],
+      maciAddress: source.maciAddress,
     };
 
   } catch (error) {

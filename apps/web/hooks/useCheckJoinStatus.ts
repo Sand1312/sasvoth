@@ -113,7 +113,7 @@ export const useCheckJoinStatus = () => {
     pollId: string
   ): Promise<CheckJoinStatusResult> => {
     const subgraphUrl = getSubgraphUrl();
-    
+
     if (!subgraphUrl) {
       console.warn("No subgraph URL configured, falling back to localStorage");
       return { isJoined: false, pollStateIndex: null, voiceCredits: null, source: "none" };
@@ -121,7 +121,7 @@ export const useCheckJoinStatus = () => {
 
     try {
       const query = buildPollJoinedQuery(pubKeyX, pubKeyY, pollId);
-      
+
       const response = await fetch(subgraphUrl, {
         method: "POST",
         headers: {
@@ -144,7 +144,7 @@ export const useCheckJoinStatus = () => {
       }
 
       const pollJoineds = json.data?.pollJoineds;
-      
+
       if (pollJoineds && pollJoineds.length > 0) {
         const joined = pollJoineds[0];
         return {
@@ -176,7 +176,7 @@ export const useCheckJoinStatus = () => {
       // Try with combined pubKey format
       const combinedKey = `${pubKeyX} ${pubKeyY}`;
       const query = buildPollJoinedQueryAlt(combinedKey, pollId);
-      
+
       const response = await fetch(subgraphUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -184,7 +184,7 @@ export const useCheckJoinStatus = () => {
       });
 
       const json = await response.json();
-      
+
       if (!json.errors && json.data?.pollJoineds?.length > 0) {
         const joined = json.data.pollJoineds[0];
         return {
@@ -243,8 +243,8 @@ export const useCheckJoinStatus = () => {
    * Main check function - tries subgraph first, then localStorage
    */
   const checkJoinStatus = useCallback(async (
-    pollId: string, 
-    pubKeyX?: string, 
+    pollId: string,
+    pubKeyX?: string,
     pubKeyY?: string
   ): Promise<CheckJoinStatusResult> => {
     setLoading(true);
@@ -254,7 +254,7 @@ export const useCheckJoinStatus = () => {
       // If we have public key, check subgraph first
       if (pubKeyX && pubKeyY) {
         const subgraphResult = await checkFromSubgraph(pubKeyX, pubKeyY, pollId);
-        
+
         if (subgraphResult.isJoined) {
           // Also update poll-specific localStorage for faster future checks
           if (typeof window !== "undefined" && subgraphResult.pollStateIndex) {
@@ -281,37 +281,8 @@ export const useCheckJoinStatus = () => {
     }
   }, []);
 
-  /**
-   * Get user's public key coordinates from localStorage
-   */
-  const getUserPubKeyCoords = useCallback(async (): Promise<{ x: string; y: string } | null> => {
-    if (typeof window === "undefined") return null;
-
-    const pubKey = localStorage.getItem("maci_pub_key");
-    if (!pubKey) return null;
-
-    try {
-      // Import dynamically to avoid SSR issues
-      const { PublicKey } = await import("@maci-protocol/domainobjs");
-      const pk = PublicKey.deserialize(pubKey);
-      const coords = pk.asArray();
-      if (!coords || coords.length < 2) {
-        console.error("Invalid public key coordinates");
-        return null;
-      }
-      return {
-        x: coords[0]!.toString(),
-        y: coords[1]!.toString(),
-      };
-    } catch (err) {
-      console.error("Failed to parse public key:", err);
-      return null;
-    }
-  }, []);
-
   return {
     checkJoinStatus,
-    getUserPubKeyCoords,
     loading,
     error,
   };

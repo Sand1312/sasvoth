@@ -1,42 +1,67 @@
 import { useState } from "react";
-// Remove SDK, use Server Action
-// import { publishBatch } from "@maci-protocol/sdk";
-import { Keypair, PrivateKey } from "@maci-protocol/domainobjs";
+import { useSignTypedData, useAccount, useChainId, usePublicClient } from "wagmi";
 import { maciApi } from "../api/maci.api";
+import { deriveMaciKeypair, getStateIndexFromChain } from "../utils/maciKeyDerivation";
 
 export const useMaciVote = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { signTypedDataAsync } = useSignTypedData();
+  const { address } = useAccount();
+  const chainId = useChainId();
+  const publicClient = usePublicClient();
 
   const handleVote = async (
     pollId: string,
     voteOptionIndex: number,
     voteWeight: number,
     nonce: number,
-    maciAddress: string
+    maciAddress: string,
+    startBlock?: number
   ) => {
     setLoading(true);
     setError(null);
     try {
-      const privateKey = localStorage.getItem("maci_priv_key");
-      const stateIndexStr = localStorage.getItem("maci_state_index");
-      if (!privateKey || !stateIndexStr) {
-        throw new Error("User not signed up (Missing privKey or stateIndex)");
+      if (!address) {
+        throw new Error("Wallet not connected");
       }
 
-      const userPrivKey = PrivateKey.deserialize(privateKey);
-      const userKeypair = new Keypair(userPrivKey);
-      
-      console.log("Voting via API...", { pollId, voteOptionIndex, voteWeight, nonce });
+      // ============================================
+      // Step 1: Derive MACI keypair (cached in memory)
+      // ============================================
+      console.log("Deriving MACI keypair...");
+      const { privateKey, publicKey, pubKeyX, pubKeyY } = await deriveMaciKeypair(
+        address,
+        chainId,
+        signTypedDataAsync,
+        { maciAddress }
+      );
 
-      // Generate Public Key string from Keypair to pass to server
-      const publicKey = userKeypair.publicKey.serialize(); 
+      // ============================================
+      // Step 2: Get stateIndex from blockchain
+      // ============================================
+      console.log("Fetching stateIndex from blockchain...");
+      const { stateIndex } = await getStateIndexFromChain(
+        maciAddress,
+        { x: pubKeyX, y: pubKeyY },
+        publicClient,
+        startBlock
+      );
 
+      if (!stateIndex) {
+        throw new Error("User not signed up (No stateIndex found on chain)");
+      }
+
+      console.log("Voting via API...", { pollId, voteOptionIndex, voteWeight, nonce, stateIndex });
+
+      // ============================================
+      // Step 3: Call vote API
+      // ============================================
       const result = await maciApi.vote(pollId, {
         voteOptionIndex,
         voteWeight,
         nonce,
-        userStateIndex: stateIndexStr,
+        userStateIndex: stateIndex,
         userMaciPrivateKey: privateKey,
         userMaciPublicKey: publicKey,
         maciAddress
@@ -68,3 +93,4 @@ export const useMaciVote = () => {
     error,
   };
 };
+

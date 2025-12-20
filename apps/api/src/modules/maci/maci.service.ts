@@ -26,6 +26,14 @@ import {
   publishBatch as sdkPublishBatch,
 } from '@maci-protocol/sdk';
 
+// Dynamic import for domainobjs (may not be in API deps)
+let PubKey: any;
+try {
+  PubKey = require('@maci-protocol/domainobjs').PubKey;
+} catch {
+  // Will use fallback parsing in signup if PubKey not available
+}
+
 const { MACI_ABI, POLL_ABI } = require('@sasvoth/contracts');
 
 const execAsync = promisify(exec);
@@ -61,9 +69,9 @@ export class MaciService {
       this.configService.get('WALLET_PRIVATE_KEY') ||
       this.configService.get('ETH_PRIVATE_KEY') ||
       '';
-    
+
     if (!this.privateKey) {
-        this.logger.error("No private key found (WALLET_PRIVATE_KEY or ETH_PRIVATE_KEY)");
+      this.logger.error("No private key found (WALLET_PRIVATE_KEY or ETH_PRIVATE_KEY)");
     }
     this.walletAddress = this.configService.get('WALLET_ADDRESS', '');
     this.maciAddress = this.configService.get('MACI_ADDRESS', '');
@@ -110,12 +118,12 @@ export class MaciService {
   async signup(maciPubKey: string, maciAddress?: string, sgData?: string) {
     try {
       this.logger.log(`Signing up to MACI... PubKey: ${maciPubKey}`);
-      
+
       const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
       const signerV6 = new ethers6.Wallet(this.privateKey, providerV6);
-      
+
       const address = maciAddress || this.maciAddress;
-      
+
       this.logger.log(`Using MACI Address: ${address}`);
 
       // Validate maciPubKey
@@ -135,14 +143,14 @@ export class MaciService {
       // Get block number
       let blockNumber: number | undefined;
       if (result.transactionHash) {
+        try {
+          const receipt = await this.provider.waitForTransaction(result.transactionHash, 1);
+          blockNumber = receipt.blockNumber;
+        } catch (e) {
           try {
-              const receipt = await this.provider.waitForTransaction(result.transactionHash, 1);
-              blockNumber = receipt.blockNumber;
-          } catch (e) {
-              try {
-                  blockNumber = await this.provider.getBlockNumber();
-              } catch(e2) {}
-          }
+            blockNumber = await this.provider.getBlockNumber();
+          } catch (e2) { }
+        }
       }
 
       return {
@@ -153,6 +161,75 @@ export class MaciService {
       };
     } catch (error) {
       this.logger.error("Signup failed", error);
+
+      // Check if error is "already signed up" type
+      const errMsg = error?.message || String(error);
+      const isAlreadySignedUp =
+        errMsg.toLowerCase().includes("already") ||
+        errMsg.toLowerCase().includes("signed up") ||
+        errMsg.toLowerCase().includes("registered") ||
+        errMsg.includes("0xf45d43bf") || // UserAlreadyJoined selector
+        errMsg.includes("0x258a195a");   // LeafAlreadyExists selector (pubkey already in tree)
+
+      if (isAlreadySignedUp) {
+        this.logger.log("User already signed up - querying existing stateIndex...");
+
+        // Try to get existing stateIndex from chain
+        try {
+          const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
+          const address = maciAddress || this.maciAddress;
+
+          // Parse public key to get coordinates
+          if (!PubKey) {
+            this.logger.warn("PubKey not available, cannot query stateIndex");
+            return {
+              success: true,
+              stateIndex: null,
+              hash: null,
+              blockNumber: null,
+              alreadySignedUp: true
+            };
+          }
+
+          const pubKey = PubKey.deserialize(maciPubKey);
+          const pubKeyX = pubKey.asArray()[0].toString();
+          const pubKeyY = pubKey.asArray()[1].toString();
+
+          // Query MACI contract for stateIndex using public key hash
+          const maciContract = new ethers6.Contract(
+            address,
+            [
+              "function hash2(uint256[2] memory array) public pure returns (uint256)",
+              "function getStateIndex(uint256 element) public view returns (uint40)"
+            ],
+            providerV6
+          );
+
+          const publicKeyHash = await maciContract.hash2([BigInt(pubKeyX), BigInt(pubKeyY)]);
+          const stateIndex = await maciContract.getStateIndex(publicKeyHash);
+
+          this.logger.log(`Found existing stateIndex: ${stateIndex}`);
+
+          return {
+            success: true,
+            stateIndex: stateIndex.toString(),
+            hash: null,
+            blockNumber: null,
+            alreadySignedUp: true
+          };
+        } catch (queryError) {
+          this.logger.warn("Could not query existing stateIndex:", queryError);
+          // Still return success but without stateIndex
+          return {
+            success: true,
+            stateIndex: null,
+            hash: null,
+            blockNumber: null,
+            alreadySignedUp: true
+          };
+        }
+      }
+
       throw new HttpException(`Signup failed: ${error.message}`, 500);
     }
   }
@@ -167,7 +244,7 @@ export class MaciService {
       // In production, query the Gatekeeper contract: gatekeeper.nonces(address)
       const redisKey = `maci:signup:nonce:${address.toLowerCase()}`;
       const nonce = await this.redis.get(redisKey);
-      
+
       return {
         nonce: nonce ? parseInt(nonce, 10) : 0,
         address: address.toLowerCase()
@@ -197,16 +274,16 @@ export class MaciService {
   ) {
     try {
       this.logger.log(`EIP-712 Signup: pubKeyX=${pubKeyX.substring(0, 20)}...`);
-      
+
       // 1. Verify user eligibility by checking Users collection
       // The signature verification will be done by the Gatekeeper contract
       // For eligibility, we recover the signer address and check DB
-      
+
       // TODO: When Gatekeeper is deployed:
       // const gatekeeperAddress = this.configService.get('GATEKEEPER_ADDRESS');
       // const gatekeeper = new ethers.Contract(gatekeeperAddress, GATEKEEPER_ABI, signer);
       // const result = await gatekeeper.signupWithSignature(pubKeyX, pubKeyY, deadline, signature);
-      
+
       // For now, verify deadline hasn't passed
       const now = Math.floor(Date.now() / 1000);
       if (deadline < now) {
@@ -217,11 +294,11 @@ export class MaciService {
       // This is a temporary fallback until Gatekeeper contract is deployed
       const domainobjs = await import('maci-domainobjs');
       const { PubKey } = domainobjs;
-      
+
       // Create PubKey from x/y coordinates
       const pubKey = new PubKey([BigInt(pubKeyX), BigInt(pubKeyY)]);
       const maciPubKey = pubKey.serialize();
-      
+
       this.logger.log(`Reconstructed MACI PubKey: ${maciPubKey.substring(0, 30)}...`);
 
       // Increment nonce in Redis
@@ -244,17 +321,17 @@ export class MaciService {
    * Join Poll
    */
   async joinPoll(
-    pollId: string, 
-    maciPrivateKey: string, 
-    maciAddress?: string, 
+    pollId: string,
+    maciPrivateKey: string,
+    maciAddress?: string,
     startBlock?: number
   ) {
     try {
       this.logger.log(`Joining Poll ${pollId}...`);
-      
+
       const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
       const signerV6 = new ethers6.Wallet(this.privateKey, providerV6);
-      
+
       const address = maciAddress || this.maciAddress;
 
       // Verify MACI State Tree Depth
@@ -269,9 +346,9 @@ export class MaciService {
         );
         const depth = await maciContract.stateTreeDepth();
         this.logger.log(`MACI Contract State Tree Depth: ${depth}`);
-        
+
         if (Number(depth) !== 10) {
-           this.logger.warn(`WARNING: MACI State Tree Depth is ${depth}, but we are using PollJoining_10_test ZKey (depth 10). This will likely fail!`);
+          this.logger.warn(`WARNING: MACI State Tree Depth is ${depth}, but we are using PollJoining_10_test ZKey (depth 10). This will likely fail!`);
         }
 
         // Verify Poll Tree Depths
@@ -281,36 +358,36 @@ export class MaciService {
         const pollContract = new ethers6.Contract(pollAddress, POLL_ABI, providerV6);
         const treeDepths = await pollContract.treeDepths();
         this.logger.log(`Poll Tree Depths: intStateTreeDepth=${treeDepths.intStateTreeDepth}, messageTreeSubDepth=${treeDepths.messageTreeSubDepth}, messageTreeDepth=${treeDepths.messageTreeDepth}, voteOptionTreeDepth=${treeDepths.voteOptionTreeDepth}`);
-        
+
       } catch (e) {
-          this.logger.warn(`Could not verify state tree depth or poll depths: ${e.message}`);
+        this.logger.warn(`Could not verify state tree depth or poll depths: ${e.message}`);
       }
 
       // Resolve ZKey Paths - Try multiple locations
       // 1. Production/Docker path (if configured)
       // 2. Development path (relative to apps/api)
       const potentialPaths = [
-          path.join(process.cwd(), "zkeys"), // Local zkeys folder
-          path.join(process.cwd(), "../web/public/zkeys"), // Monorepo sibling
-          path.join(process.cwd(), "public/zkeys"),
+        path.join(process.cwd(), "zkeys"), // Local zkeys folder
+        path.join(process.cwd(), "../web/public/zkeys"), // Monorepo sibling
+        path.join(process.cwd(), "public/zkeys"),
       ];
 
       let zkeyPath = "";
       let wasmPath = "";
-      
+
       for (const basePath of potentialPaths) {
-          const z = path.join(basePath, "PollJoining_10_test/PollJoining_10_test.0.zkey");
-          const w = path.join(basePath, "PollJoining_10_test/PollJoining_10_test_js/PollJoining_10_test.wasm");
-          if (fs.existsSync(z) && fs.existsSync(w)) {
-              zkeyPath = z;
-              wasmPath = w;
-              this.logger.log(`Found ZKeys at: ${basePath}`);
-              break;
-          }
+        const z = path.join(basePath, "PollJoining_10_test/PollJoining_10_test.0.zkey");
+        const w = path.join(basePath, "PollJoining_10_test/PollJoining_10_test_js/PollJoining_10_test.wasm");
+        if (fs.existsSync(z) && fs.existsSync(w)) {
+          zkeyPath = z;
+          wasmPath = w;
+          this.logger.log(`Found ZKeys at: ${basePath}`);
+          break;
+        }
       }
 
       if (!zkeyPath || !wasmPath) {
-          throw new HttpException("ZKey files not found. Setup zkeys in apps/api/zkeys or apps/web/public/zkeys", 500);
+        throw new HttpException("ZKey files not found. Setup zkeys in apps/api/zkeys or apps/web/public/zkeys", 500);
       }
 
       const ZERO_DATA = "0x0000000000000000000000000000000000000000000000000000000000000000";
@@ -342,74 +419,74 @@ export class MaciService {
 
     } catch (error: any) {
       this.logger.error("Join Poll failed", error);
-       let errorMessage = error.message || "Unknown error joining poll";
-       const errorData = error.data || error.error?.data || '';
-       
-       // Decode Poll contract custom errors by selector
-       // Selectors computed from keccak256 of error signature
-       const ERROR_SELECTORS: Record<string, string> = {
-         '0xf45d43bf': 'UserAlreadyJoined',
-         '0x75fc7f6f': 'InvalidPollProof',
-         '0xa47dcd48': 'VotingPeriodOver',
-         '0x1262a27a': 'VotingPeriodNotOver', 
-         '0x256eadc8': 'VotingPeriodNotStarted',
-         '0xb984588b': 'TooManySignups',
-         '0xc64891a5': 'NotRelayer',
-         '0xdfd58098': 'StateLeafNotFound',
-         '0xb2d14184': 'UserNotSignedUp',
-         '0xa2d0fee8': 'InvalidPublicKey',
-       };
+      let errorMessage = error.message || "Unknown error joining poll";
+      const errorData = error.data || error.error?.data || '';
 
-       // Check for known error selectors in error data
-       let decodedError: string | null = null;
-       for (const [selector, errorName] of Object.entries(ERROR_SELECTORS)) {
-         if (errorMessage.includes(selector) || errorData.includes(selector)) {
-           decodedError = errorName;
-           break;
-         }
-       }
+      // Decode Poll contract custom errors by selector
+      // Selectors computed from keccak256 of error signature
+      const ERROR_SELECTORS: Record<string, string> = {
+        '0xf45d43bf': 'UserAlreadyJoined',
+        '0x75fc7f6f': 'InvalidPollProof',
+        '0xa47dcd48': 'VotingPeriodOver',
+        '0x1262a27a': 'VotingPeriodNotOver',
+        '0x256eadc8': 'VotingPeriodNotStarted',
+        '0xb984588b': 'TooManySignups',
+        '0xc64891a5': 'NotRelayer',
+        '0xdfd58098': 'StateLeafNotFound',
+        '0xb2d14184': 'UserNotSignedUp',
+        '0xa2d0fee8': 'InvalidPublicKey',
+      };
 
-       if (decodedError) {
-         this.logger.error(`Decoded custom error: ${decodedError}`);
-       }
-       
-       // Handle "UserAlreadyJoined" (selector 0xf45d43bf)
-       if (decodedError === 'UserAlreadyJoined') {
-         this.logger.log("User already joined poll. Treating as success.");
-         return {
-           success: true,
-           alreadyJoined: true,
-           pollStateIndex: "0",
-           voiceCredits: "0", 
-         };
-       }
+      // Check for known error selectors in error data
+      let decodedError: string | null = null;
+      for (const [selector, errorName] of Object.entries(ERROR_SELECTORS)) {
+        if (errorMessage.includes(selector) || errorData.includes(selector)) {
+          decodedError = errorName;
+          break;
+        }
+      }
 
-       // Handle InvalidPollProof - ZK proof verification failed
-       if (decodedError === 'InvalidPollProof') {
-         errorMessage = "ZK Proof verification failed. Possible causes: (1) ZKey mismatch with contract, (2) State tree depth mismatch, (3) startBlock is wrong causing incorrect Merkle tree, (4) User not found in MACI state tree.";
-         this.logger.error(`InvalidPollProof details: startBlock may be incorrect or user signup not indexed`);
-       }
+      if (decodedError) {
+        this.logger.error(`Decoded custom error: ${decodedError}`);
+      }
 
-       // Handle UserNotSignedUp
-       if (decodedError === 'UserNotSignedUp') {
-         errorMessage = "User has not signed up to MACI. Please call signupToMaci first.";
-       }
+      // Handle "UserAlreadyJoined" (selector 0xf45d43bf)
+      if (decodedError === 'UserAlreadyJoined') {
+        this.logger.log("User already joined poll. Treating as success.");
+        return {
+          success: true,
+          alreadyJoined: true,
+          pollStateIndex: "0",
+          voiceCredits: "0",
+        };
+      }
 
-       // Handle VotingPeriodNotStarted
-       if (decodedError === 'VotingPeriodNotStarted') {
-         errorMessage = "Poll voting period has not started yet.";
-       }
+      // Handle InvalidPollProof - ZK proof verification failed
+      if (decodedError === 'InvalidPollProof') {
+        errorMessage = "ZK Proof verification failed. Possible causes: (1) ZKey mismatch with contract, (2) State tree depth mismatch, (3) startBlock is wrong causing incorrect Merkle tree, (4) User not found in MACI state tree.";
+        this.logger.error(`InvalidPollProof details: startBlock may be incorrect or user signup not indexed`);
+      }
 
-       // Handle VotingPeriodOver
-       if (decodedError === 'VotingPeriodOver') {
-         errorMessage = "Poll voting period has ended. Cannot join after deadline.";
-       }
+      // Handle UserNotSignedUp
+      if (decodedError === 'UserNotSignedUp') {
+        errorMessage = "User has not signed up to MACI. Please call signupToMaci first.";
+      }
 
-       if (errorMessage.includes("Signal indices not found")) {
-         errorMessage = "User signup not found on-chain. Check startBlock or if user is signed up.";
-       }
-       
-       this.logger.error(`Join Poll full error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
+      // Handle VotingPeriodNotStarted
+      if (decodedError === 'VotingPeriodNotStarted') {
+        errorMessage = "Poll voting period has not started yet.";
+      }
+
+      // Handle VotingPeriodOver
+      if (decodedError === 'VotingPeriodOver') {
+        errorMessage = "Poll voting period has ended. Cannot join after deadline.";
+      }
+
+      if (errorMessage.includes("Signal indices not found")) {
+        errorMessage = "User signup not found on-chain. Check startBlock or if user is signed up.";
+      }
+
+      this.logger.error(`Join Poll full error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
       throw new HttpException(`Join Poll failed: ${errorMessage}`, 500);
     }
   }
@@ -429,10 +506,10 @@ export class MaciService {
   ) {
     try {
       this.logger.log(`Voting on Poll ${pollId} for Option ${voteOptionIndex}...`);
-      
+
       const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
       const signerV6 = new ethers6.Wallet(this.privateKey, providerV6);
-      
+
       const address = maciAddress || this.maciAddress;
 
       // Use SmartNonce with distributed locking
@@ -517,10 +594,10 @@ export class MaciService {
       }
 
       const maciAddress = result.maciContractAddress || result.address;
-      
+
       // Get block number from Coordinator response or fetch from chain
       let startBlock = result.blockNumber || result.startBlock || 0;
-      
+
       if (!startBlock || startBlock === 0) {
         try {
           // Fetch current block number from chain as fallback
@@ -537,7 +614,7 @@ export class MaciService {
       // Deploy subgraph for the new MACI contract (optional, based on config)
       let subgraphUrl: string | null = null;
       const shouldDeploySubgraph = this.configService.get<boolean>('AUTO_DEPLOY_SUBGRAPH', false);
-      
+
       if (shouldDeploySubgraph) {
         try {
           this.logger.log('Auto-deploying subgraph for new MACI contract...');

@@ -54,6 +54,9 @@ class UpdateChainDto {
 
   @ApiProperty({ required: false })
   subgraphUrl?: string;
+
+  @ApiProperty({ required: false })
+  maciAddress?: string;  // MACI contract address this poll belongs to
 }
 
 /**
@@ -82,7 +85,7 @@ export class PollsController {
   constructor(
     private pollsService: PollsService,
     private resultsMetaService: ResultsMetaService,
-  ) {}
+  ) { }
 
   // ========================================
   // RESTful Endpoints (New)
@@ -126,7 +129,7 @@ export class PollsController {
         });
         return res.status(200).json(result);
       }
-      
+
       // Legacy: return all polls without pagination
       let polls;
       if (status) {
@@ -412,12 +415,13 @@ export class PollsController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const { pollIdOnChain, subgraphUrl } = req.body;
+    const { pollIdOnChain, subgraphUrl, maciAddress } = req.body;
     try {
       const updatedPoll = await this.pollsService.savePollOnChainId(
         id,
         pollIdOnChain,
         subgraphUrl,
+        maciAddress,
       );
       return res.status(200).json({ poll: updatedPoll });
     } catch (error) {

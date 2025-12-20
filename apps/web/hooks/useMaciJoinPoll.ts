@@ -1,58 +1,67 @@
 import { useState } from "react";
-// Import the Server Action
-// Import API
+import { useSignTypedData, useAccount, useChainId } from "wagmi";
 import { maciApi } from "../api/maci.api";
+import { deriveMaciKeypair } from "../utils/maciKeyDerivation";
 
 export const useMaciJoinPoll = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { signTypedDataAsync } = useSignTypedData();
+  const { address } = useAccount();
+  const chainId = useChainId();
 
-  const handleJoinPoll = async (maciAddress: string, pollId: string) => {
+  const handleJoinPoll = async (maciAddress: string, pollId: string, startBlock?: number) => {
     setLoading(true);
     setError(null);
     try {
-      // 1. Retrieve Keys from LocalStorage
-      const privateKey = localStorage.getItem("maci_priv_key");
-      if (!privateKey) {
-        throw new Error("User not signed up (No MACI Private Key found)");
+      if (!address) {
+        throw new Error("Wallet not connected");
       }
 
-      // Get startBlock from localStorage (important for Arbitrum Sepolia performance)
-      // Priority: signupBlockNumber > maciStartBlock > 0
-      const signupBlockStr = localStorage.getItem("signupBlockNumber");
-      const maciStartBlockStr = localStorage.getItem("maciStartBlock");
-
-      // IMPORTANT: For joinPoll, we MUST scan from MACI deploy block
-      // to build the full Merkle tree with ALL signups (not just user's signup)
-      let startBlock = 0;
-      if (maciStartBlockStr) {
-        startBlock = parseInt(maciStartBlockStr);
-        console.log("Using maciStartBlock for full Merkle tree:", startBlock);
-      } else {
-        // Fallback to hardcoded MACI deploy block
-        startBlock = 224688901;
-        console.log("Using hardcoded maciStartBlock:", startBlock);
-      }
-
-      console.log(
-        "Final startBlock for joinPoll:",
-        startBlock,
-        "(signupBlockNumber:",
-        signupBlockStr,
-        ")"
+      // ============================================
+      // Step 1: Derive MACI keypair (cached in memory)
+      // ============================================
+      console.log("Deriving MACI keypair...");
+      const { privateKey } = await deriveMaciKeypair(
+        address,
+        chainId,
+        signTypedDataAsync,
+        { maciAddress }
       );
+
+      // ============================================
+      // Step 2: Determine startBlock for Merkle tree
+      // ============================================
+      let effectiveStartBlock = startBlock || 0;
+
+      // Fallback to localStorage if not provided (for backward compatibility)
+      if (!effectiveStartBlock && typeof window !== "undefined") {
+        const maciStartBlockStr = localStorage.getItem("maciStartBlock");
+        if (maciStartBlockStr) {
+          effectiveStartBlock = parseInt(maciStartBlockStr);
+          console.log("Using maciStartBlock from localStorage:", effectiveStartBlock);
+        }
+      }
+
+      // Ultimate fallback to hardcoded block
+      if (!effectiveStartBlock) {
+        effectiveStartBlock = 224688901;
+        console.log("Using hardcoded maciStartBlock:", effectiveStartBlock);
+      }
 
       console.log("Calling JoinPoll API...", {
         pollId,
         maciAddress,
-        startBlock,
+        startBlock: effectiveStartBlock,
       });
 
-      // 2. Call API
+      // ============================================
+      // Step 3: Call API
+      // ============================================
       const result = await maciApi.joinPoll(pollId, {
         maciAddress,
         maciPrivateKey: privateKey,
-        startBlock
+        startBlock: effectiveStartBlock
       });
 
       if (!result.success) {
@@ -61,7 +70,6 @@ export const useMaciJoinPoll = () => {
 
       console.log("Join Poll Success:", result);
 
-      // 3. Store Result State
       return {
         success: true,
         pollStateIndex: result.pollStateIndex,
@@ -84,3 +92,4 @@ export const useMaciJoinPoll = () => {
     error,
   };
 };
+
