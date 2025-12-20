@@ -62,20 +62,16 @@ function BuyTicketsModal({
 
       console.log("Approving token spend...", cost.toString());
       const hash = await token.approve(claim.contractAddress, cost.toString());
-      console.log("Approve TX Hash:", hash);
-
-      // Wait for transaction to be mined reliably
-      if (hash && publicClient) {
-        console.log("Waiting for approval confirmation...");
-        await publicClient.waitForTransactionReceipt({ hash });
-        console.log("Approval confirmed!");
-      }
-
-      console.log("Buying credits...");
-      await claim.buyVoiceCredits(cost.toString());
-      showSuccess("Success", "Bought voice credits successfully!");
-      setCredits("");
-      onNext(credits);
+     setTimeout(async () => {
+        try {
+          await claim.buyVoiceCredits(cost.toString());
+          setCredits("");
+          onNext(credits);
+        } catch (e) {
+          console.error(e);
+          alert("Failed to buy credits");
+        }
+      }, 8000); 
     } catch (e: any) {
       console.error(e);
       showError("Failed to Buy Credits", e.message || e);

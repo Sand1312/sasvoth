@@ -81,6 +81,7 @@ export class PollsService {
     return this.syncPollStatus(poll);
   }
   async createPoll(pollData: Partial<Polls>): Promise<PollsDocument> {
+    console.log('Creating poll with data:', pollData);
     const newPoll = new this.pollsModel(pollData);
     return newPoll.save();
   }

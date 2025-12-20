@@ -55,7 +55,7 @@ export class MaciService {
   ) {
     this.coordinatorUrl = this.configService.get(
       'MACI_COORDINATOR_URL',
-      'https://slim-certainly-milan-amounts.trycloudflare.com',
+      'https://roller-missile-vast-hampshire.trycloudflare.com/',
     );
     this.privateKey =
       this.configService.get('WALLET_PRIVATE_KEY') ||

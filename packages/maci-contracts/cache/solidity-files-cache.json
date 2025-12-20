@@ -162,6 +162,44 @@
         "SnarkCommon"
       ]
     },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\trees\\LazyIMT.sol": {
+      "lastModificationDate": 1765897014426,
+      "contentHash": "b5bd8f97fabf780b4c204d6c687815cf",
+      "sourceName": "contracts/trees/LazyIMT.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../crypto/PoseidonT3.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "InternalLazyIMT"
+      ]
+    },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\interfaces\\IMACI.sol": {
       "lastModificationDate": 1765897014423,
       "contentHash": "5fe02e95adc9091462743a1911a0d114",
@@ -199,44 +237,6 @@
       ],
       "artifacts": [
         "IMACI"
-      ]
-    },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\trees\\LazyIMT.sol": {
-      "lastModificationDate": 1765897014426,
-      "contentHash": "b5bd8f97fabf780b4c204d6c687815cf",
-      "sourceName": "contracts/trees/LazyIMT.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../crypto/PoseidonT3.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "InternalLazyIMT"
       ]
     },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\interfaces\\IPoll.sol": {
@@ -652,6 +652,42 @@
         "PoseidonT3"
       ]
     },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\crypto\\SnarkConstants.sol": {
+      "lastModificationDate": 1765897014422,
+      "contentHash": "12c07d1c5c731042b9c79b0fb72c4057",
+      "sourceName": "contracts/crypto/SnarkConstants.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "SnarkConstants"
+      ]
+    },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\crypto\\Hasher.sol": {
       "lastModificationDate": 1765897014421,
       "contentHash": "dc5c865b85972583ee90040db5148170",
@@ -692,42 +728,6 @@
       ],
       "artifacts": [
         "Hasher"
-      ]
-    },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\crypto\\SnarkConstants.sol": {
-      "lastModificationDate": 1765897014422,
-      "contentHash": "12c07d1c5c731042b9c79b0fb72c4057",
-      "sourceName": "contracts/crypto/SnarkConstants.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "SnarkConstants"
       ]
     },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\crypto\\PoseidonT4.sol": {
@@ -1372,10 +1372,10 @@
         "Context"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicy.sol": {
-      "lastModificationDate": 1765829166810,
-      "contentHash": "b3f15c17405261c761dca0c58c4adc79",
-      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicy.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphorePolicy.sol": {
+      "lastModificationDate": 1765829166809,
+      "contentHash": "8dec86c7962895f002f24be4b0ac990b",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphorePolicy.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -1401,19 +1401,170 @@
         }
       },
       "imports": [
-        "../../policy/BasePolicy.sol"
+        "../../policy/BasePolicy.sol",
+        "./ISemaphore.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "ZupassPolicy"
+        "SemaphorePolicy"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicyFactory.sol": {
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\ISemaphore.sol": {
+      "lastModificationDate": 1765829166809,
+      "contentHash": "0a74688ed6598f2f1edf480397b72b22",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/ISemaphore.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ISemaphore"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreChecker.sol": {
+      "lastModificationDate": 1765829166809,
+      "contentHash": "693af06defd66897b0da5a91fea56998",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./ISemaphore.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SemaphoreChecker"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassChecker.sol": {
       "lastModificationDate": 1765829166810,
-      "contentHash": "2598c97843c7067aefb8957d4bb1b025",
-      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicyFactory.sol",
+      "contentHash": "3cf120dfb04bc0738498e0af03429f46",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./ZupassGroth16Verifier.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ZupassChecker"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassGroth16Verifier.sol": {
+      "lastModificationDate": 1765829166810,
+      "contentHash": "15412d828e09382ea8524e2f980a7f2e",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassGroth16Verifier.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ZupassGroth16Verifier"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassCheckerFactory.sol": {
+      "lastModificationDate": 1765829166810,
+      "contentHash": "dfb5c7b12b958f0b211e060ddc89ac4d",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassCheckerFactory.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -1440,13 +1591,13 @@
       },
       "imports": [
         "../../proxy/Factory.sol",
-        "./ZupassPolicy.sol"
+        "./ZupassChecker.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "ZupassPolicyFactory"
+        "ZupassCheckerFactory"
       ]
     },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\mocks\\Mocker.sol": {
@@ -1517,45 +1668,6 @@
         "Mocker"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicyFactory.sol": {
-      "lastModificationDate": 1765829166804,
-      "contentHash": "a9fdce73a930d26385542adc65d17ee8",
-      "sourceName": "@excubiae/contracts/contracts/extensions/eas/EASPolicyFactory.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../proxy/Factory.sol",
-        "./EASPolicy.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "EASPolicyFactory"
-      ]
-    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASCheckerFactory.sol": {
       "lastModificationDate": 1765829166804,
       "contentHash": "247e8c141c00c3d7b190a878437a4f3d",
@@ -1593,45 +1705,6 @@
       ],
       "artifacts": [
         "EASCheckerFactory"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllCheckerFactory.sol": {
-      "lastModificationDate": 1765829166806,
-      "contentHash": "7d5ff3493a4ee7734c51d9cae289c697",
-      "sourceName": "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllCheckerFactory.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../proxy/Factory.sol",
-        "./FreeForAllChecker.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "FreeForAllCheckerFactory"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarCheckerFactory.sol": {
@@ -1673,10 +1746,10 @@
         "AnonAadhaarCheckerFactory"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicyFactory.sol": {
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicyFactory.sol": {
       "lastModificationDate": 1765829166804,
-      "contentHash": "6b6ce5ec787b7bd29097841979a154b4",
-      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicyFactory.sol",
+      "contentHash": "a9fdce73a930d26385542adc65d17ee8",
+      "sourceName": "@excubiae/contracts/contracts/extensions/eas/EASPolicyFactory.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -1703,13 +1776,52 @@
       },
       "imports": [
         "../../proxy/Factory.sol",
-        "./AnonAadhaarPolicy.sol"
+        "./EASPolicy.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "AnonAadhaarPolicyFactory"
+        "EASPolicyFactory"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllCheckerFactory.sol": {
+      "lastModificationDate": 1765829166806,
+      "contentHash": "7d5ff3493a4ee7734c51d9cae289c697",
+      "sourceName": "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./FreeForAllChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "FreeForAllCheckerFactory"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllPolicyFactory.sol": {
@@ -1751,10 +1863,10 @@
         "FreeForAllPolicyFactory"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicyFactory.sol": {
-      "lastModificationDate": 1765829166808,
-      "contentHash": "1845dc7800696bc2dd5e970eaf11ea76",
-      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsPolicyFactory.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsCheckerFactory.sol": {
+      "lastModificationDate": 1765829166807,
+      "contentHash": "9aa78dd620c2c5f328a802ceb37d9e2e",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsCheckerFactory.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -1781,13 +1893,13 @@
       },
       "imports": [
         "../../proxy/Factory.sol",
-        "./HatsPolicy.sol"
+        "./HatsChecker.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "HatsPolicyFactory"
+        "HatsCheckerFactory"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofCheckerFactory.sol": {
@@ -1829,10 +1941,10 @@
         "MerkleProofCheckerFactory"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsCheckerFactory.sol": {
-      "lastModificationDate": 1765829166807,
-      "contentHash": "9aa78dd620c2c5f328a802ceb37d9e2e",
-      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsCheckerFactory.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicyFactory.sol": {
+      "lastModificationDate": 1765829166808,
+      "contentHash": "1845dc7800696bc2dd5e970eaf11ea76",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsPolicyFactory.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -1859,13 +1971,130 @@
       },
       "imports": [
         "../../proxy/Factory.sol",
-        "./HatsChecker.sol"
+        "./HatsPolicy.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "HatsCheckerFactory"
+        "HatsPolicyFactory"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicyFactory.sol": {
+      "lastModificationDate": 1765829166804,
+      "contentHash": "6b6ce5ec787b7bd29097841979a154b4",
+      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./AnonAadhaarPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AnonAadhaarPolicyFactory"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicyFactory.sol": {
+      "lastModificationDate": 1765829166807,
+      "contentHash": "ed485a6ce3ec67318b7c54c6d9894bc0",
+      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportPolicyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./GitcoinPassportPolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "GitcoinPassportPolicyFactory"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenCheckerFactory.sol": {
+      "lastModificationDate": 1765829166810,
+      "contentHash": "a8357804918e6386cba2e88cfc066b53",
+      "sourceName": "@excubiae/contracts/contracts/extensions/token/TokenCheckerFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../proxy/Factory.sol",
+        "./TokenChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "TokenCheckerFactory"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicyFactory.sol": {
@@ -1946,88 +2175,10 @@
         "GitcoinPassportCheckerFactory"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicyFactory.sol": {
-      "lastModificationDate": 1765829166807,
-      "contentHash": "ed485a6ce3ec67318b7c54c6d9894bc0",
-      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportPolicyFactory.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../proxy/Factory.sol",
-        "./GitcoinPassportPolicy.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "GitcoinPassportPolicyFactory"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreCheckerFactory.sol": {
-      "lastModificationDate": 1765829166809,
-      "contentHash": "652a69281699d026b8ea832fc2238eab",
-      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreCheckerFactory.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../proxy/Factory.sol",
-        "./SemaphoreChecker.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "SemaphoreCheckerFactory"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenCheckerFactory.sol": {
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicyFactory.sol": {
       "lastModificationDate": 1765829166810,
-      "contentHash": "a8357804918e6386cba2e88cfc066b53",
-      "sourceName": "@excubiae/contracts/contracts/extensions/token/TokenCheckerFactory.sol",
+      "contentHash": "2598c97843c7067aefb8957d4bb1b025",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicyFactory.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -2054,13 +2205,13 @@
       },
       "imports": [
         "../../proxy/Factory.sol",
-        "./TokenChecker.sol"
+        "./ZupassPolicy.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "TokenCheckerFactory"
+        "ZupassPolicyFactory"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenPolicyFactory.sol": {
@@ -2141,83 +2292,6 @@
         "SemaphorePolicyFactory"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassCheckerFactory.sol": {
-      "lastModificationDate": 1765829166810,
-      "contentHash": "dfb5c7b12b958f0b211e060ddc89ac4d",
-      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassCheckerFactory.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../proxy/Factory.sol",
-        "./ZupassChecker.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ZupassCheckerFactory"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicy.sol": {
-      "lastModificationDate": 1765829166805,
-      "contentHash": "be00d99a6e065fc8aa0cacf2e66e4cf8",
-      "sourceName": "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicy.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../policy/BasePolicy.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ERC20VotesPolicy"
-      ]
-    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicyFactory.sol": {
       "lastModificationDate": 1765829166806,
       "contentHash": "24984cb02115e5249f5c2fe8c135f340",
@@ -2257,10 +2331,10 @@
         "ERC20VotesPolicyFactory"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesChecker.sol": {
-      "lastModificationDate": 1765829166805,
-      "contentHash": "27674b141ffe2dbcec962e29622562d5",
-      "sourceName": "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesChecker.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreCheckerFactory.sol": {
+      "lastModificationDate": 1765829166809,
+      "contentHash": "652a69281699d026b8ea832fc2238eab",
+      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreCheckerFactory.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -2286,14 +2360,14 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/governance/utils/IVotes.sol",
-        "../../checker/BaseChecker.sol"
+        "../../proxy/Factory.sol",
+        "./SemaphoreChecker.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "ERC20VotesChecker"
+        "SemaphoreCheckerFactory"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesCheckerFactory.sol": {
@@ -2374,6 +2448,157 @@
         "ERC20CheckerFactory"
       ]
     },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesPolicy.sol": {
+      "lastModificationDate": 1765829166805,
+      "contentHash": "be00d99a6e065fc8aa0cacf2e66e4cf8",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20VotesPolicy"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20votes\\ERC20VotesChecker.sol": {
+      "lastModificationDate": 1765829166805,
+      "contentHash": "27674b141ffe2dbcec962e29622562d5",
+      "sourceName": "@excubiae/contracts/contracts/extensions/erc20votes/ERC20VotesChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/governance/utils/IVotes.sol",
+        "../../checker/BaseChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ERC20VotesChecker"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockGitcoinPassportDecoder.sol": {
+      "lastModificationDate": 1765829166815,
+      "contentHash": "4de0b452a33e419ce48964857f37d856",
+      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockGitcoinPassportDecoder.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MockGitcoinPassportDecoder"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockAnonAadhaar.sol": {
+      "lastModificationDate": 1765829166815,
+      "contentHash": "491d9d22638a2cde054fea5b6d628270",
+      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockAnonAadhaar.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../../extensions/anonAadhaar/IAnonAadhaar.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MockAnonAadhaar"
+      ]
+    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\erc20\\ERC20Checker.sol": {
       "lastModificationDate": 1765829166805,
       "contentHash": "603a7e7e41e7241b5f5a25c210794548",
@@ -2411,42 +2636,6 @@
       ],
       "artifacts": [
         "ERC20Checker"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockGitcoinPassportDecoder.sol": {
-      "lastModificationDate": 1765829166815,
-      "contentHash": "4de0b452a33e419ce48964857f37d856",
-      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockGitcoinPassportDecoder.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "MockGitcoinPassportDecoder"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockEAS.sol": {
@@ -2526,44 +2715,6 @@
         "MockToken"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockAnonAadhaar.sol": {
-      "lastModificationDate": 1765829166815,
-      "contentHash": "491d9d22638a2cde054fea5b6d628270",
-      "sourceName": "@excubiae/contracts/contracts/test/extensions/mocks/MockAnonAadhaar.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../../extensions/anonAadhaar/IAnonAadhaar.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "MockAnonAadhaar"
-      ]
-    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\test\\extensions\\mocks\\MockHatsProtocol.sol": {
       "lastModificationDate": 1765829166815,
       "contentHash": "f06071c9cebba1a6c2109779bcb9343a",
@@ -2598,44 +2749,6 @@
       ],
       "artifacts": [
         "MockHatsProtocol"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicy.sol": {
-      "lastModificationDate": 1765829166804,
-      "contentHash": "7d286a82a318c23b9d2c2f70a88e7cba",
-      "sourceName": "@excubiae/contracts/contracts/extensions/eas/EASPolicy.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../policy/BasePolicy.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "EASPolicy"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASChecker.sol": {
@@ -2713,44 +2826,6 @@
         "IEAS"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllChecker.sol": {
-      "lastModificationDate": 1765829166806,
-      "contentHash": "591da1e07b41264b8401fcc22e5d6203",
-      "sourceName": "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllChecker.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../checker/BaseChecker.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "FreeForAllChecker"
-      ]
-    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarChecker.sol": {
       "lastModificationDate": 1765829166803,
       "contentHash": "adb3148516c8024b62c0c825a04d191e",
@@ -2826,10 +2901,10 @@
         "IAnonAadhaar"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicy.sol": {
-      "lastModificationDate": 1765829166803,
-      "contentHash": "cfc7ce4be7e2187f0fd0b10cf7551ef2",
-      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicy.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\eas\\EASPolicy.sol": {
+      "lastModificationDate": 1765829166804,
+      "contentHash": "7d286a82a318c23b9d2c2f70a88e7cba",
+      "sourceName": "@excubiae/contracts/contracts/extensions/eas/EASPolicy.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -2861,7 +2936,45 @@
         "^0.8.20"
       ],
       "artifacts": [
-        "AnonAadhaarPolicy"
+        "EASPolicy"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllChecker.sol": {
+      "lastModificationDate": 1765829166806,
+      "contentHash": "591da1e07b41264b8401fcc22e5d6203",
+      "sourceName": "@excubiae/contracts/contracts/extensions/freeForAll/FreeForAllChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "FreeForAllChecker"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\freeForAll\\FreeForAllPolicy.sol": {
@@ -2902,10 +3015,10 @@
         "FreeForAllPolicy"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicy.sol": {
-      "lastModificationDate": 1765829166808,
-      "contentHash": "62022ef313c0869a96ca1cfe84596c19",
-      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsPolicy.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsChecker.sol": {
+      "lastModificationDate": 1765829166807,
+      "contentHash": "cf7778b26699b41df5e1d361ca5d5f20",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsChecker.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -2931,14 +3044,14 @@
         }
       },
       "imports": [
-        "../../policy/BasePolicy.sol",
+        "../../checker/BaseChecker.sol",
         "./IHats.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "HatsPolicy"
+        "HatsChecker"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\IHats.sol": {
@@ -3090,10 +3203,10 @@
         "Hashes"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsChecker.sol": {
-      "lastModificationDate": 1765829166807,
-      "contentHash": "cf7778b26699b41df5e1d361ca5d5f20",
-      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsChecker.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\hats\\HatsPolicy.sol": {
+      "lastModificationDate": 1765829166808,
+      "contentHash": "62022ef313c0869a96ca1cfe84596c19",
+      "sourceName": "@excubiae/contracts/contracts/extensions/hats/HatsPolicy.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -3119,20 +3232,20 @@
         }
       },
       "imports": [
-        "../../checker/BaseChecker.sol",
+        "../../policy/BasePolicy.sol",
         "./IHats.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "HatsChecker"
+        "HatsPolicy"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicy.sol": {
-      "lastModificationDate": 1765829166808,
-      "contentHash": "dd4c3868c09fddd19c1cf93d24f653b9",
-      "sourceName": "@excubiae/contracts/contracts/extensions/merkle/MerkleProofPolicy.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\anonAadhaar\\AnonAadhaarPolicy.sol": {
+      "lastModificationDate": 1765829166803,
+      "contentHash": "cfc7ce4be7e2187f0fd0b10cf7551ef2",
+      "sourceName": "@excubiae/contracts/contracts/extensions/anonAadhaar/AnonAadhaarPolicy.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -3158,89 +3271,13 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol",
         "../../policy/BasePolicy.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "MerkleProofPolicy"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportChecker.sol": {
-      "lastModificationDate": 1765829166806,
-      "contentHash": "b7f5de49b3f6ca13a49d7cd0e230c2f2",
-      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportChecker.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../checker/BaseChecker.sol",
-        "./IGitcoinPassportDecoder.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "GitcoinPassportChecker"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\IGitcoinPassportDecoder.sol": {
-      "lastModificationDate": 1765829166807,
-      "contentHash": "bbc718d6a257b0babecbcfadf3496ac3",
-      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/IGitcoinPassportDecoder.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "IGitcoinPassportDecoder"
+        "AnonAadhaarPolicy"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportPolicy.sol": {
@@ -3282,49 +3319,10 @@
         "GitcoinPassportPolicy"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphoreChecker.sol": {
-      "lastModificationDate": 1765829166809,
-      "contentHash": "693af06defd66897b0da5a91fea56998",
-      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphoreChecker.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../checker/BaseChecker.sol",
-        "./ISemaphore.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "SemaphoreChecker"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\ISemaphore.sol": {
-      "lastModificationDate": 1765829166809,
-      "contentHash": "0a74688ed6598f2f1edf480397b72b22",
-      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/ISemaphore.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\IGitcoinPassportDecoder.sol": {
+      "lastModificationDate": 1765829166807,
+      "contentHash": "bbc718d6a257b0babecbcfadf3496ac3",
+      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/IGitcoinPassportDecoder.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -3354,7 +3352,7 @@
         "^0.8.20"
       ],
       "artifacts": [
-        "ISemaphore"
+        "IGitcoinPassportDecoder"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenChecker.sol": {
@@ -3671,10 +3669,10 @@
         "IERC721Metadata"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeCast.sol": {
-      "lastModificationDate": 1764063189744,
-      "contentHash": "2adca1150f58fc6f3d1f0a0f22ee7cca",
-      "sourceName": "@openzeppelin/contracts/utils/math/SafeCast.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\math\\Math.sol": {
+      "lastModificationDate": 1764063189740,
+      "contentHash": "5ec781e33d3a9ac91ffdc83d94420412",
+      "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -3699,12 +3697,15 @@
           }
         }
       },
-      "imports": [],
+      "imports": [
+        "../Panic.sol",
+        "./SafeCast.sol"
+      ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "SafeCast"
+        "Math"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SignedMath.sol": {
@@ -3745,10 +3746,10 @@
         "SignedMath"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\math\\Math.sol": {
-      "lastModificationDate": 1764063189740,
-      "contentHash": "5ec781e33d3a9ac91ffdc83d94420412",
-      "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeCast.sol": {
+      "lastModificationDate": 1764063189744,
+      "contentHash": "2adca1150f58fc6f3d1f0a0f22ee7cca",
+      "sourceName": "@openzeppelin/contracts/utils/math/SafeCast.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -3773,15 +3774,12 @@
           }
         }
       },
-      "imports": [
-        "../Panic.sol",
-        "./SafeCast.sol"
-      ],
+      "imports": [],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "Math"
+        "SafeCast"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\Panic.sol": {
@@ -3892,6 +3890,122 @@
         "IERC721Receiver"
       ]
     },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\merkle\\MerkleProofPolicy.sol": {
+      "lastModificationDate": 1765829166808,
+      "contentHash": "dd4c3868c09fddd19c1cf93d24f653b9",
+      "sourceName": "@excubiae/contracts/contracts/extensions/merkle/MerkleProofPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol",
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MerkleProofPolicy"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\gitcoin\\GitcoinPassportChecker.sol": {
+      "lastModificationDate": 1765829166806,
+      "contentHash": "b7f5de49b3f6ca13a49d7cd0e230c2f2",
+      "sourceName": "@excubiae/contracts/contracts/extensions/gitcoin/GitcoinPassportChecker.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../checker/BaseChecker.sol",
+        "./IGitcoinPassportDecoder.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "GitcoinPassportChecker"
+      ]
+    },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassPolicy.sol": {
+      "lastModificationDate": 1765829166810,
+      "contentHash": "b3f15c17405261c761dca0c58c4adc79",
+      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassPolicy.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../policy/BasePolicy.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ZupassPolicy"
+      ]
+    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\token\\TokenPolicy.sol": {
       "lastModificationDate": 1765829166810,
       "contentHash": "c4dc3b13dff2ecf92e2b261c8944614d",
@@ -3929,120 +4043,6 @@
       ],
       "artifacts": [
         "TokenPolicy"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\semaphore\\SemaphorePolicy.sol": {
-      "lastModificationDate": 1765829166809,
-      "contentHash": "8dec86c7962895f002f24be4b0ac990b",
-      "sourceName": "@excubiae/contracts/contracts/extensions/semaphore/SemaphorePolicy.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../policy/BasePolicy.sol",
-        "./ISemaphore.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "SemaphorePolicy"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassChecker.sol": {
-      "lastModificationDate": 1765829166810,
-      "contentHash": "3cf120dfb04bc0738498e0af03429f46",
-      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassChecker.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../checker/BaseChecker.sol",
-        "./ZupassGroth16Verifier.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ZupassChecker"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@excubiae+contracts@0.11.0\\node_modules\\@excubiae\\contracts\\contracts\\extensions\\zupass\\ZupassGroth16Verifier.sol": {
-      "lastModificationDate": 1765829166810,
-      "contentHash": "15412d828e09382ea8524e2f980a7f2e",
-      "sourceName": "@excubiae/contracts/contracts/extensions/zupass/ZupassGroth16Verifier.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ZupassGroth16Verifier"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\governance\\utils\\IVotes.sol": {
@@ -4196,245 +4196,6 @@
         "IERC20Metadata"
       ]
     },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\Tally.sol": {
-      "lastModificationDate": 1765897014420,
-      "contentHash": "c2473767789326a0d4116985dd518eac",
-      "sourceName": "contracts/Tally.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@excubiae/contracts/contracts/proxy/Clone.sol",
-        "./interfaces/IMACI.sol",
-        "./crypto/Hasher.sol",
-        "./interfaces/IPoll.sol",
-        "./interfaces/ITally.sol",
-        "./interfaces/IMessageProcessor.sol",
-        "./crypto/SnarkCommon.sol",
-        "./interfaces/IVerifier.sol",
-        "./interfaces/IVerifyingKeysRegistry.sol",
-        "./utilities/DomainObjs.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "Tally"
-      ]
-    },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\interfaces\\ITally.sol": {
-      "lastModificationDate": 1765897014424,
-      "contentHash": "cf0f1def1a2f81e9bc36224d611132fc",
-      "sourceName": "contracts/interfaces/ITally.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "ITally"
-      ]
-    },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\interfaces\\IMessageProcessor.sol": {
-      "lastModificationDate": 1765897014423,
-      "contentHash": "0f24adde91a13ab3620db8c4ad7ab9a8",
-      "sourceName": "contracts/interfaces/IMessageProcessor.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "IMessageProcessor"
-      ]
-    },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\TallyFactory.sol": {
-      "lastModificationDate": 1765897014420,
-      "contentHash": "6a803622a0f9dd604f2cc20aeac04533",
-      "sourceName": "contracts/TallyFactory.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@excubiae/contracts/contracts/proxy/Factory.sol",
-        "./Tally.sol",
-        "./interfaces/ITallyFactory.sol",
-        "./utilities/DomainObjs.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "TallyFactory"
-      ]
-    },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\interfaces\\ITallyFactory.sol": {
-      "lastModificationDate": 1765897014424,
-      "contentHash": "3a9e6cdf83ec7edf509c5d95cbe85435",
-      "sourceName": "contracts/interfaces/ITallyFactory.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../utilities/DomainObjs.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "ITallyFactory"
-      ]
-    },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\VerifyingKeysRegistry.sol": {
-      "lastModificationDate": 1765897014421,
-      "contentHash": "44ea5f0751e27d7b29e21fa240afafa4",
-      "sourceName": "contracts/VerifyingKeysRegistry.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "./crypto/SnarkCommon.sol",
-        "./interfaces/IVerifyingKeysRegistry.sol",
-        "./utilities/DomainObjs.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "VerifyingKeysRegistry"
-      ]
-    },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\MACI.sol": {
       "lastModificationDate": 1765897014419,
       "contentHash": "0bb85364e429ca0107e28f74a2aaa3fd",
@@ -4523,6 +4284,44 @@
         "IMessageProcessorFactory"
       ]
     },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\interfaces\\ITallyFactory.sol": {
+      "lastModificationDate": 1765897014424,
+      "contentHash": "3a9e6cdf83ec7edf509c5d95cbe85435",
+      "sourceName": "contracts/interfaces/ITallyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ITallyFactory"
+      ]
+    },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\trees\\LeanIMT.sol": {
       "lastModificationDate": 1765897014426,
       "contentHash": "155a6ef4bd3510e7eae2deafcdae4817",
@@ -4561,10 +4360,10 @@
         "InternalLeanIMT"
       ]
     },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\mocks\\MockVerifier.sol": {
-      "lastModificationDate": 1765897014425,
-      "contentHash": "6f2c49cb54cbf499e52e3d81c30f8fd5",
-      "sourceName": "contracts/mocks/MockVerifier.sol",
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\VerifyingKeysRegistry.sol": {
+      "lastModificationDate": 1765897014421,
+      "contentHash": "44ea5f0751e27d7b29e21fa240afafa4",
+      "sourceName": "contracts/VerifyingKeysRegistry.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -4590,15 +4389,176 @@
         }
       },
       "imports": [
-        "../crypto/SnarkConstants.sol",
-        "../crypto/SnarkCommon.sol",
-        "../interfaces/IVerifier.sol"
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./crypto/SnarkCommon.sol",
+        "./interfaces/IVerifyingKeysRegistry.sol",
+        "./utilities/DomainObjs.sol"
       ],
       "versionPragmas": [
         "^0.8.28"
       ],
       "artifacts": [
-        "MockVerifier"
+        "VerifyingKeysRegistry"
+      ]
+    },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\Tally.sol": {
+      "lastModificationDate": 1765897014420,
+      "contentHash": "c2473767789326a0d4116985dd518eac",
+      "sourceName": "contracts/Tally.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Clone.sol",
+        "./interfaces/IMACI.sol",
+        "./crypto/Hasher.sol",
+        "./interfaces/IPoll.sol",
+        "./interfaces/ITally.sol",
+        "./interfaces/IMessageProcessor.sol",
+        "./crypto/SnarkCommon.sol",
+        "./interfaces/IVerifier.sol",
+        "./interfaces/IVerifyingKeysRegistry.sol",
+        "./utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Tally"
+      ]
+    },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\interfaces\\IMessageProcessor.sol": {
+      "lastModificationDate": 1765897014423,
+      "contentHash": "0f24adde91a13ab3620db8c4ad7ab9a8",
+      "sourceName": "contracts/interfaces/IMessageProcessor.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IMessageProcessor"
+      ]
+    },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\interfaces\\ITally.sol": {
+      "lastModificationDate": 1765897014424,
+      "contentHash": "cf0f1def1a2f81e9bc36224d611132fc",
+      "sourceName": "contracts/interfaces/ITally.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ITally"
+      ]
+    },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\TallyFactory.sol": {
+      "lastModificationDate": 1765897014420,
+      "contentHash": "6a803622a0f9dd604f2cc20aeac04533",
+      "sourceName": "contracts/TallyFactory.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@excubiae/contracts/contracts/proxy/Factory.sol",
+        "./Tally.sol",
+        "./interfaces/ITallyFactory.sol",
+        "./utilities/DomainObjs.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "TallyFactory"
       ]
     },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\MessageProcessor.sol": {
@@ -4689,47 +4649,6 @@
         "MessageProcessorFactory"
       ]
     },
-    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\crypto\\Verifier.sol": {
-      "lastModificationDate": 1765897014422,
-      "contentHash": "7aa1775e947d4950331b8171fe794a8a",
-      "sourceName": "contracts/crypto/Verifier.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./Pairing.sol",
-        "./SnarkConstants.sol",
-        "./SnarkCommon.sol",
-        "../interfaces/IVerifier.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.28"
-      ],
-      "artifacts": [
-        "Verifier"
-      ]
-    },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\gatekeepers\\SafeSignupGatekeeper.sol": {
       "lastModificationDate": 1766066344402,
       "contentHash": "2322f2abf72d2456c895da10775dd6dc",
@@ -4772,42 +4691,6 @@
         "SafeSignupGatekeeper"
       ]
     },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\ECDSA.sol": {
-      "lastModificationDate": 1764063189704,
-      "contentHash": "81de029d56aa803972be03c5d277cb6c",
-      "sourceName": "@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ECDSA"
-      ]
-    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\EIP712.sol": {
       "lastModificationDate": 1764063189705,
       "contentHash": "d67dfba302ed2489324d7584625c3bde",
@@ -4848,6 +4731,42 @@
         "EIP712"
       ]
     },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\ECDSA.sol": {
+      "lastModificationDate": 1764063189704,
+      "contentHash": "81de029d56aa803972be03c5d277cb6c",
+      "sourceName": "@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ECDSA"
+      ]
+    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\ShortStrings.sol": {
       "lastModificationDate": 1764063189745,
       "contentHash": "c1be9487e5a64acf23b5d8028482e748",
@@ -4886,6 +4805,42 @@
         "ShortStrings"
       ]
     },
+    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC5267.sol": {
+      "lastModificationDate": 1764063189735,
+      "contentHash": "6e00d2fe4bc0d5f1add753824498bb35",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC5267.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.16"
+      ],
+      "artifacts": [
+        "IERC5267"
+      ]
+    },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\MessageHashUtils.sol": {
       "lastModificationDate": 1764063189740,
       "contentHash": "260f3968eefa3bbd30520cff5384cd93",
@@ -4922,42 +4877,6 @@
       ],
       "artifacts": [
         "MessageHashUtils"
-      ]
-    },
-    "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC5267.sol": {
-      "lastModificationDate": 1764063189735,
-      "contentHash": "6e00d2fe4bc0d5f1add753824498bb35",
-      "sourceName": "@openzeppelin/contracts/interfaces/IERC5267.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">=0.4.16"
-      ],
-      "artifacts": [
-        "IERC5267"
       ]
     },
     "D:\\Project\\sasvoth\\node_modules\\.pnpm\\@openzeppelin+contracts@5.4.0\\node_modules\\@openzeppelin\\contracts\\utils\\StorageSlot.sol": {
@@ -5150,6 +5069,87 @@
       ],
       "artifacts": [
         "EIP712SignupCheckerFactory"
+      ]
+    },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\mocks\\MockVerifier.sol": {
+      "lastModificationDate": 1765897014425,
+      "contentHash": "6f2c49cb54cbf499e52e3d81c30f8fd5",
+      "sourceName": "contracts/mocks/MockVerifier.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../crypto/SnarkConstants.sol",
+        "../crypto/SnarkCommon.sol",
+        "../interfaces/IVerifier.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MockVerifier"
+      ]
+    },
+    "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\crypto\\Verifier.sol": {
+      "lastModificationDate": 1765897014422,
+      "contentHash": "7aa1775e947d4950331b8171fe794a8a",
+      "sourceName": "contracts/crypto/Verifier.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Pairing.sol",
+        "./SnarkConstants.sol",
+        "./SnarkCommon.sol",
+        "../interfaces/IVerifier.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "Verifier"
       ]
     },
     "D:\\Project\\sasvoth\\packages\\maci-contracts\\contracts\\initialVoiceCreditProxy\\ERC20VotesInitialVoiceCreditProxy.sol": {
