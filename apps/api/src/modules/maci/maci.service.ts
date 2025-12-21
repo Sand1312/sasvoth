@@ -116,122 +116,133 @@ export class MaciService {
    * Signup to MACI
    */
   async signup(maciPubKey: string, maciAddress?: string, sgData?: string) {
-    try {
-      this.logger.log(`Signing up to MACI... PubKey: ${maciPubKey}`);
+    const address = maciAddress || this.maciAddress;
 
-      const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
-      const signerV6 = new ethers6.Wallet(this.privateKey, providerV6);
+    // Use Redlock to prevent duplicate signup requests
+    // Lock key uses first 20 chars of pubKey for uniqueness
+    const pubKeyForLock = maciPubKey.slice(0, 20);
 
-      const address = maciAddress || this.maciAddress;
-
-      this.logger.log(`Using MACI Address: ${address}`);
-
-      // Validate maciPubKey
-      if (!maciPubKey || !maciPubKey.startsWith("macipk.")) {
-        throw new HttpException("Invalid MACI Public Key format", 400);
-      }
-
-      const result = await sdkSignup({
-        maciAddress: address,
-        maciPublicKey: maciPubKey,
-        signer: signerV6,
-        sgData: sgData || "0x0000000000000000000000000000000000000000000000000000000000000000"
-      });
-
-      this.logger.log(`Signup success. StateIndex: ${result.stateIndex}`);
-
-      // Get block number
-      let blockNumber: number | undefined;
-      if (result.transactionHash) {
+    return this.smartNonceService.withSignupLock(
+      address,
+      pubKeyForLock,  // Use pubKey prefix as X
+      pubKeyForLock,  // Use same as Y (just for lock key uniqueness)
+      async () => {
         try {
-          const receipt = await this.provider.waitForTransaction(result.transactionHash, 1);
-          blockNumber = receipt.blockNumber;
-        } catch (e) {
-          try {
-            blockNumber = await this.provider.getBlockNumber();
-          } catch (e2) { }
-        }
-      }
+          this.logger.log(`Signing up to MACI... PubKey: ${maciPubKey}`);
 
-      return {
-        success: true,
-        stateIndex: result.stateIndex.toString(),
-        hash: result.transactionHash,
-        blockNumber
-      };
-    } catch (error) {
-      this.logger.error("Signup failed", error);
-
-      // Check if error is "already signed up" type
-      const errMsg = error?.message || String(error);
-      const isAlreadySignedUp =
-        errMsg.toLowerCase().includes("already") ||
-        errMsg.toLowerCase().includes("signed up") ||
-        errMsg.toLowerCase().includes("registered") ||
-        errMsg.includes("0xf45d43bf") || // UserAlreadyJoined selector
-        errMsg.includes("0x258a195a");   // LeafAlreadyExists selector (pubkey already in tree)
-
-      if (isAlreadySignedUp) {
-        this.logger.log("User already signed up - querying existing stateIndex...");
-
-        // Try to get existing stateIndex from chain
-        try {
           const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
-          const address = maciAddress || this.maciAddress;
+          const signerV6 = new ethers6.Wallet(this.privateKey, providerV6);
 
-          // Parse public key to get coordinates
-          if (!PubKey) {
-            this.logger.warn("PubKey not available, cannot query stateIndex");
-            return {
-              success: true,
-              stateIndex: null,
-              hash: null,
-              blockNumber: null,
-              alreadySignedUp: true
-            };
+          this.logger.log(`Using MACI Address: ${address}`);
+
+          // Validate maciPubKey
+          if (!maciPubKey || !maciPubKey.startsWith("macipk.")) {
+            throw new HttpException("Invalid MACI Public Key format", 400);
           }
 
-          const pubKey = PubKey.deserialize(maciPubKey);
-          const pubKeyX = pubKey.asArray()[0].toString();
-          const pubKeyY = pubKey.asArray()[1].toString();
+          const result = await sdkSignup({
+            maciAddress: address,
+            maciPublicKey: maciPubKey,
+            signer: signerV6,
+            sgData: sgData || "0x0000000000000000000000000000000000000000000000000000000000000000"
+          });
 
-          // Query MACI contract for stateIndex using public key hash
-          const maciContract = new ethers6.Contract(
-            address,
-            [
-              "function hash2(uint256[2] memory array) public pure returns (uint256)",
-              "function getStateIndex(uint256 element) public view returns (uint40)"
-            ],
-            providerV6
-          );
+          this.logger.log(`Signup success. StateIndex: ${result.stateIndex}`);
 
-          const publicKeyHash = await maciContract.hash2([BigInt(pubKeyX), BigInt(pubKeyY)]);
-          const stateIndex = await maciContract.getStateIndex(publicKeyHash);
-
-          this.logger.log(`Found existing stateIndex: ${stateIndex}`);
+          // Get block number
+          let blockNumber: number | undefined;
+          if (result.transactionHash) {
+            try {
+              const receipt = await this.provider.waitForTransaction(result.transactionHash, 1);
+              blockNumber = receipt.blockNumber;
+            } catch (e) {
+              try {
+                blockNumber = await this.provider.getBlockNumber();
+              } catch (e2) { }
+            }
+          }
 
           return {
             success: true,
-            stateIndex: stateIndex.toString(),
-            hash: null,
-            blockNumber: null,
-            alreadySignedUp: true
+            stateIndex: result.stateIndex.toString(),
+            hash: result.transactionHash,
+            blockNumber
           };
-        } catch (queryError) {
-          this.logger.warn("Could not query existing stateIndex:", queryError);
-          // Still return success but without stateIndex
-          return {
-            success: true,
-            stateIndex: null,
-            hash: null,
-            blockNumber: null,
-            alreadySignedUp: true
-          };
+        } catch (error) {
+          this.logger.error("Signup failed", error);
+
+          // Check if error is "already signed up" type
+          const errMsg = error?.message || String(error);
+          const isAlreadySignedUp =
+            errMsg.toLowerCase().includes("already") ||
+            errMsg.toLowerCase().includes("signed up") ||
+            errMsg.toLowerCase().includes("registered") ||
+            errMsg.includes("0xf45d43bf") || // UserAlreadyJoined selector
+            errMsg.includes("0x258a195a");   // LeafAlreadyExists selector (pubkey already in tree)
+
+          if (isAlreadySignedUp) {
+            this.logger.log("User already signed up - querying existing stateIndex...");
+
+            // Try to get existing stateIndex from chain
+            try {
+              const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
+              const address = maciAddress || this.maciAddress;
+
+              // Parse public key to get coordinates
+              if (!PubKey) {
+                this.logger.warn("PubKey not available, cannot query stateIndex");
+                return {
+                  success: true,
+                  stateIndex: null,
+                  hash: null,
+                  blockNumber: null,
+                  alreadySignedUp: true
+                };
+              }
+
+              const pubKey = PubKey.deserialize(maciPubKey);
+              const pubKeyX = pubKey.asArray()[0].toString();
+              const pubKeyY = pubKey.asArray()[1].toString();
+
+              // Query MACI contract for stateIndex using public key hash
+              const maciContract = new ethers6.Contract(
+                address,
+                [
+                  "function hash2(uint256[2] memory array) public pure returns (uint256)",
+                  "function getStateIndex(uint256 element) public view returns (uint40)"
+                ],
+                providerV6
+              );
+
+              const publicKeyHash = await maciContract.hash2([BigInt(pubKeyX), BigInt(pubKeyY)]);
+              const stateIndex = await maciContract.getStateIndex(publicKeyHash);
+
+              this.logger.log(`Found existing stateIndex: ${stateIndex}`);
+
+              return {
+                success: true,
+                stateIndex: stateIndex.toString(),
+                hash: null,
+                blockNumber: null,
+                alreadySignedUp: true
+              };
+            } catch (queryError) {
+              this.logger.warn("Could not query existing stateIndex:", queryError);
+              // Still return success but without stateIndex
+              return {
+                success: true,
+                stateIndex: null,
+                hash: null,
+                blockNumber: null,
+                alreadySignedUp: true
+              };
+            }
+          }
+
+          throw new HttpException(`Signup failed: ${error.message}`, 500);
         }
       }
-
-      throw new HttpException(`Signup failed: ${error.message}`, 500);
-    }
+    );
   }
 
   /**
@@ -450,13 +461,18 @@ export class MaciService {
         this.logger.error(`Decoded custom error: ${decodedError}`);
       }
 
-      // Handle "UserAlreadyJoined" (selector 0xf45d43bf)
-      if (decodedError === 'UserAlreadyJoined') {
+      // Handle "UserAlreadyJoined" (selector 0xf45d43bf OR text match)
+      const isAlreadyJoined =
+        decodedError === 'UserAlreadyJoined' ||
+        errorMessage.toLowerCase().includes('already joined') ||
+        errorMessage.toLowerCase().includes('user has already joined');
+
+      if (isAlreadyJoined) {
         this.logger.log("User already joined poll. Treating as success.");
         return {
           success: true,
           alreadyJoined: true,
-          pollStateIndex: "0",
+          pollStateIndex: "0",  // TODO: Could query actual pollStateIndex from Poll contract
           voiceCredits: "0",
         };
       }
@@ -505,7 +521,7 @@ export class MaciService {
     maciAddress?: string
   ) {
     try {
-      this.logger.log(`Voting on Poll ${pollId} for Option ${voteOptionIndex}...`);
+      this.logger.log(`Voting on Poll ${pollId} for Option ${voteOptionIndex} with weight ${voteWeight} voice credits...`);
 
       const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
       const signerV6 = new ethers6.Wallet(this.privateKey, providerV6);
@@ -794,8 +810,8 @@ export class MaciService {
         txHash: result.txHash,
         subgraphUrl: result.subgraphUrl,
       };
-    } catch (error) {
-      this.logger.error('Deploy poll failed', error);
+    } catch (error: any) {
+      this.logger.error(`Deploy poll failed: ${error?.message || error}`, error?.stack);
       throw error;
     }
   }

@@ -107,6 +107,43 @@ export const maciApi = {
   },
 
   /**
+   * Get latest MACI deployment info
+   * GET /maci/deployments/latest
+   * 
+   * TODO: Dùng để lấy maciAddress và startBlock từ backend
+   * - Thay thế localStorage.getItem("maciAddress")
+   * - Thay thế localStorage.getItem("maciStartBlock")
+   * - Sử dụng trong: useMaciJoinPoll, votes/[id]/page.tsx
+   */
+  getLatestDeployment: async (): Promise<{
+    maciAddress: string;
+    startBlock: number;
+    subgraphUrl: string;
+    chain: string;
+  }> => {
+    const response = await api.get("/maci/deployments/latest");
+    return response.data;
+  },
+
+  /**
+   * Get MACI deployment by address
+   * GET /maci/deployments/:address
+   * 
+   * TODO: Dùng khi có maciAddress cụ thể từ poll.maciAddress
+   * - Query thông tin MACI contract cụ thể
+   * - Hữu ích khi có nhiều MACI deployments khác nhau
+   */
+  getDeploymentByAddress: async (maciAddress: string): Promise<{
+    maciAddress: string;
+    startBlock: number;
+    subgraphUrl: string;
+    chain: string;
+  }> => {
+    const response = await api.get(`/maci/deployments/${maciAddress}`);
+    return response.data;
+  },
+
+  /**
    * Join Poll
    * POST /maci/polls/:id/join
    */
@@ -119,14 +156,14 @@ export const maciApi = {
    * Vote
    * POST /maci/polls/:id/vote
    */
-  vote: async (pollId: string, payload: { 
-    voteOptionIndex: number; 
-    voteWeight: number; 
-    nonce: number; 
-    userStateIndex: string; 
-    userMaciPrivateKey: string; 
-    userMaciPublicKey: string; 
-    maciAddress?: string 
+  vote: async (pollId: string, payload: {
+    voteOptionIndex: number;
+    voteWeight: number;
+    nonce: number;
+    userStateIndex: string;
+    userMaciPrivateKey: string;
+    userMaciPublicKey: string;
+    maciAddress?: string
   }) => {
     const response = await api.post(`/maci/polls/${pollId}/vote`, payload);
     return response.data;
@@ -161,7 +198,7 @@ export const maciApi = {
    */
   getContracts: async (pollId: string, maciAddress?: string) => {
     const response = await api.get(`/maci/polls/${pollId}/contracts`, {
-         params: { maciAddress }
+      params: { maciAddress }
     });
     return response.data;
   },

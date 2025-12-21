@@ -1,5 +1,6 @@
 import { Keypair, PrivateKey, PublicKey } from "@maci-protocol/domainobjs";
 import { keccak256, encodePacked } from "viem";
+import { MACI_ABI } from "@sasvoth/contracts";
 
 // ============ EIP-712 Constants with Domain Separation ============
 
@@ -253,19 +254,19 @@ export function getMaciPublicKey(
 // ============ Blockchain Query Functions ============
 
 /**
- * Query stateIndex from blockchain by scanning SignUp events
- * Uses viem's getLogs to find user's signup event
+ * Query stateIndex from blockchain using MACI contract's getStateIndex function
+ * Much faster than scanning events!
  * 
  * @param maciAddress - MACI contract address
  * @param publicKey - User's MACI public key (serialized or object)
  * @param publicClient - Viem public client from wagmi
- * @param startBlock - Block to start scanning from (optional)
+ * @param startBlock - (ignored, kept for backward compatibility)
  */
 export async function getStateIndexFromChain(
     maciAddress: string,
     publicKey: string | { x: string; y: string },
     publicClient: any,
-    startBlock?: number
+    startBlock?: number  // eslint-disable-line @typescript-eslint/no-unused-vars
 ): Promise<StateIndexResult> {
     try {
         if (!publicClient) {
@@ -274,85 +275,56 @@ export async function getStateIndexFromChain(
         }
 
         // Get pubKey coordinates
-        let pubKeyX: bigint;
-        let pubKeyY: bigint;
+        let pubKeyX: string;
+        let pubKeyY: string;
 
         if (typeof publicKey === 'string') {
             const coords = getPubKeyCoordinates(publicKey);
             if (!coords) {
                 throw new Error("Invalid public key format");
             }
-            pubKeyX = BigInt(coords.x);
-            pubKeyY = BigInt(coords.y);
+            pubKeyX = coords.x;
+            pubKeyY = coords.y;
         } else {
-            pubKeyX = BigInt(publicKey.x);
-            pubKeyY = BigInt(publicKey.y);
+            pubKeyX = publicKey.x;
+            pubKeyY = publicKey.y;
         }
 
-        console.log(`🔍 Scanning SignUp events for pubKey (${pubKeyX.toString().slice(0, 10)}..., ${pubKeyY.toString().slice(0, 10)}...)`);
+        console.log(`🔍 Querying stateIndex for pubKey (${pubKeyX.slice(0, 10)}..., ${pubKeyY.slice(0, 10)}...)`);
 
-        // SignUp event ABI for MACI contract
-        // event SignUp(uint256 indexed _stateIndex, uint256 indexed _userPubKeyX, uint256 indexed _userPubKeyY, ...)
-        const SignUpEventSignature = '0x02f99de69f2d0c92e3f1b5cb5be14f7e9f7b22e5e4b06d3dd6c3f85f9b3f1a8c';
+        // Step 1: Hash the public key coordinates
+        const publicKeyHash = await publicClient.readContract({
+            address: maciAddress as `0x${string}`,
+            abi: MACI_ABI,
+            functionName: "hash2",
+            args: [[BigInt(pubKeyX), BigInt(pubKeyY)]],
+        }) as bigint;
 
-        // Alternative: Use keccak256 hash of event signature
-        // SignUp(uint256,uint256,uint256,uint256,uint256,uint256)
+        console.log(`   PublicKeyHash: ${publicKeyHash}`);
 
-        const currentBlock = await publicClient.getBlockNumber();
-        const fromBlock = startBlock ? BigInt(startBlock) : 0n;
+        // Step 2: Get stateIndex from hash
+        const stateIndex = await publicClient.readContract({
+            address: maciAddress as `0x${string}`,
+            abi: MACI_ABI,
+            functionName: "getStateIndex",
+            args: [publicKeyHash],
+        }) as bigint;
 
-        console.log(`   From block ${fromBlock} to ${currentBlock}`);
+        console.log(`✅ Found stateIndex: ${stateIndex}`);
 
-        // Query with viem's getLogs - scan in chunks
-        const BLOCKS_PER_QUERY = 10000n;
-
-        for (let block = fromBlock; block <= currentBlock; block += BLOCKS_PER_QUERY) {
-            const toBlock = block + BLOCKS_PER_QUERY - 1n > currentBlock ? currentBlock : block + BLOCKS_PER_QUERY - 1n;
-
-            try {
-                // Use viem to get logs with topic filters
-                // Topic[0] = event signature
-                // Topic[1] = stateIndex (indexed)  
-                // Topic[2] = userPubKeyX (indexed)
-                // Topic[3] = userPubKeyY (indexed)
-                const logs = await publicClient.getLogs({
-                    address: maciAddress as `0x${string}`,
-                    fromBlock: block,
-                    toBlock: toBlock,
-                    // Filter by pubKeyX and pubKeyY in topics
-                });
-
-                // Filter logs manually by checking pubKey coordinates in data or topics
-                for (const log of logs) {
-                    // Check if this log has our pubKey coordinates
-                    // The exact structure depends on MACI's SignUp event
-                    if (log.topics && log.topics.length >= 4) {
-                        // topics[2] = pubKeyX, topics[3] = pubKeyY (if indexed)
-                        const logPubKeyX = log.topics[2] ? BigInt(log.topics[2]) : null;
-                        const logPubKeyY = log.topics[3] ? BigInt(log.topics[3]) : null;
-
-                        if (logPubKeyX === pubKeyX && logPubKeyY === pubKeyY) {
-                            const stateIndex = log.topics[1] ? BigInt(log.topics[1]).toString() : null;
-                            console.log(`✅ Found SignUp event: stateIndex=${stateIndex}, block=${log.blockNumber}`);
-
-                            return {
-                                stateIndex: stateIndex,
-                                blockNumber: log.blockNumber ? Number(log.blockNumber) : null,
-                            };
-                        }
-                    }
-                }
-            } catch (queryErr) {
-                console.warn(`Error querying blocks ${block}-${toBlock}:`, queryErr);
-                // Continue to next chunk
-            }
+        // stateIndex = 0 means not found (MACI uses 1-based indexing)
+        if (stateIndex === 0n) {
+            console.log("   User not signed up (stateIndex = 0)");
+            return { stateIndex: null, blockNumber: null };
         }
 
-        console.log("❌ No SignUp event found for this public key");
-        return { stateIndex: null, blockNumber: null };
+        return {
+            stateIndex: stateIndex.toString(),
+            blockNumber: null,  // Not available from direct query
+        };
 
     } catch (err) {
-        console.error("Failed to query SignUp events:", err);
+        console.warn("Could not query stateIndex from chain:", err);
         return { stateIndex: null, blockNumber: null };
     }
 }

@@ -22,7 +22,7 @@ export class SmartNonceService implements OnModuleInit {
 
   // TTL for pending nonces in Redis (10 minutes - time for Graph to catch up)
   private readonly PENDING_NONCE_TTL = 600;
-  
+
   // Lock TTL for vote transactions (2 minutes - enough for slow blockchain tx)
   private readonly LOCK_TTL = 120000;
 
@@ -63,7 +63,7 @@ export class SmartNonceService implements OnModuleInit {
    */
   async calculateNextNonce(pollId: string, stateIndex: string | number): Promise<number> {
     const stateIndexStr = stateIndex.toString();
-    
+
     // Step 1: Fetch confirmed count from The Graph (slow but trusted)
     const confirmedNonce = await this.getConfirmedNonce(pollId, stateIndexStr);
 
@@ -96,7 +96,7 @@ export class SmartNonceService implements OnModuleInit {
   private async getConfirmedNonce(pollId: string, stateIndex: string): Promise<number> {
     // Get subgraph URL from latest MACI deployment or fallback to env var
     const subgraphUrl = await this.getSubgraphUrl();
-    
+
     if (!subgraphUrl) {
       this.logger.debug('Subgraph URL not configured, using 0 for confirmed nonce');
       return 0;
@@ -129,7 +129,7 @@ export class SmartNonceService implements OnModuleInit {
       }
 
       const result = await response.json();
-      
+
       if (result.errors) {
         this.logger.debug(`Subgraph errors: ${JSON.stringify(result.errors)}`);
         return 0;
@@ -143,7 +143,7 @@ export class SmartNonceService implements OnModuleInit {
       } else {
         this.logger.debug(`Account ${stateIndex} not found in subgraph`);
       }
-      
+
       // Since subgraph doesn't track message count per stateIndex,
       // return 0 and rely on Redis for accurate nonce tracking
       return 0;
@@ -167,7 +167,7 @@ export class SmartNonceService implements OnModuleInit {
     } catch (error) {
       this.logger.debug('Could not fetch MACI deployment from database');
     }
-    
+
     // Fallback to env var
     return this.fallbackSubgraphUrl || null;
   }
@@ -200,7 +200,7 @@ export class SmartNonceService implements OnModuleInit {
   ): Promise<T> {
     const stateIndexStr = stateIndex.toString();
     const lockKey = `lock:vote:${pollId}:${stateIndexStr}`;
-    
+
     let lock;
     try {
       lock = await this.redlock.acquire([lockKey], this.LOCK_TTL);
@@ -209,24 +209,24 @@ export class SmartNonceService implements OnModuleInit {
       // This is better than blocking the user entirely
       this.logger.warn(`Failed to acquire vote lock for ${lockKey}: ${lockError.message}`);
       this.logger.warn('Proceeding without distributed lock - race conditions possible');
-      
+
       // Calculate nonce without lock
       const nonce = await this.calculateNextNonce(pollId, stateIndexStr);
       const result = await fn(nonce);
       await this.setPendingNonce(pollId, stateIndexStr, nonce);
       return result;
     }
-    
+
     try {
       // Calculate nonce while holding the lock
       const nonce = await this.calculateNextNonce(pollId, stateIndexStr);
-      
+
       // Execute the vote function
       const result = await fn(nonce);
-      
+
       // Optimistically update Redis with the used nonce
       await this.setPendingNonce(pollId, stateIndexStr, nonce);
-      
+
       return result;
     } finally {
       // Always release the lock
@@ -235,6 +235,96 @@ export class SmartNonceService implements OnModuleInit {
           await lock.release();
         } catch (releaseError) {
           this.logger.warn(`Failed to release lock: ${releaseError}`);
+        }
+      }
+    }
+  }
+
+  /**
+   * Execute a signup transaction with distributed locking
+   * Prevents duplicate signup requests for the same public key
+   * 
+   * TODO: Dùng để ngăn chặn nhiều signup requests cùng lúc cho cùng 1 pubkey
+   * - Lock key: lock:signup:{maciAddress}:{pubKeyHash}
+   * - Nếu user click signup nhiều lần, chỉ 1 request được xử lý
+   * 
+   * @param maciAddress - MACI contract address
+   * @param pubKeyX - Public key X coordinate
+   * @param pubKeyY - Public key Y coordinate  
+   * @param fn - Function to execute while holding lock
+   */
+  async withSignupLock<T>(
+    maciAddress: string,
+    pubKeyX: string,
+    pubKeyY: string,
+    fn: () => Promise<T>
+  ): Promise<T> {
+    // Create a simple hash of pubKey for lock key
+    const pubKeyHash = `${pubKeyX.slice(0, 10)}_${pubKeyY.slice(0, 10)}`;
+    const lockKey = `lock:signup:${maciAddress.toLowerCase()}:${pubKeyHash}`;
+
+    let lock;
+    try {
+      lock = await this.redlock.acquire([lockKey], this.LOCK_TTL);
+      this.logger.debug(`Acquired signup lock: ${lockKey}`);
+    } catch (lockError: any) {
+      // If lock cannot be acquired, it means another signup is in progress
+      this.logger.warn(`Failed to acquire signup lock for ${lockKey}: ${lockError.message}`);
+      throw new Error('Signup already in progress for this public key. Please wait and try again.');
+    }
+
+    try {
+      // Execute the signup function while holding the lock
+      return await fn();
+    } finally {
+      // Always release the lock
+      if (lock) {
+        try {
+          await lock.release();
+          this.logger.debug(`Released signup lock: ${lockKey}`);
+        } catch (releaseError) {
+          this.logger.warn(`Failed to release signup lock: ${releaseError}`);
+        }
+      }
+    }
+  }
+
+  /**
+   * Execute a joinPoll transaction with distributed locking
+   * Prevents duplicate joinPoll requests for the same user
+   * 
+   * @param pollId - Poll ID
+   * @param pubKeyX - Public key X coordinate
+   * @param pubKeyY - Public key Y coordinate
+   * @param fn - Function to execute while holding lock
+   */
+  async withJoinPollLock<T>(
+    pollId: string,
+    pubKeyX: string,
+    pubKeyY: string,
+    fn: () => Promise<T>
+  ): Promise<T> {
+    const pubKeyHash = `${pubKeyX.slice(0, 10)}_${pubKeyY.slice(0, 10)}`;
+    const lockKey = `lock:joinpoll:${pollId}:${pubKeyHash}`;
+
+    let lock;
+    try {
+      lock = await this.redlock.acquire([lockKey], this.LOCK_TTL);
+      this.logger.debug(`Acquired joinPoll lock: ${lockKey}`);
+    } catch (lockError: any) {
+      this.logger.warn(`Failed to acquire joinPoll lock for ${lockKey}: ${lockError.message}`);
+      throw new Error('JoinPoll already in progress for this user. Please wait and try again.');
+    }
+
+    try {
+      return await fn();
+    } finally {
+      if (lock) {
+        try {
+          await lock.release();
+          this.logger.debug(`Released joinPoll lock: ${lockKey}`);
+        } catch (releaseError) {
+          this.logger.warn(`Failed to release joinPoll lock: ${releaseError}`);
         }
       }
     }

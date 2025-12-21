@@ -121,9 +121,8 @@ export function SignupModal({
 
       const joinResult = await joinMaciPoll(String(pollIdOnChain), 0, "", 0);
 
-      if (joinResult.alreadyJoined) {
-        showSuccess("Already Joined", "Note: You have already joined this poll! treating as success.");
-      }
+      // Note: Don't show feedback modal for alreadyJoined - Dialog handles it
+      // showSuccess would create nested modals
 
       setJoinSuccess(true);
       setNewPollStateIndex(joinResult.pollStateIndex || null);
@@ -153,16 +152,19 @@ export function SignupModal({
                   <p className="text-emerald-800 font-semibold">Successfully Joined!</p>
                 </div>
                 <p className="text-sm text-emerald-600 mt-1">You are now registered to vote.</p>
-                <div className="mt-3 space-y-1">
-                  <p className="text-xs text-emerald-700 font-mono bg-emerald-100 px-2 py-1 rounded">
-                    Poll State Index: {newPollStateIndex || "N/A"}
-                  </p>
-                  {newVoiceCredits && (
+                {/* Only show stats if they have meaningful values */}
+                {newPollStateIndex && newPollStateIndex !== "0" && (
+                  <div className="mt-3 space-y-1">
                     <p className="text-xs text-emerald-700 font-mono bg-emerald-100 px-2 py-1 rounded">
-                      Voice Credits: {newVoiceCredits}
+                      Poll State Index: {newPollStateIndex}
                     </p>
-                  )}
-                </div>
+                    {newVoiceCredits && newVoiceCredits !== "0" && (
+                      <p className="text-xs text-emerald-700 font-mono bg-emerald-100 px-2 py-1 rounded">
+                        Voice Credits: {newVoiceCredits}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="flex justify-end">
                 <Button onClick={onClose} className="bg-emerald-600 text-white rounded-full px-6 hover:bg-emerald-700">

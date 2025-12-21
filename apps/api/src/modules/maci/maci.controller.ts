@@ -1,6 +1,6 @@
-// src/maci/maci.controller.ts
-import { Controller, Post, Get, Param, Body, Query } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Query, NotFoundException } from '@nestjs/common';
 import { MaciService } from './maci.service';
+import { MaciDeploymentsService } from './maci-deployments.service';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -45,7 +45,7 @@ class MaciSignupEip712Dto {
   @ApiProperty({ description: "MACI Public Key X coordinate" })
   pubKeyX: string;
 
-  @ApiProperty({ description: "MACI Public Key Y coordinate" })  
+  @ApiProperty({ description: "MACI Public Key Y coordinate" })
   pubKeyY: string;
 
   @ApiProperty({ description: "EIP-712 signature" })
@@ -106,6 +106,8 @@ class VoteDto {
  * POST   /maci/signup                   - Signup to MACI (legacy)
  * POST   /maci/signup-eip712            - Signup with EIP-712 signature
  * GET    /maci/nonce/:address           - Get nonce for EIP-712 signing
+ * GET    /maci/deployments/latest       - Get latest MACI deployment
+ * GET    /maci/deployments/:address     - Get MACI deployment by address
  * POST   /maci/polls                    - Deploy a new poll
  * GET    /maci/polls/:id/contracts      - Get poll contracts
  * POST   /maci/polls/:id/merge          - Merge poll state
@@ -117,7 +119,63 @@ class VoteDto {
 @ApiBearerAuth()
 @Controller('maci')
 export class MaciController {
-  constructor(private readonly maciService: MaciService) {}
+  constructor(
+    private readonly maciService: MaciService,
+    private readonly maciDeploymentsService: MaciDeploymentsService,
+  ) { }
+
+  // ========================================
+  // MACI Deployment Endpoints
+  // ========================================
+
+  /**
+   * Get latest MACI deployment
+   * GET /maci/deployments/latest
+   * 
+   * TODO: Dùng để frontend lấy maciAddress và startBlock thay vì localStorage
+   * - Thay thế localStorage.getItem("maciAddress")
+   * - Thay thế localStorage.getItem("maciStartBlock")
+   */
+  @Get('deployments/latest')
+  @ApiOperation({ summary: 'Get latest MACI deployment info' })
+  @ApiResponse({ status: 200, description: 'Latest deployment retrieved' })
+  async getLatestDeployment() {
+    const deployment = await this.maciDeploymentsService.getLatest();
+    if (!deployment) {
+      throw new NotFoundException('No MACI deployments found');
+    }
+    return {
+      maciAddress: deployment.maciAddress,
+      startBlock: deployment.startBlock,
+      subgraphUrl: deployment.subgraphUrl,
+      chain: deployment.chain,
+    };
+  }
+
+  /**
+   * Get MACI deployment by address
+   * GET /maci/deployments/:address
+   * 
+   * TODO: Dùng khi biết maciAddress cụ thể (từ poll.maciAddress)
+   * - Query deployment info cho MACI contract cụ thể
+   * - Hữu ích khi có nhiều MACI deployments
+   */
+  @Get('deployments/:address')
+  @ApiOperation({ summary: 'Get MACI deployment by address' })
+  @ApiParam({ name: 'address', type: String })
+  @ApiResponse({ status: 200, description: 'Deployment info retrieved' })
+  async getDeploymentByAddress(@Param('address') address: string) {
+    const deployment = await this.maciDeploymentsService.getByAddress(address);
+    if (!deployment) {
+      throw new NotFoundException(`MACI deployment not found: ${address}`);
+    }
+    return {
+      maciAddress: deployment.maciAddress,
+      startBlock: deployment.startBlock,
+      subgraphUrl: deployment.subgraphUrl,
+      chain: deployment.chain,
+    };
+  }
 
   // ========================================
   // RESTful Endpoints (New)
@@ -195,13 +253,13 @@ export class MaciController {
   @ApiResponse({ status: 201, description: 'Vote submitted successfully' })
   async vote(@Param('id') id: string, @Body() body: VoteDto) {
     return this.maciService.vote(
-      id, 
-      body.voteOptionIndex, 
-      body.voteWeight, 
-      body.nonce, 
-      body.userStateIndex, 
-      body.userMaciPrivateKey, 
-      body.userMaciPublicKey, 
+      id,
+      body.voteOptionIndex,
+      body.voteWeight,
+      body.nonce,
+      body.userStateIndex,
+      body.userMaciPrivateKey,
+      body.userMaciPublicKey,
       body.maciAddress
     );
   }

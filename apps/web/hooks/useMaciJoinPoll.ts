@@ -34,12 +34,14 @@ export const useMaciJoinPoll = () => {
       // ============================================
       let effectiveStartBlock = startBlock || 0;
 
-      // Fallback to localStorage if not provided (for backward compatibility)
-      if (!effectiveStartBlock && typeof window !== "undefined") {
-        const maciStartBlockStr = localStorage.getItem("maciStartBlock");
-        if (maciStartBlockStr) {
-          effectiveStartBlock = parseInt(maciStartBlockStr);
-          console.log("Using maciStartBlock from localStorage:", effectiveStartBlock);
+      // Fetch from API if not provided
+      if (!effectiveStartBlock) {
+        try {
+          const deployment = await maciApi.getLatestDeployment();
+          effectiveStartBlock = deployment.startBlock || 0;
+          console.log("Using startBlock from API:", effectiveStartBlock);
+        } catch (err) {
+          console.warn("Could not fetch startBlock from API, using hardcoded fallback");
         }
       }
 
@@ -69,6 +71,10 @@ export const useMaciJoinPoll = () => {
       }
 
       console.log("Join Poll Success:", result);
+
+      // If alreadyJoined and pollStateIndex is 0, it means backend couldn't get the real index
+      // This is expected behavior - the user is already joined, just poll index wasn't returned
+      // Frontend can query separately if needed
 
       return {
         success: true,

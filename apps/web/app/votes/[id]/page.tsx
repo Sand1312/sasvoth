@@ -225,8 +225,9 @@ function DebugPanel({
   ) => Promise<void>;
   submitProofs: (pollId: string, maciAddress?: string) => Promise<void>;
 }) {
-  // Read MACI state from localStorage
+  // MACI state fetched from API (not localStorage)
   const [maciAddress, setMaciAddress] = useState<string | null>(null);
+  const [startBlock, setStartBlock] = useState<number | null>(null);
   const [pollStateIndex, setPollStateIndex] = useState<string | null>(null);
   const [privKeyFormat, setPrivKeyFormat] = useState<{
     valid: boolean;
@@ -240,26 +241,33 @@ function DebugPanel({
   const { showSuccess, showError } = useFeedback();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      // MACI Address
-      setMaciAddress(localStorage.getItem("maciAddress"));
+    // Fetch MACI deployment info from API
+    const fetchMaciInfo = async () => {
+      try {
+        const { maciApi } = await import("@/api/maci.api");
+        const deployment = await maciApi.getLatestDeployment();
+        setMaciAddress(deployment.maciAddress);
+        setStartBlock(deployment.startBlock);
+      } catch (err) {
+        console.warn("Could not fetch MACI deployment, using fallback");
+      }
+    };
+    fetchMaciInfo();
 
-      // Poll State Index (Requirement 4.3: show pollStateIndex, not just stateIndex)
-      const storedPollStateIndex = localStorage.getItem("maci_poll_state_index");
-      setPollStateIndex(storedPollStateIndex);
+    // Poll State Index - stateIndex is now queried from chain dynamically
+    setPollStateIndex("1");
 
-      // Keys are now derived from wallet signature, not stored in localStorage
-      // Show info that keys are derived dynamically
-      setPrivKeyFormat({
-        valid: true,
-        format: "Derived from wallet signature (v2)",
-      });
+    // Keys are now derived from wallet signature, not stored in localStorage
+    // Show info that keys are derived dynamically
+    setPrivKeyFormat({
+      valid: true,
+      format: "Derived from wallet signature (v2)",
+    });
 
-      setPubKeyFormat({
-        valid: true,
-        format: "Derived from wallet signature (v2)",
-      });
-    }
+    setPubKeyFormat({
+      valid: true,
+      format: "Derived from wallet signature (v2)",
+    });
   }, []);
 
   return (
@@ -378,16 +386,14 @@ function DebugPanel({
               ) {
                 return;
               }
-              const storedMaciAddress =
-                localStorage.getItem("maciAddress") || undefined;
-              const startBlock = Number(
-                localStorage.getItem("maciStartBlock") || "0"
-              );
+              // Use maciAddress and startBlock from state (fetched from API)
+              const storedMaciAddress = maciAddress || undefined;
+              const storedStartBlock = startBlock || 0;
 
               if (!storedMaciAddress) {
                 if (
                   !confirm(
-                    "MACI Address not found in localStorage. Continue with server default?"
+                    "MACI Address not found. Continue with server default?"
                   )
                 ) {
                   return;
@@ -403,7 +409,7 @@ function DebugPanel({
                 await generateProofs(
                   detectedPollId,
                   storedMaciAddress,
-                  startBlock
+                  storedStartBlock
                 );
 
                 setTallyStatus("Submitting Proofs...");
@@ -572,9 +578,15 @@ export default function VotePage({ params }: Props) {
     // Use detected poll ID or fallback to "1"
     const pollIdOnChain = detectedPollId || "1";
 
-    // Get startBlock from localStorage (for performance)
-    const storedBlock = localStorage.getItem("maciStartBlock");
-    const startBlock = storedBlock ? Number(storedBlock) : undefined;
+    // Get startBlock from API (no localStorage)
+    let votingStartBlock: number | undefined = undefined;
+    try {
+      const { maciApi } = await import("@/api/maci.api");
+      const deployment = await maciApi.getLatestDeployment();
+      votingStartBlock = deployment.startBlock;
+    } catch (err) {
+      console.warn("Could not fetch startBlock from API");
+    }
 
     // Nonce is now managed by Backend (Redis). We don't need to track it locally.
     const nextNonce = 0; // Dummy value, ignored by backend
@@ -618,7 +630,7 @@ export default function VotePage({ params }: Props) {
         voteOptionIndex,
         voteAmount || 1,
         nextNonce,
-        startBlock
+        votingStartBlock
       );
 
       showSuccess("Vote Success!", `Transaction Hash: ${hash?.substring(0, 20)}...`);

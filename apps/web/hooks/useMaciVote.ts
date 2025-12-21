@@ -52,7 +52,7 @@ export const useMaciVote = () => {
         throw new Error("User not signed up (No stateIndex found on chain)");
       }
 
-      console.log("Voting via API...", { pollId, voteOptionIndex, voteWeight, nonce, stateIndex });
+      console.log(`🗳️ Submitting vote: Option ${voteOptionIndex} with ${voteWeight} voice credits (Poll ${pollId}, Nonce ${nonce})`);
 
       // ============================================
       // Step 3: Call vote API
