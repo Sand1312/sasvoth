@@ -38,7 +38,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "hardhat": "hardhat node",
-    "compileSol": "TS_NODE_TRANSPILE_ONLY=1 ts-node ./scripts/compileSol.ts",
+    "compileSol": "cross-env TS_NODE_TRANSPILE_ONLY=1 ts-node ./scripts/compileSol.ts",
     "moveIntegrationArtifacts": "cp -r artifacts/ ../integrationTests/artifacts",
     "prebuild": "pnpm run compileSol",
     "build": "tsc -p tsconfig.build.json",
@@ -257,6 +257,7 @@
     "@types/uuid": "^10.0.0",
     "chai": "^4.3.10",
     "chai-as-promised": "^8.0.1",
+    "cross-env": "^7.0.3",
     "dotenv": "^17.2.2",
     "hardhat-artifactor": "^0.2.0",
     "hardhat-contract-sizer": "^2.10.0",

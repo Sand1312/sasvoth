@@ -63,12 +63,13 @@ export function useMaci() {
 
   // Adapter: signupToMaci
   // The UI (PollClient) calls this with (x, y). We ignore them and let useMaciSignup generate new keys per Spec.
-  const signupToMaci = async (pubKeyX?: string, pubKeyY?: string) => {
+  // maciAddressOverride: Optional MACI address from poll data, overrides localStorage
+  const signupToMaci = async (pubKeyX?: string, pubKeyY?: string, maciAddressOverride?: string) => {
     try {
       console.log(
         "signupToMaci: Ignoring passed keys, using internal generation per Spec v2"
       );
-      const maciAddress = getMaciAddress();
+      const maciAddress = maciAddressOverride || getMaciAddress();
       console.log(
         "signupToMaci: calling maciSignup with address:",
         maciAddress
@@ -93,14 +94,15 @@ export function useMaci() {
   };
 
   // Adapter: joinMaciPoll
+  // maciAddressOverride: Optional MACI address from poll data
   const joinMaciPoll = async (
     pollId: string,
     startBlock: number | undefined,
     privKey: string,
-    signupBlockNumber?: number
+    signupBlockNumber?: number,
+    maciAddressOverride?: string
   ) => {
-    const maciAddress = getMaciAddress();
-    // Verify privKey matches storage or warn?
+    const maciAddress = maciAddressOverride || getMaciAddress();
     // new joinPollAction uses stored key, but we pass pollId
     const result = await maciJoinPoll(maciAddress, pollId);
 
@@ -115,25 +117,25 @@ export function useMaci() {
   };
 
   // Adapter: submitVote
-  // Adapter: submitVote
+  // Simplified: useMaciVote now handles key derivation and stateIndex internally
+  // maciAddressOverride: Optional MACI address from poll data
   const submitVote = async (
     pollId: string,
     voteOptionIndex: number,
     voteWeight: number,
-    pollStateIndex: number,
-    pubKeyX: string,
-    pubKeyY: string,
-    privKey: string,
-    nonce: number = 1 // Added nonce argument
+    nonce: number = 1,
+    startBlock?: number,
+    maciAddressOverride?: string
   ) => {
-    const maciAddress = getMaciAddress();
-    // useMaciVote signature: (pollId, voteOptionIndex, voteWeight, nonce, maciAddress)
+    const maciAddress = maciAddressOverride || getMaciAddress();
+    // useMaciVote will derive keypair and get stateIndex from chain
     const result = await maciVote(
       pollId,
       voteOptionIndex,
       voteWeight,
       nonce,
-      maciAddress
+      maciAddress,
+      startBlock
     );
 
     if (!result.success) throw new Error(result.error);

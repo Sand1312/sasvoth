@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sasvoth/ui/di
 import { useMaci } from "@/hooks";
 import { useFeedback } from "@/contexts/FeedbackContext";
 import { useCheckJoinStatus } from "@/hooks/useCheckJoinStatus";
+import { useMaciStore } from "@/stores/maciStore";
+import { useAccount, useChainId } from "wagmi";
 
 type SignupModalProps = {
   open: boolean;
@@ -24,7 +26,13 @@ export function SignupModal({
 }: SignupModalProps) {
   const { showSuccess, showError } = useFeedback();
   const { signupToMaci, joinMaciPoll, loading } = useMaci();
-  const { checkJoinStatus, getUserPubKeyCoords, loading: checkingStatus } = useCheckJoinStatus();
+  const { checkJoinStatus, loading: checkingStatus } = useCheckJoinStatus();
+  const { address } = useAccount();
+  const chainId = useChainId();
+  
+  // Zustand store integration
+  const { hasKeypair, getKeypair, isLocked } = useMaciStore();
+
   const [privKey, setPrivKey] = useState("");
   const [useRandomKey, setUseRandomKey] = useState(true);
   const [useExistingKey, setUseExistingKey] = useState(false);
@@ -38,22 +46,29 @@ export function SignupModal({
   const [newPollStateIndex, setNewPollStateIndex] = useState<string | null>(null);
   const [newVoiceCredits, setNewVoiceCredits] = useState<string | null>(null);
 
-  // Check join status from subgraph when modal opens
+  // Check join status when modal opens
   useEffect(() => {
     const checkStatus = async () => {
-      if (!open) return;
-      
+      if (!open || !address) return;
+
       // Reset state
       setJoinSuccess(false);
       setNewPollStateIndex(null);
       setNewVoiceCredits(null);
 
-      const storedPrivKey = localStorage.getItem("maci_priv_key");
-      
+      // Check if keypair is cached in Zustand store
+      const hasExistingKey = hasKeypair(address, chainId);
+
       // Get user's public key coordinates for subgraph query
-      const coords = await getUserPubKeyCoords();
-      
-      // Check join status (subgraph first, then localStorage fallback)
+      let coords: { x: string; y: string } | null = null;
+      if (hasExistingKey) {
+        const cached = getKeypair(address, chainId);
+        if (cached) {
+          coords = { x: cached.pubKeyX, y: cached.pubKeyY };
+        }
+      }
+
+      // Check join status (subgraph first)
       const pollIdStr = String(pollIdOnChain);
       const result = await checkJoinStatus(
         pollIdStr,
@@ -74,7 +89,7 @@ export function SignupModal({
         setExistingVoiceCredits(null);
         setStatusSource("none");
 
-        if (storedPrivKey) {
+        if (hasExistingKey) {
           setUseExistingKey(true);
           setUseRandomKey(false);
         } else {
@@ -85,35 +100,26 @@ export function SignupModal({
     };
 
     checkStatus();
-  }, [open, pollIdOnChain, checkJoinStatus, getUserPubKeyCoords]);
+  }, [open, pollIdOnChain, checkJoinStatus, address, chainId]);
 
   const handleSignup = async () => {
-    // ... (logic remains same) ...
     if (alreadyJoined) return;
 
     try {
       if (useExistingKey) {
-        // ... existing key logic
+        // Existing key is cached in Zustand store - signupToMaci will use it
       } else if (useRandomKey) {
         await signupToMaci();
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        // No delay needed! The lock guard ensures sequential execution
       } else {
-        // ... manual key logic
+        // Manual key logic - not recommended but kept for backward compatibility
         if (!privKey) {
-           showError("Missing Key", "Enter secret key or use random generation");
-           return;
+          showError("Missing Key", "Enter secret key or use random generation");
+          return;
         }
-        let finalKey = privKey.trim();
-        if (!finalKey.startsWith("macisk")) {
-           const { PrivateKey } = await import("@maci-protocol/domainobjs");
-           const rawPKey = PrivateKey.deserialize(finalKey);
-           finalKey = rawPKey.serialize();
-        }
-        localStorage.setItem("maci_priv_key", finalKey);
-        const { PrivateKey, Keypair } = await import("@maci-protocol/domainobjs");
-        const pKey = PrivateKey.deserialize(finalKey);
-        const kPair = new Keypair(pKey);
-        localStorage.setItem("maci_pub_key", kPair.publicKey.serialize());
+        // Note: Manual key mode is deprecated. Keys are now derived from wallet signature.
+        showError("Deprecated", "Manual key entry is no longer supported. Please use 'Generate new keypair' option.");
+        return;
       }
 
       const joinResult = await joinMaciPoll(String(pollIdOnChain), 0, "", 0);
@@ -126,20 +132,16 @@ export function SignupModal({
       setNewPollStateIndex(joinResult.pollStateIndex || null);
       setNewVoiceCredits(joinResult.voiceCredits || null);
 
-      if (joinResult.pollStateIndex) {
-        // Save with poll-specific key for accurate multi-poll tracking
-        localStorage.setItem(`maci_poll_state_index_${pollIdOnChain}`, joinResult.pollStateIndex);
-        // Also save generic key for backward compatibility
-        localStorage.setItem("maci_poll_state_index", joinResult.pollStateIndex);
-      }
-      if (joinResult.voiceCredits) {
-        localStorage.setItem(`maci_voice_credits_${pollIdOnChain}`, joinResult.voiceCredits);
-        localStorage.setItem("maci_voice_credits", joinResult.voiceCredits);
-      }
+      // Note: No localStorage needed - useMaciVote now gets stateIndex from chain
 
       onSuccess();
     } catch (e: any) {
       console.error("Signup/Join failed", e);
+      // Handle lock errors gracefully
+      if (e.message?.includes('another MACI operation')) {
+        showError("Please Wait", "Another operation is in progress. Please wait.");
+        return;
+      }
       showError("Signup/Join Failed", e.message);
     }
   };
@@ -241,8 +243,8 @@ export function SignupModal({
 
               <div className="flex justify-end gap-2 mt-2">
                 <Button onClick={onClose} variant="ghost">Cancel</Button>
-                <Button onClick={handleSignup} disabled={loading} className="bg-black text-white rounded-full px-6">
-                  {loading ? "Joining..." : "Join Poll"}
+                <Button onClick={handleSignup} disabled={loading || isLocked()} className="bg-black text-white rounded-full px-6">
+                  {loading ? "Joining..." : isLocked() ? "Processing..." : "Join Poll"}
                 </Button>
               </div>
             </>

@@ -64,6 +64,12 @@ export class SmartNonceService implements OnModuleInit {
   async calculateNextNonce(pollId: string, stateIndex: string | number): Promise<number> {
     const stateIndexStr = stateIndex.toString();
     
+    // Validate stateIndex is a number, not a public key
+    if (!this.isValidStateIndex(stateIndexStr)) {
+      this.logger.error(`Invalid stateIndex format: "${stateIndexStr.slice(0, 30)}..." - must be numeric`);
+      throw new Error(`Invalid stateIndex format: expected numeric string, got "${stateIndexStr.slice(0, 20)}..."`);
+    }
+    
     // Step 1: Fetch confirmed count from The Graph (slow but trusted)
     const confirmedNonce = await this.getConfirmedNonce(pollId, stateIndexStr);
 
@@ -284,5 +290,16 @@ export class SmartNonceService implements OnModuleInit {
    */
   getRedlock(): Redlock {
     return this.redlock;
+  }
+
+  /**
+   * Validate that stateIndex is a numeric value
+   * Returns false for invalid values like "macipk.xxx"
+   */
+  private isValidStateIndex(stateIndex: string): boolean {
+    // StateIndex should be a non-negative integer (e.g., "0", "1", "9", "123")
+    // Not a MACI public key (e.g., "macipk.xxx")
+    const parsed = parseInt(stateIndex, 10);
+    return !isNaN(parsed) && parsed >= 0 && String(parsed) === stateIndex;
   }
 }

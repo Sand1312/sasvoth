@@ -8,6 +8,9 @@ import { FeedbackProvider } from "@/contexts/FeedbackContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { cookies } from "next/headers";
 
+// Force dynamic rendering for routes that use cookies
+export const dynamic = 'force-dynamic';
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",

@@ -35,7 +35,7 @@ export class Polls {
     @Prop({ required: true })
     creatorAddress: string;
 
-    @Prop({ required:true})
+    @Prop({ required: true })
     status: string;
 
     @Prop({ required: true })
@@ -44,16 +44,16 @@ export class Polls {
     @Prop({ required: true })
     endTime: Date;
 
-    @Prop({ required: false ,type:[String]})
+    @Prop({ required: false, type: [String] })
     ideas: string[];// danh sách chờ duyệt
 
-    @Prop({ required: false ,type:[String]})
-    options:string[];// danh sách option đã được duyệt
+    @Prop({ required: false, type: [String] })
+    options: string[];// danh sách option đã được duyệt
 
     @Prop()
     numberOptions: number;
 
-    @Prop({required:false, equals:true})
+    @Prop({ required: false, equals: true })
     pollIdOnChain: number;
 
     @Prop({ required: false })
@@ -67,6 +67,9 @@ export class Polls {
 
     @Prop({ type: MaciConfig, required: false })
     maciConfig?: MaciConfig;
+
+    @Prop({ required: false })
+    maciAddress: string;  // MACI contract address this poll belongs to
 }
 
 export const PollsSchema = SchemaFactory.createForClass(Polls);

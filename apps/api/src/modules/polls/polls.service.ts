@@ -7,7 +7,7 @@ import { Polls, PollsDocument } from './schemas/polls';
 export class PollsService {
   constructor(
     @InjectModel(Polls.name) private pollsModel: Model<PollsDocument>,
-  ) {}
+  ) { }
 
   /**
    * Sync poll status based on time and deployment
@@ -32,46 +32,46 @@ export class PollsService {
     // If it IS deployed, we might want to "un-cancel" it if it was a mistake (like the pollId 0 bug).
     // So only return early if NOT deployed.
     if (!isDeployed && poll.status === 'cancelled') {
-        return poll; 
+      return poll;
     }
-    
+
     // 2. If it is Deployed
     if (isDeployed) {
-       if (now < start) {
-           // Deployed but waiting for start
-           newStatus = 'waiting';
-       } else if (now >= start && now <= end) {
-           // In Progress
-           // Do not override 'counting' if it was set explicitly during voting phase (unlikely but safe)
-           // Do not override 'ended' 
-           if (newStatus !== 'counting' && newStatus !== 'ended') {
-               newStatus = 'in_progress';
-           }
-       } else if (now > end) {
-           // Ended
-           // "known that calling talling take times"
-           // If status is 'counting', keep it. 
-           // If 'in_progress', move to 'ended' (or 'counting' if that was auto? No user said manual trigger)
-           // Let's default to 'ended' if time is up, unless it's explicitly 'counting'.
-           if (newStatus !== 'counting' && newStatus !== 'ended') {
-               newStatus = 'ended';
-           }
-       }
-    } 
+      if (now < start) {
+        // Deployed but waiting for start
+        newStatus = 'waiting';
+      } else if (now >= start && now <= end) {
+        // In Progress
+        // Do not override 'counting' if it was set explicitly during voting phase (unlikely but safe)
+        // Do not override 'ended' 
+        if (newStatus !== 'counting' && newStatus !== 'ended') {
+          newStatus = 'in_progress';
+        }
+      } else if (now > end) {
+        // Ended
+        // "known that calling talling take times"
+        // If status is 'counting', keep it. 
+        // If 'in_progress', move to 'ended' (or 'counting' if that was auto? No user said manual trigger)
+        // Let's default to 'ended' if time is up, unless it's explicitly 'counting'.
+        if (newStatus !== 'counting' && newStatus !== 'ended') {
+          newStatus = 'ended';
+        }
+      }
+    }
     // 3. Not Deployed
     else {
-        if (now > start) {
-            // "if poll not deploy after start time turn into cancelled should be auto trigger"
-            newStatus = 'cancelled';
-        } else {
-            // Before start time available
-            newStatus = 'prepare';
-        }
+      if (now > start) {
+        // "if poll not deploy after start time turn into cancelled should be auto trigger"
+        newStatus = 'cancelled';
+      } else {
+        // Before start time available
+        newStatus = 'prepare';
+      }
     }
 
     if (newStatus !== poll.status) {
-        poll.status = newStatus;
-        return poll.save();
+      poll.status = newStatus;
+      return poll.save();
     }
     return poll;
   }
@@ -81,6 +81,7 @@ export class PollsService {
     return this.syncPollStatus(poll);
   }
   async createPoll(pollData: Partial<Polls>): Promise<PollsDocument> {
+    console.log('Creating poll with data:', pollData);
     const newPoll = new this.pollsModel(pollData);
     return newPoll.save();
   }
@@ -129,10 +130,14 @@ export class PollsService {
     pollId: string,
     pollIdOnChain: number,
     subgraphUrl?: string,
+    maciAddress?: string,
   ): Promise<PollsDocument | null> {
     const update: any = { pollIdOnChain };
     if (subgraphUrl) {
       update.subgraphUrl = subgraphUrl;
+    }
+    if (maciAddress) {
+      update.maciAddress = maciAddress;
     }
     // After saving, we should probably sync status too
     let poll = await this.pollsModel

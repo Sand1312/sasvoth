@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Keypair, PrivateKey } from "@maci-protocol/domainobjs";
 import { maciApi } from "../api/maci.api";
-import { useSignTypedData, useAccount, useChainId } from "wagmi";
-import { keccak256 } from "viem";
+import { useSignTypedData, useAccount, useChainId, usePublicClient } from "wagmi";
+import { deriveMaciKeypair } from "../utils/maciKeyDerivation";
+import { useMaciStore, useWithMaciLock } from "@/stores/maciStore";
+import { useCheckSignupStatus } from "./useCheckJoinStatus";
 
-// ============ EIP-712 Constants (inline until shared package is linked) ============
+// ============ EIP-712 Constants for Signup Request ============
 
 const EIP712_DOMAIN_NAME = 'SaSvoth Gatekeeper';
 const EIP712_DOMAIN_VERSION = '1';
@@ -16,12 +17,6 @@ const getEIP712Domain = (chainId: number, verifyingContract: `0x${string}`) => (
   verifyingContract,
 });
 
-const getKeyGenDomain = (chainId: number) => ({
-  name: 'MACI Key Generation',
-  version: '1',
-  chainId,
-});
-
 const SIGNUP_REQUEST_TYPES = {
   SignupRequest: [
     { name: 'subject', type: 'address' },
@@ -29,12 +24,6 @@ const SIGNUP_REQUEST_TYPES = {
     { name: 'deadline', type: 'uint256' },
   ],
 } as const;
-
-const KEY_GEN_TYPES = {
-  KeyGen: [{ name: 'message', type: 'string' }],
-} as const;
-
-const KEY_GEN_MESSAGE = 'Generate MACI keypair for SaSvoth voting';
 
 const createSignupDeadline = (minutes: number = 15): bigint => {
   return BigInt(Math.floor(Date.now() / 1000) + minutes * 60);
@@ -45,7 +34,7 @@ const createSignupDeadline = (minutes: number = 15): bigint => {
 /**
  * Gatekeeper contract address - should be set via environment variable
  */
-const GATEKEEPER_ADDRESS = (process.env.NEXT_PUBLIC_GATEKEEPER_ADDRESS || 
+const GATEKEEPER_ADDRESS = (process.env.NEXT_PUBLIC_GATEKEEPER_ADDRESS ||
   "0x0000000000000000000000000000000000000000") as `0x${string}`;
 
 export const useMaciSignup = () => {
@@ -54,44 +43,78 @@ export const useMaciSignup = () => {
   const { signTypedDataAsync } = useSignTypedData();
   const { address } = useAccount();
   const chainId = useChainId();
+  const publicClient = usePublicClient();
+  
+  // Zustand store integration
+  const { setKeypair, getKeypair } = useMaciStore();
+  const { withLock, isLocked } = useWithMaciLock();
+  
+  // Graph-first signup status check
+  const { checkSignupStatus } = useCheckSignupStatus();
 
   const handleSignup = async (maciAddress: string) => {
-    setLoading(true);
-    setError(null);
-
     if (!address) {
       setError("Wallet not connected");
-      setLoading(false);
       return { success: false, error: "Wallet not connected" };
     }
 
+    // Wrap entire signup in lock to prevent double-click races
     try {
+      return await withLock('signup', address, undefined, async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
       // ============================================
-      // Step A: Generate MACI Key from EIP-712 Signature
+      // Step A: Generate MACI Key with Domain Separation
       // ============================================
-      console.log("Step A: Generating MACI keypair from EIP-712 signature...");
+      console.log("Step A: Generating MACI keypair with Domain Separation...");
 
-      const keyGenSignature = await signTypedDataAsync({
-        domain: getKeyGenDomain(chainId),
-        types: KEY_GEN_TYPES,
-        primaryType: "KeyGen",
-        message: { message: KEY_GEN_MESSAGE },
-      });
-
-      // Derive MACI private key from signature hash
-      const seed = BigInt(keccak256(keyGenSignature));
-      const userKeypair = new Keypair(new PrivateKey(seed));
-
-      const publicKey = userKeypair.publicKey.serialize();
-      const privateKey = userKeypair.privateKey.serialize();
-
-      // Extract x/y coordinates for the contract
-      // Access the public key's asArray method for raw values
-      const pubKeyArray = userKeypair.publicKey.asArray();
-      const pubKeyX = pubKeyArray?.[0]?.toString() ?? "0";
-      const pubKeyY = pubKeyArray?.[1]?.toString() ?? "0";
+      const { publicKey, pubKeyX, pubKeyY } = await deriveMaciKeypair(
+        address,
+        chainId,
+        signTypedDataAsync,
+        {
+          maciAddress,
+          // Zustand store integration
+          getFromStore: () => getKeypair(address, chainId, maciAddress),
+          setToStore: (kp) => setKeypair(address, chainId, kp, maciAddress),
+        }
+      );
 
       console.log("MACI Keypair generated:", { publicKey: publicKey.substring(0, 30) + "..." });
+
+      // ============================================
+      // Step A.1: Check if already signed up (Graph first, RPC fallback)
+      // ============================================
+      const maciStartBlock = typeof window !== 'undefined'
+        ? localStorage.getItem("maciStartBlock")
+        : null;
+
+      console.log("Step A.1: Checking signup status via Graph/Chain...");
+
+      try {
+        const signupResult = await checkSignupStatus(
+          pubKeyX,
+          pubKeyY,
+          maciAddress,
+          publicClient,
+          maciStartBlock ? parseInt(maciStartBlock) : undefined
+        );
+
+        if (signupResult.isSignedUp) {
+          console.log(`✅ Already signed up! StateIndex: ${signupResult.stateIndex}, Source: ${signupResult.source}`);
+          return {
+            success: true,
+            hash: null,
+            stateIndex: signupResult.stateIndex,
+            blockNumber: null,
+            alreadySignedUp: true,
+          };
+        }
+      } catch (checkErr) {
+        console.log("Could not check signup status, proceeding with signup:", checkErr);
+      }
 
       // ============================================
       // Step B: Get nonce and create signup request
@@ -135,48 +158,69 @@ export const useMaciSignup = () => {
       // ============================================
       console.log("Step D: Sending to backend for relay...");
 
-      const result = await maciApi.signupWithSignature({
-        maciAddress,
-        pubKeyX,
-        pubKeyY,
-        signature: signupSignature,
-        nonce: Number(nonce),
-        deadline: Number(deadline),
+      try {
+        const result = await maciApi.signupWithSignature({
+          maciAddress,
+          pubKeyX,
+          pubKeyY,
+          signature: signupSignature,
+          nonce: Number(nonce),
+          deadline: Number(deadline),
+        });
+
+        if (!result || !result.success) {
+          const errorMsg = result?.error || "Signup failed with unknown error";
+          throw new Error(errorMsg);
+        }
+
+        console.log("Signup Success:", result);
+
+        // ============================================
+        // Step E: Keys are now cached in memory by deriveMaciKeypair
+        // No localStorage needed!
+        // ============================================
+
+        return {
+          success: true,
+          hash: result.hash,
+          stateIndex: result.stateIndex,
+          blockNumber: result.blockNumber,
+        };
+      } catch (apiErr: any) {
+        // Check if error is "already signed up" - treat as success
+        const errMsg = apiErr?.message || apiErr?.response?.data?.error || String(apiErr);
+        const isAlreadySignedUp =
+          errMsg.toLowerCase().includes("already") ||
+          errMsg.toLowerCase().includes("signed up") ||
+          errMsg.toLowerCase().includes("registered");
+
+        if (isAlreadySignedUp) {
+          console.log("✅ User already signed up - treating as success");
+          return {
+            success: true,
+            hash: null,
+            stateIndex: null, // Will be fetched later if needed
+            blockNumber: null,
+            alreadySignedUp: true,
+          };
+        }
+
+        // Re-throw other errors
+        throw apiErr;
+      }
+        } catch (err: any) {
+          console.error("Signup failed:", err);
+          setError(err.message || "Signup failed");
+          return { success: false, error: err.message };
+        } finally {
+          setLoading(false);
+        }
       });
-
-      if (!result || !result.success) {
-        const errorMsg = result?.error || "Signup failed with unknown error";
-        throw new Error(errorMsg);
-      }
-
-      console.log("Signup Success:", result);
-
-      // ============================================
-      // Step E: Store keys locally
-      // ============================================
-      if (typeof window !== "undefined") {
-        localStorage.setItem("maci_priv_key", privateKey);
-        localStorage.setItem("maci_pub_key", publicKey);
-        if (result.stateIndex !== undefined) {
-          localStorage.setItem("maci_state_index", result.stateIndex.toString());
-        }
-        if (result.blockNumber) {
-          localStorage.setItem("signupBlockNumber", result.blockNumber.toString());
-        }
-      }
-
-      return {
-        success: true,
-        hash: result.hash,
-        stateIndex: result.stateIndex,
-        blockNumber: result.blockNumber,
-      };
-    } catch (err: any) {
-      console.error("Signup failed:", err);
-      setError(err.message || "Signup failed");
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
+    } catch (lockErr: any) {
+      // Lock acquisition failed (another operation in progress)
+      console.warn("Signup blocked:", lockErr.message);
+      setError(lockErr.message);
+      return { success: false, error: lockErr.message };
     }
   };
 
@@ -184,5 +228,8 @@ export const useMaciSignup = () => {
     signup: handleSignup,
     loading,
     error,
+    isLocked,
   };
 };
+
+

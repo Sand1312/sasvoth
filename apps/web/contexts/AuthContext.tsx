@@ -47,12 +47,12 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
 
         // 2. If invalid, try to refresh token
         if (!validated) {
-           try {
-             await api.post("/auth/refresh");
-             validated = true;
-           } catch {
-             validated = false;
-           }
+          try {
+            await api.post("/auth/refresh");
+            validated = true;
+          } catch {
+            validated = false;
+          }
         }
 
         // 3. If validated, fetch user profile
@@ -106,7 +106,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
         method: "eth_requestAccounts",
       });
       const account = accounts[0];
-      
+
       // Generate random nonce
       const nonce = crypto.randomUUID();
       const message = `Sign to login. Nonce: ${nonce}`;
@@ -172,6 +172,16 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
         // Fallback or ignore if already signed out
         await api.post("/auth/logout");
       }
+
+      // Clear MACI keypair cache from memory
+      try {
+        const { clearMaciKeyCache } = await import("../utils/maciKeyDerivation");
+        clearMaciKeyCache();
+        console.log("MACI key cache cleared");
+      } catch (e) {
+        console.warn("Failed to clear MACI key cache:", e);
+      }
+
       setUser(null);
       replaceTo("/signin");
     } catch (error) {

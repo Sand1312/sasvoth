@@ -62,20 +62,16 @@ function BuyTicketsModal({
 
       console.log("Approving token spend...", cost.toString());
       const hash = await token.approve(claim.contractAddress, cost.toString());
-      console.log("Approve TX Hash:", hash);
-
-      // Wait for transaction to be mined reliably
-      if (hash && publicClient) {
-        console.log("Waiting for approval confirmation...");
-        await publicClient.waitForTransactionReceipt({ hash });
-        console.log("Approval confirmed!");
-      }
-
-      console.log("Buying credits...");
-      await claim.buyVoiceCredits(cost.toString());
-      showSuccess("Success", "Bought voice credits successfully!");
-      setCredits("");
-      onNext(credits);
+      setTimeout(async () => {
+        try {
+          await claim.buyVoiceCredits(cost.toString());
+          setCredits("");
+          onNext(credits);
+        } catch (e) {
+          console.error(e);
+          alert("Failed to buy credits");
+        }
+      }, 8000);
     } catch (e: any) {
       console.error(e);
       showError("Failed to Buy Credits", e.message || e);
@@ -252,29 +248,17 @@ function DebugPanel({
       const storedPollStateIndex = localStorage.getItem("maci_poll_state_index");
       setPollStateIndex(storedPollStateIndex);
 
-      // Key format validation (Requirement 4.3)
-      const privKey = localStorage.getItem("maci_priv_key");
-      const pubKey = localStorage.getItem("maci_pub_key");
+      // Keys are now derived from wallet signature, not stored in localStorage
+      // Show info that keys are derived dynamically
+      setPrivKeyFormat({
+        valid: true,
+        format: "Derived from wallet signature (v2)",
+      });
 
-      if (privKey) {
-        const isValidFormat = privKey.startsWith("macisk.");
-        setPrivKeyFormat({
-          valid: isValidFormat,
-          format: isValidFormat ? "macisk.xxx (valid)" : "Invalid format",
-        });
-      } else {
-        setPrivKeyFormat(null);
-      }
-
-      if (pubKey) {
-        const isValidFormat = pubKey.startsWith("macipk.");
-        setPubKeyFormat({
-          valid: isValidFormat,
-          format: isValidFormat ? "macipk.xxx (valid)" : "Invalid format",
-        });
-      } else {
-        setPubKeyFormat(null);
-      }
+      setPubKeyFormat({
+        valid: true,
+        format: "Derived from wallet signature (v2)",
+      });
     }
   }, []);
 
@@ -491,16 +475,16 @@ export default function VotePage({ params }: Props) {
             `Found poll for idea ${id}: pollIdOnChain = ${pollIdOnChain}`
           );
           setDetectedPollId(pollIdOnChain);
-          
+
           // Find option index
           if (Array.isArray(poll.options)) {
-             const index = poll.options.findIndex((opt: string) => opt === id);
-             if (index !== -1) {
-                console.log(`Found option index for idea ${id}: ${index}`);
-                setDetectedOptionIndex(index);
-             } else {
-                console.warn(`Idea ${id} not found in poll options`, poll.options);
-             }
+            const index = poll.options.findIndex((opt: string) => opt === id);
+            if (index !== -1) {
+              console.log(`Found option index for idea ${id}: ${index}`);
+              setDetectedOptionIndex(index);
+            } else {
+              console.warn(`Idea ${id} not found in poll options`, poll.options);
+            }
           }
         } else {
           console.log(`No poll found containing idea ${id} in options`);
@@ -585,16 +569,12 @@ export default function VotePage({ params }: Props) {
   }
 
   async function handleVote(password: string) {
-    // Determine start block (from admin setting or default)
-    const storedBlock = localStorage.getItem("maciStartBlock");
-    const startBlock = storedBlock ? Number(storedBlock) : 0;
-
-    // Check local storage for state - use pollStateIndex (from joinPoll) instead of stateIndex
-    const pollStateIndex = localStorage.getItem(`maci_poll_state_index`);
-    const privKey = localStorage.getItem(`maci_priv_key`);
-    const pubKeySerialized = localStorage.getItem(`maci_pub_key`);
     // Use detected poll ID or fallback to "1"
     const pollIdOnChain = detectedPollId || "1";
+
+    // Get startBlock from localStorage (for performance)
+    const storedBlock = localStorage.getItem("maciStartBlock");
+    const startBlock = storedBlock ? Number(storedBlock) : undefined;
 
     // Nonce is now managed by Backend (Redis). We don't need to track it locally.
     const nextNonce = 0; // Dummy value, ignored by backend
@@ -604,95 +584,47 @@ export default function VotePage({ params }: Props) {
       return;
     }
 
-    if (!pollStateIndex) {
-      showError("MACI Error", "Poll State Index not found. Please join the poll first.");
+    // Submit Vote
+    if (detectedOptionIndex === null) {
+      showError("Vote Error", "Does not detect correct option index for this idea.");
       return;
     }
+    const voteOptionIndex = detectedOptionIndex;
 
-    if (!privKey) {
-      showError("MACI Error", "MACI Private Key not found. Please Sign Up first.");
-      return;
-    }
+    const cost = (voteAmount || 1) * (voteAmount || 1);
+    const balance = Number(token.balance || 0);
 
-    // Derive X/Y for logging/compat if needed
-    let pubKeyX = "", pubKeyY = "";
-    if (pubKeySerialized) {
-       try {
-           const domainObjs = await import("@maci-protocol/domainobjs");
-           // @ts-ignore
-           const PubKey = domainObjs.PubKey; 
-           const p = PubKey.deserialize(pubKeySerialized);
-           pubKeyX = p.rawPubKey[0].toString();
-           pubKeyY = p.rawPubKey[1].toString();
-       } catch (e) {
-           console.warn("Failed to deserialize pubKey for logging", e);
-       }
-    }
-
-    // Debug: Log first 20 chars of keys to verify they're valid
-    console.log("🔑 MACI Keys Debug:");
-    console.log("  pollStateIndex:", pollStateIndex);
-    console.log("  pubKeyX:", pubKeyX?.substring(0, 30) + "...");
-    console.log("  privKey:", privKey?.substring(0, 30) + "...");
-
-    // Validate privKey format - must be "macisk." serialized format
-    if (!privKey.startsWith("macisk.")) {
-      console.error(
-        "❌ Invalid privKey format! Expected 'macisk.' serialized format, got:",
-        privKey.substring(0, 10)
-      );
-      alert(
-        "Invalid MACI private key format. Please Sign Up again with the new format."
+    if (cost > balance) {
+      showError(
+        "Insufficient Voice Credits",
+        `Cost (${cost}) exceeds your balance (${balance}). Please buy more credits or reduce vote amount.`
       );
       return;
     }
-    console.log("✅ privKey format: serialized (macisk.)");
+
+    console.log("🗳️ Vote params:", {
+      pollIdOnChain,
+      voteOptionIndex,
+      voteWeight: voteAmount || 1,
+    });
 
     try {
       console.log("Using Poll ID:", pollIdOnChain);
-      console.log("Using pollStateIndex:", pollStateIndex);
 
-      // Submit Vote
-      if (detectedOptionIndex === null) {
-          showError("Vote Error", "Does not detect correct option index for this idea.");
-          return;
-      }
-      const voteOptionIndex = detectedOptionIndex; 
-      
-      const cost = (voteAmount || 1) * (voteAmount || 1);
-      const balance = Number(token.balance || 0);
-      
-      if (cost > balance) {
-          showError("Insufficient Voice Credits", `Cost (${cost}) exceeds your balance (${balance}). Please buy more credits or reduce vote amount.`);
-          return;
-      }
-
-      console.log("🗳️ Vote params:", {
-        pollIdOnChain,
-        voteOptionIndex,
-        voteWeight: voteAmount || 1,
-        pollStateIndex: Number(pollStateIndex),
-        privKey: privKey?.substring(0, 20) + "...",
-      });
-
+      // Note: submitVote now handles key derivation and stateIndex lookup internally
+      // It will prompt user to sign if keypair not cached
       const { hash } = await submitVote(
         pollIdOnChain,
         voteOptionIndex,
         voteAmount || 1,
-        Number(pollStateIndex),
-        pubKeyX, 
-        pubKeyY,
-        privKey,
-        nextNonce // Pass nonce
+        nextNonce,
+        startBlock
       );
 
-      // Nonce managed by backend now
-      // localStorage.setItem(nonceKey, nextNonce.toString());
-
-      alert(`Vote Success!\nTx Hash: ${hash}`);
+      showSuccess("Vote Success!", `Transaction Hash: ${hash?.substring(0, 20)}...`);
     } catch (e: any) {
       console.error(e);
-      alert("Vote Failed: " + e.message);
+      showError("Vote Failed", e.message);
     }
   }
 
@@ -730,38 +662,38 @@ export default function VotePage({ params }: Props) {
       <VoteDetailLayout>
         <VoteLeftPanel>
           {data.heroImage && (
-             <VoteGallery
-               heroImage={getImageSrc(data.heroImage)}
-               screenshots={[]} // Hide gallery part if mixed with dynamic layout, or handle below
-             />
+            <VoteGallery
+              heroImage={getImageSrc(data.heroImage)}
+              screenshots={[]} // Hide gallery part if mixed with dynamic layout, or handle below
+            />
           )}
 
           {data.layoutItems && data.layoutItems.length > 0 ? (
-             data.layoutItems.map((item: any) => {
-                if (item.type === "text") {
-                   return <VoteTextBlock key={item.id} title={item.title} content={item.content} />;
-                }
-                if (item.type === "stack") {
-                   const stackImages = item.frames
-                      ?.map((f: any) => f.ipfsUrl || f.url || f.preview) // Handle various potential keys
-                      .filter((url: any) => typeof url === 'string')
-                      .map((url: string) => getImageSrc(url));
+            data.layoutItems.map((item: any) => {
+              if (item.type === "text") {
+                return <VoteTextBlock key={item.id} title={item.title} content={item.content} />;
+              }
+              if (item.type === "stack") {
+                const stackImages = item.frames
+                  ?.map((f: any) => f.ipfsUrl || f.url || f.preview) // Handle various potential keys
+                  .filter((url: any) => typeof url === 'string')
+                  .map((url: string) => getImageSrc(url));
 
-                   return (
-                      <div key={item.id} className="w-full">
-                         <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
-                         <VoteGallery 
-                            screenshots={stackImages}
-                            urlResolver={getImageSrc} 
-                         />
-                      </div>
-                   );
-                }
-                return null;
-             })
+                return (
+                  <div key={item.id} className="w-full">
+                    <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
+                    <VoteGallery
+                      screenshots={stackImages}
+                      urlResolver={getImageSrc}
+                    />
+                  </div>
+                );
+              }
+              return null;
+            })
           ) : (
-             /* Fallback for old ideas without layoutItems: Show default gallery */
-            !data.heroImage && <VoteGallery /> 
+            /* Fallback for old ideas without layoutItems: Show default gallery */
+            !data.heroImage && <VoteGallery />
           )}
         </VoteLeftPanel>
 

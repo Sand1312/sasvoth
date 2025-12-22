@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@maci-protocol/domainobjs": "0.0.0-ci.26f28d6",
     "@maci-protocol/sdk": "workspace:*",
     "@nestjs-modules/ioredis": "^2.0.2",
     "@nestjs/common": "^11.1.6",

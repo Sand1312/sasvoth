@@ -15,7 +15,7 @@ import POSEIDON_T5_ABI from './abi/poseidon/PoseidonT5.json';
 import POSEIDON_T6_ABI from './abi/poseidon/PoseidonT6.json';
 import POLL_ABI from './abi/contracts/Poll.json';
 import TALLY_ABI from './abi/contracts/Tally.json';
-import MESSAGE_PROCESSOR_ABI from "./abi/contracts/MessageProcessor.json";
+import MESSAGE_PROCESSOR_ABI from './abi/contracts/MessageProcessor.json';
 import VERIFY_VOTE_ABI from './abi/contracts/VerifyVote.json';
 
 
