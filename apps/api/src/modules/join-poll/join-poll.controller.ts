@@ -52,13 +52,13 @@ export class JoinPollController {
   @Get('get')
   @ApiOperation({ summary: 'Retrieve votes by user or poll' })
   @ApiQuery({ name: 'pollId', required: false })
-  @ApiQuery({ name: 'userId', required: false })
+  @ApiQuery({ name: 'voterAdrress', required: false })
   @ApiResponse({ status: 200, description: 'Votes retrieved' })
   async getVotes(@Req() req: Request, @Res() res: Response) {
-    const { pollId, voterId } = req.query;
+    const { pollId, voterAdrress } = req.query;
     try {
       const votes = await this.joinPollService.get(
-        voterId as string,
+        voterAdrress as string,
         pollId as string,
       );
       return res.status(200).json({ votes });
@@ -69,10 +69,10 @@ export class JoinPollController {
 
   @Get('check')
   async checkVote(@Req() req: Request, @Res() res: Response) {
-    const { voterId, pollId } = req.query;
+    const { voterAdrress, pollId } = req.query;
     try {
       const vote = await this.joinPollService.get(
-        voterId as string,
+        voterAdrress as string,
         pollId as string,
       );
       if (vote) {
