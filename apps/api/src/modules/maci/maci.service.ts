@@ -360,7 +360,7 @@ export class MaciService {
   }
 
   /**
-   * Join Poll
+   * Join Poll (wrapped with distributed lock for ACID Isolation)
    */
   async joinPoll(
     pollId: string,
@@ -368,13 +368,36 @@ export class MaciService {
     maciAddress?: string,
     startBlock?: number
   ) {
+    // Derive pubKey from privateKey for lock key
+    // This prevents concurrent joinPoll requests for same user
+    const domainobjs = await import('maci-domainobjs');
+    const { PrivKey, Keypair } = domainobjs;
+    
+    let pubKeyX: string;
+    let pubKeyY: string;
+    
     try {
-      this.logger.log(`Joining Poll ${pollId}...`);
+      const privKey = PrivKey.deserialize(maciPrivateKey);
+      const keypair = new Keypair(privKey);
+      const pubKeyArray = keypair.pubKey.asArray();
+      pubKeyX = pubKeyArray[0].toString().slice(0, 10);
+      pubKeyY = pubKeyArray[1].toString().slice(0, 10);
+    } catch (e) {
+      // Fallback: use hash of privateKey as lock identifier
+      pubKeyX = maciPrivateKey.slice(0, 10);
+      pubKeyY = maciPrivateKey.slice(10, 20);
+      this.logger.warn('Could not derive pubKey from privateKey, using fallback for lock');
+    }
 
-      const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
-      const signerV6 = new ethers6.Wallet(this.privateKey, providerV6);
+    // Wrap with distributed lock to prevent race conditions (ACID: Isolation)
+    return this.smartNonceService.withJoinPollLock(pollId, pubKeyX, pubKeyY, async () => {
+      try {
+        this.logger.log(`Joining Poll ${pollId}...`);
 
-      const address = maciAddress || this.maciAddress;
+        const providerV6 = new ethers6.JsonRpcProvider(this.provider.connection.url);
+        const signerV6 = new ethers6.Wallet(this.privateKey, providerV6);
+
+        const address = maciAddress || this.maciAddress;
 
       // Verify MACI State Tree Depth
       try {
@@ -536,6 +559,7 @@ export class MaciService {
       this.logger.error(`Join Poll full error: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
       throw new HttpException(`Join Poll failed: ${errorMessage}`, 500);
     }
+    }); // Close lock wrapper
   }
 
   /**

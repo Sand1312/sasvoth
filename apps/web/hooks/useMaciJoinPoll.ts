@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useSignTypedData, useAccount, useChainId } from "wagmi";
+import { useSignTypedData, useAccount, useChainId, usePublicClient } from "wagmi";
 import { maciApi } from "../api/maci.api";
 import { deriveMaciKeypair } from "../utils/maciKeyDerivation";
 import { useMaciStore, useWithMaciLock } from "@/stores/maciStore";
+import { useCheckJoinStatus } from "./useCheckJoinStatus";
 
 export const useMaciJoinPoll = () => {
   const [loading, setLoading] = useState(false);
@@ -10,10 +11,14 @@ export const useMaciJoinPoll = () => {
   const { signTypedDataAsync } = useSignTypedData();
   const { address } = useAccount();
   const chainId = useChainId();
+  const publicClient = usePublicClient();
   
   // Zustand store integration
   const { setKeypair, getKeypair } = useMaciStore();
   const { withLock, isLocked } = useWithMaciLock();
+  
+  // Graph/localStorage pre-check for join status (ACID: Consistency)
+  const { checkJoinStatus } = useCheckJoinStatus();
 
   const handleJoinPoll = async (maciAddress: string, pollId: string, startBlock?: number) => {
     if (!address) {
@@ -32,7 +37,7 @@ export const useMaciJoinPoll = () => {
           // Step 1: Derive MACI keypair (cached in Zustand store)
           // ============================================
           console.log("Deriving MACI keypair...");
-          const { privateKey } = await deriveMaciKeypair(
+          const { privateKey, pubKeyX, pubKeyY } = await deriveMaciKeypair(
             address,
             chainId,
             signTypedDataAsync,
@@ -43,6 +48,30 @@ export const useMaciJoinPoll = () => {
               setToStore: (kp) => setKeypair(address, chainId, kp, maciAddress),
             }
           );
+
+          // ============================================
+          // Step 1.5: Check if already joined (ACID: Consistency + Atomicity)
+          // Graph first, localStorage fallback - skip expensive API if already joined
+          // ============================================
+          console.log("🔍 Checking if already joined poll...");
+          try {
+            // Pass maciAddress and publicClient for RPC chain fallback
+            const joinResult = await checkJoinStatus(pollId, pubKeyX, pubKeyY, maciAddress, publicClient);
+            
+            if (joinResult.isJoined) {
+              console.log(`✅ Already joined poll ${pollId}! Source: ${joinResult.source}`);
+              return {
+                success: true,
+                alreadyJoined: true,
+                pollStateIndex: joinResult.pollStateIndex || "0",
+                voiceCredits: joinResult.voiceCredits || "0",
+                hash: null,
+              };
+            }
+            console.log("❌ Not joined yet, proceeding with API call...");
+          } catch (checkErr) {
+            console.warn("Could not check join status, proceeding with API call:", checkErr);
+          }
 
           // ============================================
           // Step 2: Determine startBlock for Merkle tree

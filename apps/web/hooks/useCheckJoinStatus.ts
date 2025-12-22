@@ -331,12 +331,107 @@ export const useCheckJoinStatus = () => {
   };
 
   /**
-   * Main check function - tries subgraph first, then localStorage
+   * Check join status from chain by scanning PollJoined events (RPC fallback)
+   * Similar to getStateIndexFromChain in useCheckSignupStatus
+   */
+  const checkFromChain = async (
+    pubKeyX: string,
+    pubKeyY: string,
+    pollId: string,
+    maciAddress: string,
+    publicClient: any,
+    startBlock?: number
+  ): Promise<CheckJoinStatusResult> => {
+    try {
+      if (!publicClient || !maciAddress) {
+        console.log("⛓️ [checkJoinStatus] Missing publicClient or maciAddress for RPC fallback");
+        return { isJoined: false, pollStateIndex: null, voiceCredits: null, source: "none" };
+      }
+
+      console.log(`⛓️ [checkJoinStatus] Falling back to RPC chain query for poll ${pollId}...`);
+
+      // Import ABI dynamically
+      const { MACI_ABI, POLL_ABI } = await import("@sasvoth/contracts");
+
+      // Get Poll contract address from MACI
+      const pollContracts = await publicClient.readContract({
+        address: maciAddress as `0x${string}`,
+        abi: MACI_ABI,
+        functionName: "getPoll",
+        args: [BigInt(pollId)],
+      }) as readonly [`0x${string}`, `0x${string}`, `0x${string}`];
+
+      const pollAddress = pollContracts[0];
+      console.log(`   Poll address: ${pollAddress}`);
+
+      // Scan PollJoined events for this pubKey
+      // PollJoined event: (indexed _pollPublicKeyX, indexed _pollPublicKeyY, _voiceCreditBalance, _nullifier, _pollStateIndex)
+      const effectiveStartBlock = startBlock ? BigInt(startBlock) : BigInt(224688901);
+
+      const logs = await publicClient.getLogs({
+        address: pollAddress,
+        event: {
+          type: "event",
+          name: "PollJoined",
+          inputs: [
+            { type: "uint256", name: "_pollPublicKeyX", indexed: true },
+            { type: "uint256", name: "_pollPublicKeyY", indexed: true },
+            { type: "uint256", name: "_voiceCreditBalance", indexed: false },
+            { type: "uint256", name: "_nullifier", indexed: false },
+            { type: "uint256", name: "_pollStateIndex", indexed: false },
+          ],
+        },
+        args: {
+          _pollPublicKeyX: BigInt(pubKeyX),
+          _pollPublicKeyY: BigInt(pubKeyY),
+        },
+        fromBlock: effectiveStartBlock,
+        toBlock: "latest",
+      });
+
+      if (logs.length > 0) {
+        const log = logs[0];
+        const args = log.args as {
+          _voiceCreditBalance: bigint;
+          _pollStateIndex: bigint;
+        };
+
+        console.log(`✅ [checkJoinStatus] Found PollJoined event on-chain! pollStateIndex=${args._pollStateIndex}`);
+
+        return {
+          isJoined: true,
+          pollStateIndex: args._pollStateIndex.toString(),
+          voiceCredits: args._voiceCreditBalance.toString(),
+          source: "subgraph" as const, // Use subgraph since it's the type we return
+        };
+      }
+
+      console.log("❌ [checkJoinStatus] Not found on-chain");
+      return { isJoined: false, pollStateIndex: null, voiceCredits: null, source: "none" };
+
+    } catch (err) {
+      console.warn("⛓️ [checkJoinStatus] RPC fallback failed:", err);
+      return { isJoined: false, pollStateIndex: null, voiceCredits: null, source: "none" };
+    }
+  };
+
+  /**
+   * Main check function - tries subgraph first, then RPC chain, then localStorage
+   * 
+   * @param pollId - Poll ID to check
+   * @param pubKeyX - Public key X coordinate
+   * @param pubKeyY - Public key Y coordinate
+   * @param maciAddress - Optional MACI address for RPC fallback
+   * @param publicClient - Optional viem public client for RPC fallback
+   * @param startBlock - Optional start block for event scanning
    */
   const checkJoinStatus = useCallback(async (
     pollId: string,
     pubKeyX?: string,
-    pubKeyY?: string
+    pubKeyY?: string,
+    maciAddress?: string,
+    publicClient?: any,
+    startBlock?: number
   ): Promise<CheckJoinStatusResult> => {
     setLoading(true);
     setError(null);
@@ -355,6 +450,25 @@ export const useCheckJoinStatus = () => {
             }
           }
           return subgraphResult;
+        }
+
+        // RPC chain fallback when Graph not available or not found (ACID: Consistency)
+        const shouldTryRpc = (subgraphResult.source === "subgraph" || subgraphResult.source === "none")
+                             && maciAddress
+                             && publicClient;
+
+        if (shouldTryRpc) {
+          const chainResult = await checkFromChain(pubKeyX, pubKeyY, pollId, maciAddress, publicClient, startBlock);
+          if (chainResult.isJoined) {
+            // Cache in localStorage
+            if (typeof window !== "undefined" && chainResult.pollStateIndex) {
+              localStorage.setItem(`maci_poll_state_index_${pollId}`, chainResult.pollStateIndex);
+              if (chainResult.voiceCredits) {
+                localStorage.setItem(`maci_voice_credits_${pollId}`, chainResult.voiceCredits);
+              }
+            }
+            return chainResult;
+          }
         }
       }
 
