@@ -21,6 +21,13 @@ export const useMaciJoinPoll = () => {
   const { checkJoinStatus } = useCheckJoinStatus();
 
   const handleJoinPoll = async (maciAddress: string, pollId: string, startBlock?: number) => {
+    // 🔍 DEBUG: Log incoming parameters
+    console.log(`🔍 [useMaciJoinPoll] handleJoinPoll CALLED with:`, {
+      maciAddress: maciAddress?.slice(0, 15) + "...",
+      pollId,
+      startBlock,
+    });
+
     if (!address) {
       setError("Wallet not connected");
       return { success: false, error: "Wallet not connected" };

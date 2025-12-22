@@ -26,8 +26,8 @@ import { usePolls } from "@/hooks";
 import { PollStatus } from "@/types/polls";
 import { formatDate, parseDate } from "@/lib/date";
 
-import { DataTable } from "@sasvoth/ui/data-table";
-import { columns, PollData } from "./components/columns";
+import { PollsDataTable } from "./components/polls-data-table";
+import { PollData } from "./components/columns";
 
 import fallbackPollsData from "@/data/fallback-polls.json";
 
@@ -65,7 +65,6 @@ const statusThemes: Record<PollStatus, string> = {
   [PollStatus.InProgress]: "bg-orange-500",
   [PollStatus.Counting]: "bg-indigo-500",
   [PollStatus.Ended]: "bg-slate-500",
-  [PollStatus.Draft]: "bg-amber-500",
   [PollStatus.Cancelled]: "bg-red-600",
   [PollStatus.Waiting]: "bg-sky-500",
 };
@@ -81,10 +80,10 @@ const annotatePolls = (data: PollRecord[]): PollWithMeta[] =>
 
 const statusLegend = [
   { key: PollStatus.Prepare, label: "Prepare" },
+  { key: PollStatus.Waiting, label: "Waiting" },
   { key: PollStatus.InProgress, label: "In progress" },
   { key: PollStatus.Counting, label: "Counting" },
   { key: PollStatus.Ended, label: "Ended" },
-  { key: PollStatus.Draft, label: "Draft" },
   { key: PollStatus.Cancelled, label: "Cancelled" },
 ];
 
@@ -332,11 +331,8 @@ export default function PollsPage() {
                 </EmptyContent>
               </Empty>
             ) : viewMode === "list" ? (
-              <DataTable 
-                columns={columns} 
-                data={visiblePolls as PollData[]}
-                searchValue={searchTerm}
-                statusFilter={statusFilter}
+              <PollsDataTable 
+                polls={visiblePolls as PollData[]}
                 page={page}
                 limit={limit}
                 total={total}
@@ -356,7 +352,7 @@ function GridView({ polls }: { polls: PollWithMeta[] }) {
   return (
     <div className="grid gap-6 px-6 py-6 sm:grid-cols-2">
       {polls.map((poll) => {
-        const theme = statusThemes[poll.status ?? PollStatus.Draft];
+        const theme = statusThemes[poll.status ?? PollStatus.Prepare];
         return (
           <Card
             key={poll._id ?? poll.title}

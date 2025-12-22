@@ -7,7 +7,7 @@ import { useMaci } from "@/hooks";
 import { useFeedback } from "@/contexts/FeedbackContext";
 import { useCheckJoinStatus } from "@/hooks/useCheckJoinStatus";
 import { useMaciStore } from "@/stores/maciStore";
-import { useAccount, useChainId } from "wagmi";
+import { useAccount, useChainId, usePublicClient } from "wagmi";
 
 type SignupModalProps = {
   open: boolean;
@@ -15,6 +15,7 @@ type SignupModalProps = {
   onSuccess: () => void;
   pollId: string;
   pollIdOnChain: number;
+  maciAddress: string; // Required - from poll data
 };
 
 export function SignupModal({
@@ -23,12 +24,14 @@ export function SignupModal({
   onSuccess,
   pollId,
   pollIdOnChain,
+  maciAddress,
 }: SignupModalProps) {
   const { showSuccess, showError } = useFeedback();
   const { signupToMaci, joinMaciPoll, loading } = useMaci();
   const { checkJoinStatus, loading: checkingStatus } = useCheckJoinStatus();
   const { address } = useAccount();
   const chainId = useChainId();
+  const publicClient = usePublicClient();
   
   // Zustand store integration
   const { hasKeypair, getKeypair, isLocked } = useMaciStore();
@@ -40,7 +43,7 @@ export function SignupModal({
   const [alreadyJoined, setAlreadyJoined] = useState(false);
   const [existingPollStateIndex, setExistingPollStateIndex] = useState<string | null>(null);
   const [existingVoiceCredits, setExistingVoiceCredits] = useState<string | null>(null);
-  const [statusSource, setStatusSource] = useState<"subgraph" | "localStorage" | "none">("none");
+  const [statusSource, setStatusSource] = useState<"subgraph" | "chain" | "none">("none");
 
   const [joinSuccess, setJoinSuccess] = useState(false);
   const [newPollStateIndex, setNewPollStateIndex] = useState<string | null>(null);
@@ -68,12 +71,14 @@ export function SignupModal({
         }
       }
 
-      // Check join status (subgraph first)
+      // Check join status (subgraph first, then RPC fallback)
       const pollIdStr = String(pollIdOnChain);
       const result = await checkJoinStatus(
         pollIdStr,
         coords?.x,
-        coords?.y
+        coords?.y,
+        maciAddress,   // From prop (poll data)
+        publicClient   // For RPC fallback
       );
 
       console.log(`[SignupModal] Join status for poll ${pollIdStr}:`, result);
@@ -100,7 +105,7 @@ export function SignupModal({
     };
 
     checkStatus();
-  }, [open, pollIdOnChain, checkJoinStatus, address, chainId]);
+  }, [open, pollIdOnChain, checkJoinStatus, address, chainId, publicClient]);
 
   const handleSignup = async () => {
     if (alreadyJoined) return;
@@ -122,7 +127,17 @@ export function SignupModal({
         return;
       }
 
-      const joinResult = await joinMaciPoll(String(pollIdOnChain), 0, "", 0);
+      const pollIdStr = String(pollIdOnChain);
+      
+      // 🔍 DEBUG: Log poll IDs before calling join
+      console.log(`🔍 [SignupModal] handleSignup - about to join poll:`, {
+        pollId_prop: pollId,
+        pollIdOnChain_prop: pollIdOnChain,
+        pollIdStr_used: pollIdStr,
+        maciAddress_prop: maciAddress?.slice(0, 15) + "...",
+      });
+
+      const joinResult = await joinMaciPoll(pollIdStr, 0, "", 0, maciAddress);
 
       // Note: Don't show feedback modal for alreadyJoined - Dialog handles it
       // showSuccess would create nested modals

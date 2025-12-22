@@ -24,7 +24,8 @@ export function VotingView({ poll }: VotingViewProps) {
       <VotingControls 
         credits={poll.credits}
         pollId={poll.id}
-        pollIdOnChain={poll.onChainId} 
+        pollIdOnChain={poll.onChainId}
+        maciAddress={poll.maciAddress}
       />
 
       {/* Ideas List */}

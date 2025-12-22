@@ -22,12 +22,26 @@ interface MaciOperation {
   timestamp: number;
 }
 
+/**
+ * Current poll context for MACI operations
+ * Stored globally to avoid prop drilling and ensure consistency
+ */
+export interface CurrentPollContext {
+  pollId: string;           // MongoDB poll ID
+  pollIdOnChain: number;    // On-chain poll ID (e.g., 0, 1, 2...)
+  maciAddress: string;      // MACI contract address for this poll
+  startBlock?: number;      // Optional start block for Merkle tree
+}
+
 interface MaciState {
   // === Keypair Cache ===
   keypairs: Record<string, MaciKeypair>;
 
   // === Client-side Lock (Mutex) ===
   pendingOperation: MaciOperation | null;
+
+  // === Current Poll Context ===
+  currentPoll: CurrentPollContext | null;
 
   // === Actions ===
   // Lock management
@@ -54,6 +68,11 @@ interface MaciState {
     maciAddress?: string
   ) => boolean;
   clearKeypair: (walletAddress?: string, chainId?: number) => void;
+
+  // Current poll management
+  setCurrentPoll: (poll: CurrentPollContext) => void;
+  getCurrentPoll: () => CurrentPollContext | null;
+  clearCurrentPoll: () => void;
 }
 
 // ============ Helpers ============
@@ -79,6 +98,7 @@ export const useMaciStore = create<MaciState>()(
       (set, get) => ({
         keypairs: {},
         pendingOperation: null,
+        currentPoll: null,
 
         // === Lock Management ===
         acquireLock: (op) => {
@@ -148,10 +168,27 @@ export const useMaciStore = create<MaciState>()(
             set({ keypairs: {} });
           }
         },
+
+        // === Current Poll Management ===
+        setCurrentPoll: (poll) => {
+          console.log(`[MaciStore] 📍 Setting current poll:`, {
+            pollId: poll.pollId,
+            pollIdOnChain: poll.pollIdOnChain,
+            maciAddress: poll.maciAddress?.slice(0, 10) + "...",
+          });
+          set({ currentPoll: poll });
+        },
+
+        getCurrentPoll: () => get().currentPoll,
+
+        clearCurrentPoll: () => {
+          console.log(`[MaciStore] 🗑️ Clearing current poll`);
+          set({ currentPoll: null });
+        },
       }),
       {
         name: "maci-keypair-store",
-        // Only persist keypairs, not lock state
+        // Only persist keypairs, not lock state or currentPoll (session only)
         partialize: (state) => ({ keypairs: state.keypairs }),
         // Custom storage to handle non-serializable Keypair objects
         storage: {
@@ -233,6 +270,20 @@ export const useWithMaciLock = () => {
   return { withLock, isLocked };
 };
 
+// ============ Hook for current poll context ============
+
+/**
+ * Hook to access and manage current poll context
+ * Use this instead of prop drilling pollId, maciAddress, etc.
+ */
+export const useCurrentPoll = () => {
+  const currentPoll = useMaciStore((s) => s.currentPoll);
+  const setCurrentPoll = useMaciStore((s) => s.setCurrentPoll);
+  const clearCurrentPoll = useMaciStore((s) => s.clearCurrentPoll);
+
+  return { currentPoll, setCurrentPoll, clearCurrentPoll };
+};
+
 // ============ Selectors for fine-grained subscriptions ============
 
 export const selectHasKeypair = (
@@ -245,3 +296,6 @@ export const selectHasKeypair = (
 };
 
 export const selectIsLocked = (state: MaciState) => state.isLocked();
+
+export const selectCurrentPoll = (state: MaciState) => state.currentPoll;
+

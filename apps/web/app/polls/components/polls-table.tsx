@@ -1,6 +1,6 @@
 import { pollsApi } from "@/api";
-import { DataTable } from "@sasvoth/ui/data-table";
-import { columns, PollData } from "./columns";
+import { PollsDataTable } from "./polls-data-table";
+import { PollData } from "./columns";
 
 interface PollsTableProps {
   page: number;
@@ -45,12 +45,12 @@ export async function PollsTable({
   }
 
   return (
-    <DataTable
-      columns={columns}
-      data={polls as PollData[]}
+    <PollsDataTable
+      polls={polls as PollData[]}
       page={page}
       limit={limit}
       total={total}
     />
   );
 }
+

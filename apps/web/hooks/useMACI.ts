@@ -98,7 +98,20 @@ export function useMaci() {
     signupBlockNumber?: number,
     maciAddressOverride?: string
   ) => {
+    // 🔍 DEBUG: Log incoming parameters
+    console.log(`🔍 [useMACI] joinMaciPoll ADAPTER called with:`, {
+      pollId,
+      startBlock,
+      signupBlockNumber,
+      maciAddressOverride: maciAddressOverride?.slice(0, 15),
+    });
+
     const maciAddress = maciAddressOverride || getMaciAddress();
+    
+    // 🔍 DEBUG: Log resolved maciAddress
+    console.log(`🔍 [useMACI] Resolved maciAddress:`, maciAddress?.slice(0, 15) + "...");
+    console.log(`🔍 [useMACI] Calling maciJoinPoll with pollId:`, pollId);
+    
     // new joinPollAction uses stored key, but we pass pollId
     const result = await maciJoinPoll(maciAddress, pollId);
 

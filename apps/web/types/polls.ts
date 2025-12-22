@@ -1,5 +1,4 @@
 export enum PollStatus {
-  Draft = "draft",
   Prepare = "prepare",
   Ended = "ended",
   Cancelled = "cancelled",

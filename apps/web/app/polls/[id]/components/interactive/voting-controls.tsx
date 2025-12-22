@@ -11,12 +11,14 @@ type VotingControlsProps = {
   credits: { spent: number; total: number; remaining?: number };
   pollId: string;
   pollIdOnChain: string;
+  maciAddress?: string;
 };
 
 export function VotingControls({
   credits,
   pollId,
   pollIdOnChain,
+  maciAddress,
 }: VotingControlsProps) {
   const [showSignup, setShowSignup] = useState(false);
   const { signupToMaci, loading } = useMaci();
@@ -102,6 +104,7 @@ export function VotingControls({
         onSuccess={() => setIsJoined(true)}
         pollId={pollId}
         pollIdOnChain={Number(pollIdOnChain)}
+        maciAddress={maciAddress || ""}
       />
     </>
   );

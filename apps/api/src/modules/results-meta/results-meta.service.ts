@@ -1,8 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject, forwardRef } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { VotesService } from "../votes/votes.service";
 import { IpfsService } from "../ipfs/ipfs.service";
+import { PollsService } from "../polls/polls.service";
 import { poll } from "viem/_types/utils/poll";
 
 @Injectable()
@@ -10,7 +11,9 @@ export class ResultsMetaService {
     
     constructor(@InjectModel('ResultsMeta') private resultsMetaModel: Model<any>,
     private readonly votesService: VotesService,
-    private readonly ipfsService: IpfsService) {}
+    private readonly ipfsService: IpfsService,
+    @Inject(forwardRef(() => PollsService))
+    private readonly pollsService: PollsService) {}
 
     async saveResultsMeta(pollId: string, result_cid: string, outCome: string): Promise<any> {
         const resultsMeta = new this.resultsMetaModel({ pollId, result_cid, outCome });
@@ -31,6 +34,87 @@ export class ResultsMetaService {
         results.sort((a,b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         return results;
     }
+
+    /**
+     * Start async tally process
+     * 1. Set poll status to 'counting'
+     * 2. Run tally in background
+     * 3. Update to 'ended' when complete
+     */
+    async startTally(pollId: string): Promise<{ status: 'started' | 'already_counting' | 'already_complete'; message: string }> {
+        // Check if already counting or has results
+        const existingResults = await this.resultsMetaModel.findOne({ pollId }).exec();
+        if (existingResults && existingResults.detailResult && existingResults.detailResult.length > 0) {
+            return { status: 'already_complete', message: 'Tally already completed for this poll' };
+        }
+
+        // Check current poll status
+        const poll = await this.pollsService.getPollById(pollId);
+        if (!poll) {
+            throw new Error('Poll not found');
+        }
+
+        if ((poll as any).status === 'counting') {
+            return { status: 'already_counting', message: 'Tally already in progress' };
+        }
+
+        // Set status to counting
+        await this.pollsService.updatePollStatus(pollId, 'counting');
+
+        // Run tally in background (don't await)
+        this.runTallyInBackground(pollId).catch(error => {
+            console.error(`Background tally failed for poll ${pollId}:`, error);
+            // On error, set back to ended without results
+            this.pollsService.updatePollStatus(pollId, 'ended').catch(e => 
+                console.error(`Failed to reset poll status:`, e)
+            );
+        });
+
+        return { status: 'started', message: 'Tally process started' };
+    }
+
+    /**
+     * Run tally in background and update status when complete
+     */
+    private async runTallyInBackground(pollId: string): Promise<void> {
+        try {
+            await this.tallyVotes(pollId);
+            // Update status to ended after successful tally
+            await this.pollsService.updatePollStatus(pollId, 'ended');
+        } catch (error) {
+            console.error(`Tally failed for poll ${pollId}:`, error);
+            // Still update to ended, results will be empty
+            await this.pollsService.updatePollStatus(pollId, 'ended');
+            throw error;
+        }
+    }
+
+    /**
+     * Get tally status for a poll
+     */
+    async getTallyStatus(pollId: string): Promise<{
+        status: 'not_started' | 'counting' | 'completed' | 'error';
+        results?: any;
+        error?: string;
+    }> {
+        const poll = await this.pollsService.getPollById(pollId);
+        if (!poll) {
+            return { status: 'error', error: 'Poll not found' };
+        }
+
+        const results = await this.resultsMetaModel.findOne({ pollId }).exec();
+        
+        if ((poll as any).status === 'counting') {
+            return { status: 'counting' };
+        }
+
+        if (results && results.detailResult && results.detailResult.length > 0) {
+            return { status: 'completed', results };
+        }
+
+        return { status: 'not_started' };
+    }
+
     async tallyVotes(pollId: string): Promise<any> {
         const votes = await this.votesService.get(pollId);
         if(!votes || votes.length ===0){
