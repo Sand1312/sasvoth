@@ -56,6 +56,17 @@ export class NonceSyncJob {
       for (const [pollId, stateIndices] of Object.entries(pollUserMap)) {
         for (const stateIndex of stateIndices) {
           try {
+            // Skip invalid stateIndex values (e.g., macipk.xxx from old buggy data)
+            if (!this.isValidStateIndex(stateIndex)) {
+              this.logger.warn(
+                `Skipping invalid stateIndex "${stateIndex.slice(0, 20)}..." in poll ${pollId} - not a number`
+              );
+              // Clean up invalid key
+              const invalidKey = `maci:nonce:${pollId}:${stateIndex}`;
+              await ((this.smartNonceService as any).redis as any).del(invalidKey);
+              continue;
+            }
+            
             const synced = await this.smartNonceService.syncNonceWithGraph(pollId, stateIndex);
             if (synced) {
               syncedCount++;
@@ -136,5 +147,16 @@ export class NonceSyncJob {
       errors: 0,
       pending: 0
     };
+  }
+
+  /**
+   * Validate that stateIndex is a numeric value
+   * Returns false for invalid values like "macipk.xxx"
+   */
+  private isValidStateIndex(stateIndex: string): boolean {
+    // StateIndex should be a non-negative integer (e.g., "0", "1", "9", "123")
+    // Not a MACI public key (e.g., "macipk.xxx")
+    const parsed = parseInt(stateIndex, 10);
+    return !isNaN(parsed) && parsed >= 0 && String(parsed) === stateIndex;
   }
 }

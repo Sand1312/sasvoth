@@ -58,28 +58,29 @@ export interface StateIndexResult {
     blockNumber: number | null;
 }
 
-// ============ Module-level Cache ============
-// Cached by wallet address + chainId to support multiple wallets and chains
+// ============ Module-level Cache (DEPRECATED) ============
+// Use useMaciStore from @/stores/maciStore instead
+// Keeping for backward compatibility during migration
 const keypairCache = new Map<string, MaciKeypair>();
 
+/** @internal */
 function getCacheKey(walletAddress: string, chainId: number, maciAddress?: string): string {
     const base = `${walletAddress.toLowerCase()}_${chainId}`;
     return maciAddress ? `${base}_${maciAddress.toLowerCase()}` : base;
 }
 
 /**
- * Clear cached keypair for a specific wallet or all wallets
+ * @deprecated Use useMaciStore().clearKeypair() instead
  */
 export function clearMaciKeyCache(walletAddress?: string, chainId?: number): void {
+    console.warn('[DEPRECATED] clearMaciKeyCache - use useMaciStore().clearKeypair() instead');
     if (walletAddress && chainId) {
-        // Clear specific cache entries for this wallet
         for (const key of keypairCache.keys()) {
             if (key.startsWith(`${walletAddress.toLowerCase()}_${chainId}`)) {
                 keypairCache.delete(key);
             }
         }
     } else if (walletAddress) {
-        // Clear all entries for this wallet
         for (const key of keypairCache.keys()) {
             if (key.startsWith(walletAddress.toLowerCase())) {
                 keypairCache.delete(key);
@@ -91,25 +92,27 @@ export function clearMaciKeyCache(walletAddress?: string, chainId?: number): voi
 }
 
 /**
- * Get cached keypair without deriving (for checking if exists)
+ * @deprecated Use useMaciStore().getKeypair() instead
  */
 export function getCachedMaciKeypair(
     walletAddress: string,
     chainId: number,
     maciAddress?: string
 ): MaciKeypair | null {
+    console.warn('[DEPRECATED] getCachedMaciKeypair - use useMaciStore().getKeypair() instead');
     const cacheKey = getCacheKey(walletAddress, chainId, maciAddress);
     return keypairCache.get(cacheKey) || null;
 }
 
 /**
- * Check if keypair is already cached for a wallet
+ * @deprecated Use useMaciStore().hasKeypair() instead
  */
 export function hasCachedMaciKeypair(
     walletAddress: string,
     chainId: number,
     maciAddress?: string
 ): boolean {
+    console.warn('[DEPRECATED] hasCachedMaciKeypair - use useMaciStore().hasKeypair() instead');
     const cacheKey = getCacheKey(walletAddress, chainId, maciAddress);
     return keypairCache.has(cacheKey);
 }
@@ -157,20 +160,37 @@ export async function deriveMaciKeypair(
         maciAddress?: string;
         appName?: string;
         forceRefresh?: boolean;
+        // NEW: Optional store integration for Zustand
+        getFromStore?: () => MaciKeypair | null;
+        setToStore?: (keypair: MaciKeypair) => void;
     }
 ): Promise<MaciKeypair> {
     if (!walletAddress) {
         throw new Error("Wallet address is required");
     }
 
-    const { maciAddress, appName, forceRefresh = false } = options || {};
+    const { maciAddress, appName, forceRefresh = false, getFromStore, setToStore } = options || {};
     const cacheKey = getCacheKey(walletAddress, chainId, maciAddress);
 
-    // Check cache first (unless forceRefresh)
+    // Check store first (Zustand), then fallback to module cache
     if (!forceRefresh) {
+        // Priority 1: Check Zustand store (if callback provided)
+        if (getFromStore) {
+            const storeKeypair = getFromStore();
+            if (storeKeypair) {
+                console.log("✅ Using keypair from Zustand store");
+                return storeKeypair;
+            }
+        }
+        
+        // Priority 2: Fallback to legacy module cache (for backward compatibility)
         const cached = keypairCache.get(cacheKey);
         if (cached) {
-            console.log("✅ Using cached MACI keypair");
+            console.log("✅ Using cached MACI keypair (legacy)");
+            // Also save to store if callback provided
+            if (setToStore) {
+                setToStore(cached);
+            }
             return cached;
         }
     }
@@ -213,9 +233,15 @@ export async function deriveMaciKeypair(
         pubKeyY: pubKeyArray[1]?.toString() || '0',
     };
 
-    // Cache it
+    // Save to Zustand store if callback provided (primary cache)
+    if (setToStore) {
+        setToStore(result);
+        console.log("✅ MACI keypair derived and saved to Zustand store");
+    }
+    
+    // Also save to legacy module cache for backward compatibility
     keypairCache.set(cacheKey, result);
-    console.log("✅ MACI keypair derived and cached");
+    console.log("✅ MACI keypair also cached in legacy module cache");
 
     return result;
 }

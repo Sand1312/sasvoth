@@ -71,6 +71,17 @@ export type DeployPollPayload = {
  */
 export const maciApi = {
   /**
+   * Get MACI configuration (subgraph URL, MACI address, start block)
+   * GET /maci/config
+   * 
+   * Returns dynamic subgraph URL from database (MaciDeployments)
+   */
+  getConfig: async (): Promise<{ maciAddress: string; subgraphUrl: string | null; startBlock: number }> => {
+    const response = await api.get("/maci/config");
+    return response.data;
+  },
+
+  /**
    * Signup to MACI (Legacy - direct signup)
    * POST /maci/signup
    */
