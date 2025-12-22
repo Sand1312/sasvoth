@@ -22,7 +22,28 @@ export function SocialLoginButtons({
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || searchParams.get("from") || "/dashboard";
 
+  // Import authStore for lock check - use reactive state
+  const [isLocked, setIsLocked] = React.useState(false);
+  
+  React.useEffect(() => {
+    const { useAuthStore } = require("@/stores/authStore");
+    // Subscribe to lock state changes
+    const unsubscribe = useAuthStore.subscribe(
+      (state: any) => state.pendingOperation,
+      (pending: any) => setIsLocked(!!pending)
+    );
+    // Set initial value
+    setIsLocked(useAuthStore.getState().isLocked());
+    return unsubscribe;
+  }, []);
+
   const handleSocialLogin = async (providerId: string) => {
+    // ACID: Silently block duplicate clicks when already processing
+    if (isLocked) {
+      console.log("[Auth] Blocked duplicate click - operation in progress");
+      return; // Silent return, no error dialog
+    }
+
     try {
       console.log(`Login with ${providerId}`);
       // Mapping providerId string to literal type
@@ -32,8 +53,24 @@ export function SocialLoginButtons({
          // showSuccess("Redirecting", `Connecting to ${providerId}...`); // Removed to avoid blocking redirect
       } else if (providerId === "wallet") {
           console.log("Triggering wallet login");
-          showSuccess("Connecting Wallet", "Please check your MetaMask...");
-          await loginWithWallet();
+          const result = await loginWithWallet();
+          
+          // Handle graceful returns (no error dialog needed)
+          if (result?.reason === "in_progress") {
+            // Already processing in this tab - silently ignore
+            return;
+          }
+          if (result?.reason === "pending_other_tab") {
+            // MetaMask has pending request in another tab - show helpful message
+            showSuccess("Check MetaMask", "A wallet request is already pending. Please check your MetaMask popup.");
+            return;
+          }
+          if (result?.reason === "user_rejected") {
+            // User closed MetaMask - no error needed
+            return;
+          }
+          
+          // Success!
           showSuccess("Connected", "Wallet login successful!");
           router.push(callbackUrl);
       } else {
@@ -56,6 +93,7 @@ export function SocialLoginButtons({
             label={provider.label}
             icon={provider.icon}
             testId={provider.testId}
+            isLoading={isLocked && provider.id === "wallet"}
           />
         ))}
       </div>

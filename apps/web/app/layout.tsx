@@ -6,6 +6,7 @@ import { MockProvider } from "./mock-provider";
 import { RootNav } from "./RootNav";
 import { FeedbackProvider } from "@/contexts/FeedbackContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { WalletConnectOverlay } from "@/components/WalletConnectOverlay";
 import { cookies } from "next/headers";
 
 // Force dynamic rendering for routes that use cookies
@@ -103,6 +104,7 @@ export default async function RootLayout({
           <AuthProvider initialUser={user}>
             <MockProvider />
             <RootNav />
+            <WalletConnectOverlay />
             <FeedbackProvider>
               {children}
             </FeedbackProvider>

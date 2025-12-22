@@ -4,12 +4,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useRedirect } from "../hooks/useRedirect";
 import { authApi } from "../api";
 import { api } from "../api/base";
+import { useAuthStore } from "../stores/authStore";
 
 type User = any; // Todo: Define precise User type
 
 export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  isConnectingWallet: boolean;
   setUser: (user: User | null) => void;
   loginWithEmail: (identifier: string, password: string) => Promise<any>;
   loginWithWallet: () => Promise<any>;
@@ -24,6 +26,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   const { replaceTo } = useRedirect();
   const [user, setUser] = useState<User | null>(initialUser || null);
   const [isLoading, setIsLoading] = useState(!initialUser);
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
   // On mount, if no initial user, try to refresh/fetch
   useEffect(() => {
@@ -79,6 +82,12 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   }, [initialUser]);
 
   const loginWithEmail = async (identifier: string, password: string) => {
+    const { acquireLock, releaseLock } = useAuthStore.getState();
+    const acquired = acquireLock("login-email");
+    if (!acquired) {
+      throw new Error("Another auth operation is in progress");
+    }
+
     try {
       const res = await authApi.signinWithProvider("email", {
         username: identifier,
@@ -92,10 +101,21 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     } catch (error) {
       console.error("Email login error:", error);
       throw error;
+    } finally {
+      releaseLock();
     }
   };
 
   const loginWithWallet = async () => {
+    const { acquireLock, releaseLock } = useAuthStore.getState();
+    const acquired = acquireLock("login-wallet");
+    if (!acquired) {
+      // Silently return if already processing in this tab
+      console.log("[Auth] Wallet login blocked - operation in progress");
+      return { success: false, reason: "in_progress" };
+    }
+
+    setIsConnectingWallet(true);
     try {
       if (!(window as any).ethereum) {
         throw new Error("MetaMask is not installed.");
@@ -132,9 +152,30 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
       }
 
       return res;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Wallet login error:", error);
+      
+      // Handle MetaMask-specific errors gracefully
+      const errorMessage = error?.message?.toLowerCase() || "";
+      const errorCode = error?.code;
+      
+      // MetaMask: Already pending request (from another tab)
+      if (errorMessage.includes("already pending") || errorMessage.includes("requestpermissions")) {
+        console.log("[Auth] MetaMask has pending request in another tab");
+        return { success: false, reason: "pending_other_tab" };
+      }
+      
+      // MetaMask: User rejected request
+      if (errorCode === 4001 || errorMessage.includes("user rejected") || errorMessage.includes("user denied")) {
+        console.log("[Auth] User rejected wallet connection");
+        return { success: false, reason: "user_rejected" };
+      }
+      
+      // Other errors - still throw for error dialog
       throw error;
+    } finally {
+      releaseLock();
+      setIsConnectingWallet(false);
     }
   };
 
@@ -148,6 +189,12 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   };
 
   const signupWithEmail = async (email: string, password: string, name: string, walletAddress?: string) => {
+    const { acquireLock, releaseLock } = useAuthStore.getState();
+    const acquired = acquireLock("signup");
+    if (!acquired) {
+      throw new Error("Another auth operation is in progress");
+    }
+
     try {
       const res = await authApi.signupWithEmail(
         email,
@@ -161,10 +208,18 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
+    } finally {
+      releaseLock();
     }
   };
 
   const signout = async () => {
+    const { acquireLock, releaseLock } = useAuthStore.getState();
+    const acquired = acquireLock("logout");
+    if (!acquired) {
+      throw new Error("Another auth operation is in progress");
+    }
+
     try {
       try {
         await authApi.signout();
@@ -187,6 +242,8 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     } catch (error) {
       console.error("Signout error:", error);
       throw error;
+    } finally {
+      releaseLock();
     }
   };
 
@@ -195,6 +252,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
       value={{
         user,
         isLoading,
+        isConnectingWallet,
         setUser,
         loginWithEmail,
         loginWithWallet,

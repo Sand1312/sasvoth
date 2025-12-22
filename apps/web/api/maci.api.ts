@@ -171,11 +171,13 @@ export const maciApi = {
     voteOptionIndex: number;
     voteWeight: number;
     nonce: number;
+    voteCommitment: string;
     userStateIndex: string;
     userMaciPrivateKey: string;
     userMaciPublicKey: string;
     maciAddress?: string
   }) => {
+    // TODO: Double check this implementation
     const response = await api.post(`/maci/polls/${pollId}/vote`, payload);
     return response.data;
   },
