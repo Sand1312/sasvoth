@@ -124,6 +124,7 @@ export function useMaci() {
     voteOptionIndex: number,
     voteWeight: number,
     nonce: number = 1,
+    password: string, // New argument
     startBlock?: number,
     maciAddressOverride?: string
   ) => {
@@ -135,6 +136,7 @@ export function useMaci() {
       voteWeight,
       nonce,
       maciAddress,
+      password,
       startBlock
     );
 

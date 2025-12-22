@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@sasvoth/ui/button";
 import React, { useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";
 import { useIPFS } from "@/hooks/useIPFS";
@@ -12,6 +11,8 @@ import { VoteDetailLayout, VoteLeftPanel, VoteTextBlock } from "@/components/vot
 import { VoteRightPanel } from "@/components/vote/VoteRightPanel";
 import { VoteGallery } from "@/components/vote/VoteGallery";
 import { useFeedback } from "@/contexts/FeedbackContext";
+import { PrizeClaimForm } from "@/components/claim/PrizeClaimForm";
+
 type Props = {
   params: Promise<{ id: string }>; // id = CID
 };
@@ -27,6 +28,7 @@ type VoteData = {
   heroImage?: string;
   ageLimit?: number;
   layoutItems?: any[];
+  maciAddress?: string;
 };
 
 function BuyTicketsModal({
@@ -630,6 +632,7 @@ export default function VotePage({ params }: Props) {
         voteOptionIndex,
         voteAmount || 1,
         nextNonce,
+        password, // Pass password
         votingStartBlock
       );
 
@@ -650,8 +653,6 @@ export default function VotePage({ params }: Props) {
     if (path.startsWith("/") || path.startsWith("http")) return path;
     return `/api/v1/ipfs/${path}`;
   };
-
-
 
   return (
     <main className="p-4">
@@ -736,6 +737,14 @@ export default function VotePage({ params }: Props) {
           setShowModal(true);
         }}
       />
+      
+      {/* Prize Claim Section (New) */}
+      <div className="mt-8">
+        <PrizeClaimForm 
+          pollId={detectedPollId || "1"} 
+          maciAddress={data?.maciAddress} // If data has maciAddress or use fetched one or default
+        />
+      </div>
     </main>
   );
 }

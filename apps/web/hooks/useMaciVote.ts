@@ -17,6 +17,7 @@ export const useMaciVote = () => {
     voteWeight: number,
     nonce: number,
     maciAddress: string,
+    password: string, // Changed signature
     startBlock?: number
   ) => {
     setLoading(true);
@@ -55,12 +56,40 @@ export const useMaciVote = () => {
       console.log(`🗳️ Submitting vote: Option ${voteOptionIndex} with ${voteWeight} voice credits (Poll ${pollId}, Nonce ${nonce})`);
 
       // ============================================
+      // Step 2.5: Calculate vote commitment
+      //Hash(userVote, userVoiceCredits, userNonce, pollId, PASSWORD)
+      // ============================================
+      // @ts-ignore
+      const circomlibjs = await import("circomlibjs");
+      const poseidon = await circomlibjs.buildPoseidon();
+      
+      // Ensure password is numeric for BigInt
+      // If user inputs non-numeric text, this will throw.
+      // We assume user knows it must be numeric code, or we could handle it.
+      let passwordBigInt;
+      try {
+        passwordBigInt = BigInt(password);
+      } catch (e) {
+        throw new Error("Password must be a numeric code");
+      }
+
+      const voteCommitment = poseidon.F.toString(poseidon([
+          BigInt(voteOptionIndex),
+          BigInt(voteWeight),
+          BigInt(nonce),
+          BigInt(pollId),
+          passwordBigInt // Use password instead of privateKey
+      ]));
+      console.log("Calculated voteCommitment:", voteCommitment);
+
+      // ============================================
       // Step 3: Call vote API
       // ============================================
       const result = await maciApi.vote(pollId, {
         voteOptionIndex,
         voteWeight,
         nonce,
+        voteCommitment,
         userStateIndex: stateIndex,
         userMaciPrivateKey: privateKey,
         userMaciPublicKey: publicKey,
