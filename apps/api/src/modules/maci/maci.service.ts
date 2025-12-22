@@ -84,6 +84,37 @@ export class MaciService {
   }
 
   /**
+   * Get MACI configuration including dynamic subgraph URL
+   * Used by frontend to get current MACI deployment info
+   */
+  async getConfig(): Promise<{
+    maciAddress: string;
+    subgraphUrl: string | null;
+    startBlock: number;
+  }> {
+    try {
+      const latestDeployment = await this.maciDeploymentsService.getLatest();
+      
+      if (latestDeployment) {
+        return {
+          maciAddress: latestDeployment.maciAddress,
+          subgraphUrl: latestDeployment.subgraphUrl || null,
+          startBlock: latestDeployment.startBlock || 0,
+        };
+      }
+    } catch (error) {
+      this.logger.warn('Could not fetch latest MACI deployment from database');
+    }
+    
+    // Fallback to env vars
+    return {
+      maciAddress: this.maciAddress,
+      subgraphUrl: this.configService.get<string>('SUBGRAPH_URL') || null,
+      startBlock: 0,
+    };
+  }
+
+  /**
    * Generate auth token by calling generate-auth.js
    */
   private async generateAuthToken(): Promise<string> {

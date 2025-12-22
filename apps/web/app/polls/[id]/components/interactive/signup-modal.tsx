@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sasvoth/ui/di
 import { useMaci } from "@/hooks";
 import { useFeedback } from "@/contexts/FeedbackContext";
 import { useCheckJoinStatus } from "@/hooks/useCheckJoinStatus";
-import { hasCachedMaciKeypair, getCachedMaciKeypair } from "@/utils/maciKeyDerivation";
+import { useMaciStore } from "@/stores/maciStore";
 import { useAccount, useChainId } from "wagmi";
 
 type SignupModalProps = {
@@ -29,6 +29,9 @@ export function SignupModal({
   const { checkJoinStatus, loading: checkingStatus } = useCheckJoinStatus();
   const { address } = useAccount();
   const chainId = useChainId();
+  
+  // Zustand store integration
+  const { hasKeypair, getKeypair, isLocked } = useMaciStore();
 
   const [privKey, setPrivKey] = useState("");
   const [useRandomKey, setUseRandomKey] = useState(true);
@@ -53,13 +56,13 @@ export function SignupModal({
       setNewPollStateIndex(null);
       setNewVoiceCredits(null);
 
-      // Check if keypair is cached in memory
-      const hasExistingKey = hasCachedMaciKeypair(address, chainId);
+      // Check if keypair is cached in Zustand store
+      const hasExistingKey = hasKeypair(address, chainId);
 
       // Get user's public key coordinates for subgraph query
       let coords: { x: string; y: string } | null = null;
       if (hasExistingKey) {
-        const cached = getCachedMaciKeypair(address, chainId);
+        const cached = getKeypair(address, chainId);
         if (cached) {
           coords = { x: cached.pubKeyX, y: cached.pubKeyY };
         }
@@ -104,10 +107,10 @@ export function SignupModal({
 
     try {
       if (useExistingKey) {
-        // Existing key is cached in memory - signupToMaci will use it
+        // Existing key is cached in Zustand store - signupToMaci will use it
       } else if (useRandomKey) {
         await signupToMaci();
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        // No delay needed! The lock guard ensures sequential execution
       } else {
         // Manual key logic - not recommended but kept for backward compatibility
         if (!privKey) {
@@ -133,6 +136,11 @@ export function SignupModal({
       onSuccess();
     } catch (e: any) {
       console.error("Signup/Join failed", e);
+      // Handle lock errors gracefully
+      if (e.message?.includes('another MACI operation')) {
+        showError("Please Wait", "Another operation is in progress. Please wait.");
+        return;
+      }
       showError("Signup/Join Failed", e.message);
     }
   };
@@ -237,8 +245,8 @@ export function SignupModal({
 
               <div className="flex justify-end gap-2 mt-2">
                 <Button onClick={onClose} variant="ghost">Cancel</Button>
-                <Button onClick={handleSignup} disabled={loading} className="bg-black text-white rounded-full px-6">
-                  {loading ? "Joining..." : "Join Poll"}
+                <Button onClick={handleSignup} disabled={loading || isLocked()} className="bg-black text-white rounded-full px-6">
+                  {loading ? "Joining..." : isLocked() ? "Processing..." : "Join Poll"}
                 </Button>
               </div>
             </>

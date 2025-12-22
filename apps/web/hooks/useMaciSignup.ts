@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { maciApi } from "../api/maci.api";
 import { useSignTypedData, useAccount, useChainId, usePublicClient } from "wagmi";
-import { deriveMaciKeypair, getStateIndexFromChain } from "../utils/maciKeyDerivation";
+import { deriveMaciKeypair } from "../utils/maciKeyDerivation";
+import { useMaciStore, useWithMaciLock } from "@/stores/maciStore";
+import { useCheckSignupStatus } from "./useCheckJoinStatus";
 
 // ============ EIP-712 Constants for Signup Request ============
 
@@ -42,18 +44,27 @@ export const useMaciSignup = () => {
   const { address } = useAccount();
   const chainId = useChainId();
   const publicClient = usePublicClient();
+  
+  // Zustand store integration
+  const { setKeypair, getKeypair } = useMaciStore();
+  const { withLock, isLocked } = useWithMaciLock();
+  
+  // Graph-first signup status check
+  const { checkSignupStatus } = useCheckSignupStatus();
 
   const handleSignup = async (maciAddress: string) => {
-    setLoading(true);
-    setError(null);
-
     if (!address) {
       setError("Wallet not connected");
-      setLoading(false);
       return { success: false, error: "Wallet not connected" };
     }
 
+    // Wrap entire signup in lock to prevent double-click races
     try {
+      return await withLock('signup', address, undefined, async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
       // ============================================
       // Step A: Generate MACI Key with Domain Separation
       // ============================================
@@ -63,46 +74,46 @@ export const useMaciSignup = () => {
         address,
         chainId,
         signTypedDataAsync,
-        { maciAddress }  // Domain separation: bind to specific MACI contract
+        {
+          maciAddress,
+          // Zustand store integration
+          getFromStore: () => getKeypair(address, chainId, maciAddress),
+          setToStore: (kp) => setKeypair(address, chainId, kp, maciAddress),
+        }
       );
 
       console.log("MACI Keypair generated:", { publicKey: publicKey.substring(0, 30) + "..." });
 
       // ============================================
-      // Step A.1: Check if already signed up on chain
+      // Step A.1: Check if already signed up (Graph first, RPC fallback)
       // ============================================
-      // Get startBlock from localStorage to avoid scanning from block 0
       const maciStartBlock = typeof window !== 'undefined'
         ? localStorage.getItem("maciStartBlock")
         : null;
 
-      if (maciStartBlock && publicClient) {
-        console.log("Step A.1: Checking if already signed up on chain...");
+      console.log("Step A.1: Checking signup status via Graph/Chain...");
 
-        try {
-          const { stateIndex, blockNumber } = await getStateIndexFromChain(
-            maciAddress,
-            { x: pubKeyX, y: pubKeyY },
-            publicClient,
-            parseInt(maciStartBlock)
-          );
+      try {
+        const signupResult = await checkSignupStatus(
+          pubKeyX,
+          pubKeyY,
+          maciAddress,
+          publicClient,
+          maciStartBlock ? parseInt(maciStartBlock) : undefined
+        );
 
-          if (stateIndex) {
-            console.log("✅ Already signed up! StateIndex:", stateIndex);
-            // User already signed up - no need to call API
-            return {
-              success: true,
-              hash: null, // No new transaction
-              stateIndex: stateIndex,
-              blockNumber: blockNumber,
-              alreadySignedUp: true,
-            };
-          }
-        } catch (checkErr) {
-          console.log("Could not check on-chain status, proceeding with signup:", checkErr);
+        if (signupResult.isSignedUp) {
+          console.log(`✅ Already signed up! StateIndex: ${signupResult.stateIndex}, Source: ${signupResult.source}`);
+          return {
+            success: true,
+            hash: null,
+            stateIndex: signupResult.stateIndex,
+            blockNumber: null,
+            alreadySignedUp: true,
+          };
         }
-      } else {
-        console.log("Step A.1: Skipping on-chain check (no maciStartBlock configured)");
+      } catch (checkErr) {
+        console.log("Could not check signup status, proceeding with signup:", checkErr);
       }
 
       // ============================================
@@ -197,12 +208,19 @@ export const useMaciSignup = () => {
         // Re-throw other errors
         throw apiErr;
       }
-    } catch (err: any) {
-      console.error("Signup failed:", err);
-      setError(err.message || "Signup failed");
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
+        } catch (err: any) {
+          console.error("Signup failed:", err);
+          setError(err.message || "Signup failed");
+          return { success: false, error: err.message };
+        } finally {
+          setLoading(false);
+        }
+      });
+    } catch (lockErr: any) {
+      // Lock acquisition failed (another operation in progress)
+      console.warn("Signup blocked:", lockErr.message);
+      setError(lockErr.message);
+      return { success: false, error: lockErr.message };
     }
   };
 
@@ -210,6 +228,7 @@ export const useMaciSignup = () => {
     signup: handleSignup,
     loading,
     error,
+    isLocked,
   };
 };
 

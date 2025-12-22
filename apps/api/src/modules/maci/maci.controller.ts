@@ -181,6 +181,16 @@ export class MaciController {
   // RESTful Endpoints (New)
   // ========================================
 
+  /**
+   * Get MACI configuration including dynamic subgraph URL
+   * GET /maci/config
+   */
+  @Get('config')
+  @ApiOperation({ summary: 'Get MACI configuration (subgraph URL, start block, etc.)' })
+  @ApiResponse({ status: 200, description: 'Config retrieved successfully' })
+  async getConfig() {
+    return this.maciService.getConfig();
+  }
 
 
   /**
