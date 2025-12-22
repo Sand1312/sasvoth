@@ -11,10 +11,15 @@ interface UseTokenReturn {
   symbol: string | undefined;
   balance: string;
   rawBalance: bigint | undefined;
+  contractBalance: string;
+  rawContractBalance: bigint | undefined;
   allowance: string;
   approve: (spender: string, amount: string) => Promise<`0x${string}`>;
+  transfer: (to: string, amount: string) => Promise<`0x${string}`>;
   isApproving: boolean;
+  isTransferring: boolean;
   refetchBalance: (() => void) | undefined;
+  refetchContractBalance: (() => void) | undefined;
   refetchAllowance: (() => void) | undefined;
   tokenAddress: string;
 }
@@ -40,6 +45,14 @@ export const useToken = (): UseTokenReturn => {
     abi: TOKEN_ABI,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
+  });
+
+  // Read contract balance
+  const { data: contractBalance, refetch: refetchContractBalance } = useReadContract({
+    address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
+    abi: TOKEN_ABI,
+    functionName: "balanceOf",
+    args: [CLAIM_CONTRACT_ADDRESS as `0x${string}`],
   });
 
   // Kiểm tra allowance
@@ -84,8 +97,45 @@ export const useToken = (): UseTokenReturn => {
     }
   };
 
+  // Transfer token (wagmi v2)
+  const { writeContractAsync: transferAsync, isPending: isTransferring } =
+    useWriteContract();
+
+  const handleTransfer = async (to: string, amount: string) => {
+    if (!address) {
+      console.error("❌ Wallet not connected");
+      throw new Error("Wallet not connected");
+    }
+
+    if (!amount || Number(amount) <= 0) {
+      console.error("❌ Amount must be greater than 0");
+      throw new Error("Amount must be greater than 0");
+    }
+
+    try {
+      console.log("--- 🚀 Transferring token ---");
+      console.log("   To:", to);
+      console.log("   Amount:", amount);
+
+      const hash = await transferAsync({
+        address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
+        abi: TOKEN_ABI,
+        functionName: "transfer",
+        args: [to as `0x${string}`, parseEther(amount)],
+      });
+
+      console.log("✅ Transfer thành công! Hash:", hash);
+      return hash;
+    } catch (error: any) {
+      console.error("--- ❌ LỖI TRANSFER ---");
+      console.error("Error:", error?.message || error);
+      throw error;
+    }
+  };
+
   // Format balances
   const displayBalance = balance ? formatEther(balance as bigint) : "0";
+  const displayContractBalance = contractBalance ? formatEther(contractBalance as bigint) : "0";
   const displayAllowance = allowance ? formatEther(allowance as bigint) : "0";
 
   return {
@@ -93,10 +143,15 @@ export const useToken = (): UseTokenReturn => {
     symbol: symbol as string | undefined,
     balance: displayBalance,
     rawBalance: balance as bigint | undefined,
+    contractBalance: displayContractBalance,
+    rawContractBalance: contractBalance as bigint | undefined,
     allowance: displayAllowance,
     approve: handleApprove,
+    transfer: handleTransfer,
     isApproving,
+    isTransferring,
     refetchBalance,
+    refetchContractBalance,
     refetchAllowance,
     tokenAddress: TOKEN_CONTRACT_ADDRESS,
   };

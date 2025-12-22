@@ -500,7 +500,6 @@ export default function VotePage({ params }: Props) {
   const [tallyStatus, setTallyStatus] = useState("");
   const [detectedOptionIndex, setDetectedOptionIndex] = useState<number | null>(null);
   const [grantedVoiceCredits, setGrantedVoiceCredits] = useState<number | null>(null);
-  const { joinPoll, createVoteCommitment } = useJoinPoll();
   const { fetchMetadata } = useIPFS();
   const { getIdeaById } = useIdeas();
   const token = useToken(); // Ensure token hook is used for balance check
