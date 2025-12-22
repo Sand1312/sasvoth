@@ -12,6 +12,7 @@ import { VoteDetailLayout, VoteLeftPanel, VoteTextBlock } from "@/components/vot
 import { VoteRightPanel } from "@/components/vote/VoteRightPanel";
 import { VoteGallery } from "@/components/vote/VoteGallery";
 import { useFeedback } from "@/contexts/FeedbackContext";
+import { useJoinPoll } from "@/hooks/useJoinPoll";
 type Props = {
   params: Promise<{ id: string }>; // id = CID
 };
@@ -33,10 +34,12 @@ function BuyTicketsModal({
   open,
   onClose,
   onNext,
+  maxVoiceCredits,
 }: {
   open: boolean;
   onClose: () => void;
   onNext: (credits: string) => void;
+  maxVoiceCredits: number | null;
 }) {
   const [credits, setCredits] = useState("");
   const claim = useClaimContract();
@@ -51,6 +54,16 @@ function BuyTicketsModal({
   };
   const handleBuy = async () => {
     if (!credits) return;
+
+    // Validate against max voice credits granted
+    if (maxVoiceCredits !== null && Number(credits) > Math.sqrt(maxVoiceCredits)) {
+      showError(
+        "Exceeds Voice Credit Limit",
+        `Bạn chỉ có thể mua tối đa ${Math.sqrt(maxVoiceCredits)} voice credits .`
+      );
+      return;
+    }
+
     try {
       const cost = calculateVoteCost(Number(credits));
       if (Number(token.balance) < cost) {
@@ -87,15 +100,30 @@ function BuyTicketsModal({
         </div>
         <h3 className="text-xl font-bold text-black">Buy Voice Credits</h3>
         <p>
-          You need voice credits to vote.Voting is calculated based on Quadratic
-          Payments .
+          You need voice credits to vote. Voting is calculated based on Quadratic
+          Payments.
         </p>
+        {maxVoiceCredits !== null && (
+          <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-2">
+            🎫 Voice Credits max: <b>{Math.sqrt(maxVoiceCredits)}</b> 
+          </div>
+        )}
         <input
           className="border-2 border-black rounded-lg px-4 py-2 text-black outline-none focus:bg-gray-50"
-          placeholder="Enter amount"
+          placeholder={maxVoiceCredits !== null ? `max ${Math.sqrt(maxVoiceCredits)}` : "Enter amount"}
           type="number"
+          min="1"
+          max={maxVoiceCredits !== null ? Math.sqrt(maxVoiceCredits) : undefined}
           value={credits}
-          onChange={(e) => setCredits(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value;
+            // Enforce max limit on input
+            if (maxVoiceCredits !== null && Number(val) > Math.sqrt(maxVoiceCredits)) {
+              setCredits(Math.sqrt(maxVoiceCredits).toString());
+            } else {
+              setCredits(val);
+            }
+          }}
           autoFocus
         />
         {credits && (
@@ -104,6 +132,11 @@ function BuyTicketsModal({
             <div className="text-xs text-gray-500 mt-1">
               Công thức: {credits}² = {Number(credits) * Number(credits)} HD
             </div>
+            {maxVoiceCredits !== null && Number(credits) > maxVoiceCredits && (
+              <div className="text-xs text-red-500 mt-1 font-semibold">
+                ⚠️ Vượt quá giới hạn! Tối đa: {maxVoiceCredits}
+              </div>
+            )}
           </div>
         )}
         <div className="flex justify-end gap-3">
@@ -465,7 +498,8 @@ export default function VotePage({ params }: Props) {
   const [tallying, setTallying] = useState(false);
   const [tallyStatus, setTallyStatus] = useState("");
   const [detectedOptionIndex, setDetectedOptionIndex] = useState<number | null>(null);
-
+  const [grantedVoiceCredits, setGrantedVoiceCredits] = useState<number | null>(null);
+  const { joinPoll, createVoteCommitment } = useJoinPoll();
   const { fetchMetadata } = useIPFS();
   const { getIdeaById } = useIdeas();
   const token = useToken(); // Ensure token hook is used for balance check
@@ -481,6 +515,17 @@ export default function VotePage({ params }: Props) {
             `Found poll for idea ${id}: pollIdOnChain = ${pollIdOnChain}`
           );
           setDetectedPollId(pollIdOnChain);
+
+          // Get voice credits limit from database (maciConfig.initialVoiceCredits)
+          const voiceCreditsFromDb = poll.maciConfig?.initialVoiceCredits;
+          if (voiceCreditsFromDb !== undefined && voiceCreditsFromDb !== null) {
+            setGrantedVoiceCredits(Number(voiceCreditsFromDb));
+            console.log(`🎫 Loaded voice credits from DB: ${voiceCreditsFromDb}`);
+          } else {
+            // Default fallback if not configured
+            setGrantedVoiceCredits(100);
+            console.log(`🎫 Using default voice credits: 100`);
+          }
 
           // Find option index
           if (Array.isArray(poll.options)) {
@@ -632,7 +677,7 @@ export default function VotePage({ params }: Props) {
         nextNonce,
         votingStartBlock
       );
-
+      
       showSuccess("Vote Success!", `Transaction Hash: ${hash?.substring(0, 20)}...`);
     } catch (e: any) {
       console.error(e);
@@ -730,6 +775,7 @@ export default function VotePage({ params }: Props) {
       <BuyTicketsModal
         open={showBuyModal}
         onClose={() => setShowBuyModal(false)}
+        maxVoiceCredits={grantedVoiceCredits}
         onNext={(amount) => {
           setVoteAmount(Number(amount));
           setShowBuyModal(false);

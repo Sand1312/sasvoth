@@ -1,7 +1,7 @@
 import { api } from "./base";
 
 export type JoinPollPayload = {
-  voterId: string;
+  voterAddress: string;
   pollId: string;
   voteCommitment: string;
   pollIdOnchain: number;
@@ -36,7 +36,7 @@ export const pollParticipantsApi = {
    */
   create: async (payload: JoinPollPayload) => {
     const response = await api.post(`/join-poll/join`, {
-      voterId: payload.voterId,
+      voterAddress: payload.voterAddress,
       pollId: payload.pollId, 
       maciContractAddress: payload.maciContractAddress,
       pubKey: payload.pubKey,
@@ -67,15 +67,15 @@ export const pollParticipantsApi = {
 
 // Backward compatibility - export as joinPollApi
 export const joinPollApi = {
-  /** @deprecated Use pollParticipantsApi.getAll instead */
+  // /** @deprecated Use pollParticipantsApi.getAll instead */
   getVotes: async (params: { pollId?: string; voterId?: string }) =>
     params.pollId
       ? pollParticipantsApi.getAll(params.pollId, params.voterId)
       : [],
-  /** @deprecated Use pollParticipantsApi.create instead */
+  // /** @deprecated Use pollParticipantsApi.create instead */
   joinPoll: async (voteData: JoinPollPayload) =>
     pollParticipantsApi.create(voteData),
-  /** @deprecated Use pollParticipantsApi.createCommitment instead */
+  // /** @deprecated Use pollParticipantsApi.createCommitment instead */
   createVoteCommitment: async (
     vote: string,
     voiceCredits: string,
@@ -88,7 +88,7 @@ export const joinPollApi = {
       pollIdOnchain,
       privateKey,
     }),
-  /** @deprecated Use pollParticipantsApi.checkJoined instead */
+  // /** @deprecated Use pollParticipantsApi.checkJoined instead */
   checkVote: async (voterId: string, pollId: string) =>
     pollParticipantsApi.checkJoined(pollId, voterId),
 };

@@ -1,4 +1,4 @@
-import { useAccount, useContractRead, useContractWrite } from "wagmi";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import {
   TOKEN_ABI,
   TOKEN_CONTRACT_ADDRESS,
@@ -22,48 +22,66 @@ interface UseTokenReturn {
 export const useToken = (): UseTokenReturn => {
   const { address } = useAccount();
 
-  // Đọc thông tin token
-  const { data: name } = useContractRead({
-    address: TOKEN_CONTRACT_ADDRESS,
+  // Đọc thông tin token (wagmi v2)
+  const { data: name } = useReadContract({
+    address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
     abi: TOKEN_ABI,
     functionName: "name",
   });
 
-  const { data: symbol } = useContractRead({
-    address: TOKEN_CONTRACT_ADDRESS,
+  const { data: symbol } = useReadContract({
+    address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
     abi: TOKEN_ABI,
     functionName: "symbol",
   });
 
-  const { data: balance, refetch: refetchBalance } = useContractRead({
-    address: TOKEN_CONTRACT_ADDRESS,
+  const { data: balance, refetch: refetchBalance } = useReadContract({
+    address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
     abi: TOKEN_ABI,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
   });
 
   // Kiểm tra allowance
-  const { data: allowance, refetch: refetchAllowance } = useContractRead({
-    address: TOKEN_CONTRACT_ADDRESS,
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({
+    address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
     abi: TOKEN_ABI,
     functionName: "allowance",
     args:
       address && CLAIM_CONTRACT_ADDRESS
-        ? [address, CLAIM_CONTRACT_ADDRESS]
+        ? [address, CLAIM_CONTRACT_ADDRESS as `0x${string}`]
         : undefined,
   });
 
-  // Approve token
+  // Approve token (wagmi v2)
   const { writeContractAsync: approveAsync, isPending: isApproving } =
-    useContractWrite();
+    useWriteContract();
 
   const handleApprove = async (spender: string, amount: string) => {
-    return await approveAsync({
-      address: TOKEN_CONTRACT_ADDRESS,
-      abi: TOKEN_ABI,
-      functionName: "approve",
-      args: [spender, parseEther(amount)],
-    });
+    if (!address) {
+      console.error("❌ Wallet not connected");
+      throw new Error("Wallet not connected");
+    }
+
+    try {
+      console.log("--- 🚀 Approving token ---");
+      console.log("   Spender:", spender);
+      console.log("   Amount:", amount);
+
+      const hash = await approveAsync({
+        address: TOKEN_CONTRACT_ADDRESS as `0x${string}`,
+        abi: TOKEN_ABI,
+        functionName: "approve",
+        args: [spender as `0x${string}`, parseEther(amount)],
+      });
+
+      console.log("✅ Approve thành công! Hash:", hash);
+      return hash;
+    } catch (error: any) {
+      console.error("--- ❌ LỖI APPROVE ---");
+      console.error("Error:", error?.message || error);
+      throw error;
+    }
   };
 
   // Format balances

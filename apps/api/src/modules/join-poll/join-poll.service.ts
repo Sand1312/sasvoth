@@ -15,14 +15,14 @@ export class JoinPollService {
 
   // ...
 
-  async get(voterId: string, pollId: string): Promise<JoinPollDocument | null> {
-    return this.joinPollModel.findOne({ voterId, pollId }).exec();
+  async get(voterAdrress: string, pollId: string): Promise<JoinPollDocument | null> {
+    return this.joinPollModel.findOne({ voterAdrress, pollId }).exec();
   }
 
   async create(voteData: any): Promise<void> {
     try {
       const existingVote = await this.joinPollModel
-        .findOne({ voterId: voteData.voterId, pollId: voteData.pollId })
+        .findOne({ voterAdrress: voteData.voterAdrress, pollId: voteData.pollId })
         .exec();
 
       // Note: We might want allow re-joining if it's just a sync?

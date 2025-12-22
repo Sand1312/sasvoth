@@ -50,14 +50,10 @@ export function useMaci() {
   };
 
   const getPublicClient = () => {
-    const rpcUrls = [
-      "https://arbitrum-sepolia-rpc.publicnode.com",
-      "https://arbitrum-sepolia.drpc.org",
-      "https://sepolia-rollup.arbitrum.io/rpc",
-    ];
+    const rpcUrl = process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL!;
     return createPublicClient({
       chain: arbitrumSepolia,
-      transport: http(rpcUrls[0]),
+      transport: http(rpcUrl),
     });
   };
 

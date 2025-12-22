@@ -157,7 +157,7 @@ export default function AdminPollsPage(): React.ReactElement {
           try {
             const publicClient = createPublicClient({
               chain: arbitrumSepolia,
-              transport: http("https://sepolia-rollup.arbitrum.io/rpc"),
+              transport: http(process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL!),
             });
             block = Number(await publicClient.getBlockNumber());
           } catch (e) {
@@ -721,7 +721,7 @@ export default function AdminPollsPage(): React.ReactElement {
                             localStorage.getItem("maciStartBlock")
                           );
                         }
-                      } catch (e) {}
+                      } catch (e) { }
                       generateProofs(
                         poll.pollIdOnChain?.toString() || poll.id || "1",
                         maciAddress || undefined,
