@@ -1064,6 +1064,17 @@ export class MaciService {
               tallyResults.tally,
             );
             this.logger.log(`Tally results saved successfully.`);
+            
+            // Update poll status from 'counting' to 'ended' after successful tally
+            try {
+              await this.pollsService.updateStatusByOnChainId(
+                Number(pollId),
+                'ended',
+              );
+              this.logger.log(`Poll ${pollId} status updated to 'ended'.`);
+            } catch (statusError) {
+              this.logger.warn(`Failed to update poll status: ${statusError.message}`);
+            }
           } catch (e) {
             this.logger.error(`Failed to save tally results: ${e.message}`, e);
           }

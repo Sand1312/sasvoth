@@ -213,7 +213,11 @@ export class PollsController {
       try {
         // IMPORTANT: Results are saved with the On-Chain Poll ID (e.g., "0"), not the Mongo ID
         const onChainId = (poll as any).pollIdOnChain;
-        if (onChainId !== undefined && onChainId !== null) {
+        const pollStatus = (poll as any).status;
+        
+        // Only return results if poll is explicitly "ended" (tally completed)
+        // This prevents showing results for "counting" polls
+        if (onChainId !== undefined && onChainId !== null && pollStatus === 'ended') {
           const resultsMeta =
             await this.resultsMetaService.getOutComeByVotingEventId(
               onChainId.toString(),

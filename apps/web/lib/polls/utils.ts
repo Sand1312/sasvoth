@@ -54,8 +54,10 @@ export function derivePollStatus(poll: {
     } else if (now >= startDate && now <= endDate) {
       return PollStatus.InProgress;
     } else {
-      // Past end date
-      return PollStatus.Ended; 
+      // Past end date - poll.status must be explicitly "ended" (set by tally)
+      // Since we already checked for Ended at line 41, if we reach here,
+      // show "Counting" to indicate tally is pending
+      return PollStatus.Counting; 
     }
   } 
   
