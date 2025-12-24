@@ -192,10 +192,12 @@ export const pollsApi = {
    * Update on-chain ID
    * PATCH /polls/:id/chain
    */
-  updateChainId: async (id: string, chainId: string, subgraphUrl?: string) => {
+  updateChainId: async (id: string, chainId: string, subgraphUrl?: string, maciAddress?: string, startBlock?: number) => {
     const response = await api.patch(`/polls/${id}/chain`, {
       pollIdOnChain: chainId,
       subgraphUrl,
+      maciAddress,
+      startBlock,
     });
     return response.data?.poll ?? response.data;
   },
@@ -237,6 +239,8 @@ export const pollsApi = {
   saveOnChainId: async (
     pollId: string,
     pollIdOnChain: string,
-    subgraphUrl?: string
-  ) => pollsApi.updateChainId(pollId, pollIdOnChain, subgraphUrl),
+    subgraphUrl?: string,
+    maciAddress?: string,
+    startBlock?: number
+  ) => pollsApi.updateChainId(pollId, pollIdOnChain, subgraphUrl, maciAddress, startBlock),
 };

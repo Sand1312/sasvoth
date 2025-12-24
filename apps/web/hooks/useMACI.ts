@@ -2,7 +2,6 @@
 import { maciApi } from "../api/maci.api";
 import { useState } from "react";
 import { Keypair, PrivateKey, PublicKey } from "@maci-protocol/domainobjs";
-import { MACI_ADDRESS } from "@sasvoth/maci-assets";
 import { MACI_ABI } from "@sasvoth/contracts";
 import { createPublicClient, http } from "viem";
 import { arbitrumSepolia } from "viem/chains";
@@ -30,24 +29,6 @@ export function useMaci() {
 
   const loading = sLoading || jLoading || vLoading;
 
-  // Helper to get MACI address
-  const getMaciAddress = (): string => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("maciAddress");
-      const envAddress = process.env.NEXT_PUBLIC_MACI_ADDRESS;
-      const fallbackAddress = MACI_ADDRESS;
-
-      console.log("getMaciAddress debug:", {
-        localStorage: stored,
-        env: envAddress,
-        fallback: fallbackAddress,
-        using: stored || envAddress || fallbackAddress,
-      });
-
-      if (stored) return stored;
-    }
-    return process.env.NEXT_PUBLIC_MACI_ADDRESS || MACI_ADDRESS;
-  };
 
   const getPublicClient = () => {
     const rpcUrl = process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL!;
@@ -60,18 +41,26 @@ export function useMaci() {
   // Adapter: signupToMaci
   // The UI (PollClient) calls this with (x, y). We ignore them and let useMaciSignup generate new keys per Spec.
   // maciAddressOverride: Optional MACI address from poll data, overrides localStorage
-  const signupToMaci = async (pubKeyX?: string, pubKeyY?: string, maciAddressOverride?: string) => {
+  // startBlock: Optional start block from poll data for Merkle tree
+  const signupToMaci = async (maciAddressOverride?: string, startBlock?: number) => {
     try {
       console.log(
         "signupToMaci: Ignoring passed keys, using internal generation per Spec v2"
       );
-      const maciAddress = maciAddressOverride || getMaciAddress();
+
+      // MACI address is required - must come from poll data
+      if (!maciAddressOverride) {
+        throw new Error("MACI address is required. Please provide maciAddress from poll data.");
+      }
+
       console.log(
         "signupToMaci: calling maciSignup with address:",
-        maciAddress
+        maciAddressOverride,
+        "startBlock:",
+        startBlock
       );
 
-      const result = await maciSignup(maciAddress);
+      const result = await maciSignup(maciAddressOverride, startBlock);
       console.log("signupToMaci: maciSignup result:", result);
 
       if (!result.success) {
@@ -90,7 +79,7 @@ export function useMaci() {
   };
 
   // Adapter: joinMaciPoll
-  // maciAddressOverride: Optional MACI address from poll data
+  // maciAddressOverride: Required MACI address from poll data
   const joinMaciPoll = async (
     pollId: string,
     startBlock: number | undefined,
@@ -106,14 +95,17 @@ export function useMaci() {
       maciAddressOverride: maciAddressOverride?.slice(0, 15),
     });
 
-    const maciAddress = maciAddressOverride || getMaciAddress();
-    
+    // MACI address is required - must come from poll data
+    if (!maciAddressOverride) {
+      throw new Error("MACI address is required. Please provide maciAddress from poll data.");
+    }
+
     // 🔍 DEBUG: Log resolved maciAddress
-    console.log(`🔍 [useMACI] Resolved maciAddress:`, maciAddress?.slice(0, 15) + "...");
+    console.log(`🔍 [useMACI] Using maciAddress:`, maciAddressOverride?.slice(0, 15) + "...");
     console.log(`🔍 [useMACI] Calling maciJoinPoll with pollId:`, pollId);
-    
+
     // new joinPollAction uses stored key, but we pass pollId
-    const result = await maciJoinPoll(maciAddress, pollId);
+    const result = await maciJoinPoll(maciAddressOverride, pollId);
 
     if (!result.success) throw new Error(result.error);
 
@@ -127,7 +119,7 @@ export function useMaci() {
 
   // Adapter: submitVote
   // Simplified: useMaciVote now handles key derivation and stateIndex internally
-  // maciAddressOverride: Optional MACI address from poll data
+  // maciAddressOverride: Required MACI address from poll data
   const submitVote = async (
     pollId: string,
     voteOptionIndex: number,
@@ -137,14 +129,18 @@ export function useMaci() {
     startBlock?: number,
     maciAddressOverride?: string
   ) => {
-    const maciAddress = maciAddressOverride || getMaciAddress();
+    // MACI address is required - must come from poll data
+    if (!maciAddressOverride) {
+      throw new Error("MACI address is required. Please provide maciAddress from poll data.");
+    }
+
     // useMaciVote will derive keypair and get stateIndex from chain
     const result = await maciVote(
       pollId,
       voteOptionIndex,
       voteWeight,
       nonce,
-      maciAddress,
+      maciAddressOverride,
       password,
       startBlock
     );
@@ -158,33 +154,32 @@ export function useMaci() {
 
   // Other utility functions (kept for Dev Dashboard / Status Checks)
 
-  const checkPollStatus = async (pollId: string) => {
-    /* ... simplified ... */
-    // Reuse existing or simplify. Keeping implementation to avoid breaking dashboard.
-    // Re-implementing compact version:
-    const maciAddress = getMaciAddress();
+  const checkPollStatus = async (pollId: string, maciAddressOverride?: string) => {
+    if (!maciAddressOverride) {
+      throw new Error("MACI address is required. Please provide maciAddress from poll data.");
+    }
+
     const client = getPublicClient();
     const pollData = (await client.readContract({
-      address: maciAddress as `0x${string}`,
+      address: maciAddressOverride as `0x${string}`,
       abi: MACI_ABI,
       functionName: "getPoll",
       args: [BigInt(pollId)],
     })) as any;
 
     const pollAddress = pollData.poll;
-    // Assume existing ABI usage is correct
-    // ... For brevity I'll rely on the fact that existing code worked, but I'm rewriting file.
-    // I'll assume simple checks.
     return { isActive: true, hasStarted: true, hasEnded: false, pollAddress };
-    // NOTE: For full fidelity I should copy the logic.
   };
 
-  const getLatestPollId = async () => {
-    const maciAddress = getMaciAddress();
+  const getLatestPollId = async (maciAddressOverride?: string) => {
+    if (!maciAddressOverride) {
+      throw new Error("MACI address is required. Please provide maciAddress from poll data.");
+    }
+
     const client = getPublicClient();
     try {
       const nextPollId = (await client.readContract({
-        address: maciAddress as `0x${string}`,
+        address: maciAddressOverride as `0x${string}`,
         abi: MACI_ABI,
         functionName: "nextPollId",
       })) as bigint;
@@ -195,19 +190,22 @@ export function useMaci() {
     }
   };
 
-  const getMaciStateIndex = async (pubKeyX: string, pubKeyY: string) => {
-    const maciAddress = getMaciAddress();
+  const getMaciStateIndex = async (pubKeyX: string, pubKeyY: string, maciAddressOverride?: string) => {
+    if (!maciAddressOverride) {
+      throw new Error("MACI address is required. Please provide maciAddress from poll data.");
+    }
+
     const publicClient = getPublicClient();
     try {
       const publicKeyHash = (await publicClient.readContract({
-        address: maciAddress as `0x${string}`,
+        address: maciAddressOverride as `0x${string}`,
         abi: MACI_ABI,
         functionName: "hash2",
         args: [[BigInt(pubKeyX), BigInt(pubKeyY)]],
       })) as bigint;
 
       const stateIndex = await publicClient.readContract({
-        address: maciAddress as `0x${string}`,
+        address: maciAddressOverride as `0x${string}`,
         abi: MACI_ABI,
         functionName: "getStateIndex",
         args: [publicKeyHash],

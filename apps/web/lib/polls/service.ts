@@ -34,6 +34,7 @@ export type PollData = {
   options: string[];
   results: TallyResult[];
   maciAddress?: string;  // MACI contract address this poll belongs to
+  startBlock?: number;   // Block number when MACI was deployed
 };
 
 // Raw types from API
@@ -64,6 +65,7 @@ type ApiPoll = {
   options?: string[];
   results?: TallyResult[];
   maciAddress?: string;
+  startBlock?: number;
 };
 
 const API_BASE_URL =
@@ -228,6 +230,7 @@ export async function getPollById(id: string): Promise<PollData> {
       options: source.options ?? [],
       results: source.results ?? [],
       maciAddress: source.maciAddress,
+      startBlock: source.startBlock,
     };
 
   } catch (error) {

@@ -21,7 +21,7 @@ const config = createConfig({
   },
   connectors: [
     // MetaMask/injected wallet sẽ tự dùng RPC của nó cho write operations
-    injected({ 
+    injected({
       target: 'metaMask',
       shimDisconnect: true,
     }),

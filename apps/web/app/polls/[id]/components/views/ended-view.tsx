@@ -37,14 +37,16 @@ export function EndedView({ poll }: EndedViewProps) {
           >
             View ledger
           </Button>
-          
+
           {/* Tally Button - Show when counting (no results yet) */}
           {isCounting && (
-            <TallyButton 
-              onChainId={poll.onChainId} 
-              resultsCount={poll.results.length} 
+            <TallyButton
+              onChainId={poll.onChainId}
+              resultsCount={poll.results.length}
               status={poll.status}
               pollId={poll.id}
+              maciAddress={poll.maciAddress}
+              startBlock={poll.startBlock}
             />
           )}
         </div>
@@ -81,9 +83,8 @@ export function EndedView({ poll }: EndedViewProps) {
             <article className="flex flex-col gap-4 rounded-[32px] border border-black px-6 py-5 transition-colors hover:bg-gray-50 cursor-pointer md:flex-row md:items-center">
               <div className="flex items-center gap-4 md:w-64">
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-full border border-black text-base font-semibold ${
-                    index === 0 ? "bg-black text-white" : "bg-white text-black"
-                  }`}
+                  className={`flex h-12 w-12 items-center justify-center rounded-full border border-black text-base font-semibold ${index === 0 ? "bg-black text-white" : "bg-white text-black"
+                    }`}
                 >
                   {index + 1}
                 </div>

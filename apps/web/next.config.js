@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {}, // Add empty turbopack config to silence Next.js 16 warning
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMaci } from "@/hooks"; 
+import { useMaci } from "@/hooks";
 import { useFeedback } from "@/contexts/FeedbackContext";
 import { Spinner } from "@sasvoth/ui/spinner";
 
@@ -10,6 +10,8 @@ type TallyButtonProps = {
   resultsCount: number;
   status: string;
   pollId: string; // Internal DB ID needed for updating status?
+  maciAddress?: string; // From poll data
+  startBlock?: number; // From API/poll data
 };
 
 export function TallyButton({
@@ -17,6 +19,8 @@ export function TallyButton({
   resultsCount,
   status,
   pollId,
+  maciAddress: maciAddressProp,
+  startBlock: startBlockProp,
 }: TallyButtonProps) {
   const [devTallying, setDevTallying] = useState(false);
   const [devTallyStatus, setDevTallyStatus] = useState("");
@@ -35,19 +39,18 @@ export function TallyButton({
     ) {
       return;
     }
-    const maciAddress =
-      typeof window !== "undefined"
-        ? localStorage.getItem("maciAddress") || undefined
-        : undefined;
-    const startBlock =
-      typeof window !== "undefined"
+    // Use maciAddress from prop (poll DB) with localStorage fallback for dev
+    const maciAddress = maciAddressProp ||
+      (typeof window !== "undefined" ? localStorage.getItem("maciAddress") || undefined : undefined);
+    const startBlock = startBlockProp ||
+      (typeof window !== "undefined"
         ? Number(localStorage.getItem("maciStartBlock") || "0")
-        : 0;
+        : 0);
 
     if (!maciAddress) {
       if (
         !confirm(
-          "MACI Address not found in localStorage. Continue with server default?"
+          "MACI Address not found. Make sure poll has maciAddress saved. Continue with server default?"
         )
       ) {
         return;
@@ -87,17 +90,18 @@ export function TallyButton({
         <div className="flex items-center gap-2">
           <span>MACI:</span>
           <span className="font-mono text-xs bg-white px-2 py-1 rounded border truncate max-w-[200px]">
-            {typeof window !== "undefined"
-              ? localStorage.getItem("maciAddress") || "Not set"
-              : "..."}
+            {maciAddressProp ||
+              (typeof window !== "undefined"
+                ? localStorage.getItem("maciAddress") || "Not set"
+                : "...")}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <span>Poll ID (On-Chain):</span>
           <span className="font-mono bg-white px-2 py-1 rounded border">
             {onChainId !== undefined &&
-            onChainId !== null &&
-            onChainId !== ""
+              onChainId !== null &&
+              onChainId !== ""
               ? onChainId
               : "N/A"}
           </span>

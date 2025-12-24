@@ -8,6 +8,7 @@ import { useAccount, useSignTypedData, usePublicClient, useChainId } from "wagmi
 import { useVerifyVote } from "@/hooks/useVerifyVote";
 import { useRewards } from "@/hooks/useRewards";
 import { useClaimContract } from "@/hooks/useClaimContract";
+import { useMaci } from "@/hooks/useMACI";
 
 // @ts-ignore
 import * as snarkjs from "snarkjs";
@@ -29,7 +30,7 @@ export function PrizeClaimForm({ pollId, maciAddress, startBlock }: PrizeClaimFo
   const [voteWeight, setVoteWeight] = useState("");
   const [nonce, setNonce] = useState("0");
   const [password, setPassword] = useState(""); // User manual password
-
+  const [pollAddress, setPollAddress] = useState<string | null>(null);
   const { generateVoteProof, verifyProof } = useGenProofVerify();
   const { verifyVote } = useVerifyVote();
   const { saveReward } = useRewards();
@@ -38,12 +39,14 @@ export function PrizeClaimForm({ pollId, maciAddress, startBlock }: PrizeClaimFo
   const { address } = useAccount();
   const chainId = useChainId();
   const publicClient = usePublicClient();
+  const { checkPollStatus } = useMaci();
 
   const handleClaim = async () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
 
+    console.log("maciAddress", maciAddress);
     try {
       if (!address) throw new Error("Wallet not connected");
       if (!voteOptionIndex || !voteWeight) throw new Error("Please fill in vote details");
@@ -57,7 +60,10 @@ export function PrizeClaimForm({ pollId, maciAddress, startBlock }: PrizeClaimFo
         signTypedDataAsync,
         { maciAddress }
       );
-
+      const poll = await checkPollStatus(pollId, maciAddress);
+      if (!poll || !poll.pollAddress) {
+        
+      }
       // 2. Get State Index
       console.log("Fetching stateIndex...");
       const { stateIndex } = await getStateIndexFromChain(
@@ -84,16 +90,51 @@ export function PrizeClaimForm({ pollId, maciAddress, startBlock }: PrizeClaimFo
 
       const voteNum = BigInt(voteOptionIndex);
       const weightNum = BigInt(voteWeight);
-      const nonceNum = BigInt(nonce);
-      const pollIdNum = BigInt(pollId);
+      const nonceNum = BigInt(nonce); // Use nonce from input, not hardcoded
+      const pollAddressNum = BigInt(poll.pollAddress);
+
+      console.log("Generating vote commitment with:", {
+        voteOptionIndex,
+        voteWeight,
+        nonce,
+        pollAddress:poll.pollAddress,
+        password
+      });
 
       const voteCommitment = poseidon.F.toString(poseidon([
         voteNum,
         weightNum,
         nonceNum,
-        pollIdNum,
+        pollAddressNum,
         passwordBigInt // Use password here
       ]));
+      console.log("Calculated voteCommitment:", voteCommitment);
+      // 3.1. Verify voteCommitment against DB
+      console.log("Verifying voteCommitment with DB...");
+      const { pollParticipantsApi } = await import("@/api/join-poll.api");
+      const votes = await pollParticipantsApi.getAll(poll.pollAddress, address);
+
+      // Find the vote record for this user
+      const voteRecord = Array.isArray(votes)
+        ? votes.find((v: any) => v.voterAddress?.toLowerCase() === address?.toLowerCase())
+        : votes;
+
+      if (!voteRecord) {
+        throw new Error("Vote record not found. Did you cast a vote?");
+      }
+
+      console.log("Vote record from DB:", votes);
+      const storedCommitment = voteRecord.voteCommitment;
+      if (!storedCommitment) {
+        throw new Error("Vote commitment not found in DB record");
+      }
+
+      if (storedCommitment !== voteCommitment) {
+        console.error("Commitment mismatch:", { calculated: voteCommitment, stored: storedCommitment });
+        throw new Error("Vote commitment mismatch! Password or vote details are incorrect.");
+      }
+
+      console.log("✅ Vote commitment verified successfully!");
 
       // 4. Generate Proof
       const input = {
@@ -101,7 +142,7 @@ export function PrizeClaimForm({ pollId, maciAddress, startBlock }: PrizeClaimFo
         vote: voteNum,
         voiceCredits: weightNum,
         nonce: nonceNum,
-        pollId: pollIdNum,
+        pollId: pollAddressNum,
         pubkeyX: BigInt(pubKeyX),
         pubkeyY: BigInt(pubKeyY),
         voiceCreditBalance: weightNum * weightNum, // Minimal to pass
@@ -120,15 +161,6 @@ export function PrizeClaimForm({ pollId, maciAddress, startBlock }: PrizeClaimFo
         await verifyVote(BigInt(pollId), BigInt(stateIndex || 1), proof, proofData.publicSignals);
 
         const res = await saveReward(address, pollId, Number(voteWeight));
-        console.log("=== BACKEND RESPONSE DEBUG ===");
-        console.log("Full response:", res);
-        console.log("_idClaim:", res._idClaim);
-        console.log("amountToken:", res.amountToken);
-        console.log("_v:", res._v, "type:", typeof res._v);
-        console.log("_r:", res._r);
-        console.log("_s:", res._s);
-        console.log("==============================");
-
         if (!res || !res._idClaim || !res.amountToken) {
           throw new Error("Invalid reward response from backend");
         }

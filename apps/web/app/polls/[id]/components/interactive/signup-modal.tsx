@@ -16,6 +16,7 @@ type SignupModalProps = {
   pollId: string;
   pollIdOnChain: number;
   maciAddress: string; // Required - from poll data
+  startBlock?: number; // Optional - from poll data
 };
 
 export function SignupModal({
@@ -25,6 +26,7 @@ export function SignupModal({
   pollId,
   pollIdOnChain,
   maciAddress,
+  startBlock,
 }: SignupModalProps) {
   const { showSuccess, showError } = useFeedback();
   const { signupToMaci, joinMaciPoll, loading } = useMaci();
@@ -32,7 +34,7 @@ export function SignupModal({
   const { address } = useAccount();
   const chainId = useChainId();
   const publicClient = usePublicClient();
-  
+
   // Zustand store integration
   const { hasKeypair, getKeypair, isLocked } = useMaciStore();
 
@@ -60,12 +62,12 @@ export function SignupModal({
       setNewVoiceCredits(null);
 
       // Check if keypair is cached in Zustand store
-      const hasExistingKey = hasKeypair(address, chainId);
+      const hasExistingKey = hasKeypair(address, chainId, maciAddress);
 
       // Get user's public key coordinates for subgraph query
       let coords: { x: string; y: string } | null = null;
       if (hasExistingKey) {
-        const cached = getKeypair(address, chainId);
+        const cached = getKeypair(address, chainId, maciAddress);
         if (cached) {
           coords = { x: cached.pubKeyX, y: cached.pubKeyY };
         }
@@ -105,16 +107,16 @@ export function SignupModal({
     };
 
     checkStatus();
-  }, [open, pollIdOnChain, checkJoinStatus, address, chainId, publicClient]);
+  }, [open, pollIdOnChain, checkJoinStatus, address, chainId, publicClient, maciAddress, hasKeypair, getKeypair]);
 
   const handleSignup = async () => {
     if (alreadyJoined) return;
-
+    console.log("maci address", maciAddress);
     try {
       if (useExistingKey) {
         // Existing key is cached in Zustand store - signupToMaci will use it
       } else if (useRandomKey) {
-        await signupToMaci();
+        await signupToMaci(maciAddress, startBlock); // Pass maciAddress and startBlock from poll
         // No delay needed! The lock guard ensures sequential execution
       } else {
         // Manual key logic - not recommended but kept for backward compatibility
@@ -128,7 +130,7 @@ export function SignupModal({
       }
 
       const pollIdStr = String(pollIdOnChain);
-      
+
       // 🔍 DEBUG: Log poll IDs before calling join
       console.log(`🔍 [SignupModal] handleSignup - about to join poll:`, {
         pollId_prop: pollId,

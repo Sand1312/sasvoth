@@ -6,7 +6,7 @@ import {
 } from "@sasvoth/contracts";
 import { parseEther, formatEther } from "viem";
 
-interface UseTokenReturn {
+export interface UseTokenReturn {
   name: string | undefined;
   symbol: string | undefined;
   balance: string;

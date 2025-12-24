@@ -2,7 +2,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { CLAIMING_ABI, CLAIM_CONTRACT_ADDRESS } from '@sasvoth/contracts';
 import { parseEther } from 'viem';
 
-interface UseClaimContractReturn {
+export interface UseClaimContractReturn {
   allowToClaim: boolean | undefined;
   rate: bigint | undefined;
   buyHD: (ethAmount: string) => Promise<`0x${string}` | undefined>;
