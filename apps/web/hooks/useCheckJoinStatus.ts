@@ -574,7 +574,7 @@ export const useCheckSignupStatus = () => {
         console.log("⛓️ [checkSignupStatus] Falling back to RPC chain query...");
         
         // Import dynamically to avoid circular dependencies
-        const { getStateIndexFromChain } = await import("../utils/maciKeyDerivation");
+        const { getStateIndexFromChain } = await import("@/lib/maci-key-derivation");
         
         const chainResult = await getStateIndexFromChain(
           maciAddress,

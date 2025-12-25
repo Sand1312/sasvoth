@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { maciApi } from "../api/maci.api";
 import { useSignTypedData, useAccount, useChainId, usePublicClient } from "wagmi";
-import { deriveMaciKeypair } from "../utils/maciKeyDerivation";
+import { deriveMaciKeypair } from "@/lib/maci-key-derivation";
 import { useMaciStore, useWithMaciLock } from "@/stores/maciStore";
 import { useCheckSignupStatus } from "./useCheckJoinStatus";
 

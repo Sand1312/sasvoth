@@ -41,10 +41,10 @@
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "circomlib": "^2.0.5",
-    "circomlibjs": "^0.1.7",
+    "circomlibjs": "catalog:",
     "config": "3.2.3",
     "cookie-parser": "^1.4.7",
-    "dotenv": "^17.2.1",
+    "dotenv": "catalog:",
     "ethers": "^5.8.0",
     "ethers6": "npm:ethers@^6.0.0",
     "form-data": "^4.0.4",
@@ -64,12 +64,12 @@
     "redlock": "5.0.0-beta.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "snarkjs": "^0.7.5",
+    "snarkjs": "catalog:",
     "swagger-ui-express": "^5.0.1",
     "turbo": "catalog:",
     "typeorm": "^0.3.27",
     "viem": "^2.39.0",
-    "zod": "^4.1.12"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -91,7 +91,7 @@
     "@types/node-fetch": "^2.6.13",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
-    "eslint": "^9.32.0",
+    "eslint": "catalog:",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
@@ -104,7 +104,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
+    "typescript": "catalog:",
     "typescript-eslint": "^8.20.0"
   },
   "jest": {

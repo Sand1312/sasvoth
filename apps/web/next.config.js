@@ -67,6 +67,8 @@ const nextConfig = {
     "hardhat",
     "ts-node",
   ],
+  // Required for Next.js 16 when using webpack config
+  turbopack: {},
 };
 
 export default nextConfig;

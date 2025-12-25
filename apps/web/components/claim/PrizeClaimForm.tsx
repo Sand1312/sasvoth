@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { useGenProofVerify } from "@/hooks/genProofVerify";
-import { deriveMaciKeypair, getStateIndexFromChain } from "@/utils/maciKeyDerivation";
+import { deriveMaciKeypair, getStateIndexFromChain } from "@/lib/maci-key-derivation";
 import { useAccount, useSignTypedData, usePublicClient, useChainId } from "wagmi";
 import { useVerifyVote } from "@/hooks/useVerifyVote";
 import { useRewards } from "@/hooks/useRewards";
