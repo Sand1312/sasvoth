@@ -84,99 +84,103 @@ export function WalletSection() {
             </div>
          </div>
 
-        {/* DEPOSIT FORM */}
-        <TabsContent value="deposit" className="mt-6">
-          <Form {...depositForm}>
-            <form onSubmit={depositForm.handleSubmit(onDeposit)} className="max-w-md space-y-4">
-              <FormField
-                control={depositForm.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ETH Amount</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.001"
-                        placeholder="0.001"
-                        className="w-full rounded-full border border-black bg-white px-5 py-3 text-lg font-semibold focus:outline-none h-auto"
-                        {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              {claim.rate && depositForm.watch("amount") > 0 && (
-                  <p className="text-sm text-black/60">
-                    ≈{" "}
-                    {(
-                      Number(depositForm.watch("amount")) * Number(claim.rate)
-                    ).toLocaleString()}{" "}
-                    HD
-                  </p>
-                )}
+        {/* Main Content: Form left, History right */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column: Deposit/Withdraw Forms */}
+          <div>
+            {/* DEPOSIT FORM */}
+            <TabsContent value="deposit" className="mt-0">
+              <Form {...depositForm}>
+                <form onSubmit={depositForm.handleSubmit(onDeposit)} className="space-y-4">
+                  <FormField
+                    control={depositForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ETH Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.001"
+                            placeholder="0.001"
+                            className="w-full rounded-full border border-black bg-white px-5 py-3 text-lg font-semibold focus:outline-none h-auto"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {claim.rate && depositForm.watch("amount") > 0 && (
+                      <p className="text-sm text-black/60">
+                        ≈{" "}
+                        {(
+                          Number(depositForm.watch("amount")) * Number(claim.rate)
+                        ).toLocaleString()}{" "}
+                        HD
+                      </p>
+                    )}
 
-              <Button
-                type="submit"
-                disabled={!isConnected || claim.isBuying}
-                className="w-full rounded-full border border-black bg-black text-white py-3 font-semibold uppercase tracking-wide hover:bg-black/90 disabled:opacity-50 h-auto"
-              >
-                {claim.isBuying ? "Processing..." : "Buy HD"}
-              </Button>
-            </form>
-          </Form>
-        </TabsContent>
+                  <Button
+                    type="submit"
+                    disabled={!isConnected || claim.isBuying}
+                    className="w-full rounded-full border border-black bg-black text-white py-3 font-semibold uppercase tracking-wide hover:bg-black/90 disabled:opacity-50 h-auto"
+                  >
+                    {claim.isBuying ? "Processing..." : "Buy HD"}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
 
-        {/* WITHDRAW FORM */}
-        <TabsContent value="withdraw" className="mt-6">
-            <Form {...withdrawForm}>
-            <form onSubmit={withdrawForm.handleSubmit(onWithdraw)} className="max-w-md space-y-4">
-              <FormField
-                control={withdrawForm.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>HD Amount</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="1"
-                        placeholder="100"
-                        className="w-full rounded-full border border-black bg-white px-5 py-3 text-lg font-semibold focus:outline-none h-auto"
-                        {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-               {claim.rate && withdrawForm.watch("amount") > 0 && (
-                  <p className="text-sm text-black/60">
-                    ≈{" "}
-                    {(Number(withdrawForm.watch("amount")) / Number(claim.rate)).toFixed(6)}{" "}
-                    ETH
-                  </p>
-                )}
+            {/* WITHDRAW FORM */}
+            <TabsContent value="withdraw" className="mt-0">
+                <Form {...withdrawForm}>
+                <form onSubmit={withdrawForm.handleSubmit(onWithdraw)} className="space-y-4">
+                  <FormField
+                    control={withdrawForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>HD Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="1"
+                            placeholder="0"
+                            className="w-full rounded-full border border-black bg-white px-5 py-3 text-lg font-semibold focus:outline-none h-auto"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                   {claim.rate && withdrawForm.watch("amount") > 0 && (
+                      <p className="text-sm text-black/60">
+                        ≈{" "}
+                        {(Number(withdrawForm.watch("amount")) / Number(claim.rate)).toFixed(6)}{" "}
+                        ETH
+                      </p>
+                    )}
 
-              <Button
-                type="submit"
-                disabled={!isConnected || claim.isSelling}
-                className="w-full rounded-full border border-black bg-white text-black py-3 font-semibold uppercase tracking-wide hover:bg-black/5 disabled:opacity-50 h-auto"
-              >
-                {claim.isSelling ? "Processing..." : "Sell HD"}
-              </Button>
-            </form>
-          </Form>
-        </TabsContent>
-      </Tabs>
+                  <Button
+                    type="submit"
+                    disabled={!isConnected || claim.isSelling}
+                    className="w-full rounded-full border border-black bg-white text-black py-3 font-semibold uppercase tracking-wide hover:bg-black/5 disabled:opacity-50 h-auto"
+                  >
+                    {claim.isSelling ? "Processing..." : "Sell HD"}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+          </div>
 
-       {/* Transaction History */}
-           <div className="mt-8 pt-6 border-t border-black/10">
+          {/* Right Column: Transaction History */}
+          <div className="lg:border-l lg:border-black/10 lg:pl-8">
             <h3 className="text-xs font-bold text-black uppercase tracking-[0.3em] mb-4">
               History
             </h3>
@@ -217,6 +221,8 @@ export function WalletSection() {
               </div>
             </ScrollArea>
           </div>
+        </div>
+      </Tabs>
     </section>
   );
 }

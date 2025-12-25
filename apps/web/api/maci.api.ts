@@ -137,6 +137,25 @@ export const maciApi = {
   },
 
   /**
+   * Get all MACI deployments
+   * GET /maci/deployments
+   * 
+   * Returns list of all MACI deployments with member count (nextIndex - 1)
+   */
+  getDeployments: async (): Promise<{
+    id: string;
+    name: string;
+    logo?: string;
+    maciAddress: string;
+    chain: string;
+    members: number;
+    pollCount: number;
+  }[]> => {
+    const response = await api.get("/maci/deployments");
+    return response.data;
+  },
+
+  /**
    * Get MACI deployment by address
    * GET /maci/deployments/:address
    * 
