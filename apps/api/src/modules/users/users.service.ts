@@ -56,6 +56,51 @@ export class UsersService {
     return this.usersModel.findById(id).exec();
   }
 
+  async findAll(
+    options: {
+      page?: number;
+      limit?: number;
+      search?: string;
+    } = {},
+  ): Promise<{
+    users: UsersDocument[];
+    total: number;
+    page: number;
+    limit: number;
+    todaySignups: number;
+  }> {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const query: any = {};
+    if (options.search) {
+      query.$or = [
+        { email: { $regex: options.search, $options: 'i' } },
+        { name: { $regex: options.search, $options: 'i' } },
+        { walletAddress: { $regex: options.search, $options: 'i' } },
+      ];
+    }
+
+    // Calculate today's start
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const [users, total, todaySignups] = await Promise.all([
+      this.usersModel
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('-password -privateKey')
+        .exec(),
+      this.usersModel.countDocuments(query).exec(),
+      this.usersModel.countDocuments({ createdAt: { $gte: today } }).exec(),
+    ]);
+
+    return { users, total, page, limit, todaySignups };
+  }
+
   async createGoogleUser(profile: {
     googleId: string;
     email: string;

@@ -2,6 +2,8 @@ import { api, directApi } from "./base";
 
 export type DeployMaciPayload = {
   chain: string;
+  name?: string; // Deployment name (EIP-712 domain)
+  organizationName?: string; // Organization name for branding
   sessionKeyAddress: string;
   config: {
     policy: {

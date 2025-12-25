@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
-import { ideasApi, IdeaPayload, ipfsApi, pollsApi } from "@/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@sasvoth/ui/select";
+import { ideasApi, IdeaPayload, ipfsApi, pollsApi, maciApi } from "@/api";
 import { useMaci } from "@/hooks";
 import { usePolls } from "@/hooks";
 import { createPublicClient, http } from "viem";
@@ -92,18 +99,53 @@ export default function AdminPollsPage(): React.ReactElement {
   // MACI State
   const [maciAddress, setMaciAddress] = useState<string | null>(null);
   const [maciStartBlock, setMaciStartBlock] = useState<number | null>(null);
+  const [maciDeployments, setMaciDeployments] = useState<
+    {
+      id: string;
+      name: string;
+      maciAddress: string;
+      chain: string;
+      members: number;
+      pollCount: number;
+    }[]
+  >([]);
+  const [selectedMaciId, setSelectedMaciId] = useState<string | null>(null);
+
+  // New MACI deployment form
+  const [newMaciName, setNewMaciName] = useState("");
+  const [newMaciOrg, setNewMaciOrg] = useState("");
+  const [showNewMaciForm, setShowNewMaciForm] = useState(false);
 
   const preparePolls = useMemo(
     () => polls.filter((p) => (p.status || "").toLowerCase() === "prepare"),
-    [polls]
+    [polls],
   );
 
   useEffect(() => {
     refreshPolls();
-    const storedMaci = localStorage.getItem("maciAddress");
-    const storedBlock = localStorage.getItem("maciStartBlock");
-    if (storedMaci) setMaciAddress(storedMaci);
-    if (storedBlock) setMaciStartBlock(Number(storedBlock));
+    // Fetch MACI deployments from backend
+    const fetchMaciDeployments = async () => {
+      try {
+        const deployments = await maciApi.getDeployments();
+        setMaciDeployments(deployments);
+        // Auto-select the first one if available
+        if (deployments.length > 0) {
+          const first = deployments[0]!;
+          setSelectedMaciId(first.id);
+          setMaciAddress(first.maciAddress);
+          // Fetch startBlock from deployment detail if needed
+          try {
+            const detail = await maciApi.getDeploymentByAddress(
+              first.maciAddress,
+            );
+            setMaciStartBlock(detail.startBlock);
+          } catch {}
+        }
+      } catch (err) {
+        console.error("Failed to fetch MACI deployments:", err);
+      }
+    };
+    fetchMaciDeployments();
   }, []);
 
   function toGatewayUrl(cid?: string) {
@@ -115,10 +157,18 @@ export default function AdminPollsPage(): React.ReactElement {
   }
 
   async function handleDeployMaci() {
+    if (!newMaciName.trim()) {
+      setError(
+        "Please enter a name for the MACI deployment (required for EIP-712)",
+      );
+      return;
+    }
     setLoading(true);
     try {
       const payload = {
         chain: "arbitrum_sepolia",
+        name: newMaciName.trim(),
+        organizationName: newMaciOrg.trim() || undefined,
         sessionKeyAddress: "0xDB750f2c4196d4989d97A137c8D3779e5B93E666", // Placeholder/Admin Key
         config: {
           policy: {
@@ -157,7 +207,9 @@ export default function AdminPollsPage(): React.ReactElement {
           try {
             const publicClient = createPublicClient({
               chain: arbitrumSepolia,
-              transport: http(process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL!),
+              transport: http(
+                process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL!,
+              ),
             });
             block = Number(await publicClient.getBlockNumber());
           } catch (e) {
@@ -168,6 +220,15 @@ export default function AdminPollsPage(): React.ReactElement {
 
         setMaciStartBlock(block);
         localStorage.setItem("maciStartBlock", block.toString());
+
+        // Clear form and refresh deployments
+        setNewMaciName("");
+        setNewMaciOrg("");
+        setShowNewMaciForm(false);
+
+        // Refresh deployments list
+        const deployments = await maciApi.getDeployments();
+        setMaciDeployments(deployments);
       }
     } catch (err) {
       setError("Failed to deploy MACI contract.");
@@ -229,7 +290,7 @@ export default function AdminPollsPage(): React.ReactElement {
       // Nếu deploy thành công, tiếp tục update status và lưu onchainId
       if (deployed && deployed.pollId !== undefined) {
         console.log(
-          `Poll deployed successfully! On-chain Poll ID: ${deployed.pollId}`
+          `Poll deployed successfully! On-chain Poll ID: ${deployed.pollId}`,
         );
         const status = PollStatus.InProgress;
         await updatePollStatus(pollId, status);
@@ -237,8 +298,8 @@ export default function AdminPollsPage(): React.ReactElement {
           pollId,
           deployed.pollId.toString(),
           deployed.subgraphUrl,
-          maciAddress,  // Pass MACI address to save with poll
-          maciStartBlock || undefined  // Pass startBlock to save with poll
+          maciAddress, // Pass MACI address to save with poll
+          maciStartBlock || undefined, // Pass startBlock to save with poll
         );
         alert(`Poll deployed! On-chain ID: ${deployed.pollId}`);
       } else {
@@ -272,13 +333,13 @@ export default function AdminPollsPage(): React.ReactElement {
                 console.error("Failed to load idea", ideaId, err);
                 return null;
               }
-            })
+            }),
           );
           const ideaMap = Object.fromEntries(
-            pairs.filter(Boolean) as [string, IdeaRecord][]
+            pairs.filter(Boolean) as [string, IdeaRecord][],
           );
           return { ...poll, ideaMap };
-        })
+        }),
       );
       setPolls(hydrated);
     } catch (err) {
@@ -413,7 +474,7 @@ export default function AdminPollsPage(): React.ReactElement {
           } catch (err) {
             console.warn("Unable to persist idea CID", err);
           }
-        })
+        }),
       );
       await refreshPolls();
     } catch (err) {
@@ -447,46 +508,144 @@ export default function AdminPollsPage(): React.ReactElement {
 
       {/* MACI Deployment Logic */}
       <section className="mb-8 p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
-        <h2 className="text-lg font-semibold mb-2">MACI Configuration</h2>
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div>
-            <p className="text-sm text-slate-600">
-              Target Chain:{" "}
-              <span className="font-mono font-bold">Arbitrum Sepolia</span>
-            </p>
-            <p className="text-sm text-slate-600 mt-1">
-              MACI Address:{" "}
-              {maciAddress ? (
-                <span className="font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
-                  {maciAddress}
-                </span>
-              ) : (
-                <span className="text-red-500 font-bold">Not Deployed</span>
-              )}
-            </p>
-            {maciStartBlock && (
-              <p className="text-sm text-slate-600 mt-1">
-                Start Block: <span className="font-mono">{maciStartBlock}</span>
-              </p>
-            )}
-          </div>
-          {!maciAddress && (
-            <Button onClick={handleDeployMaci} disabled={loading}>
-              {loading ? "Deploying..." : "Deploy MACI Contract"}
-            </Button>
-          )}
-          {maciAddress && (
+        <h2 className="text-lg font-semibold mb-4">MACI Configuration</h2>
+
+        <div className="flex flex-col gap-4">
+          {/* MACI Selection Row */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex-1 min-w-0">
+              <label className="text-sm text-slate-600 mb-1 block">
+                Select MACI Deployment
+              </label>
+              <Select
+                value={selectedMaciId || ""}
+                onValueChange={async (id) => {
+                  setSelectedMaciId(id);
+                  const deployment = maciDeployments.find((d) => d.id === id);
+                  if (deployment) {
+                    setMaciAddress(deployment.maciAddress);
+                    try {
+                      const detail = await maciApi.getDeploymentByAddress(
+                        deployment.maciAddress,
+                      );
+                      setMaciStartBlock(detail.startBlock);
+                    } catch {
+                      setMaciStartBlock(null);
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a MACI deployment..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {maciDeployments.length === 0 && (
+                    <SelectItem value="_empty" disabled>
+                      No MACI deployments found
+                    </SelectItem>
+                  )}
+                  {maciDeployments.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">
+                          {d.name || `MACI ${d.maciAddress.slice(0, 8)}...`}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          ({d.members} members, {d.pollCount} polls)
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <Button
-              variant="outline"
-              onClick={() => {
-                localStorage.removeItem("maciAddress");
-                localStorage.removeItem("maciStartBlock");
-                setMaciAddress(null);
-                setMaciStartBlock(null);
-              }}
+              onClick={() => setShowNewMaciForm(!showNewMaciForm)}
+              variant={showNewMaciForm ? "outline" : "default"}
+              className="shrink-0"
             >
-              Reset / Redeploy
+              {showNewMaciForm ? "Cancel" : "+ Add New MACI"}
             </Button>
+          </div>
+
+          {/* New MACI Form */}
+          {showNewMaciForm && (
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 space-y-4">
+              <h3 className="text-sm font-semibold text-blue-900">
+                Deploy New MACI Contract
+              </h3>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="text-sm text-slate-700 mb-1 block">
+                    Name <span className="text-red-500">*</span>
+                    <span className="text-xs text-slate-500 ml-1">
+                      (for EIP-712)
+                    </span>
+                  </label>
+                  <Input
+                    value={newMaciName}
+                    onChange={(e) => setNewMaciName(e.target.value)}
+                    placeholder="e.g. CSES, MyDAO, VoteApp"
+                    className="bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-slate-700 mb-1 block">
+                    Organization Name
+                    <span className="text-xs text-slate-500 ml-1">
+                      (optional)
+                    </span>
+                  </label>
+                  <Input
+                    value={newMaciOrg}
+                    onChange={(e) => setNewMaciOrg(e.target.value)}
+                    placeholder="e.g. Computer Science Club"
+                    className="bg-white"
+                  />
+                </div>
+              </div>
+
+              <Button
+                onClick={handleDeployMaci}
+                disabled={loading || !newMaciName.trim()}
+              >
+                {loading ? "Deploying MACI..." : "Deploy MACI Contract"}
+              </Button>
+            </div>
+          )}
+
+          {/* Selected MACI Info */}
+          {maciAddress && (
+            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="grid gap-2 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600">Target Chain:</span>
+                  <span className="font-mono font-bold">Arbitrum Sepolia</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600">MACI Address:</span>
+                  <span className="font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded text-xs">
+                    {maciAddress}
+                  </span>
+                </div>
+                {maciStartBlock && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Start Block:</span>
+                    <span className="font-mono">{maciStartBlock}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!maciAddress && maciDeployments.length === 0 && (
+            <p className="text-sm text-slate-500 italic">
+              No MACI contract deployed yet. Click "+ Add New MACI" to deploy
+              one.
+            </p>
           )}
         </div>
       </section>
@@ -674,7 +833,7 @@ export default function AdminPollsPage(): React.ReactElement {
       <div className="grid gap-6 lg:grid-cols-2">
         {polls
           .filter((p) =>
-            ["inprogress", "ended"].includes((p.status || "").toLowerCase())
+            ["inprogress", "ended"].includes((p.status || "").toLowerCase()),
           )
           .map((poll) => (
             <section
@@ -707,7 +866,7 @@ export default function AdminPollsPage(): React.ReactElement {
                     onClick={() =>
                       mergePoll(
                         poll.pollIdOnChain?.toString() || poll.id || "1",
-                        maciAddress || undefined
+                        maciAddress || undefined,
                       )
                     }
                   >
@@ -720,14 +879,14 @@ export default function AdminPollsPage(): React.ReactElement {
                       try {
                         if (localStorage.getItem("maciStartBlock")) {
                           startBlock = Number(
-                            localStorage.getItem("maciStartBlock")
+                            localStorage.getItem("maciStartBlock"),
                           );
                         }
-                      } catch (e) { }
+                      } catch (e) {}
                       generateProofs(
                         poll.pollIdOnChain?.toString() || poll.id || "1",
                         maciAddress || undefined,
-                        startBlock
+                        startBlock,
                       );
                     }}
                   >
@@ -738,7 +897,7 @@ export default function AdminPollsPage(): React.ReactElement {
                     onClick={() =>
                       submitProofs(
                         poll.pollIdOnChain?.toString() || poll.id || "1",
-                        maciAddress || undefined
+                        maciAddress || undefined,
                       )
                     }
                   >

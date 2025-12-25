@@ -2,8 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import { Search, RefreshCw } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@sasvoth/ui/button";
+import { RefreshButton } from "@sasvoth/ui/refresh-button";
 import { Tabs, TabsList, TabsTrigger } from "@sasvoth/ui/tabs";
 import {
   Empty,
@@ -48,16 +49,12 @@ export function PollsSection() {
         {/* Mobile Header: Title + Refresh */}
         <div className="flex items-center justify-between md:hidden mb-4">
           <h2 className="text-2xl font-bold text-black">Polls</h2>
-          <button
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-black/20 bg-white"
+          <RefreshButton
             onClick={() => refetch()}
-            disabled={loadingPolls}
-            aria-label="Refresh polls"
-          >
-            <RefreshCw
-              className={`w-5 h-5 ${loadingPolls ? "animate-spin" : ""}`}
-            />
-          </button>
+            loading={loadingPolls}
+            variant="outline"
+            size="lg"
+          />
         </div>
 
         {/* Mobile Status Select */}
@@ -125,15 +122,11 @@ export function PollsSection() {
             </TabsList>
           </Tabs>
 
-          <Button
-            className="rounded-full border border-black bg-black text-white hover:bg-black/90 w-8 h-8 p-0 flex items-center justify-center ml-auto"
+          <RefreshButton
             onClick={() => refetch()}
-            disabled={loadingPolls}
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${loadingPolls ? "animate-spin" : ""}`}
-            />
-          </Button>
+            loading={loadingPolls}
+            className="ml-auto"
+          />
         </div>
 
         {/* Polls Loading State */}

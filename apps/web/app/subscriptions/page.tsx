@@ -37,46 +37,53 @@ function SubscriptionCard({
   subscribing: boolean;
 }) {
   return (
-    <Card className="flex flex-col items-center p-6 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-      <Avatar className="w-20 h-20 mb-3">
-        <AvatarImage src={subscription.logo} alt={subscription.name} />
-        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
-          {subscription.name?.slice(0, 2).toUpperCase() || "MA"}
-        </AvatarFallback>
-      </Avatar>
+    <Card className="group flex flex-col border border-black/10 hover:border-black transition-colors rounded-none bg-white shadow-none">
+      <div className="p-6 flex flex-col items-center text-center">
+        <Avatar className="w-16 h-16 mb-4 border border-black/20">
+          <AvatarImage src={subscription.logo} alt={subscription.name} />
+          <AvatarFallback className="bg-black text-white text-lg font-medium tracking-tight">
+            {subscription.name?.slice(0, 2).toUpperCase() || "MA"}
+          </AvatarFallback>
+        </Avatar>
 
-      <h3 className="text-lg font-bold text-gray-900 mb-1">
-        {subscription.name}
-      </h3>
+        <h3 className="text-base font-medium text-black tracking-tight">
+          {subscription.name}
+        </h3>
 
-      <div className="flex gap-4 text-sm text-gray-500 mb-4">
-        <span>{subscription.members.toLocaleString()} members</span>
-        <span>•</span>
-        <span>{subscription.pollCount} polls</span>
+        <div className="flex gap-3 text-xs text-black/50 mt-2 font-mono">
+          <span>{subscription.members.toLocaleString()} members</span>
+          <span>·</span>
+          <span>{subscription.pollCount} polls</span>
+        </div>
       </div>
 
-      {isSubscribed ? (
-        <Link
-          href={`/subscriptions/${subscription.maciAddress}`}
-          className="w-full"
-        >
-          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-            View
+      <div className="border-t border-black/10 p-4">
+        {isSubscribed ? (
+          <Link
+            href={`/subscriptions/${subscription.maciAddress}`}
+            className="block"
+          >
+            <Button
+              variant="outline"
+              className="w-full border-black text-black hover:bg-black hover:text-white transition-colors rounded-none"
+            >
+              View
+            </Button>
+          </Link>
+        ) : (
+          <Button
+            onClick={onSubscribe}
+            disabled={checking || subscribing}
+            className="w-full bg-black text-white hover:bg-white hover:text-black border border-black transition-colors rounded-none disabled:opacity-40"
+          >
+            {checking
+              ? "Checking..."
+              : subscribing
+                ? "Subscribing..."
+                : "Subscribe"}
           </Button>
-        </Link>
-      ) : (
-        <Button
-          onClick={onSubscribe}
-          disabled={checking || subscribing}
-          className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg disabled:opacity-50"
-        >
-          {checking
-            ? "Checking..."
-            : subscribing
-              ? "Subscribing..."
-              : "Subscribe"}
-        </Button>
-      )}
+        )}
+      </div>
     </Card>
   );
 }
@@ -92,14 +99,12 @@ export default function SubscriptionsPage() {
   const { address } = useAccount();
   const { signup } = useMaciSignup();
 
-  // Split into subscribed and not subscribed
   const { subscribed, notSubscribed } = useMemo(() => {
     const sub = subscriptions.filter((s) => s.isSubscribed);
     const notSub = subscriptions.filter((s) => !s.isSubscribed);
     return { subscribed: sub, notSubscribed: notSub };
   }, [subscriptions]);
 
-  // Check subscription (MACI signup) status from DATABASE (fast, no on-chain query)
   const checkSubscriptionStatus = useCallback(
     async (subs: Subscription[]) => {
       if (!address) {
@@ -111,7 +116,6 @@ export default function SubscriptionsPage() {
       }
 
       try {
-        // Get all user's signups in ONE API call (efficient)
         const statusResult = await maciApi.getSignupStatus(address);
         const signedUpMacis = new Set(
           (statusResult.signups || []).map((s) => s.maciAddress.toLowerCase()),
@@ -124,7 +128,6 @@ export default function SubscriptionsPage() {
         }));
       } catch (err) {
         console.error("Failed to check signup status:", err);
-        // Fallback: assume not subscribed
         return subs.map((s) => ({
           ...s,
           isSubscribed: false,
@@ -177,40 +180,57 @@ export default function SubscriptionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-500" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="h-6 w-6 animate-spin border-2 border-black/20 border-t-black" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
-        <p className="text-red-500">{error}</p>
-        <Button onClick={() => window.location.reload()}>Retry</Button>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6">
+        <p className="text-black/60 font-mono text-sm">{error}</p>
+        <Button
+          onClick={() => window.location.reload()}
+          variant="outline"
+          className="border-black text-black hover:bg-black hover:text-white rounded-none"
+        >
+          Retry
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-6xl mx-auto px-6 py-16">
+        {/* Header */}
+        <header className="mb-16">
+          <p className="text-xs font-mono uppercase tracking-[0.3em] text-black/40 mb-2">
+            Organizations
+          </p>
+          <h1 className="text-3xl font-medium tracking-tight text-black">
+            Subscriptions
+          </h1>
+        </header>
+
         {/* Subscribed Section */}
         {subscribed.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <section className="mb-16">
+            <h2 className="text-xs font-mono uppercase tracking-[0.3em] text-black/40 mb-6">
               Your Subscriptions
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/10">
               {subscribed.map((subscription) => (
-                <SubscriptionCard
-                  key={subscription.id}
-                  subscription={subscription}
-                  isSubscribed={true}
-                  checking={subscription.checking}
-                  subscribing={false}
-                  onSubscribe={() => {}}
-                />
+                <div key={subscription.id} className="bg-white">
+                  <SubscriptionCard
+                    subscription={subscription}
+                    isSubscribed={true}
+                    checking={subscription.checking}
+                    subscribing={false}
+                    onSubscribe={() => {}}
+                  />
+                </div>
               ))}
             </div>
           </section>
@@ -218,34 +238,39 @@ export default function SubscriptionsPage() {
 
         {/* Discover Section */}
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {subscribed.length > 0 ? "Discover" : "Organizations"}
+          <h2 className="text-xs font-mono uppercase tracking-[0.3em] text-black/40 mb-2">
+            {subscribed.length > 0 ? "Discover" : "Available"}
           </h2>
-          <p className="text-gray-500 mb-6">
+          <p className="text-sm text-black/50 mb-6">
             Organizations using MACI for private voting
           </p>
 
           {notSubscribed.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black/10">
               {notSubscribed.map((subscription) => (
-                <SubscriptionCard
-                  key={subscription.id}
-                  subscription={subscription}
-                  isSubscribed={false}
-                  checking={subscription.checking}
-                  subscribing={subscribingTo === subscription.maciAddress}
-                  onSubscribe={() => handleSubscribe(subscription.maciAddress)}
-                />
+                <div key={subscription.id} className="bg-white">
+                  <SubscriptionCard
+                    subscription={subscription}
+                    isSubscribed={false}
+                    checking={subscription.checking}
+                    subscribing={subscribingTo === subscription.maciAddress}
+                    onSubscribe={() =>
+                      handleSubscribe(subscription.maciAddress)
+                    }
+                  />
+                </div>
               ))}
             </div>
           ) : subscribed.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No organizations found</p>
+            <div className="border border-black/10 py-16 text-center">
+              <p className="text-black/40 font-mono text-sm">
+                No organizations found
+              </p>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-400">
-                You're subscribed to all available organizations!
+            <div className="border border-black/10 py-12 text-center">
+              <p className="text-black/30 text-sm">
+                You're subscribed to all available organizations
               </p>
             </div>
           )}

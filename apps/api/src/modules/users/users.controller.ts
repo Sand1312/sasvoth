@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Patch,
   Param,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -19,6 +20,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiProperty,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -75,6 +77,47 @@ export class UsersController {
   // ========================================
   // RESTful Endpoints (New)
   // ========================================
+
+  /**
+   * Get all users with pagination
+   * GET /users
+   */
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all users with pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
+  async getAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ) {
+    const result = await this.usersService.findAll({
+      page: page ? parseInt(page, 10) : 1,
+      limit: limit ? parseInt(limit, 10) : 20,
+      search,
+    });
+    return {
+      users: result.users.map((user: any) => ({
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        displayName: user.name,
+        walletAddress: user.walletAddress,
+        authType: user.authType,
+        role: user.role,
+        avatar: user.avatar,
+        createdAt: user.createdAt,
+      })),
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      todaySignups: result.todaySignups,
+    };
+  }
 
   /**
    * Get current authenticated user

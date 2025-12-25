@@ -1,3 +1,6 @@
+// 🔧 LOCAL MACI SDK - Localized from privacy-ethereum/maci for debugging
+console.log("[MACI-SDK] Using LOCAL @maci-protocol/sdk from packages/maci-sdk");
+
 export * from "./verifyingKeys";
 export * from "./maci";
 export * from "./relayer";
