@@ -1,23 +1,15 @@
 "use client";
 
-import {
-  ChangeEvent,
-  FormEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { cn } from "@sasvoth/ui/lib/utils";
 import { useAuth } from "@/hooks";
 import { useIdeas } from "@/hooks/useIdeas";
-import { userApi } from "@/api";
-import { useIPFS } from "@/hooks/useIPFS";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { IdeaEditDialog, IdeaData } from "@/components/IdeaEditDialog";
+import { ProfileForm } from "@/components/settings/profile-form";
 
 type IdeaSummary = {
   id: string;
@@ -76,31 +68,10 @@ function IdeaLogo({ label, accent }: { label: string; accent: string }) {
 }
 
 export default function SettingsPage() {
-  const { user, isLoading, setUser } = useAuth();
+  const { user, isLoading } = useAuth();
   const { address } = useAccount();
   const { getByUserAddress } = useIdeas();
-  const { uploadFile } = useIPFS();
   const router = useRouter();
-  const [displayName, setDisplayName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const avatarInputRef = useRef<HTMLInputElement | null>(null);
-  const [pendingAvatar, setPendingAvatar] = useState<{
-    preview: string;
-    file: File;
-  } | null>(null);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
-    current: "",
-    next: "",
-    confirm: "",
-  });
-  const [profileMessage, setProfileMessage] = useState<string | null>(null);
-  const [passwordMessage, setPasswordMessage] = useState<{
-    tone: "error" | "success";
-    text: string;
-  } | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [ideas, setIdeas] = useState<IdeaSummary[]>([]);
   const [ideasLoading, setIdeasLoading] = useState(true);
@@ -108,6 +79,7 @@ export default function SettingsPage() {
   const [sortKey, setSortKey] = useState<"date" | "name">("date");
   const [editingIdea, setEditingIdea] = useState<IdeaData | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [profileMessage, setProfileMessage] = useState<string | null>(null);
 
   const handleEditIdea = (idea: IdeaSummary) => {
     setEditingIdea({
@@ -178,19 +150,6 @@ export default function SettingsPage() {
     fetchIdeas();
   }, [address, user?.walletAddress, getByUserAddress]);
 
-  useEffect(() => {
-    if (!user) return;
-    setDisplayName(user?.name ?? user?.username ?? user?.email ?? "");
-    setAvatarPreview(user?.avatar ?? null);
-    setDateOfBirth(
-      user?.dateOfBirth
-        ? (new Date(user.dateOfBirth).toISOString().split("T")[0] ?? "")
-        : "",
-    );
-    setPendingAvatar(null);
-    setIsConfirmOpen(false);
-  }, [user]);
-
   const visibleIdeas = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
     const filtered = ideas.filter((idea) => {
@@ -209,115 +168,8 @@ export default function SettingsPage() {
     });
   }, [ideas, searchTerm, sortKey]);
 
-  const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setPendingAvatar({
-          preview: reader.result,
-          file,
-        });
-      }
-    };
-    reader.readAsDataURL(file);
-    if (avatarInputRef.current) {
-      avatarInputRef.current.value = "";
-    }
-  };
-
-  const handleProfileSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!user?.id) return;
-
-    setIsSaving(true);
-    try {
-      const updateData: { dateOfBirth?: string } = {};
-      if (dateOfBirth) {
-        updateData.dateOfBirth = dateOfBirth;
-      }
-
-      await userApi.updateProfile(user.id, updateData);
-      setProfileMessage("Profile saved successfully!");
-      setTimeout(() => setProfileMessage(null), 4000);
-    } catch (err: any) {
-      setProfileMessage(`Error: ${err.message || "Failed to save profile"}`);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleAvatarCancel = () => {
-    setPendingAvatar(null);
-    if (avatarInputRef.current) {
-      avatarInputRef.current.value = "";
-    }
-  };
-
-  const handleAvatarSave = () => {
-    if (!pendingAvatar) return;
-    setIsConfirmOpen(true);
-  };
-
-  const confirmAvatarSave = async () => {
-    if (!pendingAvatar || !user?.id) {
-      setIsConfirmOpen(false);
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      // Upload avatar to IPFS first
-      const result = await uploadFile(pendingAvatar.file);
-      const avatarUrl = result.url;
-
-      // Then update profile with new avatar URL
-      await userApi.updateProfile(user.id, { avatar: avatarUrl });
-
-      setAvatarPreview(avatarUrl);
-      setPendingAvatar(null);
-      setIsConfirmOpen(false);
-      setProfileMessage("Avatar updated successfully!");
-      setTimeout(() => setProfileMessage(null), 4000);
-    } catch (err: any) {
-      console.error("Failed to save avatar:", err);
-      setProfileMessage(`Error: ${err.message || "Failed to save avatar"}`);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const currentAvatarSrc = pendingAvatar?.preview ?? avatarPreview;
-
   const toggleSortKey = () => {
     setSortKey((prev) => (prev === "date" ? "name" : "date"));
-  };
-
-  const handlePasswordSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (passwordForm.next.trim() === "" || passwordForm.confirm.trim() === "") {
-      setPasswordMessage({
-        tone: "error",
-        text: "Please enter and confirm your new password.",
-      });
-      return;
-    }
-
-    if (passwordForm.next !== passwordForm.confirm) {
-      setPasswordMessage({
-        tone: "error",
-        text: "New passwords do not match.",
-      });
-      return;
-    }
-
-    setPasswordMessage({
-      tone: "success",
-      text: "Password updated. We'll ask you to use it next time you sign in.",
-    });
-    setPasswordForm({ current: "", next: "", confirm: "" });
-    setTimeout(() => setPasswordMessage(null), 4000);
   };
 
   const ideaListView = (
@@ -441,115 +293,12 @@ export default function SettingsPage() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[320px,1fr]">
-          <section className="rounded-3xl border border-gray-200/80 bg-white/70 p-6 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-gray-400">
-              Profile
-            </p>
-            <div className="mt-6 flex flex-col items-center text-center">
-              <div className="relative">
-                <input
-                  ref={avatarInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
-                <button
-                  type="button"
-                  onClick={() => avatarInputRef.current?.click()}
-                  className="group relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-transparent focus-visible:border-gray-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black/10"
-                  aria-label="Edit avatar"
-                >
-                  {currentAvatarSrc ? (
-                    <img
-                      src={currentAvatarSrc}
-                      alt="Avatar preview"
-                      className="h-full w-full object-cover transition-all group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gray-100 text-2xl font-semibold text-gray-500 transition-all group-hover:bg-gray-200">
-                      {getInitials(displayName)}
-                    </div>
-                  )}
-                  <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-xs font-semibold uppercase tracking-[0.5em] text-white opacity-0 transition-opacity group-hover:opacity-100">
-                    Edit
-                  </div>
-                </button>
-                {pendingAvatar ? (
-                  <button
-                    type="button"
-                    onClick={handleAvatarCancel}
-                    className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-base font-semibold text-gray-800 shadow-md"
-                    aria-label="Cancel avatar change"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                ) : null}
-              </div>
-              {pendingAvatar ? (
-                <Button
-                  type="button"
-                  className="mt-6 w-full max-w-[180px]"
-                  onClick={handleAvatarSave}
-                >
-                  Save avatar
-                </Button>
-              ) : null}
-            </div>
-
-            <form className="mt-8 space-y-4" onSubmit={handleProfileSubmit}>
-              <div>
-                <label
-                  htmlFor="displayName"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Display name
-                </label>
-                <Input
-                  id="displayName"
-                  className="mt-1"
-                  value={displayName}
-                  onChange={(event) => setDisplayName(event.target.value)}
-                  placeholder="Enter your preferred name"
-                  disabled={isSaving}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="dateOfBirth"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Date of Birth
-                </label>
-                <Input
-                  id="dateOfBirth"
-                  type="date"
-                  className="mt-1"
-                  value={dateOfBirth}
-                  onChange={(event) => setDateOfBirth(event.target.value)}
-                  max={new Date().toISOString().split("T")[0]}
-                  disabled={isSaving}
-                />
-              </div>
-              <div className="flex justify-end">
-                <Button type="submit" className="px-6" disabled={isSaving}>
-                  {isSaving ? "Saving..." : "Save profile"}
-                </Button>
-              </div>
-              {profileMessage ? (
-                <p
-                  className={cn(
-                    "text-sm",
-                    profileMessage.startsWith("Error")
-                      ? "text-red-600"
-                      : "text-emerald-600",
-                  )}
-                >
-                  {profileMessage}
-                </p>
-              ) : null}
-            </form>
-          </section>
+          <ProfileForm
+            onSuccess={() => {
+              setProfileMessage("Profile saved successfully!");
+              setTimeout(() => setProfileMessage(null), 4000);
+            }}
+          />
 
           {/* TODO: Re-enable password change functionality when ready */}
           {/*
@@ -712,28 +461,6 @@ export default function SettingsPage() {
           </div>
         </section>
       </main>
-      {isConfirmOpen ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4 py-6">
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
-          >
-            <h3 className="text-lg font-semibold text-gray-900">
-              Save new avatar?
-            </h3>
-            <p className="mt-2 text-sm text-gray-600">
-              We&apos;ll update your profile image for SaSvoth once you confirm.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <Button variant="ghost" onClick={() => setIsConfirmOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={confirmAvatarSave}>Confirm</Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       {/* Idea Edit Dialog */}
       <IdeaEditDialog
