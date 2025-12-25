@@ -15,11 +15,11 @@ const AUTH_COOKIE_NAMES = [
 
 const PUBLIC_FILE = /\.(.*)$/;
 
-export async function middleware(req: NextRequest) {
-  const { nextUrl, cookies } = req;
+export function middleware(req: NextRequest) {
+  const { nextUrl } = req;
   const pathname = nextUrl.pathname;
-  const isMocking = process.env.NEXT_PUBLIC_API_MOCKING === "enabled";
 
+  // Skip static files, API routes (handled by rewrites), etc.
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -34,60 +34,18 @@ export async function middleware(req: NextRequest) {
 
   if (!needsAuth) return NextResponse.next();
 
-  // Check cookies for any of the known auth cookie names
-  // For HttpOnly cookies, we need to check the raw cookie header
+  // Simple cookie existence check - no backend validation
+  // Full auth validation happens in Server Components/Server Actions
   const cookieHeader = req.headers.get("cookie") || "";
   const hasAuthCookie = AUTH_COOKIE_NAMES.some((name) =>
     cookieHeader.includes(`${name}=`)
   );
 
-  console.log(
-    "Middleware check for",
-    pathname,
-    "- hasAuthCookie:",
-    hasAuthCookie,
-    "- cookie header contains:",
-    cookieHeader ? "cookies present" : "no cookies"
-  );
-
   if (hasAuthCookie) {
-    if (isMocking) {
-      console.log(
-        "Mock mode enabled - trusting cookie without backend validation."
-      );
-      return NextResponse.next();
-    }
-    // perform server-side validation by calling our internal API which proxies the request
-    try {
-      // Prefer an explicit backend origin provided via env. This must be
-      // publicly available to the Next middleware (prefix NEXT_PUBLIC_).
-      // Fallback to localhost:8000 which is the API default in this repo.
-      const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-      const validateUrl = new URL("/api/v1/auth/validate", apiBase);
-
-      console.log("Middleware will validate against:", validateUrl.toString());
-
-      const validationRes = await fetch(validateUrl.toString(), {
-        method: "POST",
-        headers: {
-          cookie: cookieHeader,
-        },
-        cache: "no-store",
-      });
-
-      console.log("Validation response status:", validationRes.status);
-
-      if (validationRes.ok) {
-        console.log("Validation passed, allowing access to", pathname);
-        return NextResponse.next();
-      } else {
-        console.log("Validation failed, redirecting to signin");
-      }
-    } catch (e) {
-      console.error("Middleware validation error:", e);
-    }
+    return NextResponse.next();
   }
 
+  // Redirect to signin if no auth cookie found
   const signInUrl = new URL("/signin", req.url);
   signInUrl.searchParams.set("from", pathname);
   return NextResponse.redirect(signInUrl);

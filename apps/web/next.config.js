@@ -1,6 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  turbopack: {}, // Add empty turbopack config to silence Next.js 16 warning
+  async rewrites() {
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_URL ||
+      process.env.API_URL ||
+      "http://localhost:8000";
+    return [
+      {
+        source: "/api/v1/:path*",
+        destination: `${apiBase}/api/v1/:path*`,
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
