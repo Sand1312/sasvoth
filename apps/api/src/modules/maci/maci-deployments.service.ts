@@ -22,6 +22,8 @@ export class MaciDeploymentsService {
    */
   async upsert(data: {
     maciAddress: string;
+    name: string;
+    logo?: string;
     subgraphUrl?: string;
     startBlock?: number;
     chain: string;
@@ -37,6 +39,8 @@ export class MaciDeploymentsService {
 
     if (existing) {
       // Update existing record
+      if (data.name) existing.name = data.name;
+      if (data.logo) existing.logo = data.logo;
       if (data.subgraphUrl) existing.subgraphUrl = data.subgraphUrl;
       if (data.startBlock) existing.startBlock = data.startBlock;
       if (data.deploymentId) existing.deploymentId = data.deploymentId;
@@ -95,9 +99,39 @@ export class MaciDeploymentsService {
   }
 
   /**
+   * Get only valid deployments (for public API)
+   */
+  async getValid(): Promise<MaciDeploymentDocument[]> {
+    return this.maciDeploymentModel.find({ isValid: { $ne: false } }).sort({ createdAt: -1 });
+  }
+
+  /**
    * Get the latest deployment (most recently created)
    */
   async getLatest(): Promise<MaciDeploymentDocument | null> {
-    return this.maciDeploymentModel.findOne().sort({ createdAt: -1 });
+    return this.maciDeploymentModel.findOne({ isValid: { $ne: false } }).sort({ createdAt: -1 });
+  }
+
+  /**
+   * Update cached stats (called by DeploymentStatsSyncJob)
+   */
+  async updateStats(maciAddress: string, members: number, pollCount: number): Promise<void> {
+    const normalized = maciAddress.toLowerCase();
+    await this.maciDeploymentModel.updateOne(
+      { maciAddress: normalized },
+      { $set: { members, pollCount, isValid: true } }
+    );
+  }
+
+  /**
+   * Mark deployment as invalid (contract doesn't exist or wrong ABI)
+   */
+  async markInvalid(maciAddress: string): Promise<void> {
+    const normalized = maciAddress.toLowerCase();
+    await this.maciDeploymentModel.updateOne(
+      { maciAddress: normalized },
+      { $set: { isValid: false } }
+    );
+    this.logger.warn(`Marked deployment ${maciAddress} as invalid`);
   }
 }

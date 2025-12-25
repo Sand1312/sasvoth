@@ -7,11 +7,15 @@ import { useCheckSignupStatus } from "./useCheckJoinStatus";
 
 // ============ EIP-712 Constants for Signup Request ============
 
-const EIP712_DOMAIN_NAME = 'SaSvoth Gatekeeper';
+const DEFAULT_EIP712_DOMAIN_NAME = 'SaSvoth Gatekeeper';
 const EIP712_DOMAIN_VERSION = '1';
 
-const getEIP712Domain = (chainId: number, verifyingContract: `0x${string}`) => ({
-  name: EIP712_DOMAIN_NAME,
+const getEIP712Domain = (
+  chainId: number,
+  verifyingContract: `0x${string}`,
+  deploymentName?: string
+) => ({
+  name: deploymentName || DEFAULT_EIP712_DOMAIN_NAME,
   version: EIP712_DOMAIN_VERSION,
   chainId,
   verifyingContract,
@@ -138,8 +142,18 @@ export const useMaciSignup = () => {
           // ============================================
           console.log("Step C: Signing EIP-712 signup request...");
 
+          // Fetch deployment name for dynamic EIP-712 domain
+          let deploymentName: string | undefined;
+          try {
+            const deployment = await maciApi.getLatestDeployment();
+            deploymentName = deployment?.name;
+            console.log("Using deployment name for EIP-712:", deploymentName || "(default)");
+          } catch (e) {
+            console.log("Could not fetch deployment name, using default");
+          }
+
           const signupSignature = await signTypedDataAsync({
-            domain: getEIP712Domain(chainId, GATEKEEPER_ADDRESS),
+            domain: getEIP712Domain(chainId, GATEKEEPER_ADDRESS, deploymentName),
             types: SIGNUP_REQUEST_TYPES,
             primaryType: "SignupRequest",
             message: {

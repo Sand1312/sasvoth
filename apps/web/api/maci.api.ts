@@ -128,6 +128,8 @@ export const maciApi = {
    */
   getLatestDeployment: async (): Promise<{
     maciAddress: string;
+    name: string;
+    logo?: string;
     startBlock: number;
     subgraphUrl: string;
     chain: string;

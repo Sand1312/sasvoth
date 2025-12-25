@@ -129,12 +129,32 @@ export class MaciController {
   // ========================================
 
   /**
+   * Get all MACI deployments
+   * GET /maci/deployments
+   * 
+   * Returns cached stats from DB (updated by DeploymentStatsSyncJob every 5 mins)
+   */
+  @Get('deployments')
+  @ApiOperation({ summary: 'Get all MACI deployments for subscriptions' })
+  @ApiResponse({ status: 200, description: 'Deployments retrieved' })
+  async getDeployments() {
+    const deployments = await this.maciDeploymentsService.getValid();
+    
+    // Return cached stats from DB (no live RPC calls)
+    return deployments.map(d => ({
+      id: d._id?.toString() || d.maciAddress,
+      maciAddress: d.maciAddress,
+      name: d.name,
+      logo: d.logo,
+      chain: d.chain,
+      members: d.members || 0,
+      pollCount: d.pollCount || 0,
+    }));
+  }
+
+  /**
    * Get latest MACI deployment
    * GET /maci/deployments/latest
-   * 
-   * TODO: Dùng để frontend lấy maciAddress và startBlock thay vì localStorage
-   * - Thay thế localStorage.getItem("maciAddress")
-   * - Thay thế localStorage.getItem("maciStartBlock")
    */
   @Get('deployments/latest')
   @ApiOperation({ summary: 'Get latest MACI deployment info' })
@@ -146,6 +166,8 @@ export class MaciController {
     }
     return {
       maciAddress: deployment.maciAddress,
+      name: deployment.name,
+      logo: deployment.logo,
       startBlock: deployment.startBlock,
       subgraphUrl: deployment.subgraphUrl,
       chain: deployment.chain,
@@ -155,10 +177,6 @@ export class MaciController {
   /**
    * Get MACI deployment by address
    * GET /maci/deployments/:address
-   * 
-   * TODO: Dùng khi biết maciAddress cụ thể (từ poll.maciAddress)
-   * - Query deployment info cho MACI contract cụ thể
-   * - Hữu ích khi có nhiều MACI deployments
    */
   @Get('deployments/:address')
   @ApiOperation({ summary: 'Get MACI deployment by address' })

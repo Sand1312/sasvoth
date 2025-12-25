@@ -6,6 +6,7 @@ import { PollsModule } from '../polls/polls.module';
 import { ResultsMetaModule } from '../results-meta/results-meta.module';
 import { SmartNonceService } from './smart-nonce.service';
 import { NonceSyncJob } from './nonce-sync.job';
+import { DeploymentStatsSyncJob } from './deployment-stats-sync.job';
 import { SubgraphService } from './subgraph.service';
 import { MaciDeploymentsService } from './maci-deployments.service';
 import { MaciDeployment, MaciDeploymentSchema } from './schemas/maci-deployment.schema';
@@ -32,7 +33,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     forwardRef(() => ResultsMetaModule),
   ],
   controllers: [MaciController],
-  providers: [MaciService, SmartNonceService, NonceSyncJob, SubgraphService, MaciDeploymentsService],
+  providers: [MaciService, SmartNonceService, NonceSyncJob, DeploymentStatsSyncJob, SubgraphService, MaciDeploymentsService],
   exports: [MaciService, SmartNonceService, SubgraphService, MaciDeploymentsService],
 })
 export class MaciModule {}

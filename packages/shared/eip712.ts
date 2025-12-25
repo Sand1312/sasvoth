@@ -7,8 +7,11 @@
  * - Smart Contract (SafeSignupGatekeeper)
  */
 
-export const EIP712_DOMAIN_NAME = 'SaSvoth Gatekeeper';
+export const DEFAULT_EIP712_DOMAIN_NAME = 'SaSvoth Gatekeeper';
 export const EIP712_DOMAIN_VERSION = '1';
+
+// Keep legacy export for backward compatibility
+export const EIP712_DOMAIN_NAME = DEFAULT_EIP712_DOMAIN_NAME;
 
 /**
  * Chain-specific configuration
@@ -23,12 +26,17 @@ export const CHAIN_CONFIG = {
 /**
  * EIP-712 Domain (without contract-specific fields)
  * verifyingContract and chainId should be set at runtime
+ * 
+ * @param chainId - Chain ID for the domain
+ * @param verifyingContract - Contract address for verification
+ * @param deploymentName - Optional deployment name (e.g., "CSES") - falls back to default
  */
 export const getEIP712Domain = (
   chainId: number,
-  verifyingContract: `0x${string}`
+  verifyingContract: `0x${string}`,
+  deploymentName?: string
 ) => ({
-  name: EIP712_DOMAIN_NAME,
+  name: deploymentName || DEFAULT_EIP712_DOMAIN_NAME,
   version: EIP712_DOMAIN_VERSION,
   chainId,
   verifyingContract,

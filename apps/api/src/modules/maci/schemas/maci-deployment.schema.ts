@@ -15,6 +15,12 @@ export class MaciDeployment {
     @Prop({ required: true, unique: true, index: true })
     maciAddress: string;
 
+    @Prop({ required: true })
+    name: string;  // Deployment name (e.g., "CSES") - used in EIP-712 domain
+
+    @Prop({ required: false })
+    logo: string;  // Logo URL for subscriptions card
+
     @Prop({ required: false })
     subgraphUrl: string;
 
@@ -32,6 +38,16 @@ export class MaciDeployment {
 
     @Prop({ type: Object, required: false })
     config: Record<string, any>;
+
+    // === Cached Stats (updated by DeploymentStatsSyncJob) ===
+    @Prop({ required: false, default: 0 })
+    members: number;  // numSignUps from MACI contract
+
+    @Prop({ required: false, default: 0 })
+    pollCount: number;  // nextPollId from MACI contract
+
+    @Prop({ required: false, default: true })
+    isValid: boolean;  // false if contract doesn't exist or has wrong ABI
 }
 
 export const MaciDeploymentSchema = SchemaFactory.createForClass(MaciDeployment);

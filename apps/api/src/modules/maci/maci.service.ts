@@ -734,6 +734,8 @@ export class MaciService {
       try {
         await this.maciDeploymentsService.upsert({
           maciAddress,
+          name: payload.name || `MACI ${maciAddress.slice(0, 8)}`,
+          logo: payload.logo,
           subgraphUrl: subgraphUrl || undefined,
           startBlock,
           chain: payload.chain || 'arbitrum_sepolia',
