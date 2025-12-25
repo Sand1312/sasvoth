@@ -103,18 +103,18 @@ export class DeploymentStatsSyncJob implements OnModuleInit {
             const maciContract = new Contract(
               deployment.maciAddress,
               [
-                'function numSignUps() view returns (uint256)',
+                'function totalSignups() view returns (uint256)',
                 'function nextPollId() view returns (uint256)',
               ],
               provider,
             );
 
-            const [numSignUps, nextPollId] = await Promise.all([
-              maciContract.numSignUps(),
+            const [totalSignups, nextPollId] = await Promise.all([
+              maciContract.totalSignups(),
               maciContract.nextPollId(),
             ]);
 
-            members = Number(numSignUps);
+            members = Number(totalSignups);
             pollCount = Number(nextPollId);
 
             this.logger.debug(
