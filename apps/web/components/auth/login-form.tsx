@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useActionState, useEffect, Suspense } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginFormData } from '@/lib/schemas/auth';
-import { loginAction } from '@/app/(auth)/signin/actions';
-import { Input } from '@sasvoth/ui/input';
-import { Button } from '@sasvoth/ui/button';
-import { useFeedback } from '@/contexts/FeedbackContext';
-import { SocialLoginButtons } from '@/components/SocialLoginButtons';
-import { useAuth } from '@/hooks/useAuth';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useActionState, useEffect, Suspense } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginFormData } from "@/lib/schemas/auth";
+import { loginAction } from "@/app/(auth)/signin/actions";
+import { Input } from "@sasvoth/ui/input";
+import { Button } from "@sasvoth/ui/button";
+import { useFeedback } from "@/contexts/FeedbackContext";
+import { SocialLoginButtons } from "@/components/SocialLoginButtons";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const initialState = {
   success: false,
-  message: '',
+  message: "",
 };
 
 function LoginFormContent() {
@@ -23,10 +23,14 @@ function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   // Support both 'from' (from middleware) and 'callbackUrl' for compatibility
-  const redirectTo = searchParams.get('from') || searchParams.get('callbackUrl') || '/dashboard';
+  const redirectTo =
+    searchParams.get("from") || searchParams.get("callbackUrl") || "/dashboard";
 
   // React 19: useActionState handles pending state & form result
-  const [state, formAction, isPending] = useActionState(loginAction, initialState);
+  const [state, formAction, isPending] = useActionState(
+    loginAction,
+    initialState,
+  );
 
   // Redirect if already logged in (Client Side)
   useEffect(() => {
@@ -38,7 +42,7 @@ function LoginFormContent() {
   const {
     register,
     setError,
-    formState: { errors }
+    formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
@@ -46,8 +50,8 @@ function LoginFormContent() {
   // Sync Server Errors to React Hook Form
   useEffect(() => {
     if (state.success) {
-       // Optional: Trigger manual useAuth refresh if needed, but router.push usually suffices
-       // refreshAuth(); 
+      // Optional: Trigger manual useAuth refresh if needed, but router.push usually suffices
+      // refreshAuth();
     }
     if (!state.success && state.errors) {
       Object.entries(state.errors).forEach(([key, msgs]) => {
@@ -55,13 +59,14 @@ function LoginFormContent() {
       });
     }
     if (!state.success && state.message) {
-      showError('Login Failed', state.message);
+      showError("Login Failed", state.message);
     }
   }, [state, setError, showError]);
 
   return (
     <form action={formAction} className="space-y-4">
-      {/* Identifier */}
+      {/* TODO: Re-enable email/password login when ready */}
+      {/* 
       <div>
         <Input 
           {...register('identifier')} 
@@ -73,7 +78,6 @@ function LoginFormContent() {
         )}
       </div>
 
-      {/* Password */}
       <div>
         <Input 
           {...register('password')} 
@@ -95,21 +99,25 @@ function LoginFormContent() {
         <span className="mx-2 text-xs text-gray-400">or</span>
         <div className="flex-grow h-px bg-gray-200" />
       </div>
+      */}
 
-      <SocialLoginButtons error={null} />
+      {/* TODO: Re-enable Google/GitHub social login when ready */}
+      {/* <SocialLoginButtons error={null} /> */}
     </form>
   );
 }
 
 export function LoginForm() {
   return (
-    <Suspense fallback={
-      <div className="space-y-4">
-        <div className="h-10 bg-gray-200 animate-pulse rounded" />
-        <div className="h-10 bg-gray-200 animate-pulse rounded" />
-        <div className="h-10 bg-gray-200 animate-pulse rounded" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="space-y-4">
+          <div className="h-10 bg-gray-200 animate-pulse rounded" />
+          <div className="h-10 bg-gray-200 animate-pulse rounded" />
+          <div className="h-10 bg-gray-200 animate-pulse rounded" />
+        </div>
+      }
+    >
       <LoginFormContent />
     </Suspense>
   );
