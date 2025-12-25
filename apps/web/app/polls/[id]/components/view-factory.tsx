@@ -19,8 +19,12 @@ export async function PollViewFactory({ pollId }: { pollId: string }) {
     case PollStatus.Ended:
       return <EndedView poll={poll} />;
       
+    case PollStatus.Waiting:
+      // Deployed but waiting for start time
+      return <PrepareView poll={poll} />;
+
     case PollStatus.Cancelled:
-      // Reuse PrepareView for now as per legacy logic, it handles cancelled state display
+      // Reuse PrepareView, it handles cancelled state display
       return <PrepareView poll={poll} />;
       
     case PollStatus.Counting:

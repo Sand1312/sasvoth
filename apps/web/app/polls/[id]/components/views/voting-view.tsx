@@ -10,7 +10,7 @@ export function VotingView({ poll }: VotingViewProps) {
   // In VotingView, we expect 'ideas' (approvedOptions) to be pre-hydrated by the service layer.
   // The service layer populates `approvedIdeas` with hydrated data from `options` or `approvedIdeaIds`.
   // If `approvedIdeas` is empty, we fallback to `poll.ideas` (this was logic in PollClient, line ~694).
-  
+
   const displayIdeas =
     poll.approvedIdeas.length > 0 ? poll.approvedIdeas : poll.ideas;
 
@@ -21,10 +21,12 @@ export function VotingView({ poll }: VotingViewProps) {
   return (
     <section className="space-y-8">
       {/* Interactive Voting Controls Island */}
-      <VotingControls 
+      <VotingControls
         credits={poll.credits}
         pollId={poll.id}
-        pollIdOnChain={poll.onChainId} 
+        pollIdOnChain={poll.onChainId}
+        maciAddress={poll.maciAddress}
+        startBlock={poll.startBlock}
       />
 
       {/* Ideas List */}

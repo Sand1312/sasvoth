@@ -5,16 +5,16 @@ export type RewardsDocument = HydratedDocument<Rewards>;
 @Schema()
 export class Rewards {
     @Prop({ type: String, required: true })
-    userId: string;
+    userAddress: string;
     
     @Prop({ type: String, required: true })
-    pollId : number;
+    pollId : string;
 
     @Prop({ type: Number, required: true })
     credit_count: number;
     
-    @Prop({ type: Number, required: true })
-    amountToken: number;
+    @Prop({ type: String, required: true })
+    amountToken: string; // Wei amount as string (too large for Number)
 
     @Prop({type:String, required:true, enum:["pending","claimed","failed"], default:"pending"})
     status: string;

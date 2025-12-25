@@ -61,4 +61,11 @@ export class IdeasService {
       .findByIdAndUpdate(ideaId, { idea_cid }, { new: true })
       .exec();
   }
+
+  /**
+   * Get ideas by user address
+   */
+  async getIdeasByUserAddress(userAddress: string): Promise<any[]> {
+    return this.ideasModel.find({ userAddress }).exec();
+  }
 }

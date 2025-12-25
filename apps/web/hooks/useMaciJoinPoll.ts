@@ -1,80 +1,152 @@
 import { useState } from "react";
-// Import the Server Action
-// Import API
+import { useSignTypedData, useAccount, useChainId, usePublicClient } from "wagmi";
 import { maciApi } from "../api/maci.api";
+import { deriveMaciKeypair } from "@/lib/maci-key-derivation";
+import { useMaciStore, useWithMaciLock } from "@/stores/maciStore";
+import { useCheckJoinStatus } from "./useCheckJoinStatus";
 
 export const useMaciJoinPoll = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { signTypedDataAsync } = useSignTypedData();
+  const { address } = useAccount();
+  const chainId = useChainId();
+  const publicClient = usePublicClient();
+  
+  // Zustand store integration
+  const { setKeypair, getKeypair } = useMaciStore();
+  const { withLock, isLocked } = useWithMaciLock();
+  
+  // Graph/localStorage pre-check for join status (ACID: Consistency)
+  const { checkJoinStatus } = useCheckJoinStatus();
 
-  const handleJoinPoll = async (maciAddress: string, pollId: string) => {
-    setLoading(true);
-    setError(null);
+  const handleJoinPoll = async (maciAddress: string, pollId: string, startBlock?: number) => {
+    // 🔍 DEBUG: Log incoming parameters
+    console.log(`🔍 [useMaciJoinPoll] handleJoinPoll CALLED with:`, {
+      maciAddress: maciAddress?.slice(0, 15) + "...",
+      pollId,
+      startBlock,
+    });
+
+    if (!address) {
+      setError("Wallet not connected");
+      return { success: false, error: "Wallet not connected" };
+    }
+
+    // Wrap entire join in lock to prevent double-click races
     try {
-      // 1. Retrieve Keys from LocalStorage
-      const privateKey = localStorage.getItem("maci_priv_key");
-      if (!privateKey) {
-        throw new Error("User not signed up (No MACI Private Key found)");
+      return await withLock('join', address, pollId, async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+          // ============================================
+          // Step 1: Derive MACI keypair (cached in Zustand store)
+          // ============================================
+          console.log("Deriving MACI keypair...");
+          const { privateKey, pubKeyX, pubKeyY } = await deriveMaciKeypair(
+            address,
+            chainId,
+            signTypedDataAsync,
+            {
+              maciAddress,
+              // Zustand store integration
+              getFromStore: () => getKeypair(address, chainId, maciAddress),
+              setToStore: (kp) => setKeypair(address, chainId, kp, maciAddress),
+            }
+          );
+
+          // ============================================
+          // Step 1.5: Check if already joined (ACID: Consistency + Atomicity)
+          // Graph first, localStorage fallback - skip expensive API if already joined
+          // ============================================
+          console.log("🔍 Checking if already joined poll...");
+          try {
+            // Pass maciAddress and publicClient for RPC chain fallback
+            const joinResult = await checkJoinStatus(pollId, pubKeyX, pubKeyY, maciAddress, publicClient);
+            
+            if (joinResult.isJoined) {
+              console.log(`✅ Already joined poll ${pollId}! Source: ${joinResult.source}`);
+              return {
+                success: true,
+                alreadyJoined: true,
+                pollStateIndex: joinResult.pollStateIndex || "0",
+                voiceCredits: joinResult.voiceCredits || "0",
+                hash: null,
+              };
+            }
+            console.log("❌ Not joined yet, proceeding with API call...");
+          } catch (checkErr) {
+            console.warn("Could not check join status, proceeding with API call:", checkErr);
+          }
+
+          // ============================================
+          // Step 2: Determine startBlock for Merkle tree
+          // ============================================
+          let effectiveStartBlock = startBlock || 0;
+
+      // Fetch from API if not provided
+      if (!effectiveStartBlock) {
+        try {
+          const deployment = await maciApi.getLatestDeployment();
+          effectiveStartBlock = deployment.startBlock || 0;
+          console.log("Using startBlock from API:", effectiveStartBlock);
+        } catch (err) {
+          console.warn("Could not fetch startBlock from API, using hardcoded fallback");
+        }
       }
 
-      // Get startBlock from localStorage (important for Arbitrum Sepolia performance)
-      // Priority: signupBlockNumber > maciStartBlock > 0
-      const signupBlockStr = localStorage.getItem("signupBlockNumber");
-      const maciStartBlockStr = localStorage.getItem("maciStartBlock");
+          // Ultimate fallback to hardcoded block
+          if (!effectiveStartBlock) {
+            effectiveStartBlock = 224688901;
+            console.log("Using hardcoded maciStartBlock:", effectiveStartBlock);
+          }
 
-      // IMPORTANT: For joinPoll, we MUST scan from MACI deploy block
-      // to build the full Merkle tree with ALL signups (not just user's signup)
-      let startBlock = 0;
-      if (maciStartBlockStr) {
-        startBlock = parseInt(maciStartBlockStr);
-        console.log("Using maciStartBlock for full Merkle tree:", startBlock);
-      } else {
-        // Fallback to hardcoded MACI deploy block
-        startBlock = 224688901;
-        console.log("Using hardcoded maciStartBlock:", startBlock);
-      }
+          console.log("Calling JoinPoll API...", {
+            pollId,
+            maciAddress,
+            startBlock: effectiveStartBlock,
+          });
 
-      console.log(
-        "Final startBlock for joinPoll:",
-        startBlock,
-        "(signupBlockNumber:",
-        signupBlockStr,
-        ")"
-      );
+          // ============================================
+          // Step 3: Call API
+          // ============================================
+          const result = await maciApi.joinPoll(pollId, {
+            maciAddress,
+            maciPrivateKey: privateKey,
+            startBlock: effectiveStartBlock
+          });
 
-      console.log("Calling JoinPoll API...", {
-        pollId,
-        maciAddress,
-        startBlock,
-      });
-
-      // 2. Call API
-      const result = await maciApi.joinPoll(pollId, {
-        maciAddress,
-        maciPrivateKey: privateKey,
-        startBlock
-      });
-
-      if (!result.success) {
-        throw new Error(result.error || "Join Poll failed");
-      }
+          if (!result.success) {
+            throw new Error(result.error || "Join Poll failed");
+          }
 
       console.log("Join Poll Success:", result);
 
-      // 3. Store Result State
-      return {
-        success: true,
-        pollStateIndex: result.pollStateIndex,
-        voiceCredits: result.voiceCredits,
-        hash: result.hash,
-        alreadyJoined: result.alreadyJoined,
-      };
-    } catch (err: any) {
-      console.error("Join Poll failed:", err);
-      setError(err.message || "Join Poll failed");
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
+      // If alreadyJoined and pollStateIndex is 0, it means backend couldn't get the real index
+      // This is expected behavior - the user is already joined, just poll index wasn't returned
+      // Frontend can query separately if needed
+
+          return {
+            success: true,
+            pollStateIndex: result.pollStateIndex,
+            voiceCredits: result.voiceCredits,
+            hash: result.hash,
+            alreadyJoined: result.alreadyJoined,
+          };
+        } catch (err: any) {
+          console.error("Join Poll failed:", err);
+          setError(err.message || "Join Poll failed");
+          return { success: false, error: err.message };
+        } finally {
+          setLoading(false);
+        }
+      });
+    } catch (lockErr: any) {
+      // Lock acquisition failed (another operation in progress)
+      console.warn("JoinPoll blocked:", lockErr.message);
+      setError(lockErr.message);
+      return { success: false, error: lockErr.message };
     }
   };
 
@@ -82,5 +154,6 @@ export const useMaciJoinPoll = () => {
     joinPoll: handleJoinPoll,
     loading,
     error,
+    isLocked,
   };
 };

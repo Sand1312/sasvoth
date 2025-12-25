@@ -54,6 +54,12 @@ class UpdateChainDto {
 
   @ApiProperty({ required: false })
   subgraphUrl?: string;
+
+  @ApiProperty({ required: false })
+  maciAddress?: string;  // MACI contract address this poll belongs to
+
+  @ApiProperty({ required: false })
+  startBlock?: number;  // Block number when MACI was deployed
 }
 
 /**
@@ -82,7 +88,7 @@ export class PollsController {
   constructor(
     private pollsService: PollsService,
     private resultsMetaService: ResultsMetaService,
-  ) {}
+  ) { }
 
   // ========================================
   // RESTful Endpoints (New)
@@ -90,18 +96,44 @@ export class PollsController {
 
   /**
    * List all polls (with optional status filter)
-   * GET /polls or GET /polls?status=X
+   * GET /polls or GET /polls?status=X&page=1&limit=10
    */
   @Get()
   @ApiOperation({ summary: 'List all polls' })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    description: 'Filter by status',
-  })
+  @ApiQuery({ name: 'status', required: false, description: 'Filter by status' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page (default: 10)' })
+  @ApiQuery({ name: 'activeAt', required: false, description: 'Filter polls active at date (ISO string)' })
+  @ApiQuery({ name: 'search', required: false, description: 'Search in title/description' })
+  @ApiQuery({ name: 'sortBy', required: false, description: 'Sort field: createdAt, updatedAt, startTime, title' })
+  @ApiQuery({ name: 'sortOrder', required: false, description: 'Sort order: asc or desc' })
   @ApiResponse({ status: 200, description: 'Polls retrieved successfully' })
-  async getAll(@Query('status') status: string, @Res() res: Response) {
+  async getAll(
+    @Query('status') status: string,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('activeAt') activeAt: string,
+    @Query('search') search: string,
+    @Query('sortBy') sortBy: string,
+    @Query('sortOrder') sortOrder: string,
+    @Res() res: Response,
+  ) {
     try {
+      // If pagination params are provided, use paginated method
+      if (page || limit || activeAt || search || sortBy) {
+        const result = await this.pollsService.getAllPaginated({
+          page: page ? parseInt(page, 10) : 1,
+          limit: limit ? parseInt(limit, 10) : 10,
+          status: status || undefined,
+          activeAt: activeAt ? new Date(activeAt) : undefined,
+          search: search || undefined,
+          sortBy: (sortBy as 'createdAt' | 'updatedAt' | 'startTime' | 'title') || 'createdAt',
+          sortOrder: (sortOrder as 'asc' | 'desc') || 'desc',
+        });
+        return res.status(200).json(result);
+      }
+
+      // Legacy: return all polls without pagination
       let polls;
       if (status) {
         polls = await this.pollsService.getPollByStatus(status);
@@ -184,7 +216,11 @@ export class PollsController {
       try {
         // IMPORTANT: Results are saved with the On-Chain Poll ID (e.g., "0"), not the Mongo ID
         const onChainId = (poll as any).pollIdOnChain;
-        if (onChainId !== undefined && onChainId !== null) {
+        const pollStatus = (poll as any).status;
+
+        // Only return results if poll is explicitly "ended" (tally completed)
+        // This prevents showing results for "counting" polls
+        if (onChainId !== undefined && onChainId !== null && pollStatus === 'ended') {
           const resultsMeta =
             await this.resultsMetaService.getOutComeByVotingEventId(
               onChainId.toString(),
@@ -386,12 +422,14 @@ export class PollsController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const { pollIdOnChain, subgraphUrl } = req.body;
+    const { pollIdOnChain, subgraphUrl, maciAddress, startBlock } = req.body;
     try {
       const updatedPoll = await this.pollsService.savePollOnChainId(
         id,
         pollIdOnChain,
         subgraphUrl,
+        maciAddress,
+        startBlock,
       );
       return res.status(200).json({ poll: updatedPoll });
     } catch (error) {

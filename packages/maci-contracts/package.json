@@ -38,7 +38,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "hardhat": "hardhat node",
-    "compileSol": "TS_NODE_TRANSPILE_ONLY=1 ts-node ./scripts/compileSol.ts",
+    "compileSol": "cross-env TS_NODE_TRANSPILE_ONLY=1 ts-node ./scripts/compileSol.ts",
     "moveIntegrationArtifacts": "cp -r artifacts/ ../integrationTests/artifacts",
     "prebuild": "pnpm run compileSol",
     "build": "tsc -p tsconfig.build.json",
@@ -235,11 +235,11 @@
     "@pcd/util": "^0.9.0",
     "@zk-kit/imt.sol": "2.0.0-beta.12",
     "@zk-kit/lean-imt": "^2.2.3",
-    "circomlibjs": "^0.1.7",
-    "ethers": "^6.15.0",
+    "circomlibjs": "catalog:",
+    "ethers": "catalog:",
     "hardhat": "^2.25.0",
     "lowdb": "^1.0.0",
-    "snarkjs": "^0.7.5",
+    "snarkjs": "catalog:",
     "solady": "^0.1.24",
     "solidity-docgen": "^0.6.0-beta.36",
     "uuid": "^11.1.0"
@@ -251,17 +251,18 @@
     "@types/circomlibjs": "^0.1.6",
     "@types/lowdb": "^1.0.15",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.2.0",
+    "@types/node": "catalog:",
     "@types/sinon": "^17.0.4",
     "@types/snarkjs": "^0.7.9",
     "@types/uuid": "^10.0.0",
-    "chai": "^4.3.10",
+    "chai": "catalog:",
     "chai-as-promised": "^8.0.1",
-    "dotenv": "^17.2.2",
+    "cross-env": "catalog:",
+    "dotenv": "catalog:",
     "hardhat-artifactor": "^0.2.0",
     "hardhat-contract-sizer": "^2.10.0",
     "sinon": "^21.0.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.9.2"
+    "ts-node": "catalog:",
+    "typescript": "catalog:"
   }
 }

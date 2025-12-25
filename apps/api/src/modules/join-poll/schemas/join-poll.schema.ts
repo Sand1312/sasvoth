@@ -6,7 +6,7 @@ export type JoinPollDocument = HydratedDocument<JoinPoll>;
 @Schema()
 export class JoinPoll {
     @Prop({ required: true })
-    voterId: string;
+    voterAdrress: string;
 
     @Prop({ required: true })
     pollId: string;

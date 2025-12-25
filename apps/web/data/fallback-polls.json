@@ -1,0 +1,52 @@
+[
+  {
+    "_id": "mock-1",
+    "title": "Future of Play",
+    "description": "A curated shortlist of ideas exploring how social games and civic tech overlap.",
+    "status": "Prepare",
+    "startTime": "2024-10-12T09:00:00.000Z",
+    "endTime": "2024-11-24T23:00:00.000Z",
+    "createdAt": "2024-10-01T12:00:00.000Z",
+    "updatedAt": "2024-10-20T15:30:00.000Z"
+  },
+  {
+    "_id": "mock-2",
+    "title": "Commons Treasury",
+    "description": "Prioritise open-source infrastructure upgrades for new community-owned treasuries.",
+    "status": "In Progress",
+    "startTime": "2024-08-04T09:00:00.000Z",
+    "endTime": "2024-09-04T23:00:00.000Z",
+    "createdAt": "2024-07-28T10:10:00.000Z",
+    "updatedAt": "2024-08-18T16:00:00.000Z"
+  },
+  {
+    "_id": "mock-3",
+    "title": "Neighborhood Canvas",
+    "description": "Funding round for public artists to reimagine civic billboards and pocket parks.",
+    "status": "Counting",
+    "startTime": "2024-06-01T09:00:00.000Z",
+    "endTime": "2024-06-20T23:00:00.000Z",
+    "createdAt": "2024-05-10T08:00:00.000Z",
+    "updatedAt": "2024-06-15T11:45:00.000Z"
+  },
+  {
+    "_id": "mock-4",
+    "title": "Civic Sandbox Residency",
+    "description": "Prototype residency proposals that combine play, stewardship, and tactical urbanism.",
+    "status": "Ended",
+    "startTime": "2024-03-10T09:00:00.000Z",
+    "endTime": "2024-04-10T23:00:00.000Z",
+    "createdAt": "2024-02-20T13:00:00.000Z",
+    "updatedAt": "2024-04-15T17:20:00.000Z"
+  },
+  {
+    "_id": "mock-5",
+    "title": "All Hands Assembly",
+    "description": "Cross-coalition vote to select facilitators for the 2025 impact assembly tour.",
+    "status": "Draft",
+    "startTime": "2025-01-05T09:00:00.000Z",
+    "endTime": "2025-02-05T23:00:00.000Z",
+    "createdAt": "2024-12-01T09:45:00.000Z",
+    "updatedAt": "2024-12-14T14:30:00.000Z"
+  }
+]

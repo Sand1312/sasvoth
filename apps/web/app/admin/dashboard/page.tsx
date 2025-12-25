@@ -4,6 +4,10 @@ import React, { useEffect, useState } from "react";
 import { PollStatus } from "@/types/polls";
 import { Button } from "@sasvoth/ui/button";
 import { IdeaUploadForm } from "@/components/idea-upload-form";
+import { useClaimContract } from "@/hooks/useClaimContract";
+import { useToken } from "@/hooks/useToken";
+import { useAccount } from "wagmi";
+import { CLAIM_CONTRACT_ADDRESS } from "@sasvoth/contracts";
 
 type Vote = {
   id: string;
@@ -38,6 +42,86 @@ export default function AdminDashboardPage(): React.ReactElement {
   /* Removed MOCK_VOTES and fixed state */
   const [votes, setVotes] = useState<Vote[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const { address } = useAccount();
+  const { withdrawETH, withdrawToken, isWithdrawingETH, isWithdrawingToken } = useClaimContract();
+  const { transfer, isTransferring, balance, contractBalance } = useToken();
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [withdrawSuccess, setWithdrawSuccess] = useState<string | null>(null);
+  const [withdrawError, setWithdrawError] = useState<string | null>(null);
+  const [depositAmount, setDepositAmount] = useState("");
+
+  const handleWithdrawETH = async () => {
+    if (!address) {
+      alert("Please connect wallet first!");
+      return;
+    }
+    
+    setWithdrawing(true);
+    setWithdrawSuccess(null);
+    setWithdrawError(null);
+    
+    try {
+      const hash = await withdrawETH();
+      if (hash) {
+        setWithdrawSuccess(`ETH withdrawn successfully! Tx: ${hash.slice(0, 10)}...`);
+      }
+    } catch (error: any) {
+      setWithdrawError(error.message || "Failed to withdraw ETH");
+    } finally {
+      setWithdrawing(false);
+    }
+  };
+
+  const handleWithdrawToken = async () => {
+    if (!address) {
+      alert("Please connect wallet first!");
+      return;
+    }
+    
+    setWithdrawing(true);
+    setWithdrawSuccess(null);
+    setWithdrawError(null);
+    
+    try {
+      const hash = await withdrawToken();
+      if (hash) {
+        setWithdrawSuccess(`Tokens withdrawn successfully! Tx: ${hash.slice(0, 10)}...`);
+      }
+    } catch (error: any) {
+      setWithdrawError(error.message || "Failed to withdraw tokens");
+    } finally {
+      setWithdrawing(false);
+    }
+  };
+
+  const handleDepositToken = async () => {
+    if (!address) {
+      alert("Please connect wallet first!");
+      return;
+    }
+    
+    if (!depositAmount || Number(depositAmount) <= 0) {
+      setWithdrawError("Please enter a valid amount");
+      return;
+    }
+    
+    setWithdrawing(true);
+    setWithdrawSuccess(null);
+    setWithdrawError(null);
+    
+    try {
+      const hash = await transfer(CLAIM_CONTRACT_ADDRESS, depositAmount);
+      if (hash) {
+        setWithdrawSuccess(`Deposited ${depositAmount} HD tokens! Tx: ${hash.slice(0, 10)}...`);
+        setDepositAmount("");
+      }
+    } catch (error: any) {
+      setWithdrawError(error.message || "Failed to deposit tokens");
+    } finally {
+      setWithdrawing(false);
+    }
+  };
 
   // Fetch real votes
   useEffect(() => {
@@ -111,6 +195,82 @@ export default function AdminDashboardPage(): React.ReactElement {
           </Button>
         </div>
       </header>
+
+      {/* Admin Withdraw Section */}
+      <section className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+        <h2 className="text-xl font-bold mb-4">💰 Admin Fund Management</h2>
+        
+        {withdrawSuccess && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded text-green-700 text-sm">
+            ✅ {withdrawSuccess}
+          </div>
+        )}
+        
+        {withdrawError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+            ❌ {withdrawError}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-6">
+          {/* Deposit Section */}
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
+            <h3 className="text-lg font-semibold mb-3">📥 Deposit Tokens</h3>
+            <div className="mb-3 space-y-1">
+              <p className="text-sm text-gray-600">
+                Your Balance: <span className="font-semibold">{balance} HD</span>
+              </p>
+              <p className="text-sm text-gray-600">
+                Contract Balance: <span className="font-semibold text-blue-600">{contractBalance} HD</span>
+              </p>
+            </div>
+            <div className="space-y-3">
+              <input
+                type="number"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                placeholder="Amount to deposit"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Button
+                onClick={handleDepositToken}
+                disabled={withdrawing || isTransferring || !address || !depositAmount}
+                className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50"
+              >
+                {isTransferring ? "Depositing..." : "Deposit HD Tokens"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Withdraw Section */}
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
+            <h3 className="text-lg font-semibold mb-3">📤 Withdraw Funds</h3>
+            <div className="space-y-3">
+              <Button
+                onClick={handleWithdrawETH}
+                disabled={withdrawing || isWithdrawingETH || !address}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50"
+              >
+                {isWithdrawingETH ? "Withdrawing..." : "Withdraw ETH"}
+              </Button>
+
+              <Button
+                onClick={handleWithdrawToken}
+                disabled={withdrawing || isWithdrawingToken || !address}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium disabled:opacity-50"
+              >
+                {isWithdrawingToken ? "Withdrawing..." : "Withdraw HD Tokens"}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {!address && (
+          <p className="mt-3 text-sm text-gray-600">
+            ⚠️ Please connect your wallet to manage funds
+          </p>
+        )}
+      </section>
 
       {/* Progress of opening vote */}
       <section className="mb-8 border-t border-b border-gray-200 py-6">
@@ -462,7 +622,7 @@ export default function AdminDashboardPage(): React.ReactElement {
             preview modal.
           </p>
         </div>
-        <IdeaUploadForm />
+        <IdeaUploadForm pollId="" />
       </section>
     </main>
   );

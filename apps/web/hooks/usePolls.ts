@@ -28,6 +28,14 @@ export function usePolls() {
     numberOptions: number,
     startTime: Date,
     endTime: Date,
+    maciConfig?: {
+      mode?: number;
+      messageBatchSize?: number;
+      pollStateTreeDepth?: number;
+      voteOptionTreeDepth?: number;
+      tallyProcessingStateTreeDepth?: number;
+      initialVoiceCredits?: number;
+    }
   ) => {
     try {
       const res = await pollsApi.createPoll(
@@ -37,6 +45,7 @@ export function usePolls() {
         numberOptions,
         startTime,
         endTime,
+        maciConfig
       );
       goTo("/admin/dashboard");
       return res;
@@ -69,11 +78,33 @@ export function usePolls() {
    const approveIdeaInPoll= pollsApi.approveIdeaInPoll;
    const saveOnChainId= pollsApi.saveOnChainId;
 
+  /**
+   * Get polls with pagination and filtering (server-side)
+   */
+  const getPollsPaginated = async (options: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    activeAt?: Date;
+    search?: string;
+    sortBy?: 'createdAt' | 'updatedAt' | 'startTime' | 'title';
+    sortOrder?: 'asc' | 'desc';
+  }) => {
+    try {
+      const res = await pollsApi.getPollsPaginated(options);
+      return res;
+    } catch (error) {
+      console.error("Get Polls Paginated error:", error);
+      throw error;
+    }
+  };
+
 
   return {
     initPoll,
     getPolls,
     getPollById,
+    getPollsPaginated,
     updatePollStatus ,
     addIdeaToPoll,
     approveIdeaInPoll,

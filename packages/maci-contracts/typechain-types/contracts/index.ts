@@ -3,6 +3,10 @@
 /* eslint-disable */
 import type * as crypto from "./crypto";
 export type { crypto };
+import type * as extensions from "./extensions";
+export type { extensions };
+import type * as gatekeepers from "./gatekeepers";
+export type { gatekeepers };
 import type * as initialVoiceCreditProxy from "./initialVoiceCreditProxy";
 export type { initialVoiceCreditProxy };
 import type * as interfaces from "./interfaces";

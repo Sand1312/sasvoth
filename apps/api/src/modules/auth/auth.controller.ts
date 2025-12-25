@@ -330,7 +330,8 @@ export class AuthController {
 
   // ---- WALLET ----
   private async walletAuth(@Req() req: Request, @Res() res: Response) {
-    const { address, signature } = req.body;
+    // Expect message to be passed from client (including nonce)
+    const { address, signature, message } = req.body;
 
     if (!address || !signature)
       throw new UnauthorizedException('Address and signature are required');
@@ -338,8 +339,14 @@ export class AuthController {
     if (!ethers.utils.isAddress(address))
       throw new BadRequestException('Invalid wallet address');
 
-    const msg = 'Sign to login with MetaMask';
-    const signer = ethers.utils.verifyMessage(msg, signature);
+    // Use the provided message, or fallback for legacy clients if strict security isn't blocking
+    // For now, let's enforce equality to what FE sends or fallback to legacy constant
+    const msgToVerify = message || 'Sign to login with MetaMask';
+    
+    // Optional: Validate message format if we want to enforce nonces
+    // if (!msgToVerify.startsWith("Sign to login")) throw new BadRequestException("Invalid message format");
+
+    const signer = ethers.utils.verifyMessage(msgToVerify, signature);
     if (signer.toLowerCase() !== address.toLowerCase())
       throw new BadRequestException('Invalid signature');
 

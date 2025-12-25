@@ -8,7 +8,7 @@ export function IdeaSubmit({ pollId }: { pollId: string }) {
       className="rounded-full border border-black bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white hover:bg-black"
       pollId={pollId}
     >
-      Submit new idea
+      Submit your idea
     </IdeaSubmitFormTrigger>
   );
 }

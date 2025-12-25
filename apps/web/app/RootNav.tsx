@@ -1,17 +1,11 @@
 import { cookies } from "next/headers";
 import { RootNavClient } from "../components/root-nav-client";
-
-type User = {
-  id?: string;
-  email?: string;
-  name?: string;
-  [key: string]: unknown;
-} | null;
+import type { User } from "../types/user";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Polls", href: "/polls" },
-  { label: "Transactions", href: "/transactions" },
+  {label: "Subscriptions", href: "/subscriptions"}
 ];
 
 const AUTH_HIDDEN_ROUTES = ["/signin", "/signup"];
@@ -27,14 +21,11 @@ const LOGO_PROPS = {
 const NAV_WRAPPER_CLASSES =
   "mx-auto flex w-full max-w-7xl items-center justify-between px-[2%] py-5 md:py-6 bg-white";
 
-async function refreshToken(
-  cookieHeader: string,
-  apiBase: string
-): Promise<boolean> {
-  try {
-    const refreshEndpoint = new URL("/api/v1/auth/refresh", apiBase).toString();
+const API_BASE = "/api/v1";
 
-    const res = await fetch(refreshEndpoint, {
+async function refreshToken(cookieHeader: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -66,13 +57,7 @@ async function getCurrentUser(): Promise<User> {
       )
       .join("; ");
 
-    const apiBase =
-      process.env.NEXT_PUBLIC_API_URL ||
-      process.env.API_URL ||
-      "http://localhost:8000";
-    const userEndpoint = new URL("/api/v1/users/me", apiBase).toString();
-
-    let res = await fetch(userEndpoint, {
+    let res = await fetch(`${API_BASE}/users/me`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -84,12 +69,12 @@ async function getCurrentUser(): Promise<User> {
     // Handle 401 with token refresh
     if (res.status === 401) {
       console.log("Received 401, attempting token refresh...");
-      const refreshSuccess = await refreshToken(cookieHeader, apiBase);
+      const refreshSuccess = await refreshToken(cookieHeader);
 
       if (refreshSuccess) {
         console.log("Token refresh successful, retrying user request...");
         // Retry the original request
-        res = await fetch(userEndpoint, {
+        res = await fetch(`${API_BASE}/users/me`, {
           method: "GET",
           headers: {
             Accept: "application/json",

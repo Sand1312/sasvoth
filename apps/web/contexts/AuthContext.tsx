@@ -4,14 +4,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useRedirect } from "../hooks/useRedirect";
 import { authApi } from "../api";
 import { api } from "../api/base";
-import { useMaci } from "../hooks/useMACI";
-import { useUser } from "../hooks/useUser";
+import { useAuthStore } from "../stores/authStore";
 
 type User = any; // Todo: Define precise User type
 
 export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  isConnectingWallet: boolean;
   setUser: (user: User | null) => void;
   loginWithEmail: (identifier: string, password: string) => Promise<any>;
   loginWithWallet: () => Promise<any>;
@@ -23,11 +23,10 @@ export interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children, initialUser }: { children: ReactNode; initialUser?: User | null }) {
-  const { goTo, replaceTo } = useRedirect();
+  const { replaceTo } = useRedirect();
   const [user, setUser] = useState<User | null>(initialUser || null);
   const [isLoading, setIsLoading] = useState(!initialUser);
-  const { signupToMaci } = useMaci();
-  const { saveStateIndex } = useUser();
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
   // On mount, if no initial user, try to refresh/fetch
   useEffect(() => {
@@ -40,36 +39,33 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
 
     const refresh = async () => {
       try {
-        // Validation logic similar to original useAuth
+        // 1. Try to validate existing session
         let validated = false;
         try {
           const v = await api.post("/auth/validate");
           validated = v?.status === 200;
-        } catch (_) {
+        } catch {
           validated = false;
         }
 
+        // 2. If invalid, try to refresh token
         if (!validated) {
           try {
             await api.post("/auth/refresh");
             validated = true;
-          } catch (_) {
+          } catch {
             validated = false;
           }
         }
 
+        // 3. If validated, fetch user profile
         if (validated) {
-          try {
-            const res = await api.get("/users/me");
-            if (isMounted) {
-              const u = (res as any)?.data ?? null;
-              setUser(u);
-            }
-          } catch (_) {
-            // ignore
+          const res = await api.get("/users/me");
+          if (isMounted) {
+            setUser((res as any)?.data ?? null);
           }
         } else {
-             if (isMounted) setUser(null);
+          if (isMounted) setUser(null);
         }
       } catch (err) {
         console.error("Auth refresh failed:", err);
@@ -85,39 +81,13 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     };
   }, [initialUser]);
 
-  const handleMaciSetup = async (user: any) => {
-      try {
-        if (user.privateKey) {
-          // New user - create MACI identity
-          const maciResult = await signupToMaci(user.publicKeyX, user.publicKeyY);
-  
-          if (maciResult.stateIndex) {
-            // Store in localStorage
-            localStorage.setItem(
-              "maci_stateIndex",
-              maciResult.stateIndex.toString()
-            );
-            localStorage.setItem("maci_pubKeyX", user.publicKeyX.toString());
-            localStorage.setItem("maci_pubKeyY", user.publicKeyY.toString());
-  
-            // Save to user profile
-            await saveStateIndex(user.walletAddress!, Number(maciResult.stateIndex));
-          }
-        } else {
-          // Existing user - restore from data
-          if (user.stateIndex) {
-            localStorage.setItem("maci_stateIndex", user.stateIndex.toString());
-            localStorage.setItem("maci_pubKeyX", user.publicKeyX.toString());
-            localStorage.setItem("maci_pubKeyY", user.publicKeyY.toString());
-          }
-        }
-      } catch (error) {
-        console.error("MACI setup error:", error);
-        throw new Error("Failed to setup MACI system.");
-      }
-    };
-
   const loginWithEmail = async (identifier: string, password: string) => {
+    const { acquireLock, releaseLock } = useAuthStore.getState();
+    const acquired = acquireLock("login-email");
+    if (!acquired) {
+      throw new Error("Another auth operation is in progress");
+    }
+
     try {
       const res = await authApi.signinWithProvider("email", {
         username: identifier,
@@ -125,101 +95,156 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
         password,
       });
 
-      const returnedUser = res.user;
-      const newUser = returnedUser || ({ authenticated: true } as any);
-      setUser(newUser);
-      // Logic for redirect is handled in components now with callbackUrl
+      const returnedUser = res.user || ({ authenticated: true } as any);
+      setUser(returnedUser);
       return res;
     } catch (error) {
       console.error("Email login error:", error);
       throw error;
+    } finally {
+      releaseLock();
     }
   };
 
   const loginWithWallet = async () => {
-     try {
-          // Check if MetaMask is installed
-          if (!(window as any).ethereum) {
-            throw new Error("MetaMask is not installed.");
-          }
-    
-          // Request account access
-          const accounts = await (window as any).ethereum.request({
-            method: "eth_requestAccounts",
-          });
-          const account = accounts[0];
-          const message = "Sign to login with MetaMask";
-    
-          // Request signature
-          const signature = await (window as any).ethereum.request({
-            method: "personal_sign",
-            params: [message, account],
-          });
-    
-          // Authenticate with backend
-          const res = await authApi.signinWithProvider("wallet", {
-            address: account,
-            signature,
-            message,
-          });
-    
-          const returnedUser = res.user;
-          if (returnedUser) {
-            setUser(returnedUser);
-            // Initialize MACI
-            await handleMaciSetup(returnedUser);
-          } else {
-            setUser({ authenticated: true } as any);
-          }
-    
-          // Redirect logic moved to components
-          return res;
-        } catch (error) {
-          console.error("Wallet login error:", error);
-          throw error;
-        }
+    const { acquireLock, releaseLock } = useAuthStore.getState();
+    const acquired = acquireLock("login-wallet");
+    if (!acquired) {
+      // Silently return if already processing in this tab
+      console.log("[Auth] Wallet login blocked - operation in progress");
+      return { success: false, reason: "in_progress" };
+    }
+
+    setIsConnectingWallet(true);
+    try {
+      if (!(window as any).ethereum) {
+        throw new Error("MetaMask is not installed.");
+      }
+
+      // Request account access
+      const accounts = await (window as any).ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const account = accounts[0];
+
+      // Generate random nonce
+      const nonce = crypto.randomUUID();
+      const message = `Sign to login. Nonce: ${nonce}`;
+
+      // Request signature
+      const signature = await (window as any).ethereum.request({
+        method: "personal_sign",
+        params: [message, account],
+      });
+
+      // Authenticate with backend
+      const res = await authApi.signinWithProvider("wallet", {
+        address: account,
+        signature,
+        message,
+      });
+
+      const returnedUser = res.user;
+      if (returnedUser) {
+        setUser(returnedUser);
+      } else {
+        setUser({ authenticated: true } as any);
+      }
+
+      return res;
+    } catch (error: any) {
+      console.error("Wallet login error:", error);
+      
+      // Handle MetaMask-specific errors gracefully
+      const errorMessage = error?.message?.toLowerCase() || "";
+      const errorCode = error?.code;
+      
+      // MetaMask: Already pending request (from another tab)
+      if (errorMessage.includes("already pending") || errorMessage.includes("requestpermissions")) {
+        console.log("[Auth] MetaMask has pending request in another tab");
+        return { success: false, reason: "pending_other_tab" };
+      }
+      
+      // MetaMask: User rejected request
+      if (errorCode === 4001 || errorMessage.includes("user rejected") || errorMessage.includes("user denied")) {
+        console.log("[Auth] User rejected wallet connection");
+        return { success: false, reason: "user_rejected" };
+      }
+      
+      // Other errors - still throw for error dialog
+      throw error;
+    } finally {
+      releaseLock();
+      setIsConnectingWallet(false);
+    }
   };
 
   const loginWithSocial = (provider: "google" | "github") => {
     try {
-        authApi.signinWithProvider(provider);
+      authApi.signinWithProvider(provider);
     } catch (error) {
-        console.error("Social login error:", error);
-        throw error;
+      console.error("Social login error:", error);
+      throw error;
     }
   };
 
   const signupWithEmail = async (email: string, password: string, name: string, walletAddress?: string) => {
-      try {
-          const res = await authApi.signupWithEmail(
-            email,
-            password,
-            name,
-            walletAddress
-          );
-          const createdUser = res?.data?.user ?? res?.data ?? null;
-          if (createdUser) setUser(createdUser);
-          // goTo("/dashboard"); // Handled in component
-          return res;
-        } catch (error) {
-          console.error("Signup error:", error);
-          throw error;
-        }
+    const { acquireLock, releaseLock } = useAuthStore.getState();
+    const acquired = acquireLock("signup");
+    if (!acquired) {
+      throw new Error("Another auth operation is in progress");
+    }
+
+    try {
+      const res = await authApi.signupWithEmail(
+        email,
+        password,
+        name,
+        walletAddress
+      );
+      const createdUser = res?.data?.user ?? res?.data ?? null;
+      if (createdUser) setUser(createdUser);
+      return res;
+    } catch (error) {
+      console.error("Signup error:", error);
+      throw error;
+    } finally {
+      releaseLock();
+    }
   };
 
   const signout = async () => {
+    const { acquireLock, releaseLock } = useAuthStore.getState();
+    const acquired = acquireLock("logout");
+    if (!acquired) {
+      throw new Error("Another auth operation is in progress");
+    }
+
+    try {
       try {
-          try {
-            await authApi.signout();
-          } catch (_) {
-            await api.post("/auth/logout");
-          }
-          setUser(null);
-          replaceTo("/signin");
-        } catch (error) {
-          console.error("Signout error:", error);
-          throw error;
-        }
+        await authApi.signout();
+      } catch {
+        // Fallback or ignore if already signed out
+        await api.post("/auth/logout");
+      }
+
+      // Clear MACI keypair cache from memory
+      try {
+        const { clearMaciKeyCache } = await import("@/lib/maci-key-derivation");
+        clearMaciKeyCache();
+        console.log("MACI key cache cleared");
+      } catch (e) {
+        console.warn("Failed to clear MACI key cache:", e);
+      }
+
+      setUser(null);
+      replaceTo("/signin");
+    } catch (error) {
+      console.error("Signout error:", error);
+      throw error;
+    } finally {
+      releaseLock();
+    }
   };
 
   return (
@@ -227,6 +252,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
       value={{
         user,
         isLoading,
+        isConnectingWallet,
         setUser,
         loginWithEmail,
         loginWithWallet,

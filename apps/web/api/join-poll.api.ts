@@ -1,12 +1,10 @@
 import { api } from "./base";
 
 export type JoinPollPayload = {
-  voterId: string;
+  voterAdrress: string;  // Note: Backend schema has typo "voterAdrress"
   pollId: string;
+  pollIdOnchain: string;
   voteCommitment: string;
-  pollIdOnchain: number;
-  pubKey?: { x: string; y: string };
-  maciContractAddress?: string;
 };
 
 export type VoteCommitmentPayload = {
@@ -22,12 +20,13 @@ export type VoteCommitmentPayload = {
 export const pollParticipantsApi = {
   /**
    * Get all participants for a poll
-   * GET /polls/:pollId/participants
+   * GET /join-poll/get?pollId=X&voterAdrress=Y
    */
-  getAll: async (pollId: string, voterId?: string) => {
-    const params = voterId ? { voterId } : undefined;
-    const response = await api.get(`/polls/${pollId}/participants`, { params });
-    return response.data?.participants ?? response.data?.votes ?? response.data;
+  getAll: async (pollId: string, voterAddress?: string) => {
+    const params: Record<string, string> = { pollId };
+    if (voterAddress) params.voterAdrress = voterAddress; // Note: backend has typo "voterAdrress"
+    const response = await api.get(`/join-poll/get`, { params });
+    return response.data?.votes ?? response.data;
   },
 
   /**
@@ -36,10 +35,8 @@ export const pollParticipantsApi = {
    */
   create: async (payload: JoinPollPayload) => {
     const response = await api.post(`/join-poll/join`, {
-      voterId: payload.voterId,
-      pollId: payload.pollId, 
-      maciContractAddress: payload.maciContractAddress,
-      pubKey: payload.pubKey,
+      voterAdrress: payload.voterAdrress, // Backend has typo
+      pollId: payload.pollId,
       pollIdOnchain: payload.pollIdOnchain,
       voteCommitment: payload.voteCommitment,
     });
@@ -48,11 +45,13 @@ export const pollParticipantsApi = {
 
   /**
    * Check if user has joined a poll
-   * GET /polls/:pollId/participants/:voterId
+   * GET /join-poll/check?pollId=X&voterAdrress=Y
    */
-  checkJoined: async (pollId: string, voterId: string) => {
-    const response = await api.get(`/polls/${pollId}/participants/${voterId}`);
-    return response.data?.hasJoined ?? response.data?.hasVoted ?? false;
+  checkJoined: async (pollId: string, voterAddress: string) => {
+    const response = await api.get(`/join-poll/check`, {
+      params: { pollId, voterAdrress: voterAddress } // Note: backend has typo "voterAdrress"
+    });
+    return response.data?.hasVoted ?? false;
   },
 
   /**
@@ -67,15 +66,15 @@ export const pollParticipantsApi = {
 
 // Backward compatibility - export as joinPollApi
 export const joinPollApi = {
-  /** @deprecated Use pollParticipantsApi.getAll instead */
+  // /** @deprecated Use pollParticipantsApi.getAll instead */
   getVotes: async (params: { pollId?: string; voterId?: string }) =>
     params.pollId
       ? pollParticipantsApi.getAll(params.pollId, params.voterId)
       : [],
-  /** @deprecated Use pollParticipantsApi.create instead */
+  // /** @deprecated Use pollParticipantsApi.create instead */
   joinPoll: async (voteData: JoinPollPayload) =>
     pollParticipantsApi.create(voteData),
-  /** @deprecated Use pollParticipantsApi.createCommitment instead */
+  // /** @deprecated Use pollParticipantsApi.createCommitment instead */
   createVoteCommitment: async (
     vote: string,
     voiceCredits: string,
@@ -88,7 +87,7 @@ export const joinPollApi = {
       pollIdOnchain,
       privateKey,
     }),
-  /** @deprecated Use pollParticipantsApi.checkJoined instead */
+  // /** @deprecated Use pollParticipantsApi.checkJoined instead */
   checkVote: async (voterId: string, pollId: string) =>
     pollParticipantsApi.checkJoined(pollId, voterId),
 };

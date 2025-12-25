@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@sasvoth/ui/button";
-import { useMaci } from "@/hooks"; 
+import { useMaci } from "@/hooks";
 import { useFeedback } from "@/contexts/FeedbackContext";
 import { SignupModal } from "./signup-modal";
 import { Spinner } from "@sasvoth/ui/spinner";
@@ -11,12 +11,16 @@ type VotingControlsProps = {
   credits: { spent: number; total: number; remaining?: number };
   pollId: string;
   pollIdOnChain: string;
+  maciAddress?: string;
+  startBlock?: number;
 };
 
 export function VotingControls({
   credits,
   pollId,
   pollIdOnChain,
+  maciAddress,
+  startBlock,
 }: VotingControlsProps) {
   const [showSignup, setShowSignup] = useState(false);
   const { signupToMaci, loading } = useMaci();
@@ -35,9 +39,14 @@ export function VotingControls({
 
   // Handle MACI signup only (separate from join poll)
   const handleMaciSignup = async () => {
+    if (!maciAddress) {
+      showError("Missing MACI Address", "Poll doesn't have a MACI address configured.");
+      return;
+    }
+
     try {
-      console.log("Signing up to MACI...");
-      const result = await signupToMaci();
+      console.log("Signing up to MACI with address:", maciAddress);
+      const result = await signupToMaci(maciAddress, startBlock);
       console.log("MACI Signup successful:", result);
       showSuccess(
         "MACI Signup",
@@ -65,7 +74,7 @@ export function VotingControls({
           <Button
             variant="ghost"
             onClick={handleMaciSignup}
-            disabled={loading}
+            disabled={loading || !maciAddress}
             className="rounded-full border border-purple-500 px-6 py-3 text-purple-700 hover:bg-purple-50 flex items-center gap-2"
           >
             {loading && <Spinner />}
@@ -74,11 +83,11 @@ export function VotingControls({
           <Button
             variant="ghost"
             onClick={() => setShowSignup(true)}
-            className={`rounded-full border px-6 py-3 ${
-              isJoined
+            disabled={!maciAddress}
+            className={`rounded-full border px-6 py-3 ${isJoined
                 ? "border-emerald-500 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                 : "border-black text-black hover:bg-black/5"
-            }`}
+              }`}
           >
             {isJoined
               ? `Joined (#${joinedPollStateIndex})`
@@ -102,7 +111,10 @@ export function VotingControls({
         onSuccess={() => setIsJoined(true)}
         pollId={pollId}
         pollIdOnChain={Number(pollIdOnChain)}
+        maciAddress={maciAddress || ""}
+        startBlock={startBlock}
       />
     </>
   );
 }
+

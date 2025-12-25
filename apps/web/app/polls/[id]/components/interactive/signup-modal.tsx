@@ -5,10 +5,9 @@ import { Button } from "@sasvoth/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sasvoth/ui/dialog";
 import { useMaci } from "@/hooks";
 import { useFeedback } from "@/contexts/FeedbackContext";
-
-// Dynamic imports for crypto libraries to avoid SSR issues
-// Note: In Next.js 16/React 19 we might handle this differently but sticking to working pattern
-import dynamic from "next/dynamic";
+import { useCheckJoinStatus } from "@/hooks/useCheckJoinStatus";
+import { useMaciStore } from "@/stores/maciStore";
+import { useAccount, useChainId, usePublicClient } from "wagmi";
 
 type SignupModalProps = {
   open: boolean;
@@ -16,6 +15,8 @@ type SignupModalProps = {
   onSuccess: () => void;
   pollId: string;
   pollIdOnChain: number;
+  maciAddress: string; // Required - from poll data
+  startBlock?: number; // Optional - from poll data
 };
 
 export function SignupModal({
@@ -24,38 +25,78 @@ export function SignupModal({
   onSuccess,
   pollId,
   pollIdOnChain,
+  maciAddress,
+  startBlock,
 }: SignupModalProps) {
   const { showSuccess, showError } = useFeedback();
   const { signupToMaci, joinMaciPoll, loading } = useMaci();
+  const { checkJoinStatus, loading: checkingStatus } = useCheckJoinStatus();
+  const { address } = useAccount();
+  const chainId = useChainId();
+  const publicClient = usePublicClient();
+
+  // Zustand store integration
+  const { hasKeypair, getKeypair, isLocked } = useMaciStore();
+
   const [privKey, setPrivKey] = useState("");
   const [useRandomKey, setUseRandomKey] = useState(true);
   const [useExistingKey, setUseExistingKey] = useState(false);
 
-  // ... (state logic remains same) ...
   const [alreadyJoined, setAlreadyJoined] = useState(false);
   const [existingPollStateIndex, setExistingPollStateIndex] = useState<string | null>(null);
   const [existingVoiceCredits, setExistingVoiceCredits] = useState<string | null>(null);
+  const [statusSource, setStatusSource] = useState<"subgraph" | "chain" | "none">("none");
 
   const [joinSuccess, setJoinSuccess] = useState(false);
   const [newPollStateIndex, setNewPollStateIndex] = useState<string | null>(null);
   const [newVoiceCredits, setNewVoiceCredits] = useState<string | null>(null);
 
+  // Check join status when modal opens
   useEffect(() => {
-    if (open) {
-      const storedPollStateIndex = localStorage.getItem("maci_poll_state_index");
-      const storedVoiceCredits = localStorage.getItem("maci_voice_credits");
-      const storedPrivKey = localStorage.getItem("maci_priv_key");
+    const checkStatus = async () => {
+      if (!open || !address) return;
 
-      if (storedPollStateIndex) {
+      // Reset state
+      setJoinSuccess(false);
+      setNewPollStateIndex(null);
+      setNewVoiceCredits(null);
+
+      // Check if keypair is cached in Zustand store
+      const hasExistingKey = hasKeypair(address, chainId, maciAddress);
+
+      // Get user's public key coordinates for subgraph query
+      let coords: { x: string; y: string } | null = null;
+      if (hasExistingKey) {
+        const cached = getKeypair(address, chainId, maciAddress);
+        if (cached) {
+          coords = { x: cached.pubKeyX, y: cached.pubKeyY };
+        }
+      }
+
+      // Check join status (subgraph first, then RPC fallback)
+      const pollIdStr = String(pollIdOnChain);
+      const result = await checkJoinStatus(
+        pollIdStr,
+        coords?.x,
+        coords?.y,
+        maciAddress,   // From prop (poll data)
+        publicClient   // For RPC fallback
+      );
+
+      console.log(`[SignupModal] Join status for poll ${pollIdStr}:`, result);
+
+      if (result.isJoined) {
         setAlreadyJoined(true);
-        setExistingPollStateIndex(storedPollStateIndex);
-        setExistingVoiceCredits(storedVoiceCredits);
+        setExistingPollStateIndex(result.pollStateIndex);
+        setExistingVoiceCredits(result.voiceCredits);
+        setStatusSource(result.source);
       } else {
         setAlreadyJoined(false);
         setExistingPollStateIndex(null);
         setExistingVoiceCredits(null);
+        setStatusSource("none");
 
-        if (storedPrivKey) {
+        if (hasExistingKey) {
           setUseExistingKey(true);
           setUseRandomKey(false);
         } else {
@@ -63,64 +104,67 @@ export function SignupModal({
           setUseRandomKey(true);
         }
       }
-      setJoinSuccess(false);
-      setNewPollStateIndex(null);
-      setNewVoiceCredits(null);
-    }
-  }, [open]);
+    };
+
+    checkStatus();
+  }, [open, pollIdOnChain, checkJoinStatus, address, chainId, publicClient, maciAddress, hasKeypair, getKeypair]);
 
   const handleSignup = async () => {
-    // ... (logic remains same) ...
     if (alreadyJoined) return;
-
+    console.log("maci address", maciAddress);
     try {
       if (useExistingKey) {
-        // ... existing key logic
+        // Existing key is cached in Zustand store - signupToMaci will use it
       } else if (useRandomKey) {
-        await signupToMaci();
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        await signupToMaci(maciAddress, startBlock); // Pass maciAddress and startBlock from poll
+        // No delay needed! The lock guard ensures sequential execution
       } else {
-        // ... manual key logic
+        // Manual key logic - not recommended but kept for backward compatibility
         if (!privKey) {
-           showError("Missing Key", "Enter secret key or use random generation");
-           return;
+          showError("Missing Key", "Enter secret key or use random generation");
+          return;
         }
-        let finalKey = privKey.trim();
-        if (!finalKey.startsWith("macisk")) {
-           const { PrivateKey } = await import("@maci-protocol/domainobjs");
-           const rawPKey = PrivateKey.deserialize(finalKey);
-           finalKey = rawPKey.serialize();
-        }
-        localStorage.setItem("maci_priv_key", finalKey);
-        const { PrivateKey, Keypair } = await import("@maci-protocol/domainobjs");
-        const pKey = PrivateKey.deserialize(finalKey);
-        const kPair = new Keypair(pKey);
-        localStorage.setItem("maci_pub_key", kPair.publicKey.serialize());
+        // Note: Manual key mode is deprecated. Keys are now derived from wallet signature.
+        showError("Deprecated", "Manual key entry is no longer supported. Please use 'Generate new keypair' option.");
+        return;
       }
 
-      const joinResult = await joinMaciPoll(String(pollIdOnChain), 0, "", 0);
+      const pollIdStr = String(pollIdOnChain);
 
-      if (joinResult.alreadyJoined) {
-        showSuccess("Already Joined", "Note: You have already joined this poll! treating as success.");
-      }
+      // 🔍 DEBUG: Log poll IDs before calling join
+      console.log(`🔍 [SignupModal] handleSignup - about to join poll:`, {
+        pollId_prop: pollId,
+        pollIdOnChain_prop: pollIdOnChain,
+        pollIdStr_used: pollIdStr,
+        maciAddress_prop: maciAddress?.slice(0, 15) + "...",
+      });
+
+      const joinResult = await joinMaciPoll(pollIdStr, 0, "", 0, maciAddress);
+
+      // Note: Don't show feedback modal for alreadyJoined - Dialog handles it
+      // showSuccess would create nested modals
 
       setJoinSuccess(true);
       setNewPollStateIndex(joinResult.pollStateIndex || null);
       setNewVoiceCredits(joinResult.voiceCredits || null);
 
-      if (joinResult.pollStateIndex) localStorage.setItem("maci_poll_state_index", joinResult.pollStateIndex);
-      if (joinResult.voiceCredits) localStorage.setItem("maci_voice_credits", joinResult.voiceCredits);
+      // Note: No localStorage needed - useMaciVote now gets stateIndex from chain
 
       onSuccess();
     } catch (e: any) {
       console.error("Signup/Join failed", e);
+      // Handle lock errors gracefully
+      if (e.message?.includes('another MACI operation')) {
+        showError("Please Wait", "Another operation is in progress. Please wait.");
+        return;
+      }
       showError("Signup/Join Failed", e.message);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="rounded-[32px] border-2 border-black sm:max-w-md bg-white p-6">
+      <DialogContent className="rounded-[32px] border-2 border-black sm:max-w-md !bg-white p-6 z-[100]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center sm:text-left">Join Poll</DialogTitle>
         </DialogHeader>
@@ -133,16 +177,19 @@ export function SignupModal({
                   <p className="text-emerald-800 font-semibold">Successfully Joined!</p>
                 </div>
                 <p className="text-sm text-emerald-600 mt-1">You are now registered to vote.</p>
-                <div className="mt-3 space-y-1">
-                  <p className="text-xs text-emerald-700 font-mono bg-emerald-100 px-2 py-1 rounded">
-                    Poll State Index: {newPollStateIndex || "N/A"}
-                  </p>
-                  {newVoiceCredits && (
+                {/* Only show stats if they have meaningful values */}
+                {newPollStateIndex && newPollStateIndex !== "0" && (
+                  <div className="mt-3 space-y-1">
                     <p className="text-xs text-emerald-700 font-mono bg-emerald-100 px-2 py-1 rounded">
-                      Voice Credits: {newVoiceCredits}
+                      Poll State Index: {newPollStateIndex}
                     </p>
-                  )}
-                </div>
+                    {newVoiceCredits && newVoiceCredits !== "0" && (
+                      <p className="text-xs text-emerald-700 font-mono bg-emerald-100 px-2 py-1 rounded">
+                        Voice Credits: {newVoiceCredits}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="flex justify-end">
                 <Button onClick={onClose} className="bg-emerald-600 text-white rounded-full px-6 hover:bg-emerald-700">
@@ -215,8 +262,8 @@ export function SignupModal({
 
               <div className="flex justify-end gap-2 mt-2">
                 <Button onClick={onClose} variant="ghost">Cancel</Button>
-                <Button onClick={handleSignup} disabled={loading} className="bg-black text-white rounded-full px-6">
-                  {loading ? "Joining..." : "Join Poll"}
+                <Button onClick={handleSignup} disabled={loading || isLocked()} className="bg-black text-white rounded-full px-6">
+                  {loading ? "Joining..." : isLocked() ? "Processing..." : "Join Poll"}
                 </Button>
               </div>
             </>

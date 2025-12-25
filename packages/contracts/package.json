@@ -2,12 +2,16 @@
   "name": "@sasvoth/contracts",
   "version": "1.0.0",
   "private": true,
-  "main": "index.ts",
-  "types": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "echo \"No build needed\""
+    "build": "tsc && node -e \"require('fs').cpSync('abi', 'dist/abi', {recursive: true})\"",
+    "dev": "tsc --watch"
   },
   "dependencies": {
-    "ethers": "^6.0.0"
+    "ethers": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
   }
 }

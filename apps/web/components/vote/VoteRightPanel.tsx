@@ -8,7 +8,7 @@ export type VoteRightPanelProps = {
   approvedAt: string | Date;
   ideaId?: string;
   logo?: string;
-  ageLimit?: string;
+  ageLimit?: number;
   voteAmount?: number;
   onVote?: () => void;
   isPreview?: boolean;
@@ -91,7 +91,7 @@ export function VoteRightPanel({
 
       <div className="flex items-center gap-3 mb-2">
         <div className="border border-black rounded-md px-3 py-1 text-black font-bold text-lg">
-          {ageLimit ? `${ageLimit}+` : "18+"}
+          {ageLimit && ageLimit > 0 ? `${ageLimit}+` : "All Ages"}
         </div>
         <span className="text-black text-sm">
           Extreme Violence, Strong Language

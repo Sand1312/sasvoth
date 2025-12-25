@@ -1,42 +1,96 @@
 import { useState } from "react";
-// Remove SDK, use Server Action
-// import { publishBatch } from "@maci-protocol/sdk";
-import { Keypair, PrivateKey } from "@maci-protocol/domainobjs";
+import { useSignTypedData, useAccount, useChainId, usePublicClient } from "wagmi";
 import { maciApi } from "../api/maci.api";
+import { deriveMaciKeypair, getStateIndexFromChain } from "@/lib/maci-key-derivation";
 
 export const useMaciVote = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { signTypedDataAsync } = useSignTypedData();
+  const { address } = useAccount();
+  const chainId = useChainId();
+  const publicClient = usePublicClient();
 
   const handleVote = async (
     pollId: string,
     voteOptionIndex: number,
     voteWeight: number,
     nonce: number,
-    maciAddress: string
+    maciAddress: string,
+    password: string, // Changed signature
+    startBlock?: number
   ) => {
     setLoading(true);
     setError(null);
     try {
-      const privateKey = localStorage.getItem("maci_priv_key");
-      const stateIndexStr = localStorage.getItem("maci_state_index");
-      if (!privateKey || !stateIndexStr) {
-        throw new Error("User not signed up (Missing privKey or stateIndex)");
+      if (!address) {
+        throw new Error("Wallet not connected");
       }
 
-      const userPrivKey = PrivateKey.deserialize(privateKey);
-      const userKeypair = new Keypair(userPrivKey);
+      // ============================================
+      // Step 1: Derive MACI keypair (cached in memory)
+      // ============================================
+      console.log("Deriving MACI keypair...");
+      const { privateKey, publicKey, pubKeyX, pubKeyY } = await deriveMaciKeypair(
+        address,
+        chainId,
+        signTypedDataAsync,
+        { maciAddress }
+      );
+
+      // ============================================
+      // Step 2: Get stateIndex from blockchain
+      // ============================================
+      console.log("Fetching stateIndex from blockchain...");
+      const { stateIndex } = await getStateIndexFromChain(
+        maciAddress,
+        { x: pubKeyX, y: pubKeyY },
+        publicClient,
+        startBlock
+      );
+
+      if (!stateIndex) {
+        throw new Error("User not signed up (No stateIndex found on chain)");
+      }
+
+      console.log(`🗳️ Submitting vote: Option ${voteOptionIndex} with ${voteWeight} voice credits (Poll ${pollId}, Nonce ${nonce})`);
+
+      // ============================================
+      // Step 2.5: Calculate vote commitment
+      //Hash(userVote, userVoiceCredits, userNonce, pollId, PASSWORD)
+      // ============================================
+      // @ts-ignore
+      const circomlibjs = await import("circomlibjs");
+      const poseidon = await circomlibjs.buildPoseidon();
       
-      console.log("Voting via API...", { pollId, voteOptionIndex, voteWeight, nonce });
+      // Ensure password is numeric for BigInt
+      // If user inputs non-numeric text, this will throw.
+      // We assume user knows it must be numeric code, or we could handle it.
+      let passwordBigInt;
+      try {
+        passwordBigInt = BigInt(password);
+      } catch (e) {
+        throw new Error("Password must be a numeric code");
+      }
 
-      // Generate Public Key string from Keypair to pass to server
-      const publicKey = userKeypair.publicKey.serialize(); 
+      const voteCommitment = poseidon.F.toString(poseidon([
+          BigInt(voteOptionIndex),
+          BigInt(voteWeight),
+          BigInt(nonce),
+          BigInt(pollId),
+          passwordBigInt // Use password instead of privateKey
+      ]));
+      console.log("Calculated voteCommitment:", voteCommitment);
 
+      // ============================================
+      // Step 3: Call vote API
+      // ============================================
       const result = await maciApi.vote(pollId, {
         voteOptionIndex,
         voteWeight,
         nonce,
-        userStateIndex: stateIndexStr,
+        voteCommitment,
+        userStateIndex: stateIndex,
         userMaciPrivateKey: privateKey,
         userMaciPublicKey: publicKey,
         maciAddress
@@ -68,3 +122,4 @@ export const useMaciVote = () => {
     error,
   };
 };
+

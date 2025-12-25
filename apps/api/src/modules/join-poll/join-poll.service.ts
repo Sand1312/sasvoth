@@ -11,18 +11,25 @@ export class JoinPollService {
     @InjectModel(JoinPoll.name) private joinPollModel: Model<JoinPollDocument>,
     private readonly voiceCreditsService: VoiceCreditsService,
     private readonly maciService: MaciService,
-  ) {}
+  ) { }
 
   // ...
 
-  async get(voterId: string, pollId: string): Promise<JoinPollDocument | null> {
-    return this.joinPollModel.findOne({ voterId, pollId }).exec();
+  async get(voterAdrress: string, pollId: string): Promise<JoinPollDocument | null> {
+    console.log(`[JoinPollService] get() called with voterAdrress=${voterAdrress}, pollId=${pollId}`);
+    // Use case-insensitive regex for address comparison (Ethereum addresses can be mixed case)
+    const result = await this.joinPollModel.findOne({
+      voterAdrress: { $regex: new RegExp(`^${voterAdrress}$`, 'i') },
+      pollId
+    }).exec();
+    console.log(`[JoinPollService] get() result:`, result ? 'Found' : 'Not found');
+    return result;
   }
 
   async create(voteData: any): Promise<void> {
     try {
       const existingVote = await this.joinPollModel
-        .findOne({ voterId: voteData.voterId, pollId: voteData.pollId })
+        .findOne({ voterAdrress: voteData.voterAdrress, pollId: voteData.pollId })
         .exec();
 
       // Note: We might want allow re-joining if it's just a sync?

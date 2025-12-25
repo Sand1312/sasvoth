@@ -1,10 +1,19 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import Image, { type ImageProps } from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@sasvoth/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@sasvoth/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@sasvoth/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import type { User } from "@/types/user";
 
 type NavItem = {
   label: string;
@@ -12,7 +21,7 @@ type NavItem = {
 };
 
 type RootNavClientProps = {
-  user: any;
+  user: User;
   navItems: NavItem[];
   hideOnRoutes: string[];
   wrapperClasses: string;
@@ -20,7 +29,6 @@ type RootNavClientProps = {
 };
 
 export function RootNavClient({
-  // user, // No longer needed from props, useAuth handles it
   navItems,
   hideOnRoutes,
   wrapperClasses,
@@ -29,14 +37,12 @@ export function RootNavClient({
   const { user, signout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const isLoggedIn = !!user;
 
   // Admin Path Detection
   const isAdminPath = pathname?.startsWith("/admin");
   const homeLink = isAdminPath ? "/admin/dashboard" : "/";
-  
+
   // Login Callback URL
   const loginHref = `/signin?callbackUrl=${encodeURIComponent(pathname || "/")}`;
   const shouldHideNav = hideOnRoutes.some((route) =>
@@ -44,47 +50,12 @@ export function RootNavClient({
   );
 
   // Dynamic Navigation Items
-  const computedNavItems = navItems
-    .filter((item) => item.label !== "Transactions") // User requested to remove Transactions
-    .map((item) => {
-      if (isAdminPath) {
-        if (item.href === "/dashboard") {
-          return { ...item, href: "/admin/dashboard" };
-        }
-        if (item.href === "/polls") {
-          return { ...item, href: "/admin/polls" };
-        }
-      }
-      return item;
-    });
-
-  const closeMenu = () => setIsMenuOpen(false);
-
-  useEffect(() => {
-    if (!isMenuOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        closeMenu();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMenuOpen]);
-
-  useEffect(() => {
-    closeMenu();
-  }, [pathname]);
+  const computedNavItems = navItems.map((item) =>
+    isAdminPath ? { ...item, href: `/admin${item.href}` } : item
+  );
 
   const handleLogout = async () => {
-      await signout();
-      closeMenu();
-  };
-
-  const handleSettingsClick = () => {
-    closeMenu();
-    router.push("/settings");
+    await signout();
   };
 
   if (shouldHideNav) {
@@ -150,32 +121,28 @@ export function RootNavClient({
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="relative" ref={menuRef}>
-          <Button
-            aria-haspopup="menu"
-            aria-expanded={isMenuOpen}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300"
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-          >
-            <span className="sr-only">Open user menu</span>
-          </Button>
-          {isMenuOpen ? (
-            <div className="absolute right-0 mt-3 w-40 rounded-md border border-gray-200 bg-white py-1 text-sm text-gray-700 shadow-lg">
-              <Button
-                className="flex w-full items-center px-4 py-2 text-left hover:bg-gray-50"
-                onClick={handleSettingsClick}
-              >
-                Settings
-              </Button>
-              <Button
-                className="flex w-full items-center px-4 py-2 text-left hover:bg-gray-50"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </div>
-          ) : null}
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="cursor-pointer rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300">
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
+                <AvatarFallback className="bg-gray-200 text-sm font-medium text-gray-700">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <span className="sr-only">Open user menu</span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem onClick={() => router.push("/settings")}>
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </nav>
   );

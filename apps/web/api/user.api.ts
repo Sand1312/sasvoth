@@ -7,6 +7,7 @@ import { api } from "./base";
  * Sub-resource: /users/:id/wallet
  * Sub-resource: /users/:id/state-index
  * Sub-resource: /users/:id/deposits
+ * Sub-resource: /users/:id/profile
  *
  * GET    /users              - List all users
  * GET    /users/:id          - Get a specific user
@@ -17,6 +18,7 @@ import { api } from "./base";
  * PATCH  /users/:id/state-index - Update MACI state index
  * GET    /users/:id/deposits - Get deposit history
  * POST   /users/:id/deposits - Create a deposit
+ * PATCH  /users/:id/profile  - Update user profile (avatar, DOB)
  */
 export const userApi = {
   /**
@@ -101,4 +103,16 @@ export const userApi = {
     userApi.createDeposit(userId, amountToken, txHash),
   /** @deprecated Use getDeposits instead */
   getHistoryDeposit: async (userId: string) => userApi.getDeposits(userId),
+
+  /**
+   * Update user profile (avatar, date of birth)
+   * PATCH /users/:id/profile
+   */
+  updateProfile: async (
+    userId: string,
+    data: { avatar?: string; dateOfBirth?: string },
+  ) => {
+    const response = await api.patch(`/users/${userId}/profile`, data);
+    return response.data?.user ?? response.data;
+  },
 };

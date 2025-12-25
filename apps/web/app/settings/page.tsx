@@ -12,6 +12,12 @@ import { Button } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { cn } from "@sasvoth/ui/lib/utils";
 import { useAuth } from "@/hooks";
+import { useIdeas } from "@/hooks/useIdeas";
+import { userApi } from "@/api";
+import { useIPFS } from "@/hooks/useIPFS";
+import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
+import { IdeaEditDialog, IdeaData } from "@/components/IdeaEditDialog";
 
 type IdeaSummary = {
   id: string;
@@ -22,43 +28,13 @@ type IdeaSummary = {
   accent: string;
 };
 
-const fallbackIdeas: IdeaSummary[] = [
-  {
-    id: "studio-compass",
-    name: "Studio Compass",
-    description:
-      "Guided toolset for new civic studios to sketch, test, and share ideas inside the SaSvoth network.",
-    updatedAt: "2024-06-09T12:15:00.000Z",
-    logoLabel: "SC",
-    accent: "bg-amber-100 text-amber-700",
-  },
-  {
-    id: "common-grounds",
-    name: "Common Grounds",
-    description:
-      "Micro-grants platform that pairs neighborhood councils with rapid prototyping budgets for shared spaces.",
-    updatedAt: "2024-06-11T09:42:00.000Z",
-    logoLabel: "CG",
-    accent: "bg-emerald-100 text-emerald-700",
-  },
-  {
-    id: "signal-garden",
-    name: "Signal Garden",
-    description:
-      "Data stories and live dashboards for showcasing participation metrics across SaSvoth campaigns.",
-    updatedAt: "2024-06-05T17:05:00.000Z",
-    logoLabel: "SG",
-    accent: "bg-indigo-100 text-indigo-700",
-  },
-  {
-    id: "field-notes",
-    name: "Field Notes",
-    description:
-      "Traveling residency that documents local rituals and builds cross-border cultural exchanges.",
-    updatedAt: "2024-05-29T22:10:00.000Z",
-    logoLabel: "FN",
-    accent: "bg-blue-100 text-blue-700",
-  },
+const accentColors = [
+  "bg-amber-100 text-amber-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-indigo-100 text-indigo-700",
+  "bg-blue-100 text-blue-700",
+  "bg-rose-100 text-rose-700",
+  "bg-purple-100 text-purple-700",
 ];
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -100,8 +76,13 @@ function IdeaLogo({ label, accent }: { label: string; accent: string }) {
 }
 
 export default function SettingsPage() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, setUser } = useAuth();
+  const { address } = useAccount();
+  const { getByUserAddress } = useIdeas();
+  const { uploadFile } = useIPFS();
+  const router = useRouter();
   const [displayName, setDisplayName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const [pendingAvatar, setPendingAvatar] = useState<{
@@ -109,6 +90,7 @@ export default function SettingsPage() {
     file: File;
   } | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     current: "",
     next: "",
@@ -120,14 +102,85 @@ export default function SettingsPage() {
     text: string;
   } | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [ideas] = useState<IdeaSummary[]>(fallbackIdeas);
+  const [ideas, setIdeas] = useState<IdeaSummary[]>([]);
+  const [ideasLoading, setIdeasLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<"date" | "name">("date");
+  const [editingIdea, setEditingIdea] = useState<IdeaData | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const handleEditIdea = (idea: IdeaSummary) => {
+    setEditingIdea({
+      id: idea.id,
+      title: idea.name,
+      description: idea.description,
+      ageLimit: 0, // We'd need to fetch full idea data to get ageLimit
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSuccess = async () => {
+    // Refresh ideas list
+    const userAddress = address || user?.walletAddress;
+    if (userAddress) {
+      try {
+        const result = await getByUserAddress(userAddress);
+        if (Array.isArray(result)) {
+          const mapped = result.map((idea: any, index: number) => ({
+            id: idea._id || idea.id,
+            name: idea.title || "Untitled Idea",
+            description: idea.description || "",
+            updatedAt: idea.createdAt || new Date().toISOString(),
+            logoLabel: getInitials(idea.title),
+            accent: accentColors[index % accentColors.length] ?? accentColors[0]!,
+          }));
+          setIdeas(mapped);
+        }
+      } catch (err) {
+        console.error("Failed to refresh ideas:", err);
+      }
+    }
+    setProfileMessage("Idea updated successfully!");
+    setTimeout(() => setProfileMessage(null), 4000);
+  };
+
+  // Fetch user's ideas when address is available
+  useEffect(() => {
+    const fetchIdeas = async () => {
+      const userAddress = address || user?.walletAddress;
+      if (!userAddress) {
+        setIdeasLoading(false);
+        return;
+      }
+      
+      try {
+        const result = await getByUserAddress(userAddress);
+        if (Array.isArray(result)) {
+          const mapped = result.map((idea: any, index: number) => ({
+            id: idea._id || idea.id,
+            name: idea.title || "Untitled Idea",
+            description: idea.description || "",
+            updatedAt: idea.createdAt || new Date().toISOString(),
+            logoLabel: getInitials(idea.title),
+            accent: accentColors[index % accentColors.length] ?? accentColors[0]!,
+          }));
+          setIdeas(mapped);
+        }
+      } catch (err) {
+        console.error("Failed to fetch ideas:", err);
+      } finally {
+        setIdeasLoading(false);
+      }
+    };
+
+    fetchIdeas();
+  }, [address, user?.walletAddress, getByUserAddress]);
 
   useEffect(() => {
     if (!user) return;
     setDisplayName(user?.name ?? user?.username ?? user?.email ?? "");
-    setAvatarPreview(user?.avatarUrl ?? null);
+    setAvatarPreview(user?.avatar ?? null);
+    setDateOfBirth(user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split("T")[0] ?? "" : "");
     setPendingAvatar(null);
     setIsConfirmOpen(false);
   }, [user]);
@@ -170,10 +223,25 @@ export default function SettingsPage() {
     }
   };
 
-  const handleProfileSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleProfileSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setProfileMessage("Profile saved. Your changes will reflect across SaSvoth shortly.");
-    setTimeout(() => setProfileMessage(null), 4000);
+    if (!user?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const updateData: { dateOfBirth?: string } = {};
+      if (dateOfBirth) {
+        updateData.dateOfBirth = dateOfBirth;
+      }
+      
+      await userApi.updateProfile(user.id, updateData);
+      setProfileMessage("Profile saved successfully!");
+      setTimeout(() => setProfileMessage(null), 4000);
+    } catch (err: any) {
+      setProfileMessage(`Error: ${err.message || "Failed to save profile"}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAvatarCancel = () => {
@@ -188,14 +256,32 @@ export default function SettingsPage() {
     setIsConfirmOpen(true);
   };
 
-  const confirmAvatarSave = () => {
-    if (!pendingAvatar) {
+  const confirmAvatarSave = async () => {
+    if (!pendingAvatar || !user?.id) {
       setIsConfirmOpen(false);
       return;
     }
-    setAvatarPreview(pendingAvatar.preview);
-    setPendingAvatar(null);
-    setIsConfirmOpen(false);
+    
+    setIsSaving(true);
+    try {
+      // Upload avatar to IPFS first
+      const result = await uploadFile(pendingAvatar.file);
+      const avatarUrl = result.url;
+      
+      // Then update profile with new avatar URL
+      await userApi.updateProfile(user.id, { avatar: avatarUrl });
+      
+      setAvatarPreview(avatarUrl);
+      setPendingAvatar(null);
+      setIsConfirmOpen(false);
+      setProfileMessage("Avatar updated successfully!");
+      setTimeout(() => setProfileMessage(null), 4000);
+    } catch (err: any) {
+      console.error("Failed to save avatar:", err);
+      setProfileMessage(`Error: ${err.message || "Failed to save avatar"}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const currentAvatarSrc = pendingAvatar?.preview ?? avatarPreview;
@@ -247,10 +333,18 @@ export default function SettingsPage() {
             <span className="text-sm text-gray-900">{formatUpdatedAt(idea.updatedAt)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => handleEditIdea(idea)}
+            >
               Edit
             </Button>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => router.push(`/votes/${idea.id}`)}
+            >
               View
             </Button>
           </div>
@@ -277,10 +371,18 @@ export default function SettingsPage() {
           </div>
           <p className="mt-4 flex-1 text-sm text-gray-600">{idea.description}</p>
           <div className="mt-6 flex items-center justify-between gap-3">
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => handleEditIdea(idea)}
+            >
               Edit idea
             </Button>
-            <Button size="sm" className="px-4">
+            <Button 
+              size="sm" 
+              className="px-4"
+              onClick={() => router.push(`/votes/${idea.id}`)}
+            >
               Open
             </Button>
           </div>
@@ -389,15 +491,36 @@ export default function SettingsPage() {
                 value={displayName}
                 onChange={(event) => setDisplayName(event.target.value)}
                 placeholder="Enter your preferred name"
+                disabled={isSaving}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="dateOfBirth"
+                className="text-sm font-medium text-gray-700"
+              >
+                Date of Birth
+              </label>
+              <Input
+                id="dateOfBirth"
+                type="date"
+                className="mt-1"
+                value={dateOfBirth}
+                onChange={(event) => setDateOfBirth(event.target.value)}
+                max={new Date().toISOString().split("T")[0]}
+                disabled={isSaving}
               />
             </div>
             <div className="flex justify-end">
-              <Button type="submit" className="px-6">
-                Save profile
+              <Button type="submit" className="px-6" disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save profile"}
               </Button>
             </div>
             {profileMessage ? (
-              <p className="text-sm text-emerald-600">{profileMessage}</p>
+              <p className={cn(
+                "text-sm",
+                profileMessage.startsWith("Error") ? "text-red-600" : "text-emerald-600"
+              )}>{profileMessage}</p>
             ) : null}
           </form>
         </section>
@@ -577,6 +700,14 @@ export default function SettingsPage() {
           </div>
         </div>
       ) : null}
+
+      {/* Idea Edit Dialog */}
+      <IdeaEditDialog
+        idea={editingIdea}
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSuccess={handleEditSuccess}
+      />
     </>
   );
 }

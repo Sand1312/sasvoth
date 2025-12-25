@@ -1,6 +1,15 @@
-// src/maci/maci.controller.ts
-import { Controller, Post, Get, Param, Body, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  Query,
+  NotFoundException,
+} from '@nestjs/common';
 import { MaciService } from './maci.service';
+import { MaciDeploymentsService } from './maci-deployments.service';
+import { UsersService } from '../users/users.service';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -31,7 +40,7 @@ class SignupDto {
 }
 
 class MaciSignupDto {
-  @ApiProperty({ description: "MACI Public Key string (macipk...)" })
+  @ApiProperty({ description: 'MACI Public Key string (macipk...)' })
   maciPubKey: string;
 
   @ApiProperty({ required: false })
@@ -41,8 +50,28 @@ class MaciSignupDto {
   sgData?: string;
 }
 
+class MaciSignupEip712Dto {
+  @ApiProperty({ description: 'MACI Public Key X coordinate' })
+  pubKeyX: string;
+
+  @ApiProperty({ description: 'MACI Public Key Y coordinate' })
+  pubKeyY: string;
+
+  @ApiProperty({ description: 'EIP-712 signature' })
+  signature: string;
+
+  @ApiProperty({ description: 'User nonce for anti-replay' })
+  nonce: number;
+
+  @ApiProperty({ description: 'Signature deadline timestamp' })
+  deadline: number;
+
+  @ApiProperty({ required: false })
+  maciAddress?: string;
+}
+
 class JoinPollDto {
-  @ApiProperty({ description: "User MACI Private Key" })
+  @ApiProperty({ description: 'User MACI Private Key' })
   maciPrivateKey: string;
 
   @ApiProperty({ required: false })
@@ -83,7 +112,12 @@ class VoteDto {
  * Sub-resource: /maci/polls/:id/merge
  * Sub-resource: /maci/polls/:id/proofs
  *
- * POST   /maci/signup                   - Signup to MACI
+ * POST   /maci/signup                   - Signup to MACI (legacy)
+ * POST   /maci/signup-eip712            - Signup with EIP-712 signature
+ * GET    /maci/nonce/:address           - Get nonce for EIP-712 signing
+ * GET    /maci/signup-status/:wallet    - Check signup status from DB
+ * GET    /maci/deployments/latest       - Get latest MACI deployment
+ * GET    /maci/deployments/:address     - Get MACI deployment by address
  * POST   /maci/polls                    - Deploy a new poll
  * GET    /maci/polls/:id/contracts      - Get poll contracts
  * POST   /maci/polls/:id/merge          - Merge poll state
@@ -95,26 +129,192 @@ class VoteDto {
 @ApiBearerAuth()
 @Controller('maci')
 export class MaciController {
-  constructor(private readonly maciService: MaciService) {}
+  constructor(
+    private readonly maciService: MaciService,
+    private readonly maciDeploymentsService: MaciDeploymentsService,
+    private readonly usersService: UsersService,
+  ) {}
+
+  // ========================================
+  // MACI Deployment Endpoints
+  // ========================================
+
+  /**
+   * Get all MACI deployments
+   * GET /maci/deployments
+   *
+   * Returns cached stats from DB (updated by DeploymentStatsSyncJob every 5 mins)
+   */
+  @Get('deployments')
+  @ApiOperation({ summary: 'Get all MACI deployments for subscriptions' })
+  @ApiResponse({ status: 200, description: 'Deployments retrieved' })
+  async getDeployments() {
+    const deployments = await this.maciDeploymentsService.getValid();
+
+    // Return cached stats from DB (no live RPC calls)
+    return deployments.map((d) => ({
+      id: d._id?.toString() || d.maciAddress,
+      maciAddress: d.maciAddress,
+      name: d.name,
+      logo: d.logo,
+      chain: d.chain,
+      members: d.members || 0,
+      pollCount: d.pollCount || 0,
+    }));
+  }
+
+  /**
+   * Get latest MACI deployment
+   * GET /maci/deployments/latest
+   */
+  @Get('deployments/latest')
+  @ApiOperation({ summary: 'Get latest MACI deployment info' })
+  @ApiResponse({ status: 200, description: 'Latest deployment retrieved' })
+  async getLatestDeployment() {
+    const deployment = await this.maciDeploymentsService.getLatest();
+    if (!deployment) {
+      throw new NotFoundException('No MACI deployments found');
+    }
+    return {
+      maciAddress: deployment.maciAddress,
+      name: deployment.name,
+      logo: deployment.logo,
+      startBlock: deployment.startBlock,
+      subgraphUrl: deployment.subgraphUrl,
+      chain: deployment.chain,
+    };
+  }
+
+  /**
+   * Get MACI deployment by address
+   * GET /maci/deployments/:address
+   */
+  @Get('deployments/:address')
+  @ApiOperation({ summary: 'Get MACI deployment by address' })
+  @ApiParam({ name: 'address', type: String })
+  @ApiResponse({ status: 200, description: 'Deployment info retrieved' })
+  async getDeploymentByAddress(@Param('address') address: string) {
+    const deployment = await this.maciDeploymentsService.getByAddress(address);
+    if (!deployment) {
+      throw new NotFoundException(`MACI deployment not found: ${address}`);
+    }
+    return {
+      maciAddress: deployment.maciAddress,
+      startBlock: deployment.startBlock,
+      subgraphUrl: deployment.subgraphUrl,
+      chain: deployment.chain,
+    };
+  }
 
   // ========================================
   // RESTful Endpoints (New)
   // ========================================
 
-
+  /**
+   * Get MACI configuration including dynamic subgraph URL
+   * GET /maci/config
+   */
+  @Get('config')
+  @ApiOperation({
+    summary: 'Get MACI configuration (subgraph URL, start block, etc.)',
+  })
+  @ApiResponse({ status: 200, description: 'Config retrieved successfully' })
+  async getConfig() {
+    return this.maciService.getConfig();
+  }
 
   /**
-   * Signup to MACI (Relayer)
+   * Signup to MACI (Relayer - Legacy)
    * POST /maci/signup
    */
   @Post('signup')
-  @ApiOperation({ summary: 'Signup to MACI (Relayed)' })
+  @ApiOperation({ summary: 'Signup to MACI (Relayed - Legacy)' })
   @ApiBody({ type: MaciSignupDto })
   @ApiResponse({ status: 201, description: 'Signed up successfully' })
   async signup(@Body() body: MaciSignupDto) {
-    return this.maciService.signup(body.maciPubKey, body.maciAddress, body.sgData);
+    return this.maciService.signup(
+      body.maciPubKey,
+      body.maciAddress,
+      body.sgData,
+    );
   }
 
+  /**
+   * Signup to MACI with EIP-712 signature (Secure)
+   * POST /maci/signup-eip712
+   *
+   * Backend verifies user eligibility in Users collection before relaying
+   */
+  @Post('signup-eip712')
+  @ApiOperation({ summary: 'Signup to MACI with EIP-712 signature (Secure)' })
+  @ApiBody({ type: MaciSignupEip712Dto })
+  @ApiResponse({ status: 201, description: 'Signed up successfully' })
+  @ApiResponse({ status: 403, description: 'User not eligible' })
+  async signupWithSignature(@Body() body: MaciSignupEip712Dto) {
+    return this.maciService.signupWithSignature(
+      body.pubKeyX,
+      body.pubKeyY,
+      body.signature,
+      body.nonce,
+      body.deadline,
+      body.maciAddress,
+    );
+  }
+
+  /**
+   * Get nonce for a user (for EIP-712 signing)
+   * GET /maci/nonce/:address
+   */
+  @Get('nonce/:address')
+  @ApiOperation({ summary: 'Get nonce for EIP-712 signing' })
+  @ApiParam({ name: 'address', type: String })
+  @ApiResponse({ status: 200, description: 'Nonce retrieved' })
+  async getNonce(@Param('address') address: string) {
+    return this.maciService.getNonce(address);
+  }
+
+  /**
+   * Get MACI signup status from database (fast, no on-chain query)
+   * GET /maci/signup-status/:walletAddress
+   *
+   * Returns list of MACI contracts user has signed up to
+   * Use this instead of subgraph/on-chain queries for subscription page
+   */
+  @Get('signup-status/:walletAddress')
+  @ApiOperation({ summary: 'Get MACI signup status from DB' })
+  @ApiParam({ name: 'walletAddress', type: String })
+  @ApiResponse({ status: 200, description: 'Signup status retrieved' })
+  async getSignupStatus(
+    @Param('walletAddress') walletAddress: string,
+    @Query('maciAddress') maciAddress?: string,
+  ) {
+    // If maciAddress specified, check single MACI
+    if (maciAddress) {
+      const signup = await this.usersService.getMaciSignup(
+        walletAddress,
+        maciAddress,
+      );
+      return {
+        signedUp: signup !== null,
+        stateIndex: signup?.stateIndex?.toString() || null,
+        signedUpAt: signup?.signedUpAt || null,
+      };
+    }
+
+    // Otherwise, get all user's MACI signups
+    const user = await this.usersService.findByWalletAddress(walletAddress);
+    if (!user || !user.maciSignups || user.maciSignups.length === 0) {
+      return { signups: [] };
+    }
+
+    return {
+      signups: user.maciSignups.map((s) => ({
+        maciAddress: s.maciAddress,
+        stateIndex: s.stateIndex.toString(),
+        signedUpAt: s.signedUpAt,
+      })),
+    };
+  }
   /**
    * Join Poll (Relayed)
    * POST /maci/polls/:id/join
@@ -125,7 +325,12 @@ export class MaciController {
   @ApiBody({ type: JoinPollDto })
   @ApiResponse({ status: 201, description: 'Joined poll successfully' })
   async joinPoll(@Param('id') id: string, @Body() body: JoinPollDto) {
-    return this.maciService.joinPoll(id, body.maciPrivateKey, body.maciAddress, body.startBlock);
+    return this.maciService.joinPoll(
+      id,
+      body.maciPrivateKey,
+      body.maciAddress,
+      body.startBlock,
+    );
   }
 
   /**
@@ -139,17 +344,16 @@ export class MaciController {
   @ApiResponse({ status: 201, description: 'Vote submitted successfully' })
   async vote(@Param('id') id: string, @Body() body: VoteDto) {
     return this.maciService.vote(
-      id, 
-      body.voteOptionIndex, 
-      body.voteWeight, 
-      body.nonce, 
-      body.userStateIndex, 
-      body.userMaciPrivateKey, 
-      body.userMaciPublicKey, 
-      body.maciAddress
+      id,
+      body.voteOptionIndex,
+      body.voteWeight,
+      body.nonce,
+      body.userStateIndex,
+      body.userMaciPrivateKey,
+      body.userMaciPublicKey,
+      body.maciAddress,
     );
   }
-
 
   /**
    * Deploy MACI Contract
@@ -182,7 +386,10 @@ export class MaciController {
   @ApiOperation({ summary: 'Get poll contracts' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, description: 'Contracts retrieved successfully' })
-  async getContracts(@Param('id') id: string, @Query('maciAddress') maciAddress?: string) {
+  async getContracts(
+    @Param('id') id: string,
+    @Query('maciAddress') maciAddress?: string,
+  ) {
     return this.maciService.getPollContracts(id, maciAddress);
   }
 
@@ -218,8 +425,15 @@ export class MaciController {
   @ApiOperation({ summary: 'Generate proofs' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, description: 'Proofs generated successfully' })
-  async generateProofs(@Param('id') id: string, @Body() body: { maciAddress?: string; startBlock?: number }) {
-    return this.maciService.generateProofs(id, body?.maciAddress, body?.startBlock);
+  async generateProofs(
+    @Param('id') id: string,
+    @Body() body: { maciAddress?: string; startBlock?: number },
+  ) {
+    return this.maciService.generateProofs(
+      id,
+      body?.maciAddress,
+      body?.startBlock,
+    );
   }
 
   /**
@@ -230,7 +444,10 @@ export class MaciController {
   @ApiOperation({ summary: 'Submit proofs' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, description: 'Proofs submitted successfully' })
-  async submitProofs(@Param('id') id: string, @Body() body: { maciAddress?: string }) {
+  async submitProofs(
+    @Param('id') id: string,
+    @Body() body: { maciAddress?: string },
+  ) {
     return this.maciService.submitProofs(id, body?.maciAddress);
   }
 

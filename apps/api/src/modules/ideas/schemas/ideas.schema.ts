@@ -19,17 +19,18 @@ export class Ideas {
     @Prop({ required: false ,type:[String]})
     imgsSrc: string[];
 
-    @Prop({required:true, type:String})
-    creatorIdea:string;
-
+    @Prop({required: true, type: String})
+    userAddress: string;
 
     @Prop({ required: false ,type:String})
     idea_cid: string;
 
     @Prop({ required: true ,type:Date})
     createdAt: Date;
-    
 
+    @Prop({ required: false, type: Number, default: 0 })
+    ageLimit: number;
+    
 
 }
 export const IdeasSchema = SchemaFactory.createForClass(Ideas);

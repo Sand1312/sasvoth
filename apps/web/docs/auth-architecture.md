@@ -85,3 +85,51 @@ The current code in `actions.ts` contains a TODO:
 const isAuthenticated = identifier === "admin" && password === "password";
 ```
 You should connect this to your actual backend (e.g. `api/v1/auth/login`) before deploying.
+
+## 5. ACID Compliance
+
+As of v2.0, the auth flow implements ACID-like properties using a Zustand-based lock mechanism:
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  User clicks Login/Signup                                    │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Layer 1 (UI Pre-Check): SocialLoginButtons                 │
+│  • isAuthLocked() → Show "Please wait" if locked            │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Layer 2 (Context Lock): AuthContext                         │
+│  • acquireLock("login-wallet") at start                     │
+│  • releaseLock() in finally block                           │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Execute Auth: loginWithWallet/loginWithEmail/etc            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### ACID Properties
+
+| Property | Implementation |
+|----------|----------------|
+| **Atomicity** | Lock acquired at start, released in `finally` block |
+| **Consistency** | Single source of truth via `stores/authStore.ts` |
+| **Isolation** | Only one auth operation per browser tab |
+| **Durability** | HttpOnly cookies (unchanged) |
+
+### Files Modified
+
+| File | Purpose |
+|------|---------|
+| `stores/authStore.ts` | Zustand store for auth lock management |
+| `contexts/AuthContext.tsx` | All auth methods wrapped with lock |
+| `components/SocialLoginButtons.tsx` | Early UI lock check |
+

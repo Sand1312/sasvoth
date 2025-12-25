@@ -1,6 +1,15 @@
 import { api } from "./base";
 import { PollStatus } from "@/types/polls";
 
+export type MaciConfig = {
+  mode?: number;
+  messageBatchSize?: number;
+  pollStateTreeDepth?: number;
+  voteOptionTreeDepth?: number;
+  tallyProcessingStateTreeDepth?: number;
+  initialVoiceCredits?: number;
+};
+
 export type CreatePollPayload = {
   title: string;
   description: string;
@@ -8,6 +17,7 @@ export type CreatePollPayload = {
   numberOptions: number;
   startTime: Date;
   endTime: Date;
+  maciConfig?: MaciConfig;
 };
 
 /**
@@ -52,6 +62,50 @@ export const pollsApi = {
         (poll as { pollId?: string | number }).pollId ||
         (poll as { pollIdOnChain?: string | number }).pollIdOnChain?.toString(),
     }));
+  },
+
+  /**
+   * Get all polls with pagination and filtering
+   * GET /polls?page=X&limit=Y&activeAt=Z&search=...
+   */
+  getPollsPaginated: async (options: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    activeAt?: Date;
+    search?: string;
+    sortBy?: 'createdAt' | 'updatedAt' | 'startTime' | 'title';
+    sortOrder?: 'asc' | 'desc';
+  }) => {
+    const params: Record<string, string | number> = {};
+    if (options.page) params.page = options.page;
+    if (options.limit) params.limit = options.limit;
+    if (options.status) params.status = options.status;
+    if (options.activeAt) params.activeAt = options.activeAt.toISOString();
+    if (options.search) params.search = options.search;
+    if (options.sortBy) params.sortBy = options.sortBy;
+    if (options.sortOrder) params.sortOrder = options.sortOrder;
+
+    const response = await api.get("/polls", { params });
+
+    // Handle paginated response
+    const polls = Array.isArray(response.data?.polls)
+      ? response.data.polls
+      : [];
+
+    return {
+      polls: polls.map((poll: Record<string, unknown>) => ({
+        ...poll,
+        _id:
+          (poll as { _id?: string })._id ||
+          (poll as { id?: string }).id ||
+          (poll as { pollId?: string | number }).pollId ||
+          (poll as { pollIdOnChain?: string | number }).pollIdOnChain?.toString(),
+      })),
+      total: response.data?.total ?? polls.length,
+      page: response.data?.page ?? 1,
+      limit: response.data?.limit ?? 10,
+    };
   },
 
   /**
@@ -138,10 +192,12 @@ export const pollsApi = {
    * Update on-chain ID
    * PATCH /polls/:id/chain
    */
-  updateChainId: async (id: string, chainId: string, subgraphUrl?: string) => {
+  updateChainId: async (id: string, chainId: string, subgraphUrl?: string, maciAddress?: string, startBlock?: number) => {
     const response = await api.patch(`/polls/${id}/chain`, {
       pollIdOnChain: chainId,
       subgraphUrl,
+      maciAddress,
+      startBlock,
     });
     return response.data?.poll ?? response.data;
   },
@@ -154,7 +210,8 @@ export const pollsApi = {
     creatorAddress: string,
     numberOptions: number,
     startTime: Date,
-    endTime: Date
+    endTime: Date,
+    maciConfig?: MaciConfig
   ) =>
     pollsApi.create({
       title,
@@ -163,6 +220,7 @@ export const pollsApi = {
       numberOptions,
       startTime,
       endTime,
+      maciConfig,
     }),
   /** @deprecated Use getAll instead */
   getPolls: async (status?: PollStatus) => pollsApi.getAll(status),
@@ -181,6 +239,8 @@ export const pollsApi = {
   saveOnChainId: async (
     pollId: string,
     pollIdOnChain: string,
-    subgraphUrl?: string
-  ) => pollsApi.updateChainId(pollId, pollIdOnChain, subgraphUrl),
+    subgraphUrl?: string,
+    maciAddress?: string,
+    startBlock?: number
+  ) => pollsApi.updateChainId(pollId, pollIdOnChain, subgraphUrl, maciAddress, startBlock),
 };

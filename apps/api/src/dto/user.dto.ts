@@ -10,4 +10,6 @@ export class UserDto {
   readonly publicKeyY?: string;
   readonly stateIndex?: number;
   readonly privateKey?: string;
+  readonly avatar?: string;
+  readonly dateOfBirth?: Date;
 }

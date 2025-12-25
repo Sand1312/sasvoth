@@ -5,7 +5,7 @@ import { createWalletClient, createPublicClient, custom, http } from "viem";
 import { arbitrumSepolia } from "viem/chains";
 
 import { VERIFY_VOTE_ABI } from "@sasvoth/contracts";
-import {VERIFY_VOTE} from "@sasvoth/contracts";
+import { VERIFY_VOTE } from "@sasvoth/contracts";
 export function useVerifyVote() {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<string>("");
@@ -20,18 +20,12 @@ export function useVerifyVote() {
     };
 
     const getPublicClient = () => {
-        const rpcUrls = [
-            "https://arbitrum-sepolia.drpc.org",
-            "https://arbitrum-sepolia-rpc.publicnode.com",
-            "https://sepolia-rollup.arbitrum.io/rpc",
-        ];
-
+        // const rpcUrl = process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC_URL!;
+        const rpcUrl = 'https://sepolia-rollup.arbitrum.io/rpc';
         return createPublicClient({
             chain: arbitrumSepolia,
-            transport: http(rpcUrls[0], {
+            transport: http(rpcUrl, {
                 batch: true,
-                retryCount: 3,
-                timeout: 30_000,
             }),
         });
     };

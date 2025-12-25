@@ -2,16 +2,34 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Grid3X3, LayoutList, Search } from "lucide-react";
 
 import { Button, buttonVariants } from "@sasvoth/ui/button";
 import { Input } from "@sasvoth/ui/input";
 import { cn } from "@sasvoth/ui/lib/utils";
+import { DatePicker } from "@sasvoth/ui/date-picker";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@sasvoth/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@sasvoth/ui/tabs";
+import { Empty, EmptyContent, EmptyTitle, EmptyDescription } from "@sasvoth/ui/empty";
+import { Skeleton } from "@sasvoth/ui/skeleton";
+import { Spinner } from "@sasvoth/ui/spinner";
 
 import { usePolls } from "@/hooks";
 import { PollStatus } from "@/types/polls";
 import { formatDate, parseDate } from "@/lib/date";
+
+import { PollsDataTable } from "./components/polls-data-table";
+import { PollData } from "./components/columns";
+
+import fallbackPollsData from "@/data/fallback-polls.json";
 
 type PollRecord = {
   _id?: string;
@@ -31,63 +49,7 @@ type SortKey = "name" | "dateAdded" | "dateModified" | "pollDate";
 
 type PollWithMeta = PollRecord & { participation: ParticipationFilter[] };
 
-const fallbackPolls: PollRecord[] = [
-  {
-    _id: "mock-1",
-    title: "Future of Play",
-    description:
-      "A curated shortlist of ideas exploring how social games and civic tech overlap.",
-    status: PollStatus.Prepare,
-    startTime: "2024-10-12T09:00:00.000Z",
-    endTime: "2024-11-24T23:00:00.000Z",
-    createdAt: "2024-10-01T12:00:00.000Z",
-    updatedAt: "2024-10-20T15:30:00.000Z",
-  },
-  {
-    _id: "mock-2",
-    title: "Commons Treasury",
-    description:
-      "Prioritise open-source infrastructure upgrades for new community-owned treasuries.",
-    status: PollStatus.InProgress,
-    startTime: "2024-08-04T09:00:00.000Z",
-    endTime: "2024-09-04T23:00:00.000Z",
-    createdAt: "2024-07-28T10:10:00.000Z",
-    updatedAt: "2024-08-18T16:00:00.000Z",
-  },
-  {
-    _id: "mock-3",
-    title: "Neighborhood Canvas",
-    description:
-      "Funding round for public artists to reimagine civic billboards and pocket parks.",
-    status: PollStatus.Counting,
-    startTime: "2024-06-01T09:00:00.000Z",
-    endTime: "2024-06-20T23:00:00.000Z",
-    createdAt: "2024-05-10T08:00:00.000Z",
-    updatedAt: "2024-06-15T11:45:00.000Z",
-  },
-  {
-    _id: "mock-4",
-    title: "Civic Sandbox Residency",
-    description:
-      "Prototype residency proposals that combine play, stewardship, and tactical urbanism.",
-    status: PollStatus.Ended,
-    startTime: "2024-03-10T09:00:00.000Z",
-    endTime: "2024-04-10T23:00:00.000Z",
-    createdAt: "2024-02-20T13:00:00.000Z",
-    updatedAt: "2024-04-15T17:20:00.000Z",
-  },
-  {
-    _id: "mock-5",
-    title: "All Hands Assembly",
-    description:
-      "Cross-coalition vote to select facilitators for the 2025 impact assembly tour.",
-    status: PollStatus.Draft,
-    startTime: "2025-01-05T09:00:00.000Z",
-    endTime: "2025-02-05T23:00:00.000Z",
-    createdAt: "2024-12-01T09:45:00.000Z",
-    updatedAt: "2024-12-14T14:30:00.000Z",
-  },
-];
+const fallbackPolls: PollRecord[] = fallbackPollsData as unknown as PollRecord[];
 
 const membershipPattern: ParticipationFilter[][] = [
   ["joined"],
@@ -97,40 +59,14 @@ const membershipPattern: ParticipationFilter[][] = [
   ["contributed"],
 ];
 
-const statusThemes: Record<
-  PollStatus,
-  { badge: string; text: string; accent: string }
-> = {
-  [PollStatus.Prepare]: {
-    badge: "bg-green-50 border-green-200 text-green-700",
-    text: "text-green-700",
-    accent: "bg-green-100",
-  },
-  [PollStatus.InProgress]: {
-    badge: "bg-orange-50 border-orange-200 text-orange-700",
-    text: "text-orange-700",
-    accent: "bg-orange-100",
-  },
-  [PollStatus.Counting]: {
-    badge: "bg-indigo-50 border-indigo-200 text-indigo-700",
-    text: "text-indigo-700",
-    accent: "bg-indigo-100",
-  },
-  [PollStatus.Ended]: {
-    badge: "bg-slate-50 border-slate-200 text-slate-700",
-    text: "text-slate-700",
-    accent: "bg-slate-100",
-  },
-  [PollStatus.Draft]: {
-    badge: "bg-yellow-50 border-yellow-200 text-yellow-800",
-    text: "text-yellow-800",
-    accent: "bg-yellow-100",
-  },
-  [PollStatus.Cancelled]: {
-    badge: "bg-red-50 border-red-200 text-red-700",
-    text: "text-red-700",
-    accent: "bg-red-100",
-  },
+// Cleaned up status themes with simpler structure
+const statusThemes: Record<PollStatus, string> = {
+  [PollStatus.Prepare]: "bg-emerald-500",
+  [PollStatus.InProgress]: "bg-orange-500",
+  [PollStatus.Counting]: "bg-indigo-500",
+  [PollStatus.Ended]: "bg-slate-500",
+  [PollStatus.Cancelled]: "bg-red-600",
+  [PollStatus.Waiting]: "bg-sky-500",
 };
 
 const annotatePolls = (data: PollRecord[]): PollWithMeta[] =>
@@ -141,73 +77,72 @@ const annotatePolls = (data: PollRecord[]): PollWithMeta[] =>
     ],
   }));
 
-const getSortMetric = (poll: PollWithMeta, key: SortKey) => {
-  switch (key) {
-    case "name":
-      return (poll.title ?? "").toLowerCase();
-    case "dateAdded":
-      return parseDate(poll.createdAt ?? poll.startTime)?.getTime() ?? 0;
-    case "dateModified":
-      return parseDate(poll.updatedAt ?? poll.endTime)?.getTime() ?? 0;
-    case "pollDate":
-      return parseDate(poll.endTime ?? poll.startTime)?.getTime() ?? 0;
-    default:
-      return 0;
-  }
-};
-
-const sortOptions: { key: SortKey; label: string }[] = [
-  { key: "name", label: "Name" },
-  { key: "dateAdded", label: "Date added" },
-  { key: "dateModified", label: "Date modified" },
-  { key: "pollDate", label: "Poll Date" },
-];
 
 const statusLegend = [
   { key: PollStatus.Prepare, label: "Prepare" },
+  { key: PollStatus.Waiting, label: "Waiting" },
   { key: PollStatus.InProgress, label: "In progress" },
   { key: PollStatus.Counting, label: "Counting" },
   { key: PollStatus.Ended, label: "Ended" },
-  { key: PollStatus.Draft, label: "Draft" },
   { key: PollStatus.Cancelled, label: "Cancelled" },
 ];
 
 export default function PollsPage() {
-  const { getPolls } = usePolls();
-  const [polls, setPolls] = useState<PollWithMeta[]>(() =>
-    annotatePolls(fallbackPolls)
-  );
-  const [loading, setLoading] = useState(false);
+  const {getPollsPaginated } = usePolls();
+  const [polls, setPolls] = useState<PollWithMeta[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true); // First load - shows skeleton
+  const [loading, setLoading] = useState(false); // Subsequent loads - shows overlay
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [participationFilter, setParticipationFilter] =
-    useState<ParticipationFilter>("joined");
-  const [sortConfig, setSortConfig] = useState<{
-    key: SortKey;
-    direction: "asc" | "desc";
-  }>({ key: "dateAdded", direction: "desc" });
+    useState<ParticipationFilter[]>([]);
+  const [statusFilter, setStatusFilter] = useState<PollStatus | null>(null);
+  
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [total, setTotal] = useState(0);
+  
+  // Date picker for activeAt filter
+  const [activeAtDate, setActiveAtDate] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     let isMounted = true;
     const loadPolls = async () => {
-      setLoading(true);
+      // Only show loading overlay for subsequent loads, not initial
+      if (!initialLoading) {
+        setLoading(true);
+      }
       try {
-        const response = await getPolls();
-        if (Array.isArray(response) && response.length > 0) {
-          setPolls(annotatePolls(response));
-          console.log("Loaded Polls:", annotatePolls(response));
+        const response = await getPollsPaginated({
+          page,
+          limit,
+          status: statusFilter ?? undefined,
+          activeAt: activeAtDate,
+          search: searchTerm.trim() || undefined,
+        });
+        if (response.polls && response.polls.length > 0) {
+          setPolls(annotatePolls(response.polls));
+          setTotal(response.total);
           setError(null);
         } else {
-          setPolls(annotatePolls(fallbackPolls));
-          setError("No polls available yet. Showing starter data.");
+          setPolls([]);
+          setTotal(0);
+          if (page === 1) {
+            setError("No polls available yet.");
+          }
         }
       } catch (err) {
         console.error("Polls fetch failed", err);
         setError("Unable to reach the polls service. Showing offline data.");
         setPolls(annotatePolls(fallbackPolls));
+        setTotal(fallbackPolls.length);
       } finally {
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+          setInitialLoading(false);
+        }
       }
     };
 
@@ -215,70 +150,28 @@ export default function PollsPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [page, limit, statusFilter, activeAtDate, searchTerm]);
 
+  // With server-side pagination, polls state IS the current page data
+  // Filter only by participation (client-side) since backend doesn't know about it
   const visiblePolls = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-    return [...polls]
-      .filter((poll) => poll.participation.includes(participationFilter))
-      .filter((poll) => {
-        if (!normalizedSearch) return true;
-        const haystack = [
-          poll.title,
-          poll.description,
-          poll.status,
-          poll.onChainPollId?.toString(),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+    if (participationFilter.length === 0) return polls;
+    return polls.filter((poll) => 
+      poll.participation.some(p => participationFilter.includes(p))
+    );
+  }, [polls, participationFilter]);
 
-        return haystack.includes(normalizedSearch);
-      })
-      .sort((a, b) => {
-        const firstMetric = getSortMetric(a, sortConfig.key);
-        const secondMetric = getSortMetric(b, sortConfig.key);
-
-        if (
-          typeof firstMetric === "string" &&
-          typeof secondMetric === "string"
-        ) {
-          return sortConfig.direction === "asc"
-            ? firstMetric.localeCompare(secondMetric)
-            : secondMetric.localeCompare(firstMetric);
-        }
-
-        const diff = Number(firstMetric) - Number(secondMetric);
-        return sortConfig.direction === "asc" ? diff : -diff;
-      });
-  }, [polls, participationFilter, searchTerm, sortConfig]);
-
-  const handleSortChange = (key: SortKey) => {
-    setSortConfig((current) => {
-      if (current.key === key) {
-        return {
-          key,
-          direction: current.direction === "asc" ? "desc" : "asc",
-        };
-      }
-
-      return { key, direction: key === "name" ? "asc" : "desc" };
-    });
+  const toggleParticipationFilter = (filter: ParticipationFilter) => {
+    setParticipationFilter((current) => 
+      current.includes(filter)
+        ? current.filter((f) => f !== filter)
+        : [...current, filter]
+    );
   };
 
-  const renderEmptyState = () => (
-    <div className="px-6 py-16 text-center">
-      <p className="text-lg font-semibold">
-        Nothing to show in{" "}
-        {participationFilter === "joined" ? "Joined" : "Contributed"} polls yet.
-      </p>
-      <p className="mt-2 text-sm text-black/60">
-        Try switching the view toggle or clear your filters to explore other
-        poll collections.
-      </p>
-    </div>
-  );
-
+  const toggleStatusFilter = (status: PollStatus) => {
+    setStatusFilter((current) => (current === status ? null : status));
+  };
   return (
     <main className="min-h-screen px-4 py-12 text-black md:px-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
@@ -298,19 +191,20 @@ export default function PollsPage() {
               variant="secondary"
               className="rounded-full bg-black px-6 py-6 text-base text-white shadow-none hover:bg-black/90"
             >
-              <Search className="mr-2 size-4" />
+              <Search className="mr-2 w-4 h-4" />
               Search
             </Button>
+            <div className="flex shrink-0 gap-3">
             <div className="flex shrink-0 gap-3">
               {(["joined", "contributed"] as ParticipationFilter[]).map(
                 (item) => (
                   <button
                     key={item}
                     type="button"
-                    onClick={() => setParticipationFilter(item)}
+                    onClick={() => toggleParticipationFilter(item)}
                     className={cn(
                       "rounded-full border px-6 py-2 text-sm font-semibold transition-colors",
-                      participationFilter === item
+                      participationFilter.includes(item)
                         ? "border-black bg-black text-white"
                         : "border-black/40 bg-white text-black hover:border-black/80"
                     )}
@@ -320,48 +214,63 @@ export default function PollsPage() {
                 )
               )}
             </div>
+            </div>
           </div>
 
+          {/* Date picker for "active at" filter */}
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            {sortOptions.map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                onClick={() => handleSortChange(option.key)}
-                className={cn(
-                  "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                  sortConfig.key === option.key
-                    ? "border-black bg-black text-white"
-                    : "border-black/30 bg-transparent text-black hover:border-black/80"
-                )}
-              >
-                {option.label}
-                <ChevronDown
-                  className={cn(
-                    "size-4 transition-transform",
-                    sortConfig.key === option.key &&
-                    sortConfig.direction === "asc" &&
-                    "-scale-y-100"
-                  )}
-                />
-              </button>
-            ))}
+            <span className="text-sm text-black/60">Filter by active date:</span>
+            <DatePicker
+              date={activeAtDate}
+              onSelect={(date) => {
+                setActiveAtDate(date);
+                setPage(1); // Reset to first page when filter changes
+              }}
+              placeholder="Select date..."
+            />
+            {activeAtDate && (
+              <span className="text-xs text-black/50">
+                Showing polls that would be active on this date
+              </span>
+            )}
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-black/60">
             {statusLegend.map(({ key, label }) => (
-              <div key={key} className="flex items-center gap-2">
+              <button
+                 key={key}
+                 onClick={() => toggleStatusFilter(key)}
+                 className={cn(
+                   "flex items-center gap-2 rounded-full px-3 py-1 transition-all border cursor-pointer",
+                   statusFilter === key 
+                    ? "bg-gray-100 border-black ring-1 ring-black" 
+                    : "bg-transparent border-transparent hover:bg-gray-100 hover:border-black/10"
+                 )}
+              >
                 <span
                   className={cn(
                     "inline-block h-3 w-3 rounded-full",
-                    statusThemes[key]?.accent ?? "bg-black/30"
+                    statusThemes[key]
                   )}
                 />
-                <span className="text-xs uppercase tracking-[0.2em]">
+                <span className={cn(
+                  "text-xs uppercase tracking-[0.2em]",
+                  statusFilter === key && "font-bold text-black"
+                )}>
                   {label}
                 </span>
-              </div>
+              </button>
             ))}
+            {statusFilter && (
+                <Button 
+                    variant="link"
+                    size="sm"
+                    onClick={() => setStatusFilter(null)}
+                    className="ml-2 text-xs text-black/40 hover:text-black"
+                >
+                    Clear Filter
+                </Button>
+            )}
           </div>
 
           {error && <p className="mt-4 text-sm text-orange-600">{error}</p>}
@@ -372,194 +281,146 @@ export default function PollsPage() {
             <div>
               <p className="text-sm font-semibold text-black">Poll library</p>
               <p className="text-xs uppercase tracking-[0.3em] text-black/50">
-                {visiblePolls.length} items ·{" "}
-                {participationFilter === "joined" ? "Joined" : "Contributed"}
+                {total} items ·{" "}
+                {participationFilter.length === 0 
+                  ? "All Polls" 
+                  : participationFilter.map(f => f === "joined" ? "Joined" : "Contributed").join(" & ")}
               </p>
             </div>
             <div className="inline-flex overflow-hidden rounded-full border border-black/20">
-              {(["list", "grid"] as ViewMode[]).map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => setViewMode(mode)}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 text-sm font-semibold transition",
-                    viewMode === mode
-                      ? "bg-black text-white"
-                      : "bg-transparent text-black/60 hover:text-black"
-                  )}
-                >
-                  {mode === "list" ? (
-                    <LayoutList className="size-4" />
-                  ) : (
-                    <Grid3X3 className="size-4" />
-                  )}
-                  {mode === "list" ? "List" : "Grid"}
-                </button>
-              ))}
+            <div className="inline-flex items-center">
+              <Tabs
+                defaultValue="list"
+                value={viewMode}
+                onValueChange={(val) => setViewMode(val as ViewMode)}
+              >
+                <TabsList className="grid w-full grid-cols-2 bg-transparent p-0 gap-2">
+                  <TabsTrigger 
+                    value="list"
+                    className="data-[state=active]:bg-black data-[state=active]:text-white rounded-full border border-transparent data-[state=active]:border-black hover:border-black/20 transition-all px-4 py-2 h-auto"
+                  >
+                    <LayoutList className="mr-2 size-4" />
+                    List
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="grid"
+                    className="data-[state=active]:bg-black data-[state=active]:text-white rounded-full border border-transparent data-[state=active]:border-black hover:border-black/20 transition-all px-4 py-2 h-auto"
+                  >
+                    <Grid3X3 className="mr-2 size-4" />
+                    Grid
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
             </div>
           </div>
 
-          {loading ? (
-            <div className="grid gap-4 px-6 py-10">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div
-                  key={`loading-${index}`}
-                  className="animate-pulse rounded-3xl border border-black/5 bg-black/5 px-6 py-8"
-                >
-                  <div className="h-4 w-1/3 rounded-full bg-black/10" />
-                  <div className="mt-4 grid gap-3 md:grid-cols-3">
-                    <div className="h-3 rounded-full bg-black/10" />
-                    <div className="h-3 rounded-full bg-black/10" />
-                    <div className="h-3 rounded-full bg-black/10" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : visiblePolls.length === 0 ? (
-            renderEmptyState()
-          ) : viewMode === "list" ? (
-            <ListView polls={visiblePolls} />
-          ) : (
-            <GridView polls={visiblePolls} />
-          )}
+          {/* Content area with loading overlay for pagination */}
+          <div className="relative min-h-[400px]">
+            {(loading || initialLoading) ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm z-10">
+                 <Spinner className="w-8 h-8" />
+              </div>
+            ) : null}
+
+            {visiblePolls.length === 0 && !loading && !initialLoading ? (
+              <Empty>
+                <EmptyContent>
+                  <EmptyTitle>Nothing to show in {participationFilter.length === 0 ? "All" : participationFilter.join(", ")} polls yet.</EmptyTitle>
+                  <EmptyDescription>Try switching the view toggle, clearing filters, or changing status selection.</EmptyDescription>
+                </EmptyContent>
+              </Empty>
+            ) : viewMode === "list" ? (
+              <PollsDataTable 
+                polls={visiblePolls as PollData[]}
+                page={page}
+                limit={limit}
+                total={total}
+                onPageChange={(newPage) => setPage(newPage)}
+              />
+            ) : (
+              <GridView polls={visiblePolls} />
+            )}
+          </div>
         </section>
       </div>
     </main>
   );
 }
 
-function ListView({ polls }: { polls: PollWithMeta[] }) {
-  return (
-    <div>
-      <div className="hidden border-b border-black/10 px-6 py-3 text-xs uppercase tracking-[0.3em] text-black/50 md:grid md:grid-cols-[minmax(0,1.6fr)_repeat(2,minmax(120px,1fr))_auto]">
-        <span>Poll</span>
-        <span>Timeline</span>
-        <span>Roll</span>
-        <span>Actions</span>
-      </div>
-      <div>
-        {polls.map((poll) => (
-          <article
-            key={poll._id ?? poll.title}
-            className="relative border-b border-black/10 px-6 py-6 last:border-none"
-          >
-            <span
-              className={cn(
-                "absolute right-0 top-0 h-10 w-10 rounded-bl-3xl",
-                statusThemes[poll.status ?? PollStatus.Draft]?.accent ??
-                "bg-black/10"
-              )}
-              aria-hidden
-            />
-            <div className="flex flex-col gap-6 md:grid md:grid-cols-[minmax(0,1.6fr)_repeat(2,minmax(120px,1fr))_auto] md:items-center">
-              <div>
-                <p className="text-lg font-semibold">{poll.title}</p>
-                <p className="mt-2 text-sm text-black/60">{poll.description}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50 md:hidden">
-                  Timeline
-                </p>
-                <p className="mt-2 text-sm font-medium text-black">
-                  {formatDate(poll.startTime)} – {formatDate(poll.endTime)}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-black/50 md:hidden">
-                  Roll
-                </p>
-                <p className="mt-2 text-sm text-black/70">
-                  {poll.participation.includes("contributed")
-                    ? "Contributor"
-                    : "Member"}
-                </p>
-              </div>
-              <div className="flex flex-col gap-3 md:items-end">
-                <Link
-                  href={poll._id ? `/polls/${poll._id}` : "#"}
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "sm" }),
-                    "rounded-full border border-black px-5 text-sm font-semibold text-black hover:bg-black hover:text-white"
-                  )}
-                >
-                  View poll
-                </Link>
-                <p className="text-xs text-black/40">
-                  Updated {formatDate(poll.updatedAt ?? poll.endTime)}
-                </p>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function GridView({ polls }: { polls: PollWithMeta[] }) {
   return (
     <div className="grid gap-6 px-6 py-6 sm:grid-cols-2">
-      {polls.map((poll) => (
-        <article
-          key={poll._id ?? poll.title}
-          className="relative flex h-full flex-col overflow-hidden rounded-[30px] border border-black/10 bg-white px-6 py-6 shadow-[0px_20px_35px_rgba(15,15,15,0.08)]"
-        >
-          <span
-            className={cn(
-              "absolute right-0 top-0 h-12 w-12 rounded-bl-[30px]",
-              statusThemes[poll.status ?? PollStatus.Draft]?.accent ??
-              "bg-black/10"
-            )}
-            aria-hidden
-          />
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-black/40">
-                Poll
-              </p>
-              <h3 className="mt-2 text-xl font-semibold">{poll.title}</h3>
-            </div>
-          </div>
-          <p className="mt-4 flex-1 text-sm text-black/60">
-            {poll.description}
-          </p>
-          <dl className="mt-6 grid gap-4 text-sm">
-            <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-black/40">
-                Poll window
-              </dt>
-              <dd className="mt-1 font-semibold">
-                {formatDate(poll.startTime)} – {formatDate(poll.endTime)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-black/40">
-                Role
-              </dt>
-              <dd className="mt-1 font-medium text-black">
-                {poll.participation.includes("contributed")
-                  ? "Contributor"
-                  : "Participant"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-black/40">
-                Updated
-              </dt>
-              <dd className="mt-1 font-medium">
-                {formatDate(poll.updatedAt ?? poll.endTime)}
-              </dd>
-            </div>
-          </dl>
-          <Link
-            href={poll._id ? `/polls/${poll._id}` : "#"}
-            className="mt-6 inline-flex w-full items-center justify-center rounded-full border border-black bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-black/90"
+      {polls.map((poll) => {
+        const theme = statusThemes[poll.status ?? PollStatus.Prepare];
+        return (
+          <Card
+            key={poll._id ?? poll.title}
+            className="relative flex flex-col rounded-[24px] border-black/10 bg-white shadow-[0px_20px_35px_rgba(15,15,15,0.08)]"
           >
-            Open poll
-          </Link>
-        </article>
-      ))}
+            {/* Status corner indicator */}
+            <span
+              className={cn(
+                "absolute right-0 top-0 h-10 w-10 rounded-bl-[24px]",
+                theme ?? "bg-black/10"
+              )}
+              aria-hidden
+            />
+            
+            <CardHeader className="gap-3 pb-0">
+              <div className="text-xs uppercase tracking-[0.3em] text-black/40">
+                Poll
+              </div>
+              <CardTitle className="text-xl font-semibold">
+                {poll.title}
+              </CardTitle>
+              <CardDescription className="line-clamp-3">
+                {poll.description}
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="mt-4 grid gap-3 text-sm">
+                <div>
+                  <span className="text-xs uppercase tracking-[0.2em] text-black/40">
+                    Poll window
+                  </span>
+                  <p className="mt-1 font-semibold">
+                    {formatDate(poll.startTime)} – {formatDate(poll.endTime)}
+                  </p>
+                </div>
+                <div className="flex gap-6">
+                  <div>
+                    <span className="text-xs uppercase tracking-[0.2em] text-black/40">
+                      Role
+                    </span>
+                    <p className="mt-1 font-medium">
+                      {poll.participation.some(p => p === "contributed")
+                        ? "Contributor"
+                        : "Participant"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-xs uppercase tracking-[0.2em] text-black/40">
+                      Updated
+                    </span>
+                    <p className="mt-1 font-medium">
+                      {formatDate(poll.updatedAt ?? poll.endTime)}
+                    </p>
+                  </div>
+                </div>
+            </CardContent>
+
+            <CardFooter className="mt-auto pt-4 pb-6">
+              <Link
+                href={poll._id ? `/polls/${poll._id}` : "#"}
+                className="inline-flex w-full items-center justify-center rounded-full border border-black bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-black/90"
+              >
+                Open poll
+              </Link>
+            </CardFooter>
+          </Card>
+        );
+      })}
     </div>
   );
 }
