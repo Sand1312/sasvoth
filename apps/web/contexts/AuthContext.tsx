@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { useRedirect } from "../hooks/useRedirect";
 import { authApi } from "../api";
 import { api } from "../api/base";
@@ -16,13 +22,24 @@ export interface AuthContextType {
   loginWithEmail: (identifier: string, password: string) => Promise<any>;
   loginWithWallet: () => Promise<any>;
   loginWithSocial: (provider: "google" | "github") => void;
-  signupWithEmail: (email: string, password: string, name: string, walletAddress?: string) => Promise<any>;
+  signupWithEmail: (
+    email: string,
+    password: string,
+    name: string,
+    walletAddress?: string,
+  ) => Promise<any>;
   signout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children, initialUser }: { children: ReactNode; initialUser?: User | null }) {
+export function AuthProvider({
+  children,
+  initialUser,
+}: {
+  children: ReactNode;
+  initialUser?: User | null;
+}) {
   const { replaceTo } = useRedirect();
   const [user, setUser] = useState<User | null>(initialUser || null);
   const [isLoading, setIsLoading] = useState(!initialUser);
@@ -127,8 +144,11 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
       });
       const account = accounts[0];
 
-      // Generate random nonce
-      const nonce = crypto.randomUUID();
+      // Generate random nonce (with fallback for non-secure contexts)
+      const nonce =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
       const message = `Sign to login. Nonce: ${nonce}`;
 
       // Request signature
@@ -154,23 +174,30 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
       return res;
     } catch (error: any) {
       console.error("Wallet login error:", error);
-      
+
       // Handle MetaMask-specific errors gracefully
       const errorMessage = error?.message?.toLowerCase() || "";
       const errorCode = error?.code;
-      
+
       // MetaMask: Already pending request (from another tab)
-      if (errorMessage.includes("already pending") || errorMessage.includes("requestpermissions")) {
+      if (
+        errorMessage.includes("already pending") ||
+        errorMessage.includes("requestpermissions")
+      ) {
         console.log("[Auth] MetaMask has pending request in another tab");
         return { success: false, reason: "pending_other_tab" };
       }
-      
+
       // MetaMask: User rejected request
-      if (errorCode === 4001 || errorMessage.includes("user rejected") || errorMessage.includes("user denied")) {
+      if (
+        errorCode === 4001 ||
+        errorMessage.includes("user rejected") ||
+        errorMessage.includes("user denied")
+      ) {
         console.log("[Auth] User rejected wallet connection");
         return { success: false, reason: "user_rejected" };
       }
-      
+
       // Other errors - still throw for error dialog
       throw error;
     } finally {
@@ -188,7 +215,12 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     }
   };
 
-  const signupWithEmail = async (email: string, password: string, name: string, walletAddress?: string) => {
+  const signupWithEmail = async (
+    email: string,
+    password: string,
+    name: string,
+    walletAddress?: string,
+  ) => {
     const { acquireLock, releaseLock } = useAuthStore.getState();
     const acquired = acquireLock("signup");
     if (!acquired) {
@@ -200,7 +232,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
         email,
         password,
         name,
-        walletAddress
+        walletAddress,
       );
       const createdUser = res?.data?.user ?? res?.data ?? null;
       if (createdUser) setUser(createdUser);

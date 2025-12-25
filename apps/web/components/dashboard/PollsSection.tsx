@@ -5,11 +5,30 @@ import Link from "next/link";
 import { Search, RefreshCw } from "lucide-react";
 import { Button } from "@sasvoth/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@sasvoth/ui/tabs";
-import { Empty, EmptyContent, EmptyTitle, EmptyDescription } from "@sasvoth/ui/empty";
+import {
+  Empty,
+  EmptyContent,
+  EmptyTitle,
+  EmptyDescription,
+} from "@sasvoth/ui/empty";
 import { Input } from "@sasvoth/ui/input";
 import { ScrollArea } from "@sasvoth/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@sasvoth/ui/select";
 import { usePollSearch } from "@/hooks/usePollSearch";
 import { PollStatus, Poll } from "@/types/polls";
+
+const statusOptions = [
+  { value: PollStatus.InProgress, label: "In Progress" },
+  { value: PollStatus.Prepare, label: "Prepare" },
+  { value: PollStatus.Counting, label: "Counting" },
+  { value: PollStatus.Ended, label: "Ended" },
+];
 
 export function PollsSection() {
   const {
@@ -20,57 +39,89 @@ export function PollsSection() {
     pollStatusTab,
     setPollStatusTab,
     searchTerm,
-    setSearchTerm
+    setSearchTerm,
   } = usePollSearch(PollStatus.InProgress);
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-6 pb-10">
-      <div className="rounded-[30px] border border-black/10 bg-white p-8 shadow-lg">
-        {/* Header: Title + Search + Status Tabs + Refresh */}
-        <div className="flex flex-wrap items-center gap-6 mb-8">
-          <h2 className="text-3xl font-bold text-black">Polls</h2>
-          
-          {/* Search Bar */}
-          <div className="relative w-full max-w-xs md:w-64">
+    <section className="mx-auto w-full max-w-6xl px-4 md:px-6 pb-24 md:pb-10">
+      <div className="rounded-[30px] border border-black/10 bg-white p-4 md:p-8 shadow-lg">
+        {/* Mobile Header: Title + Refresh */}
+        <div className="flex items-center justify-between md:hidden mb-4">
+          <h2 className="text-2xl font-bold text-black">Polls</h2>
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-black/20 bg-white"
+            onClick={() => refetch()}
+            disabled={loadingPolls}
+            aria-label="Refresh polls"
+          >
+            <RefreshCw
+              className={`w-5 h-5 ${loadingPolls ? "animate-spin" : ""}`}
+            />
+          </button>
+        </div>
+
+        {/* Mobile Status Select */}
+        <div className="md:hidden mb-4">
+          <Select
+            value={pollStatusTab}
+            onValueChange={(val) => setPollStatusTab(val as PollStatus)}
+          >
+            <SelectTrigger className="w-full rounded-full border-black/20">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Mobile Search */}
+        <div className="md:hidden mb-6">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40" />
-            <Input 
-              placeholder="Search polls..." 
+            <Input
+              placeholder="Search polls..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 h-10 rounded-full border-black/20 bg-white focus-visible:ring-black"
             />
           </div>
-          
-          <Tabs 
-            value={pollStatusTab} 
+        </div>
+
+        {/* Desktop Header: Title + Search + Status Tabs + Refresh */}
+        <div className="hidden md:flex flex-wrap items-center gap-6 mb-8">
+          <h2 className="text-3xl font-bold text-black">Polls</h2>
+
+          {/* Search Bar */}
+          <div className="relative w-full max-w-xs md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40" />
+            <Input
+              placeholder="Search polls..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 h-10 rounded-full border-black/20 bg-white focus-visible:ring-black"
+            />
+          </div>
+
+          <Tabs
+            value={pollStatusTab}
             onValueChange={(val) => setPollStatusTab(val as PollStatus)}
             className="mr-auto"
           >
             <TabsList className="flex flex-wrap gap-2 bg-transparent p-0">
-              <TabsTrigger 
-                value={PollStatus.InProgress}
-                className="rounded-full border border-black/20 px-4 py-2 text-sm data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:border-black transition-all hover:bg-black/5"
-              >
-                In Progress
-              </TabsTrigger>
-              <TabsTrigger 
-                value={PollStatus.Prepare}
-                className="rounded-full border border-black/20 px-4 py-2 text-sm data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:border-black transition-all hover:bg-black/5"
-              >
-                Prepare
-              </TabsTrigger>
-              <TabsTrigger 
-                value={PollStatus.Counting}
-                className="rounded-full border border-black/20 px-4 py-2 text-sm data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:border-black transition-all hover:bg-black/5"
-              >
-                Counting
-              </TabsTrigger>
-              <TabsTrigger 
-                value={PollStatus.Ended}
-                className="rounded-full border border-black/20 px-4 py-2 text-sm data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:border-black transition-all hover:bg-black/5"
-              >
-                Ended
-              </TabsTrigger>
+              {statusOptions.map(({ value, label }) => (
+                <TabsTrigger
+                  key={value}
+                  value={value}
+                  className="rounded-full border border-black/20 px-4 py-2 text-sm data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:border-black transition-all hover:bg-black/5"
+                >
+                  {label}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </Tabs>
 
@@ -79,7 +130,9 @@ export function PollsSection() {
             onClick={() => refetch()}
             disabled={loadingPolls}
           >
-            <RefreshCw className={`w-4 h-4 ${loadingPolls ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${loadingPolls ? "animate-spin" : ""}`}
+            />
           </Button>
         </div>
 
@@ -117,7 +170,7 @@ export function PollsSection() {
                 <EmptyContent>
                   <EmptyTitle>No polls found</EmptyTitle>
                   <EmptyDescription>
-                    {searchTerm 
+                    {searchTerm
                       ? `No polls matching "${searchTerm}"`
                       : "Check back later for new voting opportunities"}
                   </EmptyDescription>
@@ -142,13 +195,17 @@ export function PollsSection() {
                       </p>
                       <div className="text-xs text-black/50 mt-auto space-y-2 pt-4 border-t border-black/5">
                         <div className="flex justify-between items-center">
-                          <span className="uppercase tracking-wider font-medium text-[10px]">Options</span>
+                          <span className="uppercase tracking-wider font-medium text-[10px]">
+                            Options
+                          </span>
                           <span className="font-bold text-black bg-black/5 px-2 py-0.5 rounded-full">
                             {poll.options.length}
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="uppercase tracking-wider font-medium text-[10px]">Ends</span>
+                          <span className="uppercase tracking-wider font-medium text-[10px]">
+                            Ends
+                          </span>
                           <span className="font-bold text-black">
                             {new Date(poll.endTime).toLocaleDateString()}
                           </span>

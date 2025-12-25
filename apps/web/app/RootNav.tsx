@@ -5,7 +5,7 @@ import type { User } from "../types/user";
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Polls", href: "/polls" },
-  {label: "Subscriptions", href: "/subscriptions"}
+  { label: "Subscriptions", href: "/subscriptions" },
 ];
 
 const AUTH_HIDDEN_ROUTES = ["/signin", "/signup"];
@@ -21,19 +21,27 @@ const LOGO_PROPS = {
 const NAV_WRAPPER_CLASSES =
   "mx-auto flex w-full max-w-7xl items-center justify-between px-[2%] py-5 md:py-6 bg-white";
 
+const API_HOST =
+  process.env.API_URL ||
+  (process.env.NEXT_PUBLIC_API_URL?.startsWith("http")
+    ? process.env.NEXT_PUBLIC_API_URL
+    : "http://localhost:8000");
 const API_BASE = "/api/v1";
 
 async function refreshToken(cookieHeader: string): Promise<boolean> {
   try {
-    const res = await fetch(`${API_BASE}/auth/refresh`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        ...(cookieHeader ? { cookie: cookieHeader } : {}),
+    const res = await fetch(
+      new URL(`${API_BASE}/auth/refresh`, API_HOST).toString(),
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          ...(cookieHeader ? { cookie: cookieHeader } : {}),
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    });
+    );
 
     if (res.ok) {
       return true;
@@ -53,18 +61,22 @@ async function getCurrentUser(): Promise<User> {
     const cookieHeader = cookieStore
       .getAll()
       .map(
-        ({ name, value }: { name: string; value: string }) => `${name}=${value}`
+        ({ name, value }: { name: string; value: string }) =>
+          `${name}=${value}`,
       )
       .join("; ");
 
-    let res = await fetch(`${API_BASE}/users/me`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        ...(cookieHeader ? { cookie: cookieHeader } : {}),
+    let res = await fetch(
+      new URL(`${API_BASE}/users/me`, API_HOST).toString(),
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          ...(cookieHeader ? { cookie: cookieHeader } : {}),
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    });
+    );
 
     // Handle 401 with token refresh
     if (res.status === 401) {
@@ -74,14 +86,17 @@ async function getCurrentUser(): Promise<User> {
       if (refreshSuccess) {
         console.log("Token refresh successful, retrying user request...");
         // Retry the original request
-        res = await fetch(`${API_BASE}/users/me`, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            ...(cookieHeader ? { cookie: cookieHeader } : {}),
+        res = await fetch(
+          new URL(`${API_BASE}/users/me`, API_HOST).toString(),
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              ...(cookieHeader ? { cookie: cookieHeader } : {}),
+            },
+            cache: "no-store",
           },
-          cache: "no-store",
-        });
+        );
       } else {
         console.log("Token refresh failed, returning null");
         return null;

@@ -10,7 +10,7 @@ import { WalletConnectOverlay } from "@/components/WalletConnectOverlay";
 import { cookies } from "next/headers";
 
 // Force dynamic rendering for routes that use cookies
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,13 +34,20 @@ async function getCurrentUser() {
       .map(({ name, value }) => `${name}=${value}`)
       .join("; ");
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "http://localhost:8000";
+    const apiBase =
+      process.env.API_URL ||
+      (process.env.NEXT_PUBLIC_API_URL?.startsWith("http")
+        ? process.env.NEXT_PUBLIC_API_URL
+        : "http://localhost:8000");
     const userEndpoint = new URL("/api/v1/users/me", apiBase).toString();
 
     // Helper to refresh token
     const refreshToken = async () => {
-       try {
-        const refreshEndpoint = new URL("/api/v1/auth/refresh", apiBase).toString();
+      try {
+        const refreshEndpoint = new URL(
+          "/api/v1/auth/refresh",
+          apiBase,
+        ).toString();
         const res = await fetch(refreshEndpoint, {
           method: "POST",
           headers: {
@@ -54,7 +61,7 @@ async function getCurrentUser() {
       } catch (err) {
         return false;
       }
-    }
+    };
 
     let res = await fetch(userEndpoint, {
       method: "GET",
@@ -66,19 +73,19 @@ async function getCurrentUser() {
     });
 
     if (res.status === 401) {
-       const refreshed = await refreshToken();
-       if (refreshed) {
-         res = await fetch(userEndpoint, {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-              ...(cookieHeader ? { cookie: cookieHeader } : {}),
-            },
-            cache: "no-store",
-          });
-       } else {
-         return null;
-       }
+      const refreshed = await refreshToken();
+      if (refreshed) {
+        res = await fetch(userEndpoint, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            ...(cookieHeader ? { cookie: cookieHeader } : {}),
+          },
+          cache: "no-store",
+        });
+      } else {
+        return null;
+      }
     }
 
     if (!res.ok) return null;
@@ -105,9 +112,7 @@ export default async function RootLayout({
             <MockProvider />
             <RootNav />
             <WalletConnectOverlay />
-            <FeedbackProvider>
-              {children}
-            </FeedbackProvider>
+            <FeedbackProvider>{children}</FeedbackProvider>
           </AuthProvider>
         </Web3Provider>
       </body>
