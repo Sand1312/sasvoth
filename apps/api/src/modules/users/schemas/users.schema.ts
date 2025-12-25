@@ -46,6 +46,24 @@ export class Users {
   @Prop({ required: false })
   stateIndex?: number;
 
+  /**
+   * Track all MACI signups for this user (supports multiple MACI deployments)
+   *
+   * ACID Note: On-chain signup has no transaction rollback.
+   * Order of operations:
+   * 1. On-chain signup succeeds → get stateIndex
+   * 2. Save to database (best-effort, log error if fails)
+   * 3. Stats sync job reconciles any inconsistencies periodically
+   */
+  @Prop({ type: Array, default: [] })
+  maciSignups: Array<{
+    maciAddress: string; // MACI contract address
+    stateIndex: number; // User's state index in this MACI
+    publicKey: string; // MACI public key used (macipk.xxx)
+    txHash?: string; // Transaction hash
+    signedUpAt: Date; // Timestamp
+  }>;
+
   @Prop({ default: 0 })
   balance: number;
 

@@ -9,7 +9,11 @@ import { NonceSyncJob } from './nonce-sync.job';
 import { DeploymentStatsSyncJob } from './deployment-stats-sync.job';
 import { SubgraphService } from './subgraph.service';
 import { MaciDeploymentsService } from './maci-deployments.service';
-import { MaciDeployment, MaciDeploymentSchema } from './schemas/maci-deployment.schema';
+import {
+  MaciDeployment,
+  MaciDeploymentSchema,
+} from './schemas/maci-deployment.schema';
+import { UsersModule } from '../users/users.module';
 
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -31,9 +35,22 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     forwardRef(() => PollsModule),
     forwardRef(() => ResultsMetaModule),
+    forwardRef(() => UsersModule),
   ],
   controllers: [MaciController],
-  providers: [MaciService, SmartNonceService, NonceSyncJob, DeploymentStatsSyncJob, SubgraphService, MaciDeploymentsService],
-  exports: [MaciService, SmartNonceService, SubgraphService, MaciDeploymentsService],
+  providers: [
+    MaciService,
+    SmartNonceService,
+    NonceSyncJob,
+    DeploymentStatsSyncJob,
+    SubgraphService,
+    MaciDeploymentsService,
+  ],
+  exports: [
+    MaciService,
+    SmartNonceService,
+    SubgraphService,
+    MaciDeploymentsService,
+  ],
 })
 export class MaciModule {}
