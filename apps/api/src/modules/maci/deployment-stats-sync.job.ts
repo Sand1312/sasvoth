@@ -4,7 +4,7 @@ import { MaciDeploymentsService } from './maci-deployments.service';
 
 /**
  * Deployment Stats Synchronization Job
- * 
+ *
  * Syncs members (numSignUps) and pollCount from RPC (on-chain = source of truth).
  * Graph is used as optimization when available.
  * Runs every 5 minutes + on startup.
@@ -57,11 +57,13 @@ export class DeploymentStatsSyncJob implements OnModuleInit {
 
       // Chain to RPC URL mapping
       const chainRpcUrls: Record<string, string> = {
-        'arbitrum_sepolia': 'https://sepolia-rollup.arbitrum.io/rpc',
-        'arbitrum-sepolia': 'https://sepolia-rollup.arbitrum.io/rpc',
-        'sepolia': 'https://rpc.sepolia.org',
-        'mainnet': 'https://eth.llamarpc.com',
-        'arbitrum': 'https://arb1.arbitrum.io/rpc',
+        arbitrum_sepolia:
+          'https://arbitrum-sepolia.core.chainstack.com/42c1adce4c0b05f5fe6de1377bc9e4a5',
+        'arbitrum-sepolia':
+          'https://arbitrum-sepolia.core.chainstack.com/42c1adce4c0b05f5fe6de1377bc9e4a5',
+        sepolia: 'https://rpc.sepolia.org',
+        mainnet: 'https://eth.llamarpc.com',
+        arbitrum: 'https://arb1.arbitrum.io/rpc',
       };
 
       let updatedCount = 0;
@@ -73,19 +75,26 @@ export class DeploymentStatsSyncJob implements OnModuleInit {
           let pollCount = 0;
 
           // Get RPC URL for this deployment's chain
-          const rpcUrl = chainRpcUrls[deployment.chain?.toLowerCase()] 
-            || process.env.RPC_URL 
-            || 'https://sepolia-rollup.arbitrum.io/rpc';
-          
-          this.logger.debug(`Syncing ${deployment.name} (chain: ${deployment.chain}, RPC: ${rpcUrl.slice(0, 30)}...)`);
-          
+          const rpcUrl =
+            chainRpcUrls[deployment.chain?.toLowerCase()] ||
+            process.env.RPC_URL ||
+            'https://arbitrum-sepolia.core.chainstack.com/42c1adce4c0b05f5fe6de1377bc9e4a5';
+
+          this.logger.debug(
+            `Syncing ${deployment.name} (chain: ${deployment.chain}, RPC: ${rpcUrl.slice(0, 30)}...)`,
+          );
+
           const provider = new providers.JsonRpcProvider(rpcUrl);
 
           // Check if contract exists at address
           const code = await provider.getCode(deployment.maciAddress);
           if (code === '0x' || code === '0x0') {
-            this.logger.warn(`⚠️ Contract not found at ${deployment.maciAddress} on ${deployment.chain} - marking invalid`);
-            await this.maciDeploymentsService.markInvalid(deployment.maciAddress);
+            this.logger.warn(
+              `⚠️ Contract not found at ${deployment.maciAddress} on ${deployment.chain} - marking invalid`,
+            );
+            await this.maciDeploymentsService.markInvalid(
+              deployment.maciAddress,
+            );
             continue;
           }
 
@@ -95,23 +104,27 @@ export class DeploymentStatsSyncJob implements OnModuleInit {
               deployment.maciAddress,
               [
                 'function numSignUps() view returns (uint256)',
-                'function nextPollId() view returns (uint256)'
+                'function nextPollId() view returns (uint256)',
               ],
-              provider
+              provider,
             );
 
             const [numSignUps, nextPollId] = await Promise.all([
               maciContract.numSignUps(),
-              maciContract.nextPollId()
+              maciContract.nextPollId(),
             ]);
 
             members = Number(numSignUps);
             pollCount = Number(nextPollId);
-            
-            this.logger.debug(`RPC result: members=${members}, polls=${pollCount}`);
+
+            this.logger.debug(
+              `RPC result: members=${members}, polls=${pollCount}`,
+            );
           } catch (rpcError: any) {
-            this.logger.warn(`RPC query failed for ${deployment.maciAddress}: ${rpcError.message}`);
-            
+            this.logger.warn(
+              `RPC query failed for ${deployment.maciAddress}: ${rpcError.message}`,
+            );
+
             // FALLBACK: Try Graph if RPC failed
             if (deployment.subgraphUrl) {
               try {
@@ -119,7 +132,7 @@ export class DeploymentStatsSyncJob implements OnModuleInit {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                    query: `{ maci(id: "${deployment.maciAddress.toLowerCase()}") { numSignUps } }`
+                    query: `{ maci(id: "${deployment.maciAddress.toLowerCase()}") { numSignUps } }`,
                   }),
                 });
                 const data = await response.json();
@@ -128,43 +141,54 @@ export class DeploymentStatsSyncJob implements OnModuleInit {
                   this.logger.debug(`Graph fallback: members=${members}`);
                 }
               } catch (graphError) {
-                this.logger.warn(`Graph also failed for ${deployment.maciAddress}`);
+                this.logger.warn(
+                  `Graph also failed for ${deployment.maciAddress}`,
+                );
               }
             }
-            
+
             // If both RPC and Graph failed (no data), mark as invalid
             if (members === 0 && pollCount === 0) {
-              this.logger.warn(`❌ Both RPC and Graph failed for ${deployment.maciAddress} - marking invalid`);
-              await this.maciDeploymentsService.markInvalid(deployment.maciAddress);
+              this.logger.warn(
+                `❌ Both RPC and Graph failed for ${deployment.maciAddress} - marking invalid`,
+              );
+              await this.maciDeploymentsService.markInvalid(
+                deployment.maciAddress,
+              );
               continue;
             }
           }
 
           // Update deployment if stats changed
-          if (members !== deployment.members || pollCount !== deployment.pollCount) {
+          if (
+            members !== deployment.members ||
+            pollCount !== deployment.pollCount
+          ) {
             await this.maciDeploymentsService.updateStats(
               deployment.maciAddress,
               members,
-              pollCount
+              pollCount,
             );
             updatedCount++;
-            this.logger.log(`✅ Updated ${deployment.name}: members=${members}, polls=${pollCount}`);
+            this.logger.log(
+              `✅ Updated ${deployment.name}: members=${members}, polls=${pollCount}`,
+            );
           } else {
             this.logger.debug(`No change for ${deployment.name}`);
           }
-
         } catch (error: any) {
           errorCount++;
-          this.logger.error(`Failed to sync ${deployment.maciAddress}: ${error.message}`);
+          this.logger.error(
+            `Failed to sync ${deployment.maciAddress}: ${error.message}`,
+          );
         }
       }
 
       const duration = Date.now() - startTime;
       this.logger.log(
         `Stats sync completed in ${duration}ms: ` +
-        `${updatedCount} updated, ${errorCount} errors`
+          `${updatedCount} updated, ${errorCount} errors`,
       );
-
     } catch (error: any) {
       this.logger.error(`Stats sync failed: ${error.message}`);
     } finally {
@@ -179,4 +203,3 @@ export class DeploymentStatsSyncJob implements OnModuleInit {
     await this.syncStats();
   }
 }
-

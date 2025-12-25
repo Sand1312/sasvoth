@@ -1,4 +1,4 @@
-import { api } from "./base";
+import { api, directApi } from "./base";
 
 export type DeployMaciPayload = {
   chain: string;
@@ -73,10 +73,14 @@ export const maciApi = {
   /**
    * Get MACI configuration (subgraph URL, MACI address, start block)
    * GET /maci/config
-   * 
+   *
    * Returns dynamic subgraph URL from database (MaciDeployments)
    */
-  getConfig: async (): Promise<{ maciAddress: string; subgraphUrl: string | null; startBlock: number }> => {
+  getConfig: async (): Promise<{
+    maciAddress: string;
+    subgraphUrl: string | null;
+    startBlock: number;
+  }> => {
     const response = await api.get("/maci/config");
     return response.data;
   },
@@ -85,7 +89,11 @@ export const maciApi = {
    * Signup to MACI (Legacy - direct signup)
    * POST /maci/signup
    */
-  signup: async (payload: { maciPubKey: string; maciAddress?: string; sgData?: string }) => {
+  signup: async (payload: {
+    maciPubKey: string;
+    maciAddress?: string;
+    sgData?: string;
+  }) => {
     const response = await api.post("/maci/signup", payload);
     return response.data;
   },
@@ -93,7 +101,7 @@ export const maciApi = {
   /**
    * Signup to MACI with EIP-712 signature (New - secure)
    * POST /maci/signup-eip712
-   * 
+   *
    * The backend verifies user eligibility and relays to Gatekeeper contract
    */
   signupWithSignature: async (payload: {
@@ -120,7 +128,7 @@ export const maciApi = {
   /**
    * Get latest MACI deployment info
    * GET /maci/deployments/latest
-   * 
+   *
    * TODO: Dùng để lấy maciAddress và startBlock từ backend
    * - Thay thế localStorage.getItem("maciAddress")
    * - Thay thế localStorage.getItem("maciStartBlock")
@@ -141,18 +149,20 @@ export const maciApi = {
   /**
    * Get all MACI deployments
    * GET /maci/deployments
-   * 
+   *
    * Returns list of all MACI deployments with member count (nextIndex - 1)
    */
-  getDeployments: async (): Promise<{
-    id: string;
-    name: string;
-    logo?: string;
-    maciAddress: string;
-    chain: string;
-    members: number;
-    pollCount: number;
-  }[]> => {
+  getDeployments: async (): Promise<
+    {
+      id: string;
+      name: string;
+      logo?: string;
+      maciAddress: string;
+      chain: string;
+      members: number;
+      pollCount: number;
+    }[]
+  > => {
     const response = await api.get("/maci/deployments");
     return response.data;
   },
@@ -160,12 +170,14 @@ export const maciApi = {
   /**
    * Get MACI deployment by address
    * GET /maci/deployments/:address
-   * 
+   *
    * TODO: Dùng khi có maciAddress cụ thể từ poll.maciAddress
    * - Query thông tin MACI contract cụ thể
    * - Hữu ích khi có nhiều MACI deployments khác nhau
    */
-  getDeploymentByAddress: async (maciAddress: string): Promise<{
+  getDeploymentByAddress: async (
+    maciAddress: string,
+  ): Promise<{
     maciAddress: string;
     startBlock: number;
     subgraphUrl: string;
@@ -179,7 +191,14 @@ export const maciApi = {
    * Join Poll
    * POST /maci/polls/:id/join
    */
-  joinPoll: async (pollId: string, payload: { maciPrivateKey: string; maciAddress?: string; startBlock?: number }) => {
+  joinPoll: async (
+    pollId: string,
+    payload: {
+      maciPrivateKey: string;
+      maciAddress?: string;
+      startBlock?: number;
+    },
+  ) => {
     const response = await api.post(`/maci/polls/${pollId}/join`, payload);
     return response.data;
   },
@@ -188,16 +207,19 @@ export const maciApi = {
    * Vote
    * POST /maci/polls/:id/vote
    */
-  vote: async (pollId: string, payload: {
-    voteOptionIndex: number;
-    voteWeight: number;
-    nonce: number;
-    voteCommitment: string;
-    userStateIndex: string;
-    userMaciPrivateKey: string;
-    userMaciPublicKey: string;
-    maciAddress?: string
-  }) => {
+  vote: async (
+    pollId: string,
+    payload: {
+      voteOptionIndex: number;
+      voteWeight: number;
+      nonce: number;
+      voteCommitment: string;
+      userStateIndex: string;
+      userMaciPrivateKey: string;
+      userMaciPublicKey: string;
+      maciAddress?: string;
+    },
+  ) => {
     // TODO: Double check this implementation
     const response = await api.post(`/maci/polls/${pollId}/vote`, payload);
     return response.data;
@@ -208,12 +230,8 @@ export const maciApi = {
    * POST /maci/deploy
    */
   deployMaci: async (payload: DeployMaciPayload) => {
-    // Note: The backend endpoint might be /deploy/maci or /maci/deploy depending on implementation.
-    // Spec says: POST /v1/deploy/maci. We are using base.ts which prefixes /api/v1.
-    // So if backend serves /api/v1/deploy/maci, we use /deploy/maci.
-    // Let's assume /deploy/maci based on spec "POST /v1/deploy/maci" relative to base.
-    // UPDATE: Backend Controller MaciController maps to 'maci', so endpoint is 'maci/deploy'.
-    const response = await api.post("/maci/deploy", payload);
+    // Use directApi to bypass Next.js proxy (deploy takes 2-5 minutes)
+    const response = await directApi.post("/maci/deploy", payload);
     return response.data;
   },
 
@@ -222,7 +240,8 @@ export const maciApi = {
    * POST /maci/polls
    */
   createPoll: async (payload: DeployPollPayload) => {
-    const response = await api.post("/maci/polls", payload);
+    // Use directApi to bypass Next.js proxy (poll deploy takes 1-2 minutes)
+    const response = await directApi.post("/maci/polls", payload);
     return response.data;
   },
 
@@ -232,7 +251,7 @@ export const maciApi = {
    */
   getContracts: async (pollId: string, maciAddress?: string) => {
     const response = await api.get(`/maci/polls/${pollId}/contracts`, {
-      params: { maciAddress }
+      params: { maciAddress },
     });
     return response.data;
   },
@@ -242,7 +261,10 @@ export const maciApi = {
    * POST /maci/polls/:id/merge
    */
   merge: async (pollId: string, maciAddress?: string) => {
-    const response = await api.post(`/maci/polls/${pollId}/merge`, { maciAddress });
+    // Use directApi - merge can take 1-2 minutes
+    const response = await directApi.post(`/maci/polls/${pollId}/merge`, {
+      maciAddress,
+    });
     return response.data;
   },
 
@@ -251,7 +273,11 @@ export const maciApi = {
    * POST /maci/polls/:id/merge/direct
    */
   mergeDirect: async (pollId: string, maciAddress?: string) => {
-    const response = await api.post(`/maci/polls/${pollId}/merge/direct`, { maciAddress });
+    // Use directApi - merge can take 1-2 minutes
+    const response = await directApi.post(
+      `/maci/polls/${pollId}/merge/direct`,
+      { maciAddress },
+    );
     return response.data;
   },
 
@@ -259,8 +285,16 @@ export const maciApi = {
    * Generate proofs
    * POST /maci/polls/:id/proofs
    */
-  generateProofs: async (pollId: string, maciAddress?: string, startBlock?: number) => {
-    const response = await api.post(`/maci/polls/${pollId}/proofs`, { maciAddress, startBlock });
+  generateProofs: async (
+    pollId: string,
+    maciAddress?: string,
+    startBlock?: number,
+  ) => {
+    // Use directApi - proof generation can take 5-30 minutes
+    const response = await directApi.post(`/maci/polls/${pollId}/proofs`, {
+      maciAddress,
+      startBlock,
+    });
     return response.data;
   },
 
@@ -269,7 +303,11 @@ export const maciApi = {
    * POST /maci/polls/:id/proofs/submit
    */
   submitProofs: async (pollId: string, maciAddress?: string) => {
-    const response = await api.post(`/maci/polls/${pollId}/proofs/submit`, { maciAddress });
+    // Use directApi - proof submission can take a few minutes
+    const response = await directApi.post(
+      `/maci/polls/${pollId}/proofs/submit`,
+      { maciAddress },
+    );
     return response.data;
   },
 
@@ -277,9 +315,12 @@ export const maciApi = {
   /** @deprecated Use createPoll instead */
   deployPoll: async (body: any) => maciApi.createPoll(body),
   /** @deprecated Use merge instead */
-  mergePoll: async (pollId: string, maciAddress?: string) => maciApi.merge(pollId, maciAddress),
+  mergePoll: async (pollId: string, maciAddress?: string) =>
+    maciApi.merge(pollId, maciAddress),
   /** @deprecated Use mergeDirect instead */
-  mergeStateDirect: async (pollId: string, maciAddress?: string) => maciApi.mergeDirect(pollId, maciAddress),
+  mergeStateDirect: async (pollId: string, maciAddress?: string) =>
+    maciApi.mergeDirect(pollId, maciAddress),
   /** @deprecated Use getContracts instead */
-  getPollContracts: async (pollId: string, maciAddress?: string) => maciApi.getContracts(pollId, maciAddress),
+  getPollContracts: async (pollId: string, maciAddress?: string) =>
+    maciApi.getContracts(pollId, maciAddress),
 };
