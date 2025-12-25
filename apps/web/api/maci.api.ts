@@ -126,6 +126,32 @@ export const maciApi = {
   },
 
   /**
+   * Get MACI signup status from database (fast, no on-chain query)
+   * GET /maci/signup-status/:walletAddress
+   *
+   * Use this instead of subgraph/on-chain queries for subscription page
+   */
+  getSignupStatus: async (
+    walletAddress: string,
+    maciAddress?: string,
+  ): Promise<{
+    signedUp?: boolean;
+    stateIndex?: string | null;
+    signedUpAt?: string | null;
+    signups?: Array<{
+      maciAddress: string;
+      stateIndex: string;
+      signedUpAt: string;
+    }>;
+  }> => {
+    const params = maciAddress ? `?maciAddress=${maciAddress}` : "";
+    const response = await api.get(
+      `/maci/signup-status/${walletAddress}${params}`,
+    );
+    return response.data;
+  },
+
+  /**
    * Get latest MACI deployment info
    * GET /maci/deployments/latest
    *
