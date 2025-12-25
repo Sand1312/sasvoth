@@ -101,8 +101,8 @@ function LoginFormContent() {
       </div>
       */}
 
-      {/* TODO: Re-enable Google/GitHub social login when ready */}
-      {/* <SocialLoginButtons error={null} /> */}
+      {/* Wallet login only - Google/GitHub commented in auth.config.tsx */}
+      <SocialLoginButtons error={null} />
     </form>
   );
 }
