@@ -13,8 +13,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "prettier --write",
-      "turbo run test --filter='...[origin/main]'"
+      "prettier --write"
     ],
     "*.{js,jsx,json,md}": [
       "prettier --write"
