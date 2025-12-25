@@ -1,135 +1,142 @@
-# Turborepo starter
+# Maci Wrapper
 
-This Turborepo starter is maintained by the Turborepo core team.
+## API Call
 
-## Using this example
+Base Endpoint: `/api`
 
-Run the following command:
+### Documentation
 
-```sh
-npx create-turbo@latest
+- **Core Changes**: [Refactor Changelog](./docs/MACI_REFACTOR_CHANGELOG.md)
+- **Sign Up**: [MACI Signup V2](./docs/MACI_SIGNUP_V2.md)
+- **Join Poll**: [Join Poll V2](./docs/MACI_JOINPOLL_V2.md)
+
+## Core
+
+- **Sign Up MACI**: Handled via `useMaciSignup` hook using EIP-712 for domain-separated authentication. See [docs](./docs/MACI_SIGNUP_V2.md).
+- **Sign Up Poll**: Handled via `useMaciJoinPoll` hook. See [docs](./docs/MACI_JOINPOLL_V2.md).
+- **Tally**: Handles the tabulation of votes. _Updates in progress_.
+- **Submit Proof**: Logic for submitting ZK proofs to the contract. _Updates in progress_.
+
+## Frontend
+
+- **Framework**: **Next.js 16** (App Router).
+- **Key Technologies**:
+  - **SSR/PPR**: Utilizing Next.js 16's Partial Prerendering (PPR) and Server-Side Rendering (SSR) for optimal performance and SEO.
+  - **UX**:
+    - **Optimistic Updates**: Immediate UI feedback while transactions process in the background.
+    - **Locking Mechanism**: `useWithMaciLock` prevents race conditions (e.g., double clicking signup).
+    - **Real-time Feedback**: Polling mechanisms for transaction status.
+
+## Backend
+
+- **Framework**: **NestJS**.
+- **Philosophy**:
+  - **Robustness**: Error handling and graceful degradation (RPC fallbacks).
+  - **Scalability**: Stateless architecture compatible with serverless or containerized deployment.
+  - **Security**: Distributed locking (Redlock) to prevent replay attacks or race conditions.
+
+## Storage
+
+### Decentralization
+
+We utilize **IPFS** to decentralized storage of voting logic, specifically ensuring that poll metadata and tally results are immutable and verifiable.
+
+### Database (MongoDB)
+
+We use MongoDB for flexible, high-performance data storage.
+**Full Schema Overview:**
+
+```typescript
+// Users (Authentication & Identity)
+interface Users {
+  email?: string;
+  name: string;
+  role: "admin" | "user";
+  authType: "google" | "github" | "email" | "wallet" | "all";
+  walletAddress?: string; // Unique, Sparse
+  publicKey?: string; // MACI Public Key (deprecating)
+  maciSignups: [
+    {
+      // Track multi-MACI signups
+      maciAddress: string;
+      stateIndex: number;
+      publicKey: string;
+      signedUpAt: Date;
+    },
+  ];
+  balance: number; // Token balance
+}
+
+// MaciDeployment (Connects App to Blockchain)
+interface MaciDeployment {
+  maciAddress: string; // Contract Address (Unique)
+  name: string; // e.g., "CSES"
+  subgraphUrl?: string; // The Graph URL for this deployment
+  startBlock?: number;
+  chain: string; // e.g., "optimism-sepolia"
+  members: number; // Synced participant count
+  pollCount: number; // Synced poll count
+  isValid: boolean;
+}
+
+// Ideas (Polls/Proposals)
+interface Ideas {
+  title: string;
+  description: string;
+  userAddress: string; // Creator
+  idea_cid?: string; // IPFS CID for verifying content
+  createdAt: Date;
+  ageLimit: number;
+}
+
+// JoinPoll (Participation Tracking)
+interface JoinPoll {
+  voterAdrress: string;
+  pollId: string;
+  pollIdOnchain: string;
+  voteCommitment: string;
+  timestamp: Date;
+}
+
+// Votes (Off-chain Vote Backup)
+interface Votes {
+  pollId: string;
+  selectedOption: number;
+  voiceCredits: number;
+}
 ```
 
-## What's inside?
+### IPFS Storage
 
-This Turborepo includes the following packages/apps:
+- **Poll Metadata**: Stores title, description, and images.
+- **Tally Results**: Final vote counts and proofs are stored here after processing.
+- **Data Lifecycle**:
+  - **Creation**: Data pushed to IPFS on Poll Creation / Tally Completion.
+  - **Verification**: Frontend fetches IPFS CID to verify data integrity against on-chain hash.
 
-### Apps and Packages
+## Processing & Optimization
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Async Sync (UX Improvement)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+To provide a snappy user experience while ensuring data consistency, we use a **Smart Nonce** algorithm found in `SmartNonceService`:
 
-### Utilities
+- **Problem**: Blockchain is slow (Cold Storage), but users need to vote fast.
+- **Solution**: We maintain two states:
+  - **Hot State (Redis/Memory)**: Tracks immediate pending nonces.
+  - **Cold State (The Graph)**: confirmed on-chain nonce.
+- **Algorithm**: `NextNonce = max(ConfirmedNonce, PendingNonce) + 1`
+  - This allows users to vote multiple times in rapid succession without waiting for block confirmations, as the system optimistically issues the next nonce.
 
-This Turborepo has some additional tools already setup for you:
+### Spam Prevention (Redlock)
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+We use **Redlock** (Distributed Redis Locking) to handle concurrency:
 
-### Build
+- **Use Case**: Preventing double-signup or double-voting race conditions.
+- **Mechanism**:
+  - `lock:signup:{maciAddress}:{pubKeyHash}`: Ensures a user only signs up once per MACI instance.
+  - `lock:vote:{pollId}:{stateIndex}`: Ensures vote transactions are serialized correctly.
 
-To build all apps and packages, run the following command:
+### Scanned Processes
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- **Deployment Stats Sync**: Periodically syncs `numSignUps` and `nextPollId` from the contract to the `MaciDeployment` DB collection.
+- **Smart Nonce Sync**: Background jobs reconcile the "Hot" Redis state with the "Cold" Graph state to clean up stale locks.
