@@ -57,6 +57,9 @@ class UpdateChainDto {
 
   @ApiProperty({ required: false })
   maciAddress?: string;  // MACI contract address this poll belongs to
+
+  @ApiProperty({ required: false })
+  startBlock?: number;  // Block number when MACI was deployed
 }
 
 /**
@@ -213,7 +216,11 @@ export class PollsController {
       try {
         // IMPORTANT: Results are saved with the On-Chain Poll ID (e.g., "0"), not the Mongo ID
         const onChainId = (poll as any).pollIdOnChain;
-        if (onChainId !== undefined && onChainId !== null) {
+        const pollStatus = (poll as any).status;
+
+        // Only return results if poll is explicitly "ended" (tally completed)
+        // This prevents showing results for "counting" polls
+        if (onChainId !== undefined && onChainId !== null && pollStatus === 'ended') {
           const resultsMeta =
             await this.resultsMetaService.getOutComeByVotingEventId(
               onChainId.toString(),
@@ -415,13 +422,14 @@ export class PollsController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const { pollIdOnChain, subgraphUrl, maciAddress } = req.body;
+    const { pollIdOnChain, subgraphUrl, maciAddress, startBlock } = req.body;
     try {
       const updatedPoll = await this.pollsService.savePollOnChainId(
         id,
         pollIdOnChain,
         subgraphUrl,
         maciAddress,
+        startBlock,
       );
       return res.status(200).json({ poll: updatedPoll });
     } catch (error) {

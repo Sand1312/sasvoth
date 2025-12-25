@@ -16,8 +16,9 @@ import {
  *
  * Resource: /polls/:pollId/results (poll results as sub-resource)
  *
- * GET    /polls/:pollId/results       - Get poll results
- * POST   /polls/:pollId/results/tally - Trigger tally calculation
+ * GET    /polls/:pollId/results        - Get poll results
+ * POST   /polls/:pollId/results/tally  - Start async tally calculation
+ * GET    /polls/:pollId/results/tally-status - Check tally progress
  */
 @ApiTags('Poll Results')
 @Controller('polls')
@@ -47,20 +48,59 @@ export class ResultsMetaController {
   }
 
   /**
-   * Trigger tally calculation
+   * Start async tally calculation
    * POST /polls/:pollId/results/tally
+   * Returns 202 Accepted immediately, tally runs in background
    */
   @Post(':pollId/results/tally')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Trigger tally calculation' })
+  @ApiOperation({ summary: 'Start async tally calculation' })
   @ApiParam({ name: 'pollId', type: String })
-  @ApiResponse({ status: 200, description: 'Tally completed successfully' })
+  @ApiResponse({ status: 202, description: 'Tally process started' })
+  @ApiResponse({ status: 200, description: 'Tally already completed or in progress' })
   async tally(@Param('pollId') pollId: string, @Res() res: Response) {
     try {
-      const tallyResult = await this.resultsMetaService.tallyVotes(pollId);
-      return res.status(200).json({ results: tallyResult });
-    } catch (error) {
-      return res.status(500).json({ message: 'Error tallying votes', error });
+      const result = await this.resultsMetaService.startTally(pollId);
+      
+      if (result.status === 'started') {
+        return res.status(202).json({ 
+          status: 'started',
+          message: result.message,
+          pollId 
+        });
+      }
+      
+      // Already counting or complete
+      return res.status(200).json({
+        status: result.status,
+        message: result.message,
+        pollId
+      });
+    } catch (error: any) {
+      return res.status(500).json({ 
+        message: 'Error starting tally', 
+        error: error?.message || error 
+      });
+    }
+  }
+
+  /**
+   * Check tally progress
+   * GET /polls/:pollId/results/tally-status
+   */
+  @Get(':pollId/results/tally-status')
+  @ApiOperation({ summary: 'Check tally progress' })
+  @ApiParam({ name: 'pollId', type: String })
+  @ApiResponse({ status: 200, description: 'Tally status retrieved' })
+  async getTallyStatus(@Param('pollId') pollId: string, @Res() res: Response) {
+    try {
+      const status = await this.resultsMetaService.getTallyStatus(pollId);
+      return res.status(200).json(status);
+    } catch (error: any) {
+      return res.status(500).json({ 
+        message: 'Error fetching tally status', 
+        error: error?.message || error 
+      });
     }
   }
 }

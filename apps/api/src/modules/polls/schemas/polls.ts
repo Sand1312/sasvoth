@@ -70,6 +70,9 @@ export class Polls {
 
     @Prop({ required: false })
     maciAddress: string;  // MACI contract address this poll belongs to
+
+    @Prop({ required: false })
+    startBlock: number;  // Block number when MACI was deployed (for Merkle tree)
 }
 
 export const PollsSchema = SchemaFactory.createForClass(Polls);

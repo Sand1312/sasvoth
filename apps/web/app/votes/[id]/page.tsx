@@ -12,6 +12,8 @@ import { VoteRightPanel } from "@/components/vote/VoteRightPanel";
 import { VoteGallery } from "@/components/vote/VoteGallery";
 import { useFeedback } from "@/contexts/FeedbackContext";
 import { PrizeClaimForm } from "@/components/claim/PrizeClaimForm";
+import { useJoinPoll } from "@/hooks/useJoinPoll";
+
 
 type Props = {
   params: Promise<{ id: string }>; // id = CID
@@ -106,7 +108,7 @@ function BuyTicketsModal({
         </p>
         {maxVoiceCredits !== null && (
           <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-2">
-            🎫 Voice Credits max: <b>{Math.sqrt(maxVoiceCredits)}</b> 
+            🎫 Voice Credits max: <b>{Math.sqrt(maxVoiceCredits)}</b>
           </div>
         )}
         <input
@@ -241,6 +243,8 @@ function DebugPanel({
   mergePoll,
   generateProofs,
   submitProofs,
+  pollMaciAddress, // From poll DB
+  pollStartBlock, // From poll DB
 }: {
   detectedPollId: string | null;
   setDetectedPollId: (id: string | null) => void;
@@ -258,10 +262,12 @@ function DebugPanel({
     startBlock?: number
   ) => Promise<void>;
   submitProofs: (pollId: string, maciAddress?: string) => Promise<void>;
+  pollMaciAddress?: string | null; // From poll DB
+  pollStartBlock?: number | null; // From poll DB
 }) {
-  // MACI state fetched from API (not localStorage)
-  const [maciAddress, setMaciAddress] = useState<string | null>(null);
-  const [startBlock, setStartBlock] = useState<number | null>(null);
+  // Use maciAddress and startBlock from prop (poll DB) instead of fetching latest
+  const maciAddress = pollMaciAddress || null;
+  const startBlock = pollStartBlock || null;
   const [pollStateIndex, setPollStateIndex] = useState<string | null>(null);
   const [privKeyFormat, setPrivKeyFormat] = useState<{
     valid: boolean;
@@ -275,19 +281,6 @@ function DebugPanel({
   const { showSuccess, showError } = useFeedback();
 
   useEffect(() => {
-    // Fetch MACI deployment info from API
-    const fetchMaciInfo = async () => {
-      try {
-        const { maciApi } = await import("@/api/maci.api");
-        const deployment = await maciApi.getLatestDeployment();
-        setMaciAddress(deployment.maciAddress);
-        setStartBlock(deployment.startBlock);
-      } catch (err) {
-        console.warn("Could not fetch MACI deployment, using fallback");
-      }
-    };
-    fetchMaciInfo();
-
     // Poll State Index - stateIndex is now queried from chain dynamically
     setPollStateIndex("1");
 
@@ -452,8 +445,15 @@ function DebugPanel({
                 setTallyStatus("Done!");
                 showSuccess("Tally Completed", "Tally completed! Refresh to see results.");
               } catch (e: any) {
-                console.error("Tally failed:", e);
-                showError("Tally Failed", e.message);
+                console.error("❌ Tally failed:", e);
+                console.error("Error details:", {
+                  message: e.message,
+                  response: e.response?.data,
+                  status: e.response?.status,
+                  stack: e.stack
+                });
+                const errorMsg = e.response?.data?.message || e.message || "Unknown error";
+                showError("Tally Failed", `${errorMsg} (Check console for details)`);
                 setTallyStatus("Failed.");
               } finally {
                 setTallying(false);
@@ -500,9 +500,13 @@ export default function VotePage({ params }: Props) {
   const [tallyStatus, setTallyStatus] = useState("");
   const [detectedOptionIndex, setDetectedOptionIndex] = useState<number | null>(null);
   const [grantedVoiceCredits, setGrantedVoiceCredits] = useState<number | null>(null);
-  const { joinPoll, createVoteCommitment } = useJoinPoll();
+  const [pollMaciAddress, setPollMaciAddress] = useState<string | null>(null); // From poll DB
+  const [pollStartBlock, setPollStartBlock] = useState<number | null>(null); // From poll DB
   const { fetchMetadata } = useIPFS();
   const { getIdeaById } = useIdeas();
+  const { checkPollStatus } = useMaci();
+  const { joinPoll } = useJoinPoll();
+  const account = window.ethereum?.selectedAddress;
   const token = useToken(); // Ensure token hook is used for balance check
 
   // Find poll that contains this idea in options[] using API
@@ -526,6 +530,18 @@ export default function VotePage({ params }: Props) {
             // Default fallback if not configured
             setGrantedVoiceCredits(100);
             console.log(`🎫 Using default voice credits: 100`);
+          }
+
+          // Get maciAddress from poll DB
+          if (poll.maciAddress) {
+            setPollMaciAddress(poll.maciAddress);
+          }
+
+          // Get startBlock from poll DB
+          if (poll.startBlock) {
+            if (poll.startBlock) {
+              setPollStartBlock(poll.startBlock);
+            }
           }
 
           // Find option index
@@ -623,16 +639,10 @@ export default function VotePage({ params }: Props) {
   async function handleVote(password: string) {
     // Use detected poll ID or fallback to "1"
     const pollIdOnChain = detectedPollId || "1";
-
+    const poll = await checkPollStatus(pollIdOnChain, pollMaciAddress || undefined);
     // Get startBlock from API (no localStorage)
-    let votingStartBlock: number | undefined = undefined;
-    try {
-      const { maciApi } = await import("@/api/maci.api");
-      const deployment = await maciApi.getLatestDeployment();
-      votingStartBlock = deployment.startBlock;
-    } catch (err) {
-      console.warn("Could not fetch startBlock from API");
-    }
+
+
 
     // Nonce is now managed by Backend (Redis). We don't need to track it locally.
     const nextNonce = 0; // Dummy value, ignored by backend
@@ -677,9 +687,37 @@ export default function VotePage({ params }: Props) {
         voteAmount || 1,
         nextNonce,
         password, // Pass password
-        votingStartBlock
+        pollStartBlock || 0,
+        pollMaciAddress || undefined // Pass maciAddress from poll data
       );
-      
+      const voteNum = BigInt(voteOptionIndex);
+      const weightNum = BigInt(voteAmount || 1);
+      const nonceNum = BigInt(nextNonce);
+      const pollAddressNum = BigInt(poll.pollAddress);
+      const passwordBigInt = BigInt(password);
+      const circomlibjs = await import("circomlibjs");
+      const poseidon = await circomlibjs.buildPoseidon();
+      console.log("Generating vote commitment with:", {
+        voteOptionIndex,
+        voteAmount,
+        nextNonce,
+        pollAddress: poll.pollAddress,
+        password,
+      });
+      const voteCommitment = poseidon.F.toString(poseidon([
+        voteNum,
+        weightNum,
+        nonceNum,
+        pollAddressNum,
+        passwordBigInt // Use password here
+      ]));
+      const payload = {
+        voterAdrress: account, // Note: schema has typo "voterAdrress"
+        pollId: poll.pollAddress,
+        voteCommitment: voteCommitment,
+        pollIdOnchain: pollIdOnChain,
+      };
+      await joinPoll(payload);
       showSuccess("Vote Success!", `Transaction Hash: ${hash?.substring(0, 20)}...`);
     } catch (e: any) {
       console.error(e);
@@ -715,6 +753,8 @@ export default function VotePage({ params }: Props) {
         mergePoll={mergePoll}
         generateProofs={generateProofs}
         submitProofs={submitProofs}
+        pollMaciAddress={pollMaciAddress}
+        pollStartBlock={pollStartBlock}
       />
       <VoteDetailLayout>
         <VoteLeftPanel>
@@ -782,12 +822,12 @@ export default function VotePage({ params }: Props) {
           setShowModal(true);
         }}
       />
-      
+
       {/* Prize Claim Section (New) */}
       <div className="mt-8">
-        <PrizeClaimForm 
-          pollId={detectedPollId || "1"} 
-          maciAddress={data?.maciAddress} // If data has maciAddress or use fetched one or default
+        <PrizeClaimForm
+          pollId={detectedPollId || "1"}
+          maciAddress={pollMaciAddress || undefined}
         />
       </div>
     </main>

@@ -24,11 +24,11 @@ class CreateRewardDto {
 /**
  * Rewards Controller - RESTful Resource-Oriented
  *
- * Resource: /users/:userId/rewards (user rewards as sub-resource)
+ * Resource: /users/:userAddress/rewards (user rewards as sub-resource)
  *
- * GET    /users/:userId/rewards              - Get all rewards for user
- * GET    /users/:userId/rewards?pollId=X     - Get reward for specific poll
- * POST   /users/:userId/rewards              - Create a reward
+ * GET    /users/:userAddress/rewards              - Get all rewards for user
+ * GET    /users/:userAddress/rewards?pollId=X     - Get reward for specific poll
+ * POST   /users/:userAddress/rewards              - Create a reward
  */
 @ApiTags('User Rewards')
 @ApiBearerAuth()
@@ -42,20 +42,20 @@ export class RewardsController {
 
   /**
    * Get rewards for a user
-   * GET /users/:userId/rewards or GET /users/:userId/rewards?pollId=X
+   * GET /users/:userAddress/rewards or GET /users/:userAddress/rewards?pollId=X
    */
-  @Get(':userId/rewards')
+  @Get(':userAddress/rewards')
   @ApiOperation({ summary: 'Get user rewards' })
-  @ApiParam({ name: 'userId', type: String })
+  @ApiParam({ name: 'userAddress', type: String })
   @ApiQuery({ name: 'pollId', required: false })
   @ApiResponse({ status: 200, description: 'Rewards retrieved successfully' })
   async getRewards(
-    @Param('userId') userId: string,
+    @Param('userAddress') userAddress: string,
     @Query('pollId') pollId: string,
     @Res() res: Response,
   ) {
     try {
-      const reward = await this.rewardsService.getReward(userId, pollId);
+      const reward = await this.rewardsService.getReward(userAddress, pollId);
       if (!reward) {
         return res.status(404).json({ message: 'Reward not found' });
       }
@@ -69,22 +69,35 @@ export class RewardsController {
 
   /**
    * Create a reward
-   * POST /users/:userId/rewards
+   * POST /users/:userAddress/rewards
    */
-  @Post(':userId/rewards')
+  @Post(':userAddress/rewards')
   @ApiOperation({ summary: 'Create user reward' })
-  @ApiParam({ name: 'userId', type: String })
+  @ApiParam({ name: 'userAddress', type: String })
   @ApiBody({ type: CreateRewardDto })
   @ApiResponse({ status: 201, description: 'Reward created successfully' })
   async createReward(
-    @Param('userId') userId: string,
+    @Param('userAddress') userAddress: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
     const { pollId, creditCount } = req.body;
     try {
-      await this.rewardsService.saveReward(userId, pollId, creditCount);
-      return res.status(201).json({ message: 'Reward created successfully' });
+      const reward = await this.rewardsService.saveReward(userAddress, pollId, creditCount);
+      const rewardObj = reward.toObject();
+      
+      return res.status(201).json({ 
+        message: 'Reward created successfully',
+        userAddress: rewardObj.userAddress,
+        pollId: rewardObj.pollId,
+        credit_count: rewardObj.credit_count,
+        amountToken: rewardObj.amountToken,
+        status: rewardObj.status,
+        _idClaim: rewardObj._idClaim,
+        _r: rewardObj.signature?.r,
+        _s: rewardObj.signature?.s,
+        _v: rewardObj.signature?.v
+      });
     } catch (error) {
       return res
         .status(500)
@@ -95,7 +108,7 @@ export class RewardsController {
 
 /**
  * Legacy Rewards Controller (Backward Compatibility)
- * @deprecated Use /users/:userId/rewards instead
+ * @deprecated Use /users/:userAddress/rewards instead
  */
 @ApiTags('Rewards (Legacy)')
 @ApiBearerAuth()
@@ -103,16 +116,16 @@ export class RewardsController {
 export class RewardsLegacyController {
   constructor(private readonly rewardsService: RewardsService) {}
 
-  /** @deprecated Use GET /users/:userId/rewards instead */
+  /** @deprecated Use GET /users/:userAddress/rewards instead */
   @Get('get')
   @ApiOperation({ summary: '[Deprecated] Retrieve reward details' })
-  @ApiQuery({ name: 'userId', required: true })
+  @ApiQuery({ name: 'userAddress', required: true })
   @ApiQuery({ name: 'pollId', required: true })
   async getReward(@Req() req: Request, @Res() res: Response) {
-    const userId = req.query.userId as string;
+    const userAddress = req.query.userAddress as string;
     const pollId = req.query.pollId as string;
     try {
-      const reward = await this.rewardsService.getReward(userId, pollId);
+      const reward = await this.rewardsService.getReward(userAddress, pollId);
       if (!reward) {
         return res.status(400).json({ message: 'Reward not found' });
       }
@@ -124,14 +137,14 @@ export class RewardsLegacyController {
     }
   }
 
-  /** @deprecated Use POST /users/:userId/rewards instead */
+  /** @deprecated Use POST /users/:userAddress/rewards instead */
   @Post('save')
   @ApiOperation({ summary: '[Deprecated] Save reward entry' })
   async saveReward(@Req() req: Request, @Res() res: Response) {
-    const { userId, pollId, credit_count } = req.body;
+    const { userAddress, pollId, credit_count } = req.body;
     try {
-      await this.rewardsService.saveReward(userId, pollId, credit_count);
-      return res.status(201).json({ message: 'Reward saved successfully' });
+      const reward = await this.rewardsService.saveReward(userAddress, pollId, credit_count);
+      return res.status(201).json({ message: 'Reward saved successfully', reward });
     } catch (error) {
       return res
         .status(500)
@@ -141,8 +154,7 @@ export class RewardsLegacyController {
 
   @Get('test')
   async test(@Res() res: Response) {
-    const signature = await this.rewardsService.test();
-    return res.status(200).json({ signature });
+  
   }
 
   @Post('generate-proof')

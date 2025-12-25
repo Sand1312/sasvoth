@@ -5,8 +5,9 @@ import { api } from "./base";
  *
  * Resource: /polls/:pollId/results (poll results)
  *
- * GET    /polls/:pollId/results       - Get poll results
- * POST   /polls/:pollId/results/tally - Trigger tally calculation
+ * GET    /polls/:pollId/results             - Get poll results
+ * POST   /polls/:pollId/results/tally       - Start async tally calculation
+ * GET    /polls/:pollId/results/tally-status - Check tally progress
  */
 export const resultsApi = {
   /**
@@ -19,11 +20,21 @@ export const resultsApi = {
   },
 
   /**
-   * Trigger tally calculation
+   * Start async tally calculation
    * POST /polls/:pollId/results/tally
+   * Returns immediately with status: 'started' | 'already_counting' | 'already_complete'
    */
   tally: async (pollId: string) => {
     const response = await api.post(`/polls/${pollId}/results/tally`);
+    return response.data;
+  },
+
+  /**
+   * Check tally progress
+   * GET /polls/:pollId/results/tally-status
+   */
+  getTallyStatus: async (pollId: string) => {
+    const response = await api.get(`/polls/${pollId}/results/tally-status`);
     return response.data;
   },
 

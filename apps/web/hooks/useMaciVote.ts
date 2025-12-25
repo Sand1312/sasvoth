@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSignTypedData, useAccount, useChainId, usePublicClient } from "wagmi";
 import { maciApi } from "../api/maci.api";
-import { deriveMaciKeypair, getStateIndexFromChain } from "../utils/maciKeyDerivation";
+import { deriveMaciKeypair, getStateIndexFromChain } from "@/lib/maci-key-derivation";
 
 export const useMaciVote = () => {
   const [loading, setLoading] = useState(false);

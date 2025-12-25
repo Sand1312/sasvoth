@@ -230,7 +230,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
 
       // Clear MACI keypair cache from memory
       try {
-        const { clearMaciKeyCache } = await import("../utils/maciKeyDerivation");
+        const { clearMaciKeyCache } = await import("@/lib/maci-key-derivation");
         clearMaciKeyCache();
         console.log("MACI key cache cleared");
       } catch (e) {

@@ -1,10 +1,9 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 import { ArrowUpDown } from "lucide-react";
 
-import { Button, buttonVariants } from "@sasvoth/ui/button";
+import { Button } from "@sasvoth/ui/button";
 import { cn } from "@sasvoth/ui/lib/utils";
 
 import { PollStatus } from "@/types/polls";
@@ -45,10 +44,6 @@ const statusThemes: Record<
     accent: "bg-slate-500",
     text: "text-slate-800",
   },
-  [PollStatus.Draft]: {
-    accent: "bg-amber-500",
-    text: "text-amber-900",
-  },
   [PollStatus.Cancelled]: {
     accent: "bg-red-600",
     text: "text-red-800",
@@ -65,7 +60,7 @@ export const columns: ColumnDef<PollData>[] = [
     id: "statusBar",
     header: "",
     cell: ({ row }) => {
-      const status = row.original.status ?? PollStatus.Draft;
+      const status = row.original.status ?? PollStatus.Prepare;
       const theme = statusThemes[status];
       return (
         <div
@@ -157,28 +152,33 @@ export const columns: ColumnDef<PollData>[] = [
       );
     },
   },
-  // Actions column
+  // Updated time column with sorting
   {
-    id: "actions",
-    header: "",
-    cell: ({ row }) => {
-      const pollId = row.original._id;
+    accessorKey: "updatedAt",
+    header: ({ column }) => {
       return (
-        <div className="flex flex-col items-end gap-1">
-          <Link
-            href={pollId ? `/polls/${pollId}` : "#"}
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "sm" }),
-              "rounded-full border border-black px-4 text-sm font-semibold text-black hover:bg-black hover:text-white"
-            )}
-          >
-            View poll
-          </Link>
-          <span className="text-xs text-black/40">
-            Updated {formatDate(row.original.updatedAt ?? row.original.endTime)}
-          </span>
-        </div>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Updated
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
       );
+    },
+    cell: ({ row }) => {
+      const updatedAt = row.original.updatedAt ?? row.original.endTime;
+      return (
+        <span className="text-sm text-black/60">
+          {formatDate(updatedAt)}
+        </span>
+      );
+    },
+    sortingFn: (rowA, rowB) => {
+      const dateA = new Date(rowA.original.updatedAt ?? rowA.original.endTime ?? 0).getTime();
+      const dateB = new Date(rowB.original.updatedAt ?? rowB.original.endTime ?? 0).getTime();
+      return dateA - dateB;
     },
   },
 ];

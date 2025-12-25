@@ -22,6 +22,9 @@ class CastVoteDto {
   pollId: string;
 
   @ApiProperty()
+  pollIdOnchain: string;
+
+  @ApiProperty()
   selectedOption: string;
 
   @ApiProperty({ type: String, format: 'date-time' })
@@ -47,7 +50,7 @@ class CastVoteDto {
 @ApiBearerAuth()
 @Controller('join-poll')
 export class JoinPollController {
-  constructor(private readonly joinPollService: JoinPollService) {}
+  constructor(private readonly joinPollService: JoinPollService) { }
 
   @Get('get')
   @ApiOperation({ summary: 'Retrieve votes by user or poll' })

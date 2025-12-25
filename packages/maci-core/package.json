@@ -28,21 +28,21 @@
   "dependencies": {
     "@maci-protocol/crypto": "workspace:*",
     "@maci-protocol/domainobjs": "workspace:*",
-    "@zk-kit/lean-imt": "^2.2.3",
+    "@zk-kit/lean-imt": "catalog:",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/chai": "^4.3.11",
     "@types/lodash": "^4.17.20",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.2.0",
+    "@types/node": "catalog:",
     "benny": "^3.7.1",
-    "chai": "^4.3.10",
-    "mocha": "^11.7.2",
-    "nyc": "^17.1.0",
+    "chai": "catalog:",
+    "mocha": "catalog:",
+    "nyc": "catalog:",
     "ts-mocha": "^11.1.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.9.2"
+    "ts-node": "catalog:",
+    "typescript": "catalog:"
   },
   "nyc": {
     "reporter": [

@@ -131,6 +131,7 @@ export class PollsService {
     pollIdOnChain: number,
     subgraphUrl?: string,
     maciAddress?: string,
+    startBlock?: number,
   ): Promise<PollsDocument | null> {
     const update: any = { pollIdOnChain };
     if (subgraphUrl) {
@@ -138,6 +139,9 @@ export class PollsService {
     }
     if (maciAddress) {
       update.maciAddress = maciAddress;
+    }
+    if (startBlock) {
+      update.startBlock = startBlock;
     }
     // After saving, we should probably sync status too
     let poll = await this.pollsModel

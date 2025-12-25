@@ -236,7 +236,9 @@ export default function AdminPollsPage(): React.ReactElement {
         await saveOnChainId(
           pollId,
           deployed.pollId.toString(),
-          deployed.subgraphUrl
+          deployed.subgraphUrl,
+          maciAddress,  // Pass MACI address to save with poll
+          maciStartBlock || undefined  // Pass startBlock to save with poll
         );
         alert(`Poll deployed! On-chain ID: ${deployed.pollId}`);
       } else {

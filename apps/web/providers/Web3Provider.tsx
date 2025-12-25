@@ -13,7 +13,7 @@ const config = createConfig({
   chains: [arbitrumSepolia],
   transports: {
     // Dùng public RPC làm fallback (cho read operations)
-    [arbitrumSepolia.id]: http('https://sepolia-rollup.arbitrum.io/rpc', {
+    [arbitrumSepolia.id]: http('https://arbitrum-sepolia-rpc.publicnode.com', {
       timeout: 30_000,
       retryCount: 3,
       retryDelay: 1000,
@@ -21,7 +21,7 @@ const config = createConfig({
   },
   connectors: [
     // MetaMask/injected wallet sẽ tự dùng RPC của nó cho write operations
-    injected({ 
+    injected({
       target: 'metaMask',
       shimDisconnect: true,
     }),

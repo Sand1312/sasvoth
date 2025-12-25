@@ -3,15 +3,15 @@ import { createAsyncHook } from "./factory";
 
 export const useRewards = createAsyncHook(
   {
-    getReward: async (userId: string, pollId: string) => {
-      return await rewardsApi.getReward({ userId, pollId });
+    getReward: async (userAddress: string, pollId: string) => {
+      return await rewardsApi.getReward({ userAddress, pollId });
     },
     saveReward: async (
-      userId: string,
+      userAddress: string,
       pollId: string,
       credit_count: number
     ) => {
-      return await rewardsApi.saveReward({ userId, pollId, credit_count });
+      return await rewardsApi.saveReward({ userAddress, pollId, credit_count });
     },
   },
   "Rewards"

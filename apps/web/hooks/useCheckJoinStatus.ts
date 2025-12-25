@@ -23,7 +23,7 @@ interface CheckJoinStatusResult {
   isJoined: boolean;
   pollStateIndex: string | null;
   voiceCredits: string | null;
-  source: "subgraph" | "localStorage" | "none";
+  source: "subgraph" | "chain" | "none";
 }
 
 /**
@@ -293,44 +293,6 @@ export const useCheckJoinStatus = () => {
   };
 
   /**
-   * Check join status from localStorage (poll-specific key)
-   */
-  const checkFromLocalStorage = (pollId: string): CheckJoinStatusResult => {
-    if (typeof window === "undefined") {
-      return { isJoined: false, pollStateIndex: null, voiceCredits: null, source: "none" };
-    }
-
-    // Try poll-specific key first (new format)
-    const pollSpecificIndex = localStorage.getItem(`maci_poll_state_index_${pollId}`);
-    const pollSpecificCredits = localStorage.getItem(`maci_voice_credits_${pollId}`);
-
-    if (pollSpecificIndex) {
-      return {
-        isJoined: true,
-        pollStateIndex: pollSpecificIndex,
-        voiceCredits: pollSpecificCredits,
-        source: "localStorage",
-      };
-    }
-
-    // Fall back to generic key (old format) - but this is unreliable for multi-poll
-    const genericIndex = localStorage.getItem("maci_poll_state_index");
-    const genericCredits = localStorage.getItem("maci_voice_credits");
-
-    if (genericIndex) {
-      console.warn("Using generic localStorage key - may not be for this specific poll!");
-      return {
-        isJoined: true,
-        pollStateIndex: genericIndex,
-        voiceCredits: genericCredits,
-        source: "localStorage",
-      };
-    }
-
-    return { isJoined: false, pollStateIndex: null, voiceCredits: null, source: "none" };
-  };
-
-  /**
    * Check join status from chain by scanning PollJoined events (RPC fallback)
    * Similar to getStateIndexFromChain in useCheckSignupStatus
    */
@@ -402,7 +364,7 @@ export const useCheckJoinStatus = () => {
           isJoined: true,
           pollStateIndex: args._pollStateIndex.toString(),
           voiceCredits: args._voiceCreditBalance.toString(),
-          source: "subgraph" as const, // Use subgraph since it's the type we return
+          source: "chain" as const,
         };
       }
 
@@ -460,27 +422,18 @@ export const useCheckJoinStatus = () => {
         if (shouldTryRpc) {
           const chainResult = await checkFromChain(pubKeyX, pubKeyY, pollId, maciAddress, publicClient, startBlock);
           if (chainResult.isJoined) {
-            // Cache in localStorage
-            if (typeof window !== "undefined" && chainResult.pollStateIndex) {
-              localStorage.setItem(`maci_poll_state_index_${pollId}`, chainResult.pollStateIndex);
-              if (chainResult.voiceCredits) {
-                localStorage.setItem(`maci_voice_credits_${pollId}`, chainResult.voiceCredits);
-              }
-            }
             return chainResult;
           }
         }
       }
 
-      // Fall back to localStorage
-      const localResult = checkFromLocalStorage(pollId);
-      return localResult;
+      // Not joined (no localStorage fallback - rely on subgraph + RPC chain query only)
+      return { isJoined: false, pollStateIndex: null, voiceCredits: null, source: "none" };
 
     } catch (err: any) {
       console.error("Check join status failed:", err);
       setError(err.message);
-      // Return localStorage result as fallback
-      return checkFromLocalStorage(pollId);
+      return { isJoined: false, pollStateIndex: null, voiceCredits: null, source: "none" };
     } finally {
       setLoading(false);
     }
@@ -621,7 +574,7 @@ export const useCheckSignupStatus = () => {
         console.log("⛓️ [checkSignupStatus] Falling back to RPC chain query...");
         
         // Import dynamically to avoid circular dependencies
-        const { getStateIndexFromChain } = await import("../utils/maciKeyDerivation");
+        const { getStateIndexFromChain } = await import("@/lib/maci-key-derivation");
         
         const chainResult = await getStateIndexFromChain(
           maciAddress,
