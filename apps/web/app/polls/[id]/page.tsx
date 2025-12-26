@@ -18,30 +18,35 @@ export default async function Page({
   // 1. Fetch lightweight metadata for Hero immediately
   // This allows the hero to render instantly while the factory resolves
   // Note: getPollById fetches everything, but in a real app query would be split.
-  // We use the same fetch here, Next.js request deduping (tags) handles efficiency 
+  // We use the same fetch here, Next.js request deduping (tags) handles efficiency
   // if we call it again inside Factory (though we pass pollId to factory to force Suspense boundary there).
-  
+
   const pollMeta = await getPollById(id);
-  
+
   const badge =
     pollMeta.status === PollStatus.Prepare
       ? pollMeta.onChainId !== "0"
         ? "Waiting for Start"
         : "Ideas in review"
-      : pollMeta.status === PollStatus.InProgress
-      ? "Opening"
-      : pollMeta.status === PollStatus.Cancelled
-      ? "Cancelled"
-      : "Ended";
+      : pollMeta.status === PollStatus.Waiting
+        ? "Waiting"
+        : pollMeta.status === PollStatus.InProgress
+          ? "Opening"
+          : pollMeta.status === PollStatus.Counting
+            ? "Counting"
+            : pollMeta.status === PollStatus.Cancelled
+              ? "Cancelled"
+              : pollMeta.status === PollStatus.Ended
+                ? "Ended"
+                : "Unknown";
 
   return (
     <main className="min-h-screen bg-white px-4 py-10 text-black">
       <div className="mx-auto max-w-6xl flex flex-col gap-10">
-        
         {/* Static Shell: Render instantly */}
-        <PollHero 
-          title={pollMeta.title} 
-          description={pollMeta.description} 
+        <PollHero
+          title={pollMeta.title}
+          description={pollMeta.description}
           timeframe={pollMeta.timeframe}
           pollId={id}
           badge={badge}
@@ -51,7 +56,6 @@ export default async function Page({
         <Suspense fallback={<LoadingSkeleton />}>
           <PollViewFactory pollId={id} />
         </Suspense>
-
       </div>
     </main>
   );

@@ -9,20 +9,20 @@ import { createDataHook } from "./factory";
 export const usePollsQuery = createDataHook(
   (status?: PollStatus) => ["polls", status || "all"],
   (status?: PollStatus) => pollsApi.getPolls(status),
-  { staleTime: 1000 * 60 * 5 } // 5 minutes
+  { staleTime: 1000 * 60 * 5 }, // 5 minutes
 );
 
 export const usePollQuery = createDataHook(
   (pollId: string) => ["poll", pollId],
   (pollId: string) => pollsApi.getPollById(pollId),
-  { staleTime: 1000 * 60 * 5 }
+  { staleTime: 1000 * 60 * 5 },
 );
 
 export function usePolls() {
   const { goTo, replaceTo } = useRedirect();
   const [selectedPollId, setSelectedPollId] = useState<string>("");
   const initPoll = async (
-     title: string,
+    title: string,
     description: string,
     creatorAddress: string,
     numberOptions: number,
@@ -35,7 +35,7 @@ export function usePolls() {
       voteOptionTreeDepth?: number;
       tallyProcessingStateTreeDepth?: number;
       initialVoiceCredits?: number;
-    }
+    },
   ) => {
     try {
       const res = await pollsApi.createPoll(
@@ -45,9 +45,8 @@ export function usePolls() {
         numberOptions,
         startTime,
         endTime,
-        maciConfig
+        maciConfig,
       );
-      goTo("/admin/dashboard");
       return res;
     } catch (error) {
       console.error("Create Poll error:", error);
@@ -65,7 +64,7 @@ export function usePolls() {
   };
   const getPollById = async (pollId: string) => {
     try {
-      const res = await pollsApi.getPollById(pollId); 
+      const res = await pollsApi.getPollById(pollId);
       return res;
     } catch (error) {
       console.error("Get Poll By ID error:", error);
@@ -73,10 +72,10 @@ export function usePolls() {
     }
   };
 
-  const updatePollStatus= pollsApi.updatePollStatus;
-   const addIdeaToPoll= pollsApi.addIdeaToPoll;
-   const approveIdeaInPoll= pollsApi.approveIdeaInPoll;
-   const saveOnChainId= pollsApi.saveOnChainId;
+  const updatePollStatus = pollsApi.updatePollStatus;
+  const addIdeaToPoll = pollsApi.addIdeaToPoll;
+  const approveIdeaInPoll = pollsApi.approveIdeaInPoll;
+  const saveOnChainId = pollsApi.saveOnChainId;
 
   /**
    * Get polls with pagination and filtering (server-side)
@@ -87,8 +86,8 @@ export function usePolls() {
     status?: string;
     activeAt?: Date;
     search?: string;
-    sortBy?: 'createdAt' | 'updatedAt' | 'startTime' | 'title';
-    sortOrder?: 'asc' | 'desc';
+    sortBy?: "createdAt" | "updatedAt" | "startTime" | "title";
+    sortOrder?: "asc" | "desc";
   }) => {
     try {
       const res = await pollsApi.getPollsPaginated(options);
@@ -99,13 +98,12 @@ export function usePolls() {
     }
   };
 
-
   return {
     initPoll,
     getPolls,
     getPollById,
     getPollsPaginated,
-    updatePollStatus ,
+    updatePollStatus,
     addIdeaToPoll,
     approveIdeaInPoll,
     saveOnChainId,

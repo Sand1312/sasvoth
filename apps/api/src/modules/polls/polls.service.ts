@@ -7,12 +7,14 @@ import { Polls, PollsDocument } from './schemas/polls';
 export class PollsService {
   constructor(
     @InjectModel(Polls.name) private pollsModel: Model<PollsDocument>,
-  ) { }
+  ) {}
 
   /**
    * Sync poll status based on time and deployment
    */
-  private async syncPollStatus(poll: PollsDocument | null): Promise<PollsDocument | null> {
+  private async syncPollStatus(
+    poll: PollsDocument | null,
+  ): Promise<PollsDocument | null> {
     if (!poll) return poll;
 
     const now = new Date();
@@ -22,12 +24,12 @@ export class PollsService {
     const isDeployed =
       poll.pollIdOnChain !== undefined &&
       poll.pollIdOnChain !== null &&
-      String(poll.pollIdOnChain) !== "";
+      String(poll.pollIdOnChain) !== '';
 
     let newStatus = poll.status;
 
     // Logic:
-    // 1. If explicitly Cancelled check. 
+    // 1. If explicitly Cancelled check.
     // If it's NOT deployed and cancelled, we assume it was auto-cancelled or manual.
     // If it IS deployed, we might want to "un-cancel" it if it was a mistake (like the pollId 0 bug).
     // So only return early if NOT deployed.
@@ -43,18 +45,16 @@ export class PollsService {
       } else if (now >= start && now <= end) {
         // In Progress
         // Do not override 'counting' if it was set explicitly during voting phase (unlikely but safe)
-        // Do not override 'ended' 
+        // Do not override 'ended'
         if (newStatus !== 'counting' && newStatus !== 'ended') {
           newStatus = 'in_progress';
         }
       } else if (now > end) {
-        // Ended
-        // "known that calling talling take times"
-        // If status is 'counting', keep it. 
-        // If 'in_progress', move to 'ended' (or 'counting' if that was auto? No user said manual trigger)
-        // Let's default to 'ended' if time is up, unless it's explicitly 'counting'.
+        // Time is up - move to 'counting' to indicate tally is pending
+        // 'ended' should only be set explicitly after tally is complete
+        // If status is already 'counting' or 'ended', keep it.
         if (newStatus !== 'counting' && newStatus !== 'ended') {
-          newStatus = 'ended';
+          newStatus = 'counting';
         }
       }
     }
@@ -88,9 +88,11 @@ export class PollsService {
   async getPollByStatus(status: string): Promise<PollsDocument[]> {
     const polls = await this.pollsModel.find({ status }).exec();
     // Sync status for all found polls
-    const synced = await Promise.all(polls.map(p => this.syncPollStatus(p)));
+    const synced = await Promise.all(polls.map((p) => this.syncPollStatus(p)));
     // Filter out nulls and match status
-    return synced.filter((p): p is PollsDocument => p !== null && p.status === status);
+    return synced.filter(
+      (p): p is PollsDocument => p !== null && p.status === status,
+    );
   }
   async updatePollStatus(
     pollId: string,
@@ -154,12 +156,14 @@ export class PollsService {
     pollIdOnChain: number,
     status: string,
   ): Promise<PollsDocument | null> {
+    // Update ALL polls with this onChainId to avoid inconsistency if duplicates exist
+    await this.pollsModel
+      .updateMany({ pollIdOnChain: pollIdOnChain }, { status })
+      .exec();
+
+    // Return one of them for compatibility
     const updated = await this.pollsModel
-      .findOneAndUpdate(
-        { pollIdOnChain: pollIdOnChain },
-        { status },
-        { new: true },
-      )
+      .findOne({ pollIdOnChain: pollIdOnChain })
       .exec();
     return this.syncPollStatus(updated);
   }
@@ -172,7 +176,7 @@ export class PollsService {
 
   async getAll(): Promise<PollsDocument[]> {
     const polls = await this.pollsModel.find().exec();
-    const synced = await Promise.all(polls.map(p => this.syncPollStatus(p)));
+    const synced = await Promise.all(polls.map((p) => this.syncPollStatus(p)));
     return synced.filter((p): p is PollsDocument => p !== null);
   }
 
@@ -187,7 +191,12 @@ export class PollsService {
     search?: string;
     sortBy?: 'createdAt' | 'updatedAt' | 'startTime' | 'title';
     sortOrder?: 'asc' | 'desc';
-  }): Promise<{ polls: PollsDocument[]; total: number; page: number; limit: number }> {
+  }): Promise<{
+    polls: PollsDocument[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const {
       page = 1,
       limit = 10,
@@ -228,7 +237,7 @@ export class PollsService {
     ]);
 
     // Sync status for all found polls
-    const synced = await Promise.all(polls.map(p => this.syncPollStatus(p)));
+    const synced = await Promise.all(polls.map((p) => this.syncPollStatus(p)));
     const filteredPolls = synced.filter((p): p is PollsDocument => p !== null);
 
     return {

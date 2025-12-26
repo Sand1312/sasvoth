@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@sasvoth/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@sasvoth/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@sasvoth/ui/dialog";
 import { useMaci } from "@/hooks";
 import { useFeedback } from "@/contexts/FeedbackContext";
 import { useCheckJoinStatus } from "@/hooks/useCheckJoinStatus";
@@ -38,18 +43,27 @@ export function SignupModal({
   // Zustand store integration
   const { hasKeypair, getKeypair, isLocked } = useMaciStore();
 
-  const [privKey, setPrivKey] = useState("");
-  const [useRandomKey, setUseRandomKey] = useState(true);
-  const [useExistingKey, setUseExistingKey] = useState(false);
-
   const [alreadyJoined, setAlreadyJoined] = useState(false);
-  const [existingPollStateIndex, setExistingPollStateIndex] = useState<string | null>(null);
-  const [existingVoiceCredits, setExistingVoiceCredits] = useState<string | null>(null);
-  const [statusSource, setStatusSource] = useState<"subgraph" | "chain" | "none">("none");
+  const [existingPollStateIndex, setExistingPollStateIndex] = useState<
+    string | null
+  >(null);
+  const [existingVoiceCredits, setExistingVoiceCredits] = useState<
+    string | null
+  >(null);
+  const [statusSource, setStatusSource] = useState<
+    "subgraph" | "chain" | "none"
+  >("none");
 
   const [joinSuccess, setJoinSuccess] = useState(false);
-  const [newPollStateIndex, setNewPollStateIndex] = useState<string | null>(null);
+  const [newPollStateIndex, setNewPollStateIndex] = useState<string | null>(
+    null,
+  );
   const [newVoiceCredits, setNewVoiceCredits] = useState<string | null>(null);
+
+  // Check if user has existing keypair
+  const hasExistingKey = address
+    ? hasKeypair(address, chainId, maciAddress)
+    : false;
 
   // Check join status when modal opens
   useEffect(() => {
@@ -60,9 +74,6 @@ export function SignupModal({
       setJoinSuccess(false);
       setNewPollStateIndex(null);
       setNewVoiceCredits(null);
-
-      // Check if keypair is cached in Zustand store
-      const hasExistingKey = hasKeypair(address, chainId, maciAddress);
 
       // Get user's public key coordinates for subgraph query
       let coords: { x: string; y: string } | null = null;
@@ -79,8 +90,8 @@ export function SignupModal({
         pollIdStr,
         coords?.x,
         coords?.y,
-        maciAddress,   // From prop (poll data)
-        publicClient   // For RPC fallback
+        maciAddress, // From prop (poll data)
+        publicClient, // For RPC fallback
       );
 
       console.log(`[SignupModal] Join status for poll ${pollIdStr}:`, result);
@@ -95,40 +106,36 @@ export function SignupModal({
         setExistingPollStateIndex(null);
         setExistingVoiceCredits(null);
         setStatusSource("none");
-
-        if (hasExistingKey) {
-          setUseExistingKey(true);
-          setUseRandomKey(false);
-        } else {
-          setUseExistingKey(false);
-          setUseRandomKey(true);
-        }
       }
     };
 
     checkStatus();
-  }, [open, pollIdOnChain, checkJoinStatus, address, chainId, publicClient, maciAddress, hasKeypair, getKeypair]);
+  }, [
+    open,
+    pollIdOnChain,
+    checkJoinStatus,
+    address,
+    chainId,
+    publicClient,
+    maciAddress,
+    hasKeypair,
+    getKeypair,
+    hasExistingKey,
+  ]);
 
   const handleSignup = async () => {
     if (alreadyJoined) return;
+
+    if (!hasExistingKey) {
+      showError(
+        "No MACI Key",
+        "Please sign up to MACI first to generate your identity.",
+      );
+      return;
+    }
+
     console.log("maci address", maciAddress);
     try {
-      if (useExistingKey) {
-        // Existing key is cached in Zustand store - signupToMaci will use it
-      } else if (useRandomKey) {
-        await signupToMaci(maciAddress, startBlock); // Pass maciAddress and startBlock from poll
-        // No delay needed! The lock guard ensures sequential execution
-      } else {
-        // Manual key logic - not recommended but kept for backward compatibility
-        if (!privKey) {
-          showError("Missing Key", "Enter secret key or use random generation");
-          return;
-        }
-        // Note: Manual key mode is deprecated. Keys are now derived from wallet signature.
-        showError("Deprecated", "Manual key entry is no longer supported. Please use 'Generate new keypair' option.");
-        return;
-      }
-
       const pollIdStr = String(pollIdOnChain);
 
       // 🔍 DEBUG: Log poll IDs before calling join
@@ -141,24 +148,22 @@ export function SignupModal({
 
       const joinResult = await joinMaciPoll(pollIdStr, 0, "", 0, maciAddress);
 
-      // Note: Don't show feedback modal for alreadyJoined - Dialog handles it
-      // showSuccess would create nested modals
-
       setJoinSuccess(true);
       setNewPollStateIndex(joinResult.pollStateIndex || null);
       setNewVoiceCredits(joinResult.voiceCredits || null);
 
-      // Note: No localStorage needed - useMaciVote now gets stateIndex from chain
-
       onSuccess();
     } catch (e: any) {
-      console.error("Signup/Join failed", e);
+      console.error("Join Poll failed", e);
       // Handle lock errors gracefully
-      if (e.message?.includes('another MACI operation')) {
-        showError("Please Wait", "Another operation is in progress. Please wait.");
+      if (e.message?.includes("another MACI operation")) {
+        showError(
+          "Please Wait",
+          "Another operation is in progress. Please wait.",
+        );
         return;
       }
-      showError("Signup/Join Failed", e.message);
+      showError("Join Poll Failed", e.message);
     }
   };
 
@@ -166,7 +171,9 @@ export function SignupModal({
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
       <DialogContent className="rounded-[32px] border-2 border-black sm:max-w-md !bg-white p-6 z-[100]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-center sm:text-left">Join Poll</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-center sm:text-left">
+            Join Poll
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 mt-2">
@@ -174,9 +181,13 @@ export function SignupModal({
             <>
               <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <p className="text-emerald-800 font-semibold">Successfully Joined!</p>
+                  <p className="text-emerald-800 font-semibold">
+                    Successfully Joined!
+                  </p>
                 </div>
-                <p className="text-sm text-emerald-600 mt-1">You are now registered to vote.</p>
+                <p className="text-sm text-emerald-600 mt-1">
+                  You are now registered to vote.
+                </p>
                 {/* Only show stats if they have meaningful values */}
                 {newPollStateIndex && newPollStateIndex !== "0" && (
                   <div className="mt-3 space-y-1">
@@ -192,7 +203,10 @@ export function SignupModal({
                 )}
               </div>
               <div className="flex justify-end">
-                <Button onClick={onClose} className="bg-emerald-600 text-white rounded-full px-6 hover:bg-emerald-700">
+                <Button
+                  onClick={onClose}
+                  className="bg-emerald-600 text-white rounded-full px-6 hover:bg-emerald-700"
+                >
                   Done
                 </Button>
               </div>
@@ -208,62 +222,48 @@ export function SignupModal({
                 </div>
               </div>
               <div className="flex justify-end">
-                <Button onClick={onClose} variant="ghost">Close</Button>
+                <Button onClick={onClose} variant="ghost">
+                  Close
+                </Button>
               </div>
             </>
           ) : (
             <>
-              <p className="text-sm text-gray-600">Generate or provide a MACI identity to participate.</p>
-
-              {useExistingKey ? (
+              {hasExistingKey ? (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-sm text-blue-800 font-semibold">Existing Identity Found</p>
-                  <p className="text-xs text-blue-600 mt-1">Your saved MACI Key will be used to join this poll.</p>
-                  <button
-                    onClick={() => {
-                      setUseExistingKey(false);
-                      setUseRandomKey(true);
-                    }}
-                    className="text-xs text-blue-500 hover:text-blue-700 underline mt-2"
-                  >
-                    Use a different key
-                  </button>
+                  <p className="text-sm text-blue-800 font-semibold">
+                    MACI Identity Found
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Your saved MACI Key will be used to join this poll.
+                  </p>
                 </div>
               ) : (
-                <>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={useRandomKey}
-                      onChange={(e) => setUseRandomKey(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm">Generate new random keypair</span>
-                  </label>
-
-                  {!useRandomKey && (
-                    <input
-                      type="password"
-                      placeholder="Secret Key"
-                      value={privKey}
-                      onChange={(e) => setPrivKey(e.target.value)}
-                      className="border-2 border-black rounded-lg px-4 py-2 w-full"
-                    />
-                  )}
-
-                  <button
-                    onClick={() => setUseExistingKey(true)}
-                    className="text-xs text-gray-400 hover:text-black underline self-start"
-                  >
-                    Back to existing key
-                  </button>
-                </>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <p className="text-sm text-amber-800 font-semibold">
+                    No MACI Identity
+                  </p>
+                  <p className="text-xs text-amber-600 mt-1">
+                    Please click &quot;Sign Up to MACI&quot; first to generate
+                    your identity before joining the poll.
+                  </p>
+                </div>
               )}
 
               <div className="flex justify-end gap-2 mt-2">
-                <Button onClick={onClose} variant="ghost">Cancel</Button>
-                <Button onClick={handleSignup} disabled={loading || isLocked()} className="bg-black text-white rounded-full px-6">
-                  {loading ? "Joining..." : isLocked() ? "Processing..." : "Join Poll"}
+                <Button onClick={onClose} variant="ghost">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSignup}
+                  disabled={loading || isLocked() || !hasExistingKey}
+                  className="bg-black text-white rounded-full px-6"
+                >
+                  {loading
+                    ? "Joining..."
+                    : isLocked()
+                      ? "Processing..."
+                      : "Join Poll"}
                 </Button>
               </div>
             </>

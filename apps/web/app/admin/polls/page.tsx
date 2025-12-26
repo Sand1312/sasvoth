@@ -292,7 +292,10 @@ export default function AdminPollsPage(): React.ReactElement {
         console.log(
           `Poll deployed successfully! On-chain Poll ID: ${deployed.pollId}`,
         );
-        const status = PollStatus.InProgress;
+        // Determine status based on current time vs start time
+        const now = new Date();
+        const status =
+          pollStartTime > now ? PollStatus.Waiting : PollStatus.InProgress;
         await updatePollStatus(pollId, status);
         await saveOnChainId(
           pollId,
@@ -827,14 +830,87 @@ export default function AdminPollsPage(): React.ReactElement {
         })}
       </div>
 
-      <h2 className="text-2xl font-semibold mt-12 mb-4">
-        Active & Ended Polls
+      {/* Active Polls Section */}
+      <h2 className="text-2xl font-semibold mt-12 mb-4 flex items-center gap-3">
+        <span className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+        Active Polls
+        <span className="text-sm font-normal text-slate-500">
+          (
+          {
+            polls.filter(
+              (p) => (p.status || "").toLowerCase() === "in_progress",
+            ).length
+          }
+          )
+        </span>
+      </h2>
+      <div className="grid gap-6 lg:grid-cols-2 mb-8">
+        {polls
+          .filter((p) => (p.status || "").toLowerCase() === "in_progress")
+          .map((poll) => (
+            <section
+              key={poll._id || poll.id}
+              className="rounded-xl border-2 border-green-200 bg-gradient-to-br from-white to-green-50 p-5 shadow-sm"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-xl font-semibold">{poll.title}</h3>
+                  <p className="text-xs font-mono text-slate-500 mt-1">
+                    Poll ID: {poll.pollIdOnChain || poll.id}
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    <span className="px-2 py-1 rounded text-xs font-bold uppercase bg-green-100 text-green-800">
+                      In Progress
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 border-t border-green-100 pt-4 space-y-3">
+                <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                  Poll Management
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      mergePoll(
+                        poll.pollIdOnChain?.toString() || poll.id || "1",
+                        maciAddress || undefined,
+                      )
+                    }
+                  >
+                    Merge Signups/Logs
+                  </Button>
+                </div>
+              </div>
+            </section>
+          ))}
+        {polls.filter((p) => (p.status || "").toLowerCase() === "in_progress")
+          .length === 0 && (
+          <p className="text-sm text-slate-500 italic col-span-2">
+            No active polls at the moment.
+          </p>
+        )}
+      </div>
+
+      {/* Ended Polls Section */}
+      <h2 className="text-2xl font-semibold mt-8 mb-4 flex items-center gap-3">
+        <span className="w-3 h-3 rounded-full bg-slate-400"></span>
+        Ended Polls
+        <span className="text-sm font-normal text-slate-500">
+          (
+          {
+            polls.filter((p) => (p.status || "").toLowerCase() === "ended")
+              .length
+          }
+          )
+        </span>
       </h2>
       <div className="grid gap-6 lg:grid-cols-2">
         {polls
-          .filter((p) =>
-            ["inprogress", "ended"].includes((p.status || "").toLowerCase()),
-          )
+          .filter((p) => (p.status || "").toLowerCase() === "ended")
           .map((poll) => (
             <section
               key={poll._id || poll.id}
@@ -844,13 +920,11 @@ export default function AdminPollsPage(): React.ReactElement {
                 <div>
                   <h3 className="text-xl font-semibold">{poll.title}</h3>
                   <p className="text-xs font-mono text-slate-500 mt-1">
-                    Poll ID: {poll.id}
+                    Poll ID: {poll.pollIdOnChain || poll.id}
                   </p>
                   <div className="mt-2 flex gap-2">
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-bold uppercase ${poll.status === "InProgress" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-                    >
-                      {poll.status}
+                    <span className="px-2 py-1 rounded text-xs font-bold uppercase bg-gray-100 text-gray-800">
+                      Ended
                     </span>
                   </div>
                 </div>
@@ -910,6 +984,12 @@ export default function AdminPollsPage(): React.ReactElement {
               </div>
             </section>
           ))}
+        {polls.filter((p) => (p.status || "").toLowerCase() === "ended")
+          .length === 0 && (
+          <p className="text-sm text-slate-500 italic col-span-2">
+            No ended polls yet.
+          </p>
+        )}
       </div>
     </main>
   );

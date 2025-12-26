@@ -7,13 +7,16 @@ import { pollsApi } from "@/api";
 import { useIdeas } from "@/hooks/useIdeas";
 import { useClaimContract } from "@/hooks/useClaimContract";
 import { useToken } from "@/hooks/useToken";
-import { VoteDetailLayout, VoteLeftPanel, VoteTextBlock } from "@/components/vote/VoteDetailLayout";
+import {
+  VoteDetailLayout,
+  VoteLeftPanel,
+  VoteTextBlock,
+} from "@/components/vote/VoteDetailLayout";
 import { VoteRightPanel } from "@/components/vote/VoteRightPanel";
 import { VoteGallery } from "@/components/vote/VoteGallery";
 import { useFeedback } from "@/contexts/FeedbackContext";
 import { PrizeClaimForm } from "@/components/claim/PrizeClaimForm";
 import { useJoinPoll } from "@/hooks/useJoinPoll";
-
 
 type Props = {
   params: Promise<{ id: string }>; // id = CID
@@ -59,10 +62,13 @@ function BuyTicketsModal({
     if (!credits) return;
 
     // Validate against max voice credits granted
-    if (maxVoiceCredits !== null && Number(credits) > Math.sqrt(maxVoiceCredits)) {
+    if (
+      maxVoiceCredits !== null &&
+      Number(credits) > Math.sqrt(maxVoiceCredits)
+    ) {
       showError(
         "Exceeds Voice Credit Limit",
-        `Bạn chỉ có thể mua tối đa ${Math.sqrt(maxVoiceCredits)} voice credits .`
+        `Bạn chỉ có thể mua tối đa ${Math.sqrt(maxVoiceCredits)} voice credits .`,
       );
       return;
     }
@@ -70,8 +76,9 @@ function BuyTicketsModal({
     try {
       const cost = calculateVoteCost(Number(credits));
       if (Number(token.balance) < cost) {
-        showError("Insufficient Funds",
-          `Bạn cần có ít nhất ${cost} ${token.symbol} để mua ${credits} voice credits.`
+        showError(
+          "Insufficient Funds",
+          `Bạn cần có ít nhất ${cost} ${token.symbol} để mua ${credits} voice credits.`,
         );
         return;
       }
@@ -103,8 +110,8 @@ function BuyTicketsModal({
         </div>
         <h3 className="text-xl font-bold text-black">Buy Voice Credits</h3>
         <p>
-          You need voice credits to vote. Voting is calculated based on Quadratic
-          Payments.
+          You need voice credits to vote. Voting is calculated based on
+          Quadratic Payments.
         </p>
         {maxVoiceCredits !== null && (
           <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-2">
@@ -113,15 +120,24 @@ function BuyTicketsModal({
         )}
         <input
           className="border-2 border-black rounded-lg px-4 py-2 text-black outline-none focus:bg-gray-50"
-          placeholder={maxVoiceCredits !== null ? `max ${Math.sqrt(maxVoiceCredits)}` : "Enter amount"}
+          placeholder={
+            maxVoiceCredits !== null
+              ? `max ${Math.sqrt(maxVoiceCredits)}`
+              : "Enter amount"
+          }
           type="number"
           min="1"
-          max={maxVoiceCredits !== null ? Math.sqrt(maxVoiceCredits) : undefined}
+          max={
+            maxVoiceCredits !== null ? Math.sqrt(maxVoiceCredits) : undefined
+          }
           value={credits}
           onChange={(e) => {
             const val = e.target.value;
             // Enforce max limit on input
-            if (maxVoiceCredits !== null && Number(val) > Math.sqrt(maxVoiceCredits)) {
+            if (
+              maxVoiceCredits !== null &&
+              Number(val) > Math.sqrt(maxVoiceCredits)
+            ) {
               setCredits(Math.sqrt(maxVoiceCredits).toString());
             } else {
               setCredits(val);
@@ -259,7 +275,7 @@ function DebugPanel({
   generateProofs: (
     pollId: string,
     maciAddress?: string,
-    startBlock?: number
+    startBlock?: number,
   ) => Promise<void>;
   submitProofs: (pollId: string, maciAddress?: string) => Promise<void>;
   pollMaciAddress?: string | null; // From poll DB
@@ -408,7 +424,7 @@ function DebugPanel({
               }
               if (
                 !confirm(
-                  "This will trigger MACI Tallying (Merge -> Prove -> Submit). It may take a long time. Continue?"
+                  "This will trigger MACI Tallying (Merge -> Prove -> Submit). It may take a long time. Continue?",
                 )
               ) {
                 return;
@@ -420,7 +436,7 @@ function DebugPanel({
               if (!storedMaciAddress) {
                 if (
                   !confirm(
-                    "MACI Address not found. Continue with server default?"
+                    "MACI Address not found. Continue with server default?",
                   )
                 ) {
                   return;
@@ -436,24 +452,31 @@ function DebugPanel({
                 await generateProofs(
                   detectedPollId,
                   storedMaciAddress,
-                  storedStartBlock
+                  storedStartBlock,
                 );
 
                 setTallyStatus("Submitting Proofs...");
                 await submitProofs(detectedPollId, storedMaciAddress);
 
                 setTallyStatus("Done!");
-                showSuccess("Tally Completed", "Tally completed! Refresh to see results.");
+                showSuccess(
+                  "Tally Completed",
+                  "Tally completed! Refresh to see results.",
+                );
               } catch (e: any) {
                 console.error("❌ Tally failed:", e);
                 console.error("Error details:", {
                   message: e.message,
                   response: e.response?.data,
                   status: e.response?.status,
-                  stack: e.stack
+                  stack: e.stack,
                 });
-                const errorMsg = e.response?.data?.message || e.message || "Unknown error";
-                showError("Tally Failed", `${errorMsg} (Check console for details)`);
+                const errorMsg =
+                  e.response?.data?.message || e.message || "Unknown error";
+                showError(
+                  "Tally Failed",
+                  `${errorMsg} (Check console for details)`,
+                );
                 setTallyStatus("Failed.");
               } finally {
                 setTallying(false);
@@ -470,9 +493,6 @@ function DebugPanel({
   );
 }
 
-
-
-
 export default function VotePage({ params }: Props) {
   const { id } = React.use(params); // Next.js 15: Unwrap params
   const { showSuccess, showError } = useFeedback();
@@ -486,7 +506,7 @@ export default function VotePage({ params }: Props) {
     submitProofs,
   } = useMaci();
   const [latestOnChainPollId, setLatestOnChainPollId] = useState<string | null>(
-    null
+    null,
   );
 
   const [data, setData] = useState<VoteData | null>(null);
@@ -498,8 +518,12 @@ export default function VotePage({ params }: Props) {
   const [detectedPollId, setDetectedPollId] = useState<string | null>(null);
   const [tallying, setTallying] = useState(false);
   const [tallyStatus, setTallyStatus] = useState("");
-  const [detectedOptionIndex, setDetectedOptionIndex] = useState<number | null>(null);
-  const [grantedVoiceCredits, setGrantedVoiceCredits] = useState<number | null>(null);
+  const [detectedOptionIndex, setDetectedOptionIndex] = useState<number | null>(
+    null,
+  );
+  const [grantedVoiceCredits, setGrantedVoiceCredits] = useState<number | null>(
+    null,
+  );
   const [pollMaciAddress, setPollMaciAddress] = useState<string | null>(null); // From poll DB
   const [pollStartBlock, setPollStartBlock] = useState<number | null>(null); // From poll DB
   const { fetchMetadata } = useIPFS();
@@ -517,7 +541,7 @@ export default function VotePage({ params }: Props) {
         if (poll && poll.pollIdOnChain !== undefined) {
           const pollIdOnChain = poll.pollIdOnChain.toString();
           console.log(
-            `Found poll for idea ${id}: pollIdOnChain = ${pollIdOnChain}`
+            `Found poll for idea ${id}: pollIdOnChain = ${pollIdOnChain}`,
           );
           setDetectedPollId(pollIdOnChain);
 
@@ -525,7 +549,9 @@ export default function VotePage({ params }: Props) {
           const voiceCreditsFromDb = poll.maciConfig?.initialVoiceCredits;
           if (voiceCreditsFromDb !== undefined && voiceCreditsFromDb !== null) {
             setGrantedVoiceCredits(Number(voiceCreditsFromDb));
-            console.log(`🎫 Loaded voice credits from DB: ${voiceCreditsFromDb}`);
+            console.log(
+              `🎫 Loaded voice credits from DB: ${voiceCreditsFromDb}`,
+            );
           } else {
             // Default fallback if not configured
             setGrantedVoiceCredits(100);
@@ -551,7 +577,10 @@ export default function VotePage({ params }: Props) {
               console.log(`Found option index for idea ${id}: ${index}`);
               setDetectedOptionIndex(index);
             } else {
-              console.warn(`Idea ${id} not found in poll options`, poll.options);
+              console.warn(
+                `Idea ${id} not found in poll options`,
+                poll.options,
+              );
             }
           }
         } else {
@@ -597,7 +626,9 @@ export default function VotePage({ params }: Props) {
             logo: apiIdea.imgSrc,
             heroImage: apiIdea.imgsSrc?.[0],
             ageLimit: apiIdea.ageLimit ?? 0,
-            layoutItems: apiIdea.descriptionMore?.[0] ? JSON.parse(apiIdea.descriptionMore[0]) : [],
+            layoutItems: apiIdea.descriptionMore?.[0]
+              ? JSON.parse(apiIdea.descriptionMore[0])
+              : [],
           });
         } else if (!cancelled) {
           throw new Error("Failed to load vote data from both IPFS and API");
@@ -639,10 +670,11 @@ export default function VotePage({ params }: Props) {
   async function handleVote(password: string) {
     // Use detected poll ID or fallback to "1"
     const pollIdOnChain = detectedPollId || "1";
-    const poll = await checkPollStatus(pollIdOnChain, pollMaciAddress || undefined);
+    const poll = await checkPollStatus(
+      pollIdOnChain,
+      pollMaciAddress || undefined,
+    );
     // Get startBlock from API (no localStorage)
-
-
 
     // Nonce is now managed by Backend (Redis). We don't need to track it locally.
     const nextNonce = 0; // Dummy value, ignored by backend
@@ -654,7 +686,10 @@ export default function VotePage({ params }: Props) {
 
     // Submit Vote
     if (detectedOptionIndex === null) {
-      showError("Vote Error", "Does not detect correct option index for this idea.");
+      showError(
+        "Vote Error",
+        "Does not detect correct option index for this idea.",
+      );
       return;
     }
     const voteOptionIndex = detectedOptionIndex;
@@ -665,7 +700,7 @@ export default function VotePage({ params }: Props) {
     if (cost > balance) {
       showError(
         "Insufficient Voice Credits",
-        `Cost (${cost}) exceeds your balance (${balance}). Please buy more credits or reduce vote amount.`
+        `Cost (${cost}) exceeds your balance (${balance}). Please buy more credits or reduce vote amount.`,
       );
       return;
     }
@@ -688,7 +723,7 @@ export default function VotePage({ params }: Props) {
         nextNonce,
         password, // Pass password
         pollStartBlock || 0,
-        pollMaciAddress || undefined // Pass maciAddress from poll data
+        pollMaciAddress || undefined, // Pass maciAddress from poll data
       );
       const voteNum = BigInt(voteOptionIndex);
       const weightNum = BigInt(voteAmount || 1);
@@ -704,13 +739,15 @@ export default function VotePage({ params }: Props) {
         pollAddress: poll.pollAddress,
         password,
       });
-      const voteCommitment = poseidon.F.toString(poseidon([
-        voteNum,
-        weightNum,
-        nonceNum,
-        pollAddressNum,
-        passwordBigInt // Use password here
-      ]));
+      const voteCommitment = poseidon.F.toString(
+        poseidon([
+          voteNum,
+          weightNum,
+          nonceNum,
+          pollAddressNum,
+          passwordBigInt, // Use password here
+        ]),
+      );
       const payload = {
         voterAdrress: account, // Note: schema has typo "voterAdrress"
         pollId: poll.pollAddress,
@@ -718,7 +755,10 @@ export default function VotePage({ params }: Props) {
         pollIdOnchain: pollIdOnChain,
       };
       await joinPoll(payload);
-      showSuccess("Vote Success!", `Transaction Hash: ${hash?.substring(0, 20)}...`);
+      showSuccess(
+        "Vote Success!",
+        `Transaction Hash: ${hash?.substring(0, 20)}...`,
+      );
     } catch (e: any) {
       console.error(e);
       showError("Vote Failed", e.message);
@@ -740,7 +780,7 @@ export default function VotePage({ params }: Props) {
     <main className="p-4">
       <h1 className="text-2xl font-bold">Vote #{data.pollId}</h1>
       {/* Debug Panel (Requirement 4.3) */}
-      <DebugPanel
+      {/* <DebugPanel
         detectedPollId={detectedPollId}
         setDetectedPollId={setDetectedPollId}
         latestOnChainPollId={latestOnChainPollId}
@@ -755,7 +795,7 @@ export default function VotePage({ params }: Props) {
         submitProofs={submitProofs}
         pollMaciAddress={pollMaciAddress}
         pollStartBlock={pollStartBlock}
-      />
+      /> */}
       <VoteDetailLayout>
         <VoteLeftPanel>
           {data.heroImage && (
@@ -765,33 +805,39 @@ export default function VotePage({ params }: Props) {
             />
           )}
 
-          {data.layoutItems && data.layoutItems.length > 0 ? (
-            data.layoutItems.map((item: any) => {
-              if (item.type === "text") {
-                return <VoteTextBlock key={item.id} title={item.title} content={item.content} />;
-              }
-              if (item.type === "stack") {
-                const stackImages = item.frames
-                  ?.map((f: any) => f.ipfsUrl || f.url || f.preview) // Handle various potential keys
-                  .filter((url: any) => typeof url === 'string')
-                  .map((url: string) => getImageSrc(url));
-
-                return (
-                  <div key={item.id} className="w-full">
-                    <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
-                    <VoteGallery
-                      screenshots={stackImages}
-                      urlResolver={getImageSrc}
+          {data.layoutItems && data.layoutItems.length > 0
+            ? data.layoutItems.map((item: any) => {
+                if (item.type === "text") {
+                  return (
+                    <VoteTextBlock
+                      key={item.id}
+                      title={item.title}
+                      content={item.content}
                     />
-                  </div>
-                );
-              }
-              return null;
-            })
-          ) : (
-            /* Fallback for old ideas without layoutItems: Show default gallery */
-            !data.heroImage && <VoteGallery />
-          )}
+                  );
+                }
+                if (item.type === "stack") {
+                  const stackImages = item.frames
+                    ?.map((f: any) => f.ipfsUrl || f.url || f.preview) // Handle various potential keys
+                    .filter((url: any) => typeof url === "string")
+                    .map((url: string) => getImageSrc(url));
+
+                  return (
+                    <div key={item.id} className="w-full">
+                      <h3 className="text-xl font-bold uppercase mb-2">
+                        {item.title}
+                      </h3>
+                      <VoteGallery
+                        screenshots={stackImages}
+                        urlResolver={getImageSrc}
+                      />
+                    </div>
+                  );
+                }
+                return null;
+              })
+            : /* Fallback for old ideas without layoutItems: Show default gallery */
+              !data.heroImage && <VoteGallery />}
         </VoteLeftPanel>
 
         <VoteRightPanel
@@ -824,12 +870,13 @@ export default function VotePage({ params }: Props) {
       />
 
       {/* Prize Claim Section (New) */}
-      <div className="mt-8">
+      {/* Prize Claim Section (Moved to polls/[id]) */}
+      {/* <div className="mt-8">
         <PrizeClaimForm
           pollId={detectedPollId || "1"}
           maciAddress={pollMaciAddress || undefined}
         />
-      </div>
+      </div> */}
     </main>
   );
 }

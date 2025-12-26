@@ -40,7 +40,10 @@ export function VotingControls({
   // Handle MACI signup only (separate from join poll)
   const handleMaciSignup = async () => {
     if (!maciAddress) {
-      showError("Missing MACI Address", "Poll doesn't have a MACI address configured.");
+      showError(
+        "Missing MACI Address",
+        "Poll doesn't have a MACI address configured.",
+      );
       return;
     }
 
@@ -50,7 +53,7 @@ export function VotingControls({
       console.log("MACI Signup successful:", result);
       showSuccess(
         "MACI Signup",
-        `Signup successful! State Index: ${result.stateIndex}`
+        `Signup successful! State Index: ${result.stateIndex}`,
       );
     } catch (error: any) {
       console.error("MACI Signup failed:", error);
@@ -84,23 +87,15 @@ export function VotingControls({
             variant="ghost"
             onClick={() => setShowSignup(true)}
             disabled={!maciAddress}
-            className={`rounded-full border px-6 py-3 ${isJoined
+            className={`rounded-full border px-6 py-3 ${
+              isJoined
                 ? "border-emerald-500 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                 : "border-black text-black hover:bg-black/5"
-              }`}
+            }`}
           >
             {isJoined
               ? `Joined (#${joinedPollStateIndex})`
               : "Join Poll (Sign Up)"}
-          </Button>
-          <Button
-            variant="ghost"
-            className="rounded-full border border-black px-6 py-3 text-black hover:bg-black/5"
-          >
-            View ledger
-          </Button>
-          <Button className="rounded-full border border-black bg-black px-6 py-3 text-white hover:bg-black">
-            Buy credit
           </Button>
         </div>
       </div>
@@ -117,4 +112,3 @@ export function VotingControls({
     </>
   );
 }
-
